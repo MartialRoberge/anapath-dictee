@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: anapath-dictee
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: VOXTRAL_API_KEY
+        sync: false
+      - key: MISTRAL_API_KEY
+        sync: false
