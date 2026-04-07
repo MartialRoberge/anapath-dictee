@@ -1,19 +1,27 @@
 """Detection des donnees obligatoires manquantes dans un compte-rendu.
 
-Analyse post-traitement du rapport formate pour identifier les champs
-obligatoires absents, en combinant :
-1. L'extraction des marqueurs [A COMPLETER: xxx] inseres par le LLM (source primaire)
-2. La verification par template organe, conditionnee au contexte tumoral (source secondaire)
+Architecture :
+1. specimen_type.py detecte le type de prelevement et le contexte diagnostique
+2. Ce module utilise ce contexte pour filtrer les champs pertinents
+3. Deux sources de detection :
+   - Marqueurs [A COMPLETER: xxx] inseres par le LLM (source primaire)
+   - Verification par template organe (source secondaire)
 
-La detection est context-aware : les champs specifiques aux tumeurs
-(pTNM, marges, ganglions, emboles, etc.) ne sont signales que si le
-rapport contient effectivement des mots-cles tumoraux.
+Le filtrage est strict : une biopsie ne suggerera quasi rien (juste le
+type histologique), une piece operatoire suggerera tout le panel pronostique.
 """
 
 import re
 
 from models import DonneeManquante
 from templates_organes import get_champs_obligatoires, ChampObligatoire
+from specimen_type import (
+    SpecimenType,
+    DiagnosticContext,
+    detecter_specimen_type,
+    detecter_diagnostic_context,
+    champ_applicable,
+)
 
 # ---------------------------------------------------------------------------
 # Patterns et constantes
@@ -251,6 +259,70 @@ _CHAMPS_EXCLUS_NON_TUMEUR: list[str] = [
     "microsatellitose",
 ]
 
+# ---------------------------------------------------------------------------
+# Champs specifiques aux PIECES OPERATOIRES (pas aux biopsies)
+# ---------------------------------------------------------------------------
+
+_CHAMPS_PIECE_OPERATOIRE_SEUL: list[str] = [
+    "ptnm",
+    "tnm",
+    "staging",
+    "stade",
+    "marge",
+    "limites d'exerese",
+    "limites chirurgicales",
+    "limite",
+    "recoupe",
+    "crm",
+    "circonferentielle",
+    "ganglion",
+    "curage",
+    "ganglionnaire",
+    "sentinelle",
+    "mesorectum",
+    "qualite du mesorectum",
+    "score de regression",
+    "trg",
+    "effraction capsulaire",
+    "extension extra",
+    "rupture capsulaire",
+    "invasion du muscle",
+    "invasion de la graisse",
+    "microsatellitose",
+]
+
+# ---------------------------------------------------------------------------
+# Champs non pertinents pour les lesions pre-cancereuses / in situ
+# (AIN, dysplasie de haut grade, HSIL, CIS, DCIS, LCIS)
+# ---------------------------------------------------------------------------
+
+_CHAMPS_EXCLUS_PRE_CANCEREUX: list[str] = [
+    "ptnm",
+    "tnm",
+    "staging",
+    "stade",
+    "marge",
+    "limites d'exerese",
+    "ganglion",
+    "curage",
+    "ganglionnaire",
+    "embole",
+    "invasion vasculaire",
+    "invasion lympho",
+    "engainement",
+    "perinerveux",
+    "perineural",
+    "taille tumorale",
+    "taille de la tumeur",
+    "invasion pleurale",
+    "extension extra",
+    "effraction capsulaire",
+    "score de regression",
+    "microsatellitose",
+    "tumour budding",
+    "composante in situ",
+]
+
 
 # ---------------------------------------------------------------------------
 # Fonctions utilitaires
@@ -383,6 +455,67 @@ def _est_contexte_tumoral(rapport_normalise: str) -> bool:
     return False
 
 
+def _est_biopsie(rapport_normalise: str) -> bool:
+    """Detecte si le rapport concerne une biopsie (pas une piece operatoire)."""
+    mots_biopsie: list[str] = [
+        "biopsie", "biopsique", "carotte", "fragment biopsique",
+        "punch", "microbiopsie", "macrobiopsie",
+    ]
+    mots_piece: list[str] = [
+        "piece operatoire", "tumorectomie", "mastectomie", "colectomie",
+        "gastrectomie", "nephrectomie", "prostatectomie", "lobectomie",
+        "pneumonectomie", "thyroidectomie", "hysterectomie", "exerese",
+        "amputation", "resection",
+    ]
+    has_biopsie: bool = any(m in rapport_normalise for m in mots_biopsie)
+    has_piece: bool = any(m in rapport_normalise for m in mots_piece)
+    # Si les deux sont presents, c'est probablement une piece
+    if has_piece:
+        return False
+    return has_biopsie or not has_piece
+
+
+def _est_pre_cancereux(rapport_normalise: str) -> bool:
+    """Detecte si le diagnostic est pre-cancereux / in situ (pas infiltrant)."""
+    mots_pre_cancereux: list[str] = [
+        "ain1", "ain2", "ain3",
+        "hsil", "lsil",
+        "dysplasie de haut grade", "dysplasie de bas grade",
+        "neoplasie intraepitheliale",
+        "in situ",
+        "carcinome in situ",
+        "dcis", "lcis",
+        "hyperplasie", "metaplasie",
+    ]
+    mots_infiltrant: list[str] = [
+        "infiltrant", "infiltrante", "invasif", "invasive",
+        "carcinome infiltrant", "adenocarcinome infiltrant",
+    ]
+    texte_sans_negations: str = _masquer_negations(rapport_normalise)
+    has_pre: bool = any(m in rapport_normalise for m in mots_pre_cancereux)
+    has_infiltrant: bool = any(m in texte_sans_negations for m in mots_infiltrant)
+    # "absence de carcinome infiltrant" ne compte PAS comme infiltrant
+    return has_pre and not has_infiltrant
+
+
+def _est_champ_piece_operatoire_seul(nom_champ: str) -> bool:
+    """Verifie si un champ ne s'applique qu'aux pieces operatoires."""
+    nom_normalise: str = _normaliser_texte(nom_champ)
+    for exclu in _CHAMPS_PIECE_OPERATOIRE_SEUL:
+        if exclu in nom_normalise:
+            return True
+    return False
+
+
+def _est_champ_pre_cancereux_exclu(nom_champ: str) -> bool:
+    """Verifie si un champ est non pertinent pour les lesions pre-cancereuses."""
+    nom_normalise: str = _normaliser_texte(nom_champ)
+    for exclu in _CHAMPS_EXCLUS_PRE_CANCEREUX:
+        if exclu in nom_normalise:
+            return True
+    return False
+
+
 def _est_champ_tumeur_seul(nom_champ: str) -> bool:
     """Verifie si un champ est specifique au contexte tumoral.
 
@@ -501,38 +634,42 @@ def detecter_donnees_manquantes(
         Liste de DonneeManquante pour chaque champ obligatoire absent.
     """
     rapport_normalise: str = _normaliser_texte(rapport)
-    contexte_tumoral: bool = _est_contexte_tumoral(rapport_normalise)
+
+    # Detection du contexte via le module specimen_type
+    specimen: SpecimenType = detecter_specimen_type(rapport)
+    contexte: DiagnosticContext = detecter_diagnostic_context(rapport)
 
     manquantes: list[DonneeManquante] = []
     champs_deja_signales: set[str] = set()
 
-    # ----- Passe 1 : marqueurs [A COMPLETER] (source primaire) -----
-    # Toujours inclus, quel que soit le contexte : le LLM a decide que
-    # ces champs sont pertinents.
+    # ----- Passe 1 : marqueurs [A COMPLETER] du LLM -----
     marqueurs: list[DonneeManquante] = extraire_marqueurs_a_completer(rapport)
     for marqueur in marqueurs:
         nom_normalise: str = _normaliser_texte(marqueur.champ)
+
+        # Filtrage par le module specimen_type
+        if not champ_applicable(marqueur.champ, specimen, contexte):
+            continue
+
         if nom_normalise not in champs_deja_signales:
             manquantes.append(marqueur)
             champs_deja_signales.add(nom_normalise)
 
-    # ----- Passe 2 : verification par template organe (source secondaire) -----
+    # ----- Passe 2 : verification par template organe -----
     champs: list[ChampObligatoire] = get_champs_obligatoires(organe)
 
     for champ in champs:
         if not champ.obligatoire:
             continue
 
-        # En contexte non-tumoral, ignorer les champs specifiques aux tumeurs
-        if not contexte_tumoral and _est_champ_tumeur_seul(champ.nom):
+        # Filtrage par le module specimen_type
+        if not champ_applicable(champ.nom, specimen, contexte):
             continue
 
-        # Verifier si le champ est deja signale par un marqueur [A COMPLETER]
         nom_normalise_champ: str = _normaliser_texte(champ.nom)
         if nom_normalise_champ in champs_deja_signales:
             continue
 
-        # Verifier si le champ est present dans le rapport
         champ_present: bool = _champ_present_dans_rapport(champ, rapport_normalise)
 
         if not champ_present:
@@ -547,3 +684,39 @@ def detecter_donnees_manquantes(
             champs_deja_signales.add(nom_normalise_champ)
 
     return manquantes
+
+
+def calculer_score_completude(
+    rapport: str, organe: str
+) -> dict[str, int | float]:
+    """Calcule le score de completude INCa du rapport.
+
+    Retourne le nombre de champs obligatoires presents sur le total,
+    et le pourcentage de completude.
+    """
+    rapport_normalise: str = _normaliser_texte(rapport)
+    contexte_tumoral: bool = _est_contexte_tumoral(rapport_normalise)
+
+    champs: list[ChampObligatoire] = get_champs_obligatoires(organe)
+    total: int = 0
+    presents: int = 0
+
+    for champ in champs:
+        if not champ.obligatoire:
+            continue
+
+        if not contexte_tumoral and _est_champ_tumeur_seul(champ.nom):
+            continue
+
+        total += 1
+        if _champ_present_dans_rapport(champ, rapport_normalise):
+            presents += 1
+
+    pourcentage: float = (presents / total * 100) if total > 0 else 100.0
+
+    return {
+        "score": presents,
+        "total_champs": total,
+        "champs_presents": presents,
+        "pourcentage": round(pourcentage, 1),
+    }

@@ -21,29 +21,31 @@ MIME_TYPES: dict[str, str] = {
 
 
 def _detect_mime_type(filename: str) -> str:
-    """Détecte le MIME type à partir de l'extension du fichier."""
+    """Detecte le MIME type a partir de l'extension du fichier."""
     ext: str = ""
     if "." in filename:
         ext = "." + filename.rsplit(".", 1)[-1].lower()
     return MIME_TYPES.get(ext, "audio/webm")
 
 
-def _build_context_bias_csv() -> str:
-    """Construit la chaîne context_bias au format CSV pour Voxtral.
+def _adapt_term_for_context_bias(term: str) -> str:
+    """Adapte un terme pour le format context_bias Voxtral.
 
     Voxtral exige des termes sans espaces ni virgules (pattern ^[^,\\s]+$).
-    Les termes multi-mots sont transformés en un seul mot avec tiret,
-    ou supprimés s'ils ne peuvent pas être adaptés.
+    Les espaces sont remplaces par des tirets, les virgules supprimees.
     """
+    adapted: str = term.strip().replace(" ", "-")
+    adapted = adapted.replace(",", "")
+    return adapted
+
+
+def _build_context_bias_csv() -> str:
+    """Construit la chaine context_bias au format CSV pour Voxtral."""
     terms: list[str] = get_context_bias()
     valid_terms: list[str] = []
 
     for term in terms:
-        # Remplacer les espaces par des tirets pour les termes composés
-        adapted: str = term.strip().replace(" ", "-")
-        # Supprimer les virgules
-        adapted = adapted.replace(",", "")
-        # Vérifier qu'il reste quelque chose et pas d'espace
+        adapted: str = _adapt_term_for_context_bias(term)
         if adapted and " " not in adapted:
             valid_terms.append(adapted)
 
@@ -52,10 +54,6 @@ def _build_context_bias_csv() -> str:
 
 async def transcribe_audio(audio_bytes: bytes, filename: str) -> str:
     """Transcrit un fichier audio via Voxtral avec biais de vocabulaire ACP.
-
-    Supporte les formats : webm, mp3, mp4, m4a, mov, wav, ogg, flac, aac.
-    Utilise le paramètre context_bias (CSV) pour orienter la reconnaissance
-    vers les termes médicaux d'anatomopathologie.
 
     Args:
         audio_bytes: Contenu binaire du fichier audio.
@@ -77,7 +75,7 @@ async def transcribe_audio(audio_bytes: bytes, filename: str) -> str:
         form_data["context_bias"] = context_csv
 
     async with httpx.AsyncClient(timeout=180.0) as client:
-        response = await client.post(
+        response: httpx.Response = await client.post(
             VOXTRAL_API_URL,
             headers={"Authorization": f"Bearer {settings.voxtral_api_key}"},
             files={"file": (filename, audio_bytes, mime_type)},

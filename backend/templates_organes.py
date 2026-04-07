@@ -380,10 +380,19 @@ TEMPLATE_POUMON: TemplateOrgane = TemplateOrgane(
         "- pTNM : pT[X] pN[X] (AJCC 8e édition)"
     ),
     notes_specifiques=(
-        "Pour les adénocarcinomes : préciser tous les patterns et le pourcentage de chacun, le pattern prédominant détermine le pronostic. "
-        "PD-L1 TPS obligatoire pour tout carcinome non à petites cellules avancé. "
-        "Panel de biologie moléculaire pour adénocarcinomes avancés : EGFR, ALK, ROS1, KRAS G12C, BRAF V600E, METex14, RET, NTRK, HER2. "
-        "Invasion pleurale à évaluer par coloration élastique si doute."
+        "PIECES OPERATOIRES — STATIONS GANGLIONNAIRES IASLC (obligatoire) :\n"
+        "Detailler les ganglions PAR STATION avec le format : 'Loge X : 0/N ganglion(s)'\n"
+        "Stations : 2R/2L (paratracheaux sup.), 3 (mediastin ant.), 4R (Barety) / 4L, "
+        "5 (aortopulmonaire), 7 (sous-carinaires), 8 (para-oesophagiens), "
+        "9 (ligament triangulaire), 10 (hilaires), 11 (interlobaires), "
+        "12-13 (peribronchiques), 14 (sous-segmentaires).\n"
+        "Mentionner systematiquement : coupe bronchique [saine/envahie], coupes vasculaires [saines/envahies].\n\n"
+        "BIOPSIES : TTF1, PD-L1 (clone QR1 ou 22C3), ALK (clone 1A4) systematiques pour les ADK.\n"
+        "Panel moleculaire ADK avances : EGFR, ALK, ROS1, KRAS G12C, BRAF V600E, METex14, RET, NTRK, HER2.\n"
+        "Marqueurs neuroendocrines si suspicion : Chromogranine A, Synaptophysine, CD56, Ki67.\n"
+        "p40 pour confirmer un carcinome epidermoide.\n\n"
+        "Adenocarcinomes : preciser TOUS les patterns et le pourcentage de chacun.\n"
+        "PD-L1 TPS obligatoire pour tout CBNPC avance. Invasion pleurale : coloration elastique si doute."
     ),
     champs_obligatoires=[
         ChampObligatoire(
@@ -510,10 +519,17 @@ TEMPLATE_PROSTATE: TemplateOrgane = TemplateOrgane(
         "- pTNM : pT[X] pN[X] (AJCC 8e édition)"
     ),
     notes_specifiques=(
-        "Pour les biopsies : nombre de carottes positives/total, longueur tumorale, score de Gleason par carotte. "
-        "Grade ISUP : 1 (3+3), 2 (3+4), 3 (4+3), 4 (4+4 ou 3+5 ou 5+3), 5 (4+5 ou 5+4 ou 5+5). "
-        "L'extension extraprostatique et le statut des marges sont les facteurs pronostiques majeurs sur pièce. "
-        "IHC (AMACR, p63, CK5/6) si diagnostic incertain sur biopsie."
+        "BIOPSIES PROSTATIQUES — FORMAT TABLEAU OBLIGATOIRE :\n"
+        "Generer un tableau avec les colonnes :\n"
+        "| Siege (blocs) | Longueur biopsie (mm) | Longueur cancer (mm) | Nb biopsies +/total | Score de Gleason | EPN | Extension EP |\n"
+        "Lignes : Droite (Base, PM, Apex, TOTAL) puis Gauche (Base, PM, Apex, TOTAL) puis Cible si applicable.\n"
+        "Abreviations standard : E=Envahi, S=Sain, P=Penetre, IC=IntraCapsulaire, EP=ExtraProstatique, "
+        "EPN=Engainement PeriNerveux, NV=Non Vu, PIN=Neoplasie IntraEpitheliale Prostatique, PM=Partie Moyenne.\n\n"
+        "CONCLUSION standard : 'Adenocarcinome prostatique acineux [bien/moyennement/peu] differencie, "
+        "de score de Gleason X (X+X), histopronostic ISUP groupe X, observe au niveau des biopsies [sites]. "
+        "Phenotype IHC : glandes tumorales p504s+/p63-.'\n\n"
+        "Grade ISUP : 1 (3+3), 2 (3+4), 3 (4+3), 4 (4+4 ou 3+5 ou 5+3), 5 (4+5 ou 5+4 ou 5+5).\n"
+        "IHC si diagnostic incertain : p504s (AMACR/racemase) + p63. Phenotype tumoral : p504s+/p63-."
     ),
     champs_obligatoires=[
         ChampObligatoire(
@@ -2708,6 +2724,107 @@ TEMPLATE_CANAL_ANAL: TemplateOrgane = TemplateOrgane(
 # ===========================================================================
 # REGISTRE DE TOUS LES TEMPLATES
 # ===========================================================================
+# ---------------------------------------------------------------------------
+# 22. VESICULE BILIAIRE (Gallbladder)
+# ---------------------------------------------------------------------------
+TEMPLATE_VESICULE_BILIAIRE: TemplateOrgane = TemplateOrgane(
+    organe="vesicule_biliaire",
+    nom_affichage="Vesicule biliaire",
+    sous_types=["cholecystectomie", "piece operatoire"],
+    mots_cles_detection=["vesicule", "vesicule biliaire", "cholecystectomie", "biliaire", "cystique"],
+    marqueurs_ihc=[],
+    systeme_staging="TNM 8e edition - Vesicule biliaire (AJCC/UICC)",
+    template_macroscopie=(
+        "Piece de cholecystectomie mesurant [X] cm de longueur. "
+        "Sereuse [lisse/irreguliere]. "
+        "A l'ouverture, muqueuse [d'aspect normal/epaissie/congestive/ulceree]. "
+        "Contenu : [calcul(s) de [X] mm / bile epaisse / vide]. "
+        "Paroi d'epaisseur [X] mm [reguliere/irreguliere]. "
+        "[Presence/Absence] de lesion nodulaire ou tumorale."
+    ),
+    template_conclusion=(
+        "Cholecystite [chronique/aigue] [lithiasique/alithiasique].\n"
+        "- Muqueuse : [aspects de cholecystite chronique / metaplasie pylorique / dysplasie]\n"
+        "- Paroi : [fibrose / hypertrophie musculaire / sinus de Rokitansky-Aschoff]\n"
+        "- [Absence de lesion tumorale / Adenocarcinome infiltrant si tumoral]"
+    ),
+    notes_specifiques=(
+        "La cholecystectomie est l'un des prelevements les plus frequents. "
+        "Toujours verifier la muqueuse a la recherche de dysplasie ou de carcinome "
+        "incidental (decouverte fortuite sur piece de cholecystectomie pour lithiase). "
+        "En cas de tumeur : evaluer le pT (profondeur d'infiltration dans la paroi), "
+        "la marge cystique, et le lit hepatique si present."
+    ),
+    champs_obligatoires=[
+        ChampObligatoire(
+            nom="Etat de la muqueuse",
+            description="Aspect de la muqueuse vesiculaire (normal, cholecystite, metaplasie, dysplasie)",
+            section="microscopie",
+            mots_cles_detection=["muqueuse", "cholecystite", "metaplasie", "dysplasie", "inflammation"],
+            exemple_formulation="Muqueuse vesiculaire sieged d'une cholecystite chronique avec metaplasie pylorique",
+            obligatoire=True,
+        ),
+        ChampObligatoire(
+            nom="Presence de calculs",
+            description="Presence ou absence de calculs biliaires",
+            section="macroscopie",
+            mots_cles_detection=["calcul", "lithiase", "lithiasique", "calculs"],
+            exemple_formulation="Presence de multiples calculs de cholesterol mesurant de 2 a 8 mm",
+            obligatoire=True,
+        ),
+    ],
+)
+
+
+# ---------------------------------------------------------------------------
+# 23. APPENDICE (Appendix)
+# ---------------------------------------------------------------------------
+TEMPLATE_APPENDICE: TemplateOrgane = TemplateOrgane(
+    organe="appendice",
+    nom_affichage="Appendice",
+    sous_types=["appendicectomie", "piece operatoire"],
+    mots_cles_detection=["appendice", "appendicectomie", "appendiculaire", "caecal"],
+    marqueurs_ihc=["Chromogranine A", "Synaptophysine", "Ki-67"],
+    systeme_staging="TNM 8e edition - Appendice (AJCC/UICC)",
+    template_macroscopie=(
+        "Piece d'appendicectomie mesurant [X] cm de longueur et [X] cm de diametre. "
+        "Sereuse [lisse/congestive/recouverte de fausses membranes]. "
+        "A la coupe, lumiere [libre/contenant un stercolithe/obliteree]. "
+        "Paroi d'epaisseur [reguliere/irreguliere], mesurant [X] mm. "
+        "Base de section [saine/infiltree]."
+    ),
+    template_conclusion=(
+        "Appendicite [aigue suppuree / aigue catarrhale / chronique / gangrenee / perforee].\n"
+        "- [Presence/Absence] de peritonite associee\n"
+        "- [Absence de tumeur / Tumeur neuroendocrine de [X] mm si applicable]"
+    ),
+    notes_specifiques=(
+        "Toujours verifier la presence d'une tumeur neuroendocrine incidentale (carcinoide). "
+        "Si tumeur neuroendocrine : mesurer la taille, evaluer l'infiltration de la meso-appendice, "
+        "verifier la base de section. Si > 2 cm ou meso-appendice infiltre = hemicolectomie droite. "
+        "Classification OMS 2019 pour les tumeurs neuroendocrines de l'appendice."
+    ),
+    champs_obligatoires=[
+        ChampObligatoire(
+            nom="Type d'appendicite",
+            description="Type d'inflammation appendiculaire (catarrhale, suppuree, gangrenee, perforee)",
+            section="microscopie",
+            mots_cles_detection=["appendicite", "suppuree", "catarrhale", "gangrenee", "perforee", "inflammation"],
+            exemple_formulation="Appendicite aigue suppuree avec infiltration transmurale de polynucleaires",
+            obligatoire=True,
+        ),
+        ChampObligatoire(
+            nom="Recherche de tumeur",
+            description="Presence ou absence de tumeur neuroendocrine incidentale",
+            section="microscopie",
+            mots_cles_detection=["tumeur", "neuroendocrine", "carcinoide", "absence de tumeur", "absence de lesion tumorale"],
+            exemple_formulation="Absence de lesion tumorale",
+            obligatoire=True,
+        ),
+    ],
+)
+
+
 TOUS_LES_TEMPLATES: list[TemplateOrgane] = [
     TEMPLATE_SEIN,
     TEMPLATE_COLON_RECTUM,
@@ -2730,6 +2847,8 @@ TOUS_LES_TEMPLATES: list[TemplateOrgane] = [
     TEMPLATE_SARCOME,
     TEMPLATE_SNC,
     TEMPLATE_CANAL_ANAL,
+    TEMPLATE_VESICULE_BILIAIRE,
+    TEMPLATE_APPENDICE,
 ]
 
 _INDEX_PAR_ORGANE: dict[str, TemplateOrgane] = {t.organe: t for t in TOUS_LES_TEMPLATES}

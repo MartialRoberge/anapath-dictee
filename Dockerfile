@@ -10,6 +10,11 @@ RUN npm run build
 FROM python:3.12-slim
 WORKDIR /app
 
+# Install system dependencies for asyncpg
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install Python dependencies
 COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
@@ -19,6 +24,10 @@ COPY backend/ ./
 
 # Copy frontend build
 COPY --from=frontend-build /app/frontend/dist ../frontend/dist
+
+# Copy alembic config
+COPY alembic.ini ./alembic.ini
+COPY alembic/ ./alembic/
 
 EXPOSE 8000
 

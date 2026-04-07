@@ -1,3 +1,8 @@
+import { useState, useCallback, useRef, useEffect } from "react";
+import { Mic, Upload, RotateCcw, RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
 import { useSoundFeedback } from "../hooks/useSoundFeedback";
 import {
@@ -6,15 +11,13 @@ import {
   iterateReport,
 } from "../services/api";
 import type { DonneeManquante } from "../services/api";
-import { useState, useCallback, useRef, useEffect } from "react";
 import Pipeline from "./Pipeline";
 import type { PipelineStep } from "./Pipeline";
 
 const ACCEPTED_EXTENSIONS = ".mp3,.mp4,.m4a,.mov,.wav,.webm,.ogg,.flac,.aac";
-const ACCEPTED_MIME =
-  "audio/*,video/mp4,video/quicktime,video/x-m4v";
+const ACCEPTED_MIME = "audio/*,video/mp4,video/quicktime,video/x-m4v";
 
-interface Props {
+interface RecorderPanelProps {
   rawTranscription: string | null;
   report: string | null;
   onTranscription: (raw: string) => void;
@@ -52,7 +55,7 @@ export default function RecorderPanel({
   onRawChange,
   onReformat,
   reformatting,
-}: Props) {
+}: RecorderPanelProps) {
   const { state, audioBlob, duration, startRecording, stopRecording, reset } =
     useAudioRecorder();
   const { playStart, playStop, playStepDone, playAllDone } =
@@ -71,9 +74,20 @@ export default function RecorderPanel({
     reportRef.current = report;
   }, [report]);
 
-  const isIteration = report !== null;
+  // Reset interne quand le parent reset (report passe a null)
+  useEffect(() => {
+    if (report === null && rawTranscription === null) {
+      reset();
+      setError(null);
+      setStep("idle");
+      setDroppedFileName(null);
+      processedBlobRef.current = null;
+    }
+  }, [report, rawTranscription, reset]);
 
-  // ─── Shared processing pipeline ───────────────────────────────────
+  const isIteration = report !== null;
+  const isRecording = state === "recording";
+
   const processAudioBlob = useCallback(
     async (blob: Blob, filename: string) => {
       setProcessing(true);
@@ -128,7 +142,7 @@ export default function RecorderPanel({
     [onTranscription, onFormatted, playStepDone, playAllDone]
   );
 
-  // ─── Push-to-talk handlers ────────────────────────────────────────
+  // Push-to-talk handlers
   const handleStart = useCallback(async () => {
     if (processing || holdingRef.current || state === "recording") return;
     holdingRef.current = true;
@@ -170,7 +184,7 @@ export default function RecorderPanel({
     };
   }, [handleStart, handleStop]);
 
-  // Process recorded audio blob (dictaphone only, NOT file drops)
+  // Process recorded audio blob
   useEffect(() => {
     if (state !== "stopped" || !audioBlob) return;
     if (processedBlobRef.current === audioBlob) return;
@@ -179,11 +193,10 @@ export default function RecorderPanel({
     processAudioBlob(audioBlob, "recording.webm");
   }, [state, audioBlob, processAudioBlob, processing]);
 
-  // ─── File drop / upload handlers ──────────────────────────────────
+  // File handlers
   const handleFileSelected = useCallback(
     (file: File) => {
       if (processing) return;
-      // Ne PAS toucher processedBlobRef — il ne concerne que le dictaphone
       processAudioBlob(file, file.name);
     },
     [processing, processAudioBlob]
@@ -216,7 +229,6 @@ export default function RecorderPanel({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) handleFileSelected(file);
-      // Reset input so same file can be re-selected
       e.target.value = "";
     },
     [handleFileSelected]
@@ -231,8 +243,6 @@ export default function RecorderPanel({
     onReset();
   };
 
-  const isRecording = state === "recording";
-
   const recHint = isRecording
     ? formatDuration(duration)
     : processing
@@ -246,39 +256,53 @@ export default function RecorderPanel({
             : "Maintenir espace pour dicter";
 
   return (
-    <div className="recorder-panel">
+    <div className="flex flex-col gap-3">
       {/* Push-to-talk zone */}
       <div
-        className={`rec-zone ${isRecording ? "rec-zone--active" : ""}`}
+        className={cn(
+          "relative flex h-[90px] cursor-pointer select-none items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition-all",
+          isRecording
+            ? "border-solid border-primary"
+            : "border-border hover:border-primary/50"
+        )}
         onMouseDown={handleStart}
         onMouseUp={handleStop}
         onMouseLeave={handleStop}
         onTouchStart={handleStart}
         onTouchEnd={handleStop}
       >
-        <div className="rec-zone-content">
-          <svg
-            className="rec-mic-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        <div className="relative z-10 flex flex-col items-center gap-1.5">
+          <Mic
+            className={cn(
+              "h-6 w-6 transition-colors",
+              isRecording ? "text-primary" : "text-muted-foreground"
+            )}
+          />
+          <span
+            className={cn(
+              "text-xs tabular-nums transition-colors",
+              isRecording
+                ? "font-semibold text-primary"
+                : "text-muted-foreground"
+            )}
           >
-            <rect x="9" y="1" width="6" height="11" rx="3" />
-            <path d="M5 10a7 7 0 0 0 14 0" />
-            <line x1="12" y1="17" x2="12" y2="21" />
-            <line x1="8" y1="21" x2="16" y2="21" />
-          </svg>
-          <span className="rec-hint">{recHint}</span>
+            {recHint}
+          </span>
         </div>
-        {isRecording && <div className="rec-glow" />}
+        {isRecording && (
+          <div className="absolute inset-0 animate-pulse-glow rounded-xl bg-gradient-radial from-primary/10 to-transparent" />
+        )}
       </div>
 
-      {/* Drop zone for audio files */}
+      {/* Drop zone */}
       <div
-        className={`drop-zone ${dragOver ? "drop-zone--active" : ""} ${processing ? "drop-zone--disabled" : ""}`}
+        className={cn(
+          "flex h-[58px] cursor-pointer select-none items-center justify-center gap-2.5 rounded-lg border border-dashed transition-all",
+          dragOver
+            ? "border-solid border-primary bg-primary/5"
+            : "border-border hover:border-muted-foreground hover:bg-accent/50",
+          processing && "pointer-events-none opacity-50"
+        )}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -289,74 +313,92 @@ export default function RecorderPanel({
           type="file"
           accept={`${ACCEPTED_EXTENSIONS},${ACCEPTED_MIME}`}
           onChange={handleFileInputChange}
-          className="drop-zone-input"
+          className="hidden"
         />
-        <div className="drop-zone-content">
-          <svg
-            className="drop-zone-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        <Upload
+          className={cn(
+            "h-4 w-4 shrink-0",
+            dragOver ? "text-primary" : "text-muted-foreground"
+          )}
+        />
+        <div className="flex flex-col">
+          <span
+            className={cn(
+              "text-xs",
+              dragOver ? "font-semibold text-primary" : "text-muted-foreground"
+            )}
           >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="17 8 12 3 7 8" />
-            <line x1="12" y1="3" x2="12" y2="15" />
-          </svg>
-          <span className="drop-zone-text">
             {droppedFileName
               ? droppedFileName
               : dragOver
                 ? "Deposer le fichier"
                 : "Glisser un fichier audio ou cliquer"}
           </span>
-          <span className="drop-zone-formats">
+          <span className="text-[0.6rem] text-muted-foreground/60">
             MP3, MP4, M4A, MOV, WAV, OGG, FLAC
           </span>
         </div>
       </div>
 
-      <div className="section-label">Workflow</div>
-      <Pipeline currentStep={step} isIteration={isIteration} />
-      {error && <p className="error-message">{error}</p>}
-
-      <div className="section-label-row">
-        <span className="section-label" style={{ margin: 0 }}>
-          Transcription brute
+      {/* Workflow */}
+      <div className="space-y-2">
+        <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-muted-foreground">
+          Workflow
         </span>
-        {rawTranscription && (
-          <button
-            className="btn-reformat"
-            onClick={() => onReformat(rawTranscription)}
-            disabled={reformatting}
-            title="Relancer la mise en forme"
-          >
-            {reformatting ? "..." : "\u21BB"}
-          </button>
-        )}
+        <Pipeline currentStep={step} isIteration={isIteration} />
       </div>
-      <div className="transcription-raw">
-        {rawTranscription ? (
-          <textarea
-            className="raw-textarea"
-            value={rawTranscription}
-            onChange={(e) => onRawChange(e.target.value)}
-          />
-        ) : (
-          <p className="placeholder-text">
-            La transcription apparaitra ici...
-          </p>
-        )}
+
+      {error && (
+        <div className="rounded-lg bg-destructive/10 px-3 py-2.5 text-sm text-destructive">
+          {error}
+        </div>
+      )}
+
+      {/* Raw transcription */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-muted-foreground">
+            Transcription brute
+          </span>
+          {rawTranscription && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onReformat(rawTranscription)}
+              disabled={reformatting}
+              title="Relancer la mise en forme"
+              className="h-6 w-6"
+            >
+              <RefreshCw
+                className={cn("h-3.5 w-3.5", reformatting && "animate-spin")}
+              />
+            </Button>
+          )}
+        </div>
+        <div className="rounded-lg border bg-card">
+          {rawTranscription ? (
+            <Textarea
+              value={rawTranscription}
+              onChange={(e) => onRawChange(e.target.value)}
+              className="min-h-[80px] resize-y border-0 bg-transparent text-[0.82rem] leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          ) : (
+            <p className="px-3 py-3 text-sm italic text-muted-foreground/50">
+              La transcription apparaitra ici...
+            </p>
+          )}
+        </div>
       </div>
 
       {step === "done" && (
-        <div className="recorder-bottom-actions">
-          <button className="btn btn-new" onClick={handleReset}>
-            Nouveau compte-rendu
-          </button>
-        </div>
+        <Button
+          variant="secondary"
+          className="w-full"
+          onClick={handleReset}
+        >
+          <RotateCcw className="h-4 w-4" />
+          Nouveau compte-rendu
+        </Button>
       )}
     </div>
   );

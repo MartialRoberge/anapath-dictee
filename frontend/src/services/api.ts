@@ -112,6 +112,99 @@ export async function getSections(
   return data;
 }
 
+export interface AdicapResult {
+  code: string;
+  prelevement: string;
+  prelevement_code: string;
+  technique: string;
+  technique_code: string;
+  organe: string;
+  organe_code: string;
+  lesion: string;
+  lesion_code: string;
+}
+
+export interface CompletudeResult {
+  score: number;
+  total_champs: number;
+  champs_presents: number;
+  pourcentage: number;
+}
+
+export async function getAdicap(
+  formattedReport: string,
+  organeDetecte: string
+): Promise<AdicapResult> {
+  const response = await fetch(`${API_BASE}/adicap`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      formatted_report: formattedReport,
+      organe_detecte: organeDetecte,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
+    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function getCompletude(
+  formattedReport: string,
+  organeDetecte: string
+): Promise<CompletudeResult> {
+  const response = await fetch(`${API_BASE}/completude`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      formatted_report: formattedReport,
+      organe_detecte: organeDetecte,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
+    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export interface SnomedCode {
+  code: string;
+  display: string;
+  system: string;
+}
+
+export interface SnomedResult {
+  topography: SnomedCode;
+  morphology: SnomedCode;
+}
+
+export async function getSnomed(
+  formattedReport: string,
+  organeDetecte: string
+): Promise<SnomedResult> {
+  const response = await fetch(`${API_BASE}/snomed`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      formatted_report: formattedReport,
+      organe_detecte: organeDetecte,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
+    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
 export async function exportDocx(
   formattedReport: string,
   title?: string

@@ -1,11 +1,223 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 57%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 20%;
+    --success: 142 71% 45%;
+    --success-foreground: 142 71% 95%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 224 30% 8%;
+    --foreground: 210 40% 92%;
+    --card: 224 25% 11%;
+    --card-foreground: 210 40% 92%;
+    --popover: 224 25% 11%;
+    --popover-foreground: 210 40% 92%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 224 30% 8%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 92%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 92%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 95%;
+    --success: 142 71% 45%;
+    --success-foreground: 142 71% 95%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 217 91% 60%;
+  }
 }
 
-body {
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    margin: 0;
+  }
+}
+
+/* Scrollbar styling for dark mode */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 3px;
+  }
+}
+
+/* ============================================================
+   Medical report typography
+   Reproduit le format des CR anatomopathologiques de reference :
+   - Arial 10pt, justifie
+   - Titres : centres, gras, soulignes, majuscules
+   - Conclusion : centree, gras, soulignee
+   - Renseignements cliniques : italique
+   - Tableaux IHC : grille propre
+   ============================================================ */
+
+.report-typography {
+  font-family: Arial, Helvetica, "Liberation Sans", sans-serif;
+  font-size: 10pt;
+  line-height: 1.7;
+  text-align: justify;
+  color: hsl(var(--foreground));
+}
+
+.report-typography strong {
+  font-weight: 700;
+}
+
+.report-typography u {
+  text-decoration: underline;
+}
+
+/* Titre principal et conclusion : **__TEXTE__** -> gras souligne majuscules, aligne a GAUCHE */
+.report-typography strong u {
+  text-transform: uppercase;
+  display: block;
+  text-align: left;
+  margin: 8px 0 12px;
+  font-size: 10pt;
+  letter-spacing: 0.02em;
+}
+
+.report-typography em {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* Headers markdown */
+.report-typography h1,
+.report-typography h2,
+.report-typography h3 {
+  font-family: Arial, Helvetica, "Liberation Sans", sans-serif;
+  color: hsl(var(--foreground));
+}
+
+.report-typography h1 {
+  font-size: 10pt;
+  text-transform: uppercase;
+  text-decoration: underline;
+  font-weight: 700;
+  text-align: left;
+  margin: 12px 0 16px;
+}
+
+.report-typography h2 {
+  font-size: 10pt;
+  text-decoration: underline;
+  font-weight: 700;
+  margin: 16px 0 6px;
+}
+
+.report-typography h3 {
+  font-size: 10pt;
+  font-weight: 700;
+  margin: 12px 0 4px;
+}
+
+.report-typography p {
+  margin: 4px 0;
+}
+
+/* Listes a puces (prelevements multiples) */
+.report-typography ol,
+.report-typography ul {
+  margin: 6px 0;
+  padding-left: 24px;
+}
+
+.report-typography li {
+  margin: 3px 0;
+}
+
+/* Separateur horizontal */
+.report-typography hr {
+  border: none;
+  border-top: 1px solid hsl(var(--border));
+  margin: 16px 0;
+}
+
+/* Tableaux IHC */
+.report-typography table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 10pt;
+}
+
+.report-typography th,
+.report-typography td {
+  border: 1px solid hsl(var(--border));
+  padding: 6px 12px;
+  text-align: left;
+}
+
+.report-typography th {
+  background: hsl(var(--muted));
+  font-weight: 700;
+  font-size: 10pt;
+}
+
+/* Indentation pour sous-elements */
+.report-typography blockquote {
+  margin: 4px 0 4px 20px;
+  padding: 0;
+  border: none;
+  font-style: normal;
+}
+
+/* Spin animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 0.7s linear infinite;
 }

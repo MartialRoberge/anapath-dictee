@@ -3,15 +3,22 @@
 Utilise Mistral Large pour structurer les dictees vocales brutes en
 comptes-rendus conformes aux standards ACP, avec detection d'organe,
 injection de template et marqueurs de donnees manquantes.
+
+Architecture : chaque fonction fait UNE action.
+- corriger_et_detecter : corrections phonetiques + detection organe
+- _build_system_prompt_with_template : injection du template organe
+- _build_user_prompt_format : construction du message utilisateur
+- _call_mistral : appel API Mistral Large
+- format_transcription : orchestration de la mise en forme initiale
+- iterer_rapport : orchestration de l'iteration
 """
 
-import httpx
+import anthropic
+from anthropic.types import TextBlock
 
 from config import get_settings
 from vocabulaire_acp import corriger_phonetique
 from templates_organes import detecter_organe, generer_prompt_template
-
-MISTRAL_CHAT_URL: str = "https://api.mistral.ai/v1/chat/completions"
 
 # ---------------------------------------------------------------------------
 # SYSTEM PROMPT — Mise en forme initiale
@@ -239,7 +246,7 @@ Quand le praticien dicte un diagnostic court, developpe la microscopie :
 - AIN3, p16+ -> "Large lesion de neoplasie malpighienne intraepitheliale de haut grade. On observe une desorganisation architecturale interessant toute l'epaisseur de l'epithelium, ainsi que des figures de mitose. Il n'est pas vu d'image d'infiltration carcinomateuse, sous reserve de la tres faible representation du chorion sur ce prelevement. L'etude en immunohistochimie trouve une expression forte, diffuse, en bloc, de p16 par la lesion."
 - AIN1, HPV -> "Lesion papillomateuse acanthosique, focalement parakeratosique avec des signes de viroses. Presence de nombreux koilocytes, certains bi ou multinuclees, ainsi que quelques cellules dyskeratosiques. Les mitoses sont rares. La maturation est preservee. Absence de dysplasie ou de signe histologique de malignite."
 - hyperplasie, pas de dysplasie -> "Lesion hyperplasique malpighienne parakeratosique. La maturation est preservee. Absence de mitoses. Absence de dysplasie ou de signe histologique de malignite."
-- inflammatoire / discrètement inflammatoire -> "Muqueuse bronchique tapissee par un revetement epithelial de type respiratoire regulier sans atypie. Le chorion sous-jacent est le siege d'un infiltrat inflammatoire moderement abondant, a predominance de petits lymphocytes. Il n'est pas observe de granulome ni de proliferation tumorale."
+- inflammatoire / discretement inflammatoire -> "Muqueuse bronchique tapissee par un revetement epithelial de type respiratoire regulier sans atypie. Le chorion sous-jacent est le siege d'un infiltrat inflammatoire moderement abondant, a predominance de petits lymphocytes. Il n'est pas observe de granulome ni de proliferation tumorale."
 - ADK acineuse, TTF1+ -> "Adenocarcinome infiltrant non mucineux, d'architecture acineuse, de phenotype TTF1+ en accord avec une origine pulmonaire."
 
 ═══════════════════════════════════════
@@ -338,7 +345,7 @@ Pas de commentaire, pas d'introduction, pas d'explication."""
 
 
 # ---------------------------------------------------------------------------
-# Fonctions principales
+# Fonctions de construction de prompts
 # ---------------------------------------------------------------------------
 
 
@@ -364,6 +371,22 @@ def _build_user_prompt_format(raw_text: str, rapport_precedent: str) -> str:
     return "".join(parts)
 
 
+def _build_user_prompt_iteration(
+    rapport_actuel: str, nouveau_transcript: str
+) -> str:
+    """Construit le message utilisateur pour l'iteration."""
+    return (
+        "RAPPORT EXISTANT :\n"
+        "---\n"
+        f"{rapport_actuel}\n"
+        "---\n\n"
+        "NOUVELLE DICTEE A INTEGRER :\n"
+        "---\n"
+        f"{nouveau_transcript}\n"
+        "---"
+    )
+
+
 def _build_system_prompt_with_template(organe: str | None) -> str:
     """Injecte le template organe dans le system prompt si disponible."""
     template_section: str = ""
@@ -381,34 +404,51 @@ def _build_system_prompt_with_template(organe: str | None) -> str:
     return SYSTEM_PROMPT_FORMAT.replace("{TEMPLATE_ORGANE}", template_section)
 
 
-async def _call_mistral(system_prompt: str, user_message: str) -> str:
-    """Appelle Mistral Large pour la mise en forme."""
+# ---------------------------------------------------------------------------
+# Appel API Claude (Anthropic)
+# ---------------------------------------------------------------------------
+
+
+async def _call_claude(system_prompt: str, user_message: str) -> str:
+    """Appelle Claude pour la mise en forme du compte-rendu."""
     settings = get_settings()
 
-    payload: dict[str, object] = {
-        "model": "mistral-large-latest",
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_message},
-        ],
-        "temperature": 0.1,
-    }
+    client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
 
-    async with httpx.AsyncClient(timeout=120.0) as client:
-        response = await client.post(
-            MISTRAL_CHAT_URL,
-            headers={
-                "Authorization": f"Bearer {settings.mistral_api_key}",
-                "Content-Type": "application/json",
-            },
-            json=payload,
-        )
-        response.raise_for_status()
-        data: dict[str, object] = response.json()
+    response = await client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=4096,
+        temperature=0.3,
+        system=system_prompt,
+        messages=[{"role": "user", "content": user_message}],
+    )
 
-    choices: list[dict[str, object]] = data["choices"]  # type: ignore[assignment]
-    message: dict[str, str] = choices[0]["message"]  # type: ignore[assignment]
-    return message["content"]
+    first_block = response.content[0]
+    if not isinstance(first_block, TextBlock):
+        raise ValueError("Claude n'a pas retourne de texte.")
+    return first_block.text
+
+
+# ---------------------------------------------------------------------------
+# Pre-traitement commun
+# ---------------------------------------------------------------------------
+
+
+def _corriger_et_detecter(raw_text: str) -> tuple[str, str]:
+    """Applique les corrections phonetiques et detecte l'organe.
+
+    Returns:
+        Tuple (texte_corrige, organe_detecte).
+    """
+    corrected_text: str = corriger_phonetique(raw_text)
+    organe: str | None = detecter_organe(corrected_text)
+    organe_detecte: str = organe if organe else "non_determine"
+    return corrected_text, organe_detecte
+
+
+# ---------------------------------------------------------------------------
+# Fonctions principales
+# ---------------------------------------------------------------------------
 
 
 async def format_transcription(
@@ -416,28 +456,16 @@ async def format_transcription(
 ) -> tuple[str, str]:
     """Met en forme une transcription brute en compte-rendu structure.
 
-    Applique les corrections phonetiques, detecte l'organe, injecte le
-    template correspondant et appelle Mistral Large pour la mise en forme.
-
     Returns:
-        tuple de (rapport_formate, organe_detecte).
+        Tuple (rapport_formate, organe_detecte).
     """
-    # 1. Corrections phonetiques pre-traitement
-    corrected_text: str = corriger_phonetique(raw_text)
-
-    # 2. Detection de l'organe
-    organe: str | None = detecter_organe(corrected_text)
-    organe_detecte: str = organe if organe else "non_determine"
-
-    # 3. Construction du system prompt avec template organe
-    system_prompt: str = _build_system_prompt_with_template(organe)
-
-    # 4. Construction du message utilisateur
+    corrected_text, organe_detecte = _corriger_et_detecter(raw_text)
+    organe_for_template: str | None = (
+        organe_detecte if organe_detecte != "non_determine" else None
+    )
+    system_prompt: str = _build_system_prompt_with_template(organe_for_template)
     user_message: str = _build_user_prompt_format(corrected_text, rapport_precedent)
-
-    # 5. Appel a Mistral Large
-    formatted_report: str = await _call_mistral(system_prompt, user_message)
-
+    formatted_report: str = await _call_claude(system_prompt, user_message)
     return formatted_report, organe_detecte
 
 
@@ -446,34 +474,13 @@ async def iterer_rapport(
 ) -> tuple[str, str]:
     """Integre une nouvelle dictee dans un rapport existant.
 
-    Applique les corrections phonetiques au nouveau transcript, detecte
-    l'organe a partir du rapport existant, et appelle Mistral Large pour
-    fusionner les informations.
-
     Returns:
-        tuple de (rapport_mis_a_jour, organe_detecte).
+        Tuple (rapport_mis_a_jour, organe_detecte).
     """
-    # 1. Corrections phonetiques sur le nouveau transcript
     corrected_new: str = corriger_phonetique(nouveau_transcript)
-
-    # 2. Detection de l'organe a partir du rapport existant et du nouveau transcript
     combined_text: str = f"{rapport_actuel}\n{corrected_new}"
     organe: str | None = detecter_organe(combined_text)
     organe_detecte: str = organe if organe else "non_determine"
-
-    # 3. Message utilisateur pour l'iteration
-    user_message: str = (
-        "RAPPORT EXISTANT :\n"
-        "---\n"
-        f"{rapport_actuel}\n"
-        "---\n\n"
-        "NOUVELLE DICTEE A INTEGRER :\n"
-        "---\n"
-        f"{corrected_new}\n"
-        "---"
-    )
-
-    # 4. Appel a Mistral Large en mode iteration
-    updated_report: str = await _call_mistral(SYSTEM_PROMPT_ITERATION, user_message)
-
+    user_message: str = _build_user_prompt_iteration(rapport_actuel, corrected_new)
+    updated_report: str = await _call_claude(SYSTEM_PROMPT_ITERATION, user_message)
     return updated_report, organe_detecte

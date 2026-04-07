@@ -13,8 +13,11 @@ Note proxy frontend : le frontend doit proxifier /transcribe, /format,
 """
 
 import io
+from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
 from pathlib import Path
 
+import anthropic
 import httpx
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,13 +34,43 @@ from models import (
     ExportRequest,
     SectionsResponse,
     DonneeManquante,
+    AdicapRequest,
+    AdicapResponse,
+    SnomedCode,
+    SnomedResponse,
+    CompletudeRequest,
+    CompletudeResponse,
 )
 from transcription import transcribe_audio
 from formatting import format_transcription, iterer_rapport
 from export_docx import markdown_to_docx, split_report_sections
-from detection_manquantes import detecter_donnees_manquantes
+from detection_manquantes import detecter_donnees_manquantes, calculer_score_completude
+from adicap import suggerer_adicap
+from snomed import suggerer_snomed
+from database import close_engine, create_tables
+from routes_auth import router as auth_router
+from routes_reports import router as reports_router
+from routes_admin import router as admin_router
 
-app: FastAPI = FastAPI(title="Anapath - Dictee medicale", version="0.4.0")
+
+# ---------------------------------------------------------------------------
+# Application lifecycle
+# ---------------------------------------------------------------------------
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    """Gestion du cycle de vie de l'application."""
+    await create_tables()
+    yield
+    await close_engine()
+
+
+app: FastAPI = FastAPI(
+    title="Anapath - Dictee medicale",
+    version="0.5.0",
+    lifespan=lifespan,
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,6 +79,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Routers
+app.include_router(auth_router)
+app.include_router(reports_router)
+app.include_router(admin_router)
 
 
 # ---------------------------------------------------------------------------
@@ -70,15 +108,11 @@ ALLOWED_EXTENSIONS: set[str] = {
 }
 
 
-@app.post("/transcribe", response_model=TranscriptionResponse)
-async def transcribe(file: UploadFile = File(...)) -> TranscriptionResponse:
-    """Etape 1 : Transcription audio via Voxtral.
-
-    Accepte les formats : webm, mp3, mp4, m4a, mov, wav, ogg, flac, aac.
-    """
-    content_type: str = file.content_type or ""
-    filename: str = file.filename or "recording.webm"
-    ext: str = "." + filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+def _validate_audio_file(content_type: str, filename: str) -> None:
+    """Valide le format du fichier audio."""
+    ext: str = ""
+    if "." in filename:
+        ext = "." + filename.rsplit(".", 1)[-1].lower()
 
     type_ok: bool = any(content_type.startswith(p) for p in ALLOWED_AUDIO_PREFIXES)
     ext_ok: bool = ext in ALLOWED_EXTENSIONS
@@ -90,14 +124,21 @@ async def transcribe(file: UploadFile = File(...)) -> TranscriptionResponse:
             f"Formats acceptes : {', '.join(sorted(ALLOWED_EXTENSIONS))}",
         )
 
+
+@app.post("/transcribe", response_model=TranscriptionResponse)
+async def transcribe(file: UploadFile = File(...)) -> TranscriptionResponse:
+    """Etape 1 : Transcription audio via Voxtral."""
+    content_type: str = file.content_type or ""
+    filename: str = file.filename or "recording.webm"
+
+    _validate_audio_file(content_type, filename)
+
     audio_bytes: bytes = await file.read()
     if len(audio_bytes) == 0:
         raise HTTPException(status_code=400, detail="Fichier audio vide.")
 
     try:
-        raw_text: str = await transcribe_audio(
-            audio_bytes, file.filename or "recording.webm"
-        )
+        raw_text: str = await transcribe_audio(audio_bytes, filename)
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=502,
@@ -119,11 +160,7 @@ async def transcribe(file: UploadFile = File(...)) -> TranscriptionResponse:
 
 @app.post("/format", response_model=FormatResponse)
 async def format_text(req: FormatRequest) -> FormatResponse:
-    """Etape 2 : Mise en forme du transcript en compte-rendu structure.
-
-    Detecte l'organe, applique le template correspondant, formate le
-    rapport et detecte les donnees manquantes.
-    """
+    """Etape 2 : Mise en forme du transcript en compte-rendu structure."""
     if not req.raw_text.strip():
         raise HTTPException(status_code=400, detail="Texte vide.")
 
@@ -137,16 +174,15 @@ async def format_text(req: FormatRequest) -> FormatResponse:
         raise HTTPException(
             status_code=422, detail=f"Erreur de validation : {exc}"
         )
-    except httpx.HTTPStatusError as exc:
+    except anthropic.APIStatusError as exc:
         raise HTTPException(
-            status_code=502, detail=f"Erreur formatting Mistral : {exc}"
+            status_code=502, detail=f"Erreur formatting Claude : {exc}"
         )
-    except httpx.RequestError as exc:
+    except anthropic.APIConnectionError as exc:
         raise HTTPException(
-            status_code=502, detail=f"Erreur connexion Mistral : {exc}"
+            status_code=502, detail=f"Erreur connexion Claude : {exc}"
         )
 
-    # Detection des donnees manquantes
     donnees_manquantes: list[DonneeManquante] = detecter_donnees_manquantes(
         formatted, organe
     )
@@ -165,11 +201,7 @@ async def format_text(req: FormatRequest) -> FormatResponse:
 
 @app.post("/iterate", response_model=IterationResponse)
 async def iterate_report(req: IterationRequest) -> IterationResponse:
-    """Etape 2bis : Ajout d'une dictee complementaire a un rapport existant.
-
-    Integre le nouveau transcript dans le rapport actuel, met a jour les
-    marqueurs de donnees manquantes.
-    """
+    """Etape 2bis : Ajout d'une dictee complementaire a un rapport existant."""
     if not req.rapport_actuel.strip():
         raise HTTPException(status_code=400, detail="Rapport actuel vide.")
     if not req.nouveau_transcript.strip():
@@ -185,16 +217,15 @@ async def iterate_report(req: IterationRequest) -> IterationResponse:
         raise HTTPException(
             status_code=422, detail=f"Erreur de validation : {exc}"
         )
-    except httpx.HTTPStatusError as exc:
+    except anthropic.APIStatusError as exc:
         raise HTTPException(
-            status_code=502, detail=f"Erreur iteration Mistral : {exc}"
+            status_code=502, detail=f"Erreur iteration Claude : {exc}"
         )
-    except httpx.RequestError as exc:
+    except anthropic.APIConnectionError as exc:
         raise HTTPException(
-            status_code=502, detail=f"Erreur connexion Mistral : {exc}"
+            status_code=502, detail=f"Erreur connexion Claude : {exc}"
         )
 
-    # Re-detection des donnees manquantes apres iteration
     donnees_manquantes: list[DonneeManquante] = detecter_donnees_manquantes(
         updated, organe
     )
@@ -219,11 +250,7 @@ class _SectionsRequest(BaseModel):
 
 @app.post("/sections", response_model=SectionsResponse)
 async def get_sections(req: _SectionsRequest) -> SectionsResponse:
-    """Decoupe un rapport formate en sections nommees pour copie individuelle.
-
-    Sections reconnues : titre, renseignements_cliniques, macroscopie,
-    microscopie, ihc, biologie_moleculaire, conclusion.
-    """
+    """Decoupe un rapport formate en sections nommees."""
     if not req.formatted_report.strip():
         raise HTTPException(status_code=400, detail="Rapport vide.")
 
@@ -233,16 +260,73 @@ async def get_sections(req: _SectionsRequest) -> SectionsResponse:
 
 
 # ---------------------------------------------------------------------------
+# ADICAP
+# ---------------------------------------------------------------------------
+
+
+@app.post("/adicap", response_model=AdicapResponse)
+async def get_adicap(req: AdicapRequest) -> AdicapResponse:
+    """Suggere un code ADICAP depuis le rapport structure."""
+    if not req.formatted_report.strip():
+        raise HTTPException(status_code=400, detail="Rapport vide.")
+
+    result: dict[str, str] = suggerer_adicap(
+        req.formatted_report, req.organe_detecte
+    )
+    return AdicapResponse(**result)
+
+
+# ---------------------------------------------------------------------------
+# SNOMED CT
+# ---------------------------------------------------------------------------
+
+
+@app.post("/snomed", response_model=SnomedResponse)
+async def get_snomed(req: AdicapRequest) -> SnomedResponse:
+    """Suggere des codes SNOMED CT depuis le rapport structure."""
+    if not req.formatted_report.strip():
+        raise HTTPException(status_code=400, detail="Rapport vide.")
+
+    result = suggerer_snomed(req.formatted_report, req.organe_detecte)
+    topo = result["topography"]
+    morpho = result["morphology"]
+
+    return SnomedResponse(
+        topography=SnomedCode(**topo),  # type: ignore[arg-type]
+        morphology=SnomedCode(**morpho),  # type: ignore[arg-type]
+    )
+
+
+# ---------------------------------------------------------------------------
+# Completude INCa
+# ---------------------------------------------------------------------------
+
+
+@app.post("/completude", response_model=CompletudeResponse)
+async def get_completude(req: CompletudeRequest) -> CompletudeResponse:
+    """Calcule le score de completude INCa du rapport."""
+    if not req.formatted_report.strip():
+        raise HTTPException(status_code=400, detail="Rapport vide.")
+
+    result: dict[str, int | float] = calculer_score_completude(
+        req.formatted_report, req.organe_detecte
+    )
+    return CompletudeResponse(
+        score=int(result["score"]),
+        total_champs=int(result["total_champs"]),
+        champs_presents=int(result["champs_presents"]),
+        pourcentage=float(result["pourcentage"]),
+    )
+
+
+# ---------------------------------------------------------------------------
 # Export Word
 # ---------------------------------------------------------------------------
 
 
 @app.post("/export")
 async def export_docx(req: ExportRequest) -> StreamingResponse:
-    """Etape 3 : Export du compte-rendu en document Word .docx.
-
-    Les marqueurs [A COMPLETER: xxx] sont rendus en rouge et gras.
-    """
+    """Etape 3 : Export du compte-rendu en document Word .docx."""
     try:
         doc_bytes: bytes = markdown_to_docx(req.formatted_report, req.title)
     except ValueError as exc:
@@ -269,7 +353,6 @@ _FRONTEND_DIST: Path = Path(__file__).resolve().parent.parent / "frontend" / "di
 if _FRONTEND_DIST.is_dir():
     from starlette.responses import FileResponse
 
-    # Monter les assets statiques (JS, CSS, images)
     app.mount(
         "/assets",
         StaticFiles(directory=str(_FRONTEND_DIST / "assets")),
