@@ -26,7 +26,16 @@ export function useAudioRecorder() {
     source.connect(analyser);
     analyserRef.current = analyser;
 
-    const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+    // Detecter le MIME type supporte (Safari ne supporte pas audio/webm)
+    const mimeType = MediaRecorder.isTypeSupported("audio/webm")
+      ? "audio/webm"
+      : MediaRecorder.isTypeSupported("audio/mp4")
+        ? "audio/mp4"
+        : "";
+    const recorderOptions: MediaRecorderOptions = mimeType ? { mimeType } : {};
+    const actualMime = mimeType || "audio/webm";
+
+    const mediaRecorder = new MediaRecorder(stream, recorderOptions);
     mediaRecorderRef.current = mediaRecorder;
     chunksRef.current = [];
 
@@ -35,7 +44,7 @@ export function useAudioRecorder() {
     };
 
     mediaRecorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+      const blob = new Blob(chunksRef.current, { type: actualMime });
       setAudioBlob(blob);
       stream.getTracks().forEach((t) => t.stop());
       if (timerRef.current) clearInterval(timerRef.current);

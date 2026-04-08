@@ -16,14 +16,18 @@ import io
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from pathlib import Path
+from typing import Annotated
 
 import anthropic
 import httpx
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import Depends, FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from starlette.requests import Request
 
 from models import (
     TranscriptionResponse,
@@ -47,10 +51,15 @@ from export_docx import markdown_to_docx, split_report_sections
 from detection_manquantes import detecter_donnees_manquantes, calculer_score_completude
 from adicap import suggerer_adicap
 from snomed import suggerer_snomed
+from config import get_settings, validate_settings_at_startup
 from database import close_engine, create_tables
+from auth import get_current_user
+from db_models import User
 from routes_auth import router as auth_router
 from routes_reports import router as reports_router
 from routes_admin import router as admin_router
+
+limiter = Limiter(key_func=get_remote_address)
 
 
 # ---------------------------------------------------------------------------
@@ -61,6 +70,7 @@ from routes_admin import router as admin_router
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     """Gestion du cycle de vie de l'application."""
+    validate_settings_at_startup()
     await create_tables()
     yield
     await close_engine()
@@ -68,13 +78,20 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 app: FastAPI = FastAPI(
     title="Anapath - Dictee medicale",
-    version="0.5.0",
+    version="0.6.0",
     lifespan=lifespan,
 )
 
+app.state.limiter = limiter
+
+_settings = get_settings()
+_cors_origins: list[str] = [
+    o.strip() for o in _settings.cors_origins.split(",") if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -125,8 +142,16 @@ def _validate_audio_file(content_type: str, filename: str) -> None:
         )
 
 
+_MAX_UPLOAD_BYTES: int = _settings.max_upload_size_mb * 1024 * 1024
+
+
 @app.post("/transcribe", response_model=TranscriptionResponse)
-async def transcribe(file: UploadFile = File(...)) -> TranscriptionResponse:
+@limiter.limit("30/minute")
+async def transcribe(
+    request: Request,
+    _user: Annotated[User, Depends(get_current_user)],
+    file: UploadFile = File(...),
+) -> TranscriptionResponse:
     """Etape 1 : Transcription audio via Voxtral."""
     content_type: str = file.content_type or ""
     filename: str = file.filename or "recording.webm"
@@ -136,6 +161,12 @@ async def transcribe(file: UploadFile = File(...)) -> TranscriptionResponse:
     audio_bytes: bytes = await file.read()
     if len(audio_bytes) == 0:
         raise HTTPException(status_code=400, detail="Fichier audio vide.")
+
+    if len(audio_bytes) > _MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"Fichier trop volumineux (max {_settings.max_upload_size_mb} Mo).",
+        )
 
     try:
         raw_text: str = await transcribe_audio(audio_bytes, filename)
@@ -159,7 +190,12 @@ async def transcribe(file: UploadFile = File(...)) -> TranscriptionResponse:
 
 
 @app.post("/format", response_model=FormatResponse)
-async def format_text(req: FormatRequest) -> FormatResponse:
+@limiter.limit("20/minute")
+async def format_text(
+    request: Request,
+    _user: Annotated[User, Depends(get_current_user)],
+    req: FormatRequest,
+) -> FormatResponse:
     """Etape 2 : Mise en forme du transcript en compte-rendu structure."""
     if not req.raw_text.strip():
         raise HTTPException(status_code=400, detail="Texte vide.")
@@ -200,7 +236,12 @@ async def format_text(req: FormatRequest) -> FormatResponse:
 
 
 @app.post("/iterate", response_model=IterationResponse)
-async def iterate_report(req: IterationRequest) -> IterationResponse:
+@limiter.limit("20/minute")
+async def iterate_report(
+    request: Request,
+    _user: Annotated[User, Depends(get_current_user)],
+    req: IterationRequest,
+) -> IterationResponse:
     """Etape 2bis : Ajout d'une dictee complementaire a un rapport existant."""
     if not req.rapport_actuel.strip():
         raise HTTPException(status_code=400, detail="Rapport actuel vide.")
@@ -249,7 +290,10 @@ class _SectionsRequest(BaseModel):
 
 
 @app.post("/sections", response_model=SectionsResponse)
-async def get_sections(req: _SectionsRequest) -> SectionsResponse:
+async def get_sections(
+    _user: Annotated[User, Depends(get_current_user)],
+    req: _SectionsRequest,
+) -> SectionsResponse:
     """Decoupe un rapport formate en sections nommees."""
     if not req.formatted_report.strip():
         raise HTTPException(status_code=400, detail="Rapport vide.")
@@ -265,7 +309,10 @@ async def get_sections(req: _SectionsRequest) -> SectionsResponse:
 
 
 @app.post("/adicap", response_model=AdicapResponse)
-async def get_adicap(req: AdicapRequest) -> AdicapResponse:
+async def get_adicap(
+    _user: Annotated[User, Depends(get_current_user)],
+    req: AdicapRequest,
+) -> AdicapResponse:
     """Suggere un code ADICAP depuis le rapport structure."""
     if not req.formatted_report.strip():
         raise HTTPException(status_code=400, detail="Rapport vide.")
@@ -282,7 +329,10 @@ async def get_adicap(req: AdicapRequest) -> AdicapResponse:
 
 
 @app.post("/snomed", response_model=SnomedResponse)
-async def get_snomed(req: AdicapRequest) -> SnomedResponse:
+async def get_snomed(
+    _user: Annotated[User, Depends(get_current_user)],
+    req: AdicapRequest,
+) -> SnomedResponse:
     """Suggere des codes SNOMED CT depuis le rapport structure."""
     if not req.formatted_report.strip():
         raise HTTPException(status_code=400, detail="Rapport vide.")
@@ -303,7 +353,10 @@ async def get_snomed(req: AdicapRequest) -> SnomedResponse:
 
 
 @app.post("/completude", response_model=CompletudeResponse)
-async def get_completude(req: CompletudeRequest) -> CompletudeResponse:
+async def get_completude(
+    _user: Annotated[User, Depends(get_current_user)],
+    req: CompletudeRequest,
+) -> CompletudeResponse:
     """Calcule le score de completude INCa du rapport."""
     if not req.formatted_report.strip():
         raise HTTPException(status_code=400, detail="Rapport vide.")
@@ -325,7 +378,10 @@ async def get_completude(req: CompletudeRequest) -> CompletudeResponse:
 
 
 @app.post("/export")
-async def export_docx(req: ExportRequest) -> StreamingResponse:
+async def export_docx(
+    _user: Annotated[User, Depends(get_current_user)],
+    req: ExportRequest,
+) -> StreamingResponse:
     """Etape 3 : Export du compte-rendu en document Word .docx."""
     try:
         doc_bytes: bytes = markdown_to_docx(req.formatted_report, req.title)
@@ -362,7 +418,10 @@ if _FRONTEND_DIST.is_dir():
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str) -> FileResponse:
         """Sert le frontend React pour toutes les routes non-API."""
-        file_path: Path = _FRONTEND_DIST / full_path
+        file_path: Path = (_FRONTEND_DIST / full_path).resolve()
+        # Protection contre le path traversal
+        if not str(file_path).startswith(str(_FRONTEND_DIST.resolve())):
+            return FileResponse(str(_FRONTEND_DIST / "index.html"))
         if file_path.is_file():
             return FileResponse(str(file_path))
         return FileResponse(str(_FRONTEND_DIST / "index.html"))

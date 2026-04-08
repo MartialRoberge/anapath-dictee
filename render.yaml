@@ -9,3 +9,11 @@ services:
         sync: false
       - key: MISTRAL_API_KEY
         sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://anapath-dictee.onrender.com

@@ -17,8 +17,9 @@ Contexte diagnostique :
 - INFILTRANT : carcinome infiltrant, adenocarcinome, melanome — tumeur maligne
 """
 
-import re
 from enum import Enum
+
+from text_utils import normaliser as _normaliser
 
 
 class SpecimenType(str, Enum):
@@ -159,31 +160,32 @@ _NEGATION_PREFIXES: list[str] = [
 # ---------------------------------------------------------------------------
 
 
-def _normaliser(texte: str) -> str:
-    """Normalise le texte pour la recherche de mots-cles."""
-    resultat: str = texte.lower()
-    remplacements: dict[str, str] = {
-        "é": "e", "è": "e", "ê": "e", "ë": "e",
-        "à": "a", "â": "a", "ô": "o", "ù": "u",
-        "û": "u", "î": "i", "ï": "i", "ç": "c",
-    }
-    for accent, remplacement in remplacements.items():
-        resultat = resultat.replace(accent, remplacement)
-    return resultat
-
-
 def _contient_hors_negation(texte: str, keywords: list[str]) -> bool:
-    """Verifie si un mot-cle est present HORS d'une phrase de negation."""
+    """Verifie si un mot-cle est present HORS d'une phrase de negation.
+
+    Verifie TOUTES les occurrences de chaque mot-cle, pas seulement
+    la premiere. Si la premiere est niee mais une suivante est affirmee,
+    retourne True. Le contexte avant est limite a la phrase courante
+    (depuis le dernier point ou debut de ligne).
+    """
     for kw in keywords:
         kw_norm: str = _normaliser(kw)
-        pos: int = texte.find(kw_norm)
-        if pos == -1:
-            continue
-        # Verifier que ce n'est pas precede d'une negation
-        contexte_avant: str = texte[max(0, pos - 40):pos]
-        est_nie: bool = any(neg in contexte_avant for neg in _NEGATION_PREFIXES)
-        if not est_nie:
-            return True
+        start: int = 0
+        while True:
+            pos: int = texte.find(kw_norm, start)
+            if pos == -1:
+                break
+            # Trouver le debut de la phrase courante (dernier point ou newline)
+            sentence_start: int = max(
+                texte.rfind(".", 0, pos) + 1,
+                texte.rfind("\n", 0, pos) + 1,
+                0,
+            )
+            contexte_avant: str = texte[sentence_start:pos]
+            est_nie: bool = any(neg in contexte_avant for neg in _NEGATION_PREFIXES)
+            if not est_nie:
+                return True
+            start = pos + 1
     return False
 
 

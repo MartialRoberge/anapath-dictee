@@ -29,6 +29,7 @@ _BODY_STRUCTURES: dict[str, dict[str, str]] = {
     "oesophage": {"code": "32849002", "display": "Esophageal structure"},
     "ovaire": {"code": "15497006", "display": "Ovarian structure"},
     "pancreas": {"code": "15776009", "display": "Pancreatic structure"},
+    "plevre": {"code": "3120008", "display": "Pleural structure"},
     "poumon": {"code": "39607008", "display": "Lung structure"},
     "prostate": {"code": "41216001", "display": "Prostatic structure"},
     "rein": {"code": "64033007", "display": "Kidney structure"},
@@ -100,28 +101,41 @@ _MORPHOLOGIES: list[tuple[str, str, list[str]]] = [
 ]
 
 
-def _normaliser(texte: str) -> str:
-    """Normalise le texte pour la recherche."""
-    resultat: str = texte.lower()
-    remplacements: dict[str, str] = {
-        "é": "e", "è": "e", "ê": "e", "ë": "e",
-        "à": "a", "â": "a", "ô": "o", "ù": "u",
-        "û": "u", "î": "i", "ï": "i", "ç": "c",
-    }
-    for accent, remplacement in remplacements.items():
-        resultat = resultat.replace(accent, remplacement)
+from text_utils import normaliser
+
+_NEGATION_MARKERS: list[str] = [
+    "absence de", "pas de", "sans", "il n'est pas",
+    "ne montre pas de", "ne trouve pas de", "indemne de",
+]
+
+
+def _masquer_negations(texte: str) -> str:
+    """Masque les portions de texte en contexte de negation."""
+    resultat: str = texte
+    for marker in _NEGATION_MARKERS:
+        while marker in resultat:
+            pos: int = resultat.find(marker)
+            end: int = len(resultat)
+            for sep in [".", "\n"]:
+                sep_pos: int = resultat.find(sep, pos + len(marker))
+                if sep_pos != -1 and sep_pos < end:
+                    end = sep_pos
+            resultat = resultat[:pos] + " " * (end - pos) + resultat[end:]
     return resultat
 
 
 def suggerer_snomed(rapport: str, organe_detecte: str) -> dict[str, str | dict[str, str]]:
     """Suggere des codes SNOMED CT depuis le rapport et l'organe detecte.
 
+    Utilise le masquage de negations pour eviter de coder
+    "absence de carcinome" comme un carcinome.
+
     Returns:
         Dictionnaire avec :
         - topography : {code, display, system}
         - morphology : {code, display, system}
     """
-    rapport_normalise: str = _normaliser(rapport)
+    rapport_normalise: str = normaliser(rapport)
 
     # Topographie
     body = _BODY_STRUCTURES.get(organe_detecte)
@@ -132,6 +146,8 @@ def suggerer_snomed(rapport: str, organe_detecte: str) -> dict[str, str | dict[s
     }
 
     # Morphologie - chercher du plus specifique au plus generique
+    # Masquer les negations pour eviter les faux positifs
+    texte_sans_negations: str = _masquer_negations(rapport_normalise)
     morphology: dict[str, str] = {
         "code": "",
         "display": "Non determine",
@@ -139,7 +155,7 @@ def suggerer_snomed(rapport: str, organe_detecte: str) -> dict[str, str | dict[s
     }
     for code, display, keywords in _MORPHOLOGIES:
         for kw in keywords:
-            if kw in rapport_normalise:
+            if kw in texte_sans_negations:
                 morphology = {
                     "code": code,
                     "display": display,

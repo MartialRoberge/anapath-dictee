@@ -7,6 +7,16 @@ from vocabulaire_acp import get_context_bias
 
 VOXTRAL_API_URL: str = "https://api.mistral.ai/v1/audio/transcriptions"
 
+_httpx_client: httpx.AsyncClient | None = None
+
+
+def _get_httpx_client() -> httpx.AsyncClient:
+    """Retourne le client httpx singleton."""
+    global _httpx_client
+    if _httpx_client is None:
+        _httpx_client = httpx.AsyncClient(timeout=180.0)
+    return _httpx_client
+
 MIME_TYPES: dict[str, str] = {
     ".webm": "audio/webm",
     ".mp3": "audio/mpeg",
@@ -74,14 +84,14 @@ async def transcribe_audio(audio_bytes: bytes, filename: str) -> str:
     if context_csv:
         form_data["context_bias"] = context_csv
 
-    async with httpx.AsyncClient(timeout=180.0) as client:
-        response: httpx.Response = await client.post(
-            VOXTRAL_API_URL,
-            headers={"Authorization": f"Bearer {settings.voxtral_api_key}"},
-            files={"file": (filename, audio_bytes, mime_type)},
-            data=form_data,
-        )
-        response.raise_for_status()
-        data: dict[str, str] = response.json()
+    client = _get_httpx_client()
+    response: httpx.Response = await client.post(
+        VOXTRAL_API_URL,
+        headers={"Authorization": f"Bearer {settings.voxtral_api_key}"},
+        files={"file": (filename, audio_bytes, mime_type)},
+        data=form_data,
+    )
+    response.raise_for_status()
+    data: dict[str, str] = response.json()
 
     return data.get("text", "")

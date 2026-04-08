@@ -14,7 +14,7 @@ Ce module fournit :
 - La suggestion automatique du code ADICAP depuis le CR structure
 """
 
-import re
+from text_utils import normaliser
 
 # ---------------------------------------------------------------------------
 # Tables de reference ADICAP
@@ -96,6 +96,9 @@ _ORGANE_TO_CODE: dict[str, str] = {
     "testicule": "TE",
     "thyroide": "TH",
     "vessie": "VE",
+    "appendice": "AP",
+    "vesicule_biliaire": "VB",
+    "plevre": "PL",
 }
 
 # Lesions courantes (sous-ensemble des codes morphologiques ADICAP)
@@ -197,16 +200,25 @@ _TECHNIQUE_KEYWORDS: dict[str, list[str]] = {
 # ---------------------------------------------------------------------------
 
 
-def _normaliser(texte: str) -> str:
-    """Normalise le texte pour la recherche."""
-    resultat: str = texte.lower()
-    remplacements: dict[str, str] = {
-        "é": "e", "è": "e", "ê": "e", "ë": "e",
-        "à": "a", "â": "a", "ô": "o", "ù": "u",
-        "û": "u", "î": "i", "ï": "i", "ç": "c",
-    }
-    for accent, remplacement in remplacements.items():
-        resultat = resultat.replace(accent, remplacement)
+_NEGATION_MARKERS: list[str] = [
+    "absence de", "pas de", "sans", "il n'est pas",
+    "ne montre pas de", "ne trouve pas de", "indemne de",
+]
+
+
+def _masquer_negations(texte: str) -> str:
+    """Masque les portions de texte en contexte de negation."""
+    resultat: str = texte
+    for marker in _NEGATION_MARKERS:
+        while marker in resultat:
+            pos: int = resultat.find(marker)
+            # Trouver la fin : prochain point ou fin de ligne
+            end: int = len(resultat)
+            for sep in [".", "\n"]:
+                sep_pos: int = resultat.find(sep, pos + len(marker))
+                if sep_pos != -1 and sep_pos < end:
+                    end = sep_pos
+            resultat = resultat[:pos] + " " * (end - pos) + resultat[end:]
     return resultat
 
 
@@ -234,7 +246,14 @@ def _detecter_code_organe(organe_detecte: str) -> str:
 
 
 def _detecter_lesion(rapport_normalise: str) -> str:
-    """Detecte le code lesion ADICAP depuis le diagnostic."""
+    """Detecte le code lesion ADICAP depuis le diagnostic.
+
+    Utilise le masquage de negations pour eviter de coder
+    "absence de carcinome" comme un carcinome.
+    """
+    # Masquer les negations avant la detection
+    texte_sans_negations: str = _masquer_negations(rapport_normalise)
+
     # Chercher du plus specifique au plus generique
     lesion_keywords: list[tuple[str, list[str]]] = [
         # Neoplasies intraepitheliales
@@ -271,7 +290,7 @@ def _detecter_lesion(rapport_normalise: str) -> str:
 
     for code, keywords in lesion_keywords:
         for kw in keywords:
-            if kw in rapport_normalise:
+            if kw in texte_sans_negations:
                 return code
 
     return "0000"
@@ -294,7 +313,7 @@ def suggerer_adicap(rapport: str, organe_detecte: str) -> dict[str, str]:
         - lesion : description de la lesion
         - prelevement_code, technique_code, organe_code, lesion_code : codes bruts
     """
-    rapport_normalise: str = _normaliser(rapport)
+    rapport_normalise: str = normaliser(rapport)
 
     prelevement_code: str = _detecter_prelevement(rapport_normalise)
     technique_code: str = _detecter_technique(rapport_normalise)

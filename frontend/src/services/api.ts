@@ -1,5 +1,11 @@
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
+function getAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem("lexia_access_token");
+  if (!token) return {};
+  return { Authorization: `Bearer ${token}` };
+}
+
 export interface TranscriptionResult {
   raw_transcription: string;
 }
@@ -36,6 +42,7 @@ export async function transcribeAudio(
 
   const response = await fetch(`${API_BASE}/transcribe`, {
     method: "POST",
+    headers: { ...getAuthHeaders() },
     body: formData,
   });
 
@@ -59,7 +66,7 @@ export async function formatTranscription(
 
   const response = await fetch(`${API_BASE}/format`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify(body),
   });
 
@@ -78,7 +85,7 @@ export async function iterateReport(
 ): Promise<IterationResult> {
   const response = await fetch(`${API_BASE}/iterate`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify({
       rapport_actuel: rapportActuel,
       nouveau_transcript: nouveauTranscript,
@@ -99,7 +106,7 @@ export async function getSections(
 ): Promise<SectionsResult> {
   const response = await fetch(`${API_BASE}/sections`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify({ formatted_report: formattedReport }),
   });
 
@@ -137,7 +144,7 @@ export async function getAdicap(
 ): Promise<AdicapResult> {
   const response = await fetch(`${API_BASE}/adicap`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify({
       formatted_report: formattedReport,
       organe_detecte: organeDetecte,
@@ -158,7 +165,7 @@ export async function getCompletude(
 ): Promise<CompletudeResult> {
   const response = await fetch(`${API_BASE}/completude`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify({
       formatted_report: formattedReport,
       organe_detecte: organeDetecte,
@@ -190,7 +197,7 @@ export async function getSnomed(
 ): Promise<SnomedResult> {
   const response = await fetch(`${API_BASE}/snomed`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify({
       formatted_report: formattedReport,
       organe_detecte: organeDetecte,
@@ -216,7 +223,7 @@ export async function exportDocx(
 
   const response = await fetch(`${API_BASE}/export`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify(body),
   });
 

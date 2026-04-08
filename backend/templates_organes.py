@@ -2859,25 +2859,13 @@ _INDEX_PAR_ORGANE: dict[str, TemplateOrgane] = {t.organe: t for t in TOUS_LES_TE
 # ===========================================================================
 
 
-def _normaliser_accents(texte: str) -> str:
-    """Supprime les accents courants pour la comparaison."""
-    remplacements: dict[str, str] = {
-        "é": "e", "è": "e", "ê": "e", "ë": "e",
-        "à": "a", "â": "a", "ä": "a",
-        "ù": "u", "û": "u", "ü": "u",
-        "ô": "o", "ö": "o",
-        "î": "i", "ï": "i",
-        "ç": "c", "œ": "oe",
-    }
-    resultat: str = texte
-    for accent, remplacement in remplacements.items():
-        resultat = resultat.replace(accent, remplacement)
-    return resultat
+import re as _re
+
+from text_utils import normaliser as _normaliser_accents
 
 
 def _mot_cle_present(mot_cle_norm: str, texte_norm: str) -> bool:
     """Vérifie la présence d'un mot-clé avec respect des limites de mots."""
-    import re as _re
     pattern: str = r"\b" + _re.escape(mot_cle_norm) + r"\b"
     return _re.search(pattern, texte_norm) is not None
 

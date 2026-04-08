@@ -394,7 +394,7 @@ CORRECTIONS_PHONETIQUES: dict[str, str] = {
     "équeuse": "muqueuse",
     "équeuse branchique": "muqueuse bronchique",
     "fibro-yalin": "fibro-hyalin",
-    "trauma": "stroma",
+    # "trauma" volontairement retire : mot medical legitime (trauma, traumatisme)
     "racineuse": "acineuse",
     "dtf1": "TTF1",
     "yaline": "hyaline",

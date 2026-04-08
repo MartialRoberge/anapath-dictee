@@ -280,6 +280,37 @@ async def add_feedback(
     return {"status": "feedback_saved"}
 
 
+@router.delete("/{report_id}")
+async def delete_report(
+    report_id: str,
+    user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession | None, Depends(get_db_session)],
+) -> dict[str, str]:
+    """Supprime un CR (droit a l'effacement RGPD)."""
+    if db is None:
+        raise HTTPException(status_code=503, detail="Base de donnees non disponible")
+
+    result = await db.execute(
+        select(Report).where(Report.id == report_id, Report.user_id == user.id)
+    )
+    report: Report | None = result.scalar_one_or_none()
+
+    if report is None:
+        raise HTTPException(status_code=404, detail="CR non trouve")
+
+    await db.delete(report)
+
+    audit = AuditLog(
+        user_id=user.id,
+        action="report_deleted",
+        details=f"Report {report_id} supprime (RGPD)",
+    )
+    db.add(audit)
+
+    await db.commit()
+    return {"status": "deleted"}
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

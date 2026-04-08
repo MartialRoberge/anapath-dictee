@@ -105,29 +105,35 @@ async def admin_stats(
     if db is None:
         raise HTTPException(status_code=503, detail="Base de donnees non disponible")
 
-    # Comptages
+    # Comptages via SQL (pas de chargement en memoire)
     total_reports_result = await db.execute(select(func.count(Report.id)))
     total_reports: int = total_reports_result.scalar() or 0
 
     total_users_result = await db.execute(select(func.count(User.id)))
     total_users: int = total_users_result.scalar() or 0
 
-    # Recuperer tous les rapports pour analyser les metadata
-    all_reports_result = await db.execute(select(Report))
-    all_reports: list[Report] = list(all_reports_result.scalars().all())
+    # Comptage par organe via SQL
+    organ_result = await db.execute(
+        select(Report.organe_detecte, func.count(Report.id))
+        .group_by(Report.organe_detecte)
+    )
+    organ_counts: dict[str, int] = {
+        row[0] or "non_determine": row[1] for row in organ_result.all()
+    }
+
+    # Feedback et corrections : charge uniquement les metadata (pas le rapport entier)
+    metadata_result = await db.execute(
+        select(Report.completeness_warnings).where(
+            Report.completeness_warnings.is_not(None)
+        )
+    )
 
     ratings: list[int] = []
     reports_with_feedback: int = 0
     reports_with_corrections: int = 0
-    organ_counts: dict[str, int] = {}
 
-    for report in all_reports:
-        # Organe
-        organe: str = report.organe_detecte or "non_determine"
-        organ_counts[organe] = organ_counts.get(organe, 0) + 1
-
-        # Metadata
-        metadata = _parse_metadata(report.completeness_warnings)
+    for (raw_metadata,) in metadata_result.all():
+        metadata = _parse_metadata(raw_metadata)
         feedback = metadata.get("feedback")
         corrections = metadata.get("corrections")
 

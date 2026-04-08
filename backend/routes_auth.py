@@ -29,14 +29,19 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 class RegisterRequest(BaseModel):
     """Requete d'inscription."""
-    email: str
+    email: EmailStr
     password: str
     name: str
+
+    def validate_password(self) -> None:
+        """Valide la complexite du mot de passe."""
+        if len(self.password) < 8:
+            raise ValueError("Le mot de passe doit contenir au moins 8 caracteres")
 
 
 class LoginRequest(BaseModel):
     """Requete de connexion."""
-    email: str
+    email: EmailStr
     password: str
 
 
@@ -73,6 +78,11 @@ async def register(
     """Inscription d'un nouvel utilisateur."""
     if db is None:
         raise HTTPException(status_code=503, detail="Base de donnees non disponible")
+
+    try:
+        req.validate_password()
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
     existing = await db.execute(select(User).where(User.email == req.email))
     if existing.scalar_one_or_none() is not None:

@@ -1,14 +1,13 @@
 """Mise en forme des transcriptions en comptes-rendus anatomopathologiques.
 
-Utilise Mistral Large pour structurer les dictees vocales brutes en
-comptes-rendus conformes aux standards ACP, avec detection d'organe,
-injection de template et marqueurs de donnees manquantes.
+Utilise Claude (Anthropic) pour structurer les dictees vocales brutes en
+comptes-rendus conformes aux standards ACP, avec detection d'organe par
+recherche vectorielle et marqueurs de donnees manquantes.
 
 Architecture : chaque fonction fait UNE action.
-- corriger_et_detecter : corrections phonetiques + detection organe
-- _build_system_prompt_with_template : injection du template organe
+- _build_system_prompt_with_templates : injection des templates organes detectes
 - _build_user_prompt_format : construction du message utilisateur
-- _call_mistral : appel API Mistral Large
+- _call_claude : appel API Claude (Anthropic)
 - format_transcription : orchestration de la mise en forme initiale
 - iterer_rapport : orchestration de l'iteration
 """
@@ -18,7 +17,8 @@ from anthropic.types import TextBlock
 
 from config import get_settings
 from vocabulaire_acp import corriger_phonetique
-from templates_organes import detecter_organe, generer_prompt_template
+from templates_organes import TemplateOrgane, generer_prompt_template
+from rag import rechercher_templates
 
 # ---------------------------------------------------------------------------
 # SYSTEM PROMPT — Mise en forme initiale
@@ -110,7 +110,6 @@ Corrections phonetiques recurrentes :
 - en plan chic -> bronchique
 - mucose / equeuse -> muqueuse
 - fibro-yalin -> fibro-hyalin
-- trauma -> stroma
 - racineuse -> acineuse
 - DTF1 / DTF1+ -> TTF1 / TTF1+
 - yaline -> hyaline
@@ -128,8 +127,9 @@ Corrections phonetiques recurrentes :
 - canallaire -> canalaire
 
 REGLE CRITIQUE DE NEGATION :
-"pas de cellule normale" = "Il n'est pas observe de cellule anormale".
-"normale" est une erreur de transcription d'"anormale". Ne JAMAIS inverser une negation medicale.
+Si la transcription dit "pas de cellule normale", insere un marqueur :
+[VERIFIER : "pas de cellule normale" - confirmer s'il s'agit de "pas de cellule anormale"]
+Ne JAMAIS inverser ou corriger automatiquement une negation medicale. En cas d'ambiguite, signaler avec [VERIFIER].
 
 ═══════════════════════════════════════
 DICTIONNAIRE DES ACRONYMES ET ABREVIATIONS
@@ -257,7 +257,8 @@ FORMULES DE NEGATION STANDARDISEES
 - pas de meta / pas de metaganglionnaire -> Absence de metastase ganglionnaire sur les X ganglions examines.
 - pas de dysplasie -> Absence de dysplasie ou de signe histologique de malignite.
 - pas de granulome -> Il n'est pas observe de granulome ni de proliferation tumorale.
-- pas de cellule anormale / pas de cellule normale -> Il n'est pas observe de cellule anormale.
+- pas de cellule anormale -> Il n'est pas observe de cellule anormale.
+- pas de cellule normale -> [VERIFIER : "pas de cellule normale" - confirmer s'il s'agit de "pas de cellule anormale"]
 - ALK negatif / ALK- / ALK moins -> Absence de detection de la proteine ALK en immunohistochimie.
 - pas de mucosecretion -> Il n'est pas observe de mucosecretion.
 - pas d'embole -> Absence d'embole vasculaire ou lymphatique.
@@ -290,7 +291,27 @@ Piece operatoire carcinologique uniquement :
 
 ═══════════════════════════════════════
 
-Reponds UNIQUEMENT avec le compte-rendu formate en Markdown, sans commentaire, sans introduction, sans explication."""
+═══════════════════════════════════════
+CAS SANS TEMPLATE SPECIFIQUE
+═══════════════════════════════════════
+
+Si aucun template organe n'est fourni ci-dessus, tu dois QUAND MEME :
+1. Structurer le CR selon le format standard (titre, renseignements cliniques, macroscopie, microscopie, IHC, conclusion).
+2. Utiliser tes connaissances en anatomopathologie pour identifier les donnees obligatoires INCa pertinentes pour l'organe dicte.
+3. Inserer les marqueurs [A COMPLETER: xxx] pour les champs obligatoires manquants selon le type de prelevement et l'organe.
+4. Appliquer toutes les regles de formatage, de negation, de multi-prelevements et d'IHC.
+5. Ne JAMAIS produire un CR de qualite inferieure parce qu'un template n'est pas disponible.
+
+Tu es un expert en anatomopathologie. Tu connais les donnees minimales INCa pour tous les organes. Applique-les.
+
+═══════════════════════════════════════
+REGLES DE FORMAT DE SORTIE
+═══════════════════════════════════════
+
+- Reponds UNIQUEMENT avec le compte-rendu formate en Markdown.
+- N'inclus AUCUN HTML brut dans ta reponse (pas de <strong>, <em>, <br>, <span>, etc.).
+- Utilise EXCLUSIVEMENT la syntaxe Markdown (**gras**, *italique*, **__souligne__**, | tableau |).
+- Pas de commentaire, pas d'introduction, pas d'explication."""
 
 
 # ---------------------------------------------------------------------------
@@ -323,7 +344,6 @@ Applique les memes corrections phonetiques que pour la mise en forme initiale :
 - branchique -> bronchique
 - mucose -> muqueuse
 - fibro-yalin -> fibro-hyalin
-- trauma -> stroma
 - racineuse -> acineuse
 - DTF1 -> TTF1
 - yaline -> hyaline
@@ -355,7 +375,9 @@ def _build_user_prompt_format(raw_text: str, rapport_precedent: str) -> str:
 
     if rapport_precedent.strip():
         parts.append(
-            "RAPPORT PRECEDENT (pour reference de style et continuite) :\n"
+            "RAPPORT PRECEDENT (pour reference de STYLE uniquement) :\n"
+            "ATTENTION : N'utilise ce rapport QUE pour le style de redaction. "
+            "Ne copie AUCUNE information clinique du rapport precedent dans le nouveau rapport.\n"
             "---\n"
             f"{rapport_precedent}\n"
             "---\n\n"
@@ -387,21 +409,52 @@ def _build_user_prompt_iteration(
     )
 
 
-def _build_system_prompt_with_template(organe: str | None) -> str:
-    """Injecte le template organe dans le system prompt si disponible."""
+def _build_system_prompt_with_templates(
+    templates: list[tuple[TemplateOrgane, float]],
+) -> str:
+    """Injecte les templates organes detectes dans le system prompt.
+
+    Supporte le multi-prelevement : si plusieurs organes sont detectes,
+    tous les templates pertinents sont injectes.
+    """
     template_section: str = ""
 
-    if organe:
-        template_text: str = generer_prompt_template(organe)
-        if template_text:
+    if templates:
+        parts: list[str] = []
+        for template, score in templates:
+            template_text: str = generer_prompt_template(template.organe)
+            if template_text:
+                parts.append(
+                    f"--- TEMPLATE : {template.nom_affichage.upper()} "
+                    f"(pertinence: {score:.0%}) ---\n\n"
+                    f"{template_text}"
+                )
+
+        if parts:
             template_section = (
                 "\n═══════════════════════════════════════\n"
-                f"TEMPLATE SPECIFIQUE : {organe.upper()}\n"
+                "TEMPLATES SPECIFIQUES DETECTES\n"
                 "═══════════════════════════════════════\n\n"
-                f"{template_text}\n"
+                + "\n\n".join(parts) + "\n"
             )
 
     return SYSTEM_PROMPT_FORMAT.replace("{TEMPLATE_ORGANE}", template_section)
+
+
+# ---------------------------------------------------------------------------
+# Client Anthropic singleton
+# ---------------------------------------------------------------------------
+
+_claude_client: anthropic.AsyncAnthropic | None = None
+
+
+def _get_claude_client() -> anthropic.AsyncAnthropic:
+    """Retourne le client Anthropic singleton."""
+    global _claude_client
+    if _claude_client is None:
+        settings = get_settings()
+        _claude_client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+    return _claude_client
 
 
 # ---------------------------------------------------------------------------
@@ -412,38 +465,26 @@ def _build_system_prompt_with_template(organe: str | None) -> str:
 async def _call_claude(system_prompt: str, user_message: str) -> str:
     """Appelle Claude pour la mise en forme du compte-rendu."""
     settings = get_settings()
-
-    client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+    client = _get_claude_client()
 
     response = await client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=4096,
-        temperature=0.3,
+        model=settings.claude_model,
+        max_tokens=8192,
+        temperature=0.0,
         system=system_prompt,
         messages=[{"role": "user", "content": user_message}],
     )
+
+    if response.stop_reason == "max_tokens":
+        raise ValueError(
+            "Le compte-rendu est trop long et a ete tronque. "
+            "Essayez de dicter en plusieurs parties avec l'iteration."
+        )
 
     first_block = response.content[0]
     if not isinstance(first_block, TextBlock):
         raise ValueError("Claude n'a pas retourne de texte.")
     return first_block.text
-
-
-# ---------------------------------------------------------------------------
-# Pre-traitement commun
-# ---------------------------------------------------------------------------
-
-
-def _corriger_et_detecter(raw_text: str) -> tuple[str, str]:
-    """Applique les corrections phonetiques et detecte l'organe.
-
-    Returns:
-        Tuple (texte_corrige, organe_detecte).
-    """
-    corrected_text: str = corriger_phonetique(raw_text)
-    organe: str | None = detecter_organe(corrected_text)
-    organe_detecte: str = organe if organe else "non_determine"
-    return corrected_text, organe_detecte
 
 
 # ---------------------------------------------------------------------------
@@ -456,14 +497,21 @@ async def format_transcription(
 ) -> tuple[str, str]:
     """Met en forme une transcription brute en compte-rendu structure.
 
+    Utilise la recherche vectorielle pour trouver les templates pertinents.
+    Supporte le multi-prelevement (plusieurs organes detectes).
+
     Returns:
         Tuple (rapport_formate, organe_detecte).
     """
-    corrected_text, organe_detecte = _corriger_et_detecter(raw_text)
-    organe_for_template: str | None = (
-        organe_detecte if organe_detecte != "non_determine" else None
+    corrected_text: str = corriger_phonetique(raw_text)
+
+    # Recherche vectorielle des templates pertinents
+    templates: list[tuple[TemplateOrgane, float]] = await rechercher_templates(
+        corrected_text, top_k=3, seuil=0.3
     )
-    system_prompt: str = _build_system_prompt_with_template(organe_for_template)
+    organe_detecte: str = templates[0][0].organe if templates else "non_determine"
+
+    system_prompt: str = _build_system_prompt_with_templates(templates)
     user_message: str = _build_user_prompt_format(corrected_text, rapport_precedent)
     formatted_report: str = await _call_claude(system_prompt, user_message)
     return formatted_report, organe_detecte
@@ -474,13 +522,37 @@ async def iterer_rapport(
 ) -> tuple[str, str]:
     """Integre une nouvelle dictee dans un rapport existant.
 
+    Injecte aussi le template organe pour guider l'iteration.
+
     Returns:
         Tuple (rapport_mis_a_jour, organe_detecte).
     """
     corrected_new: str = corriger_phonetique(nouveau_transcript)
     combined_text: str = f"{rapport_actuel}\n{corrected_new}"
-    organe: str | None = detecter_organe(combined_text)
-    organe_detecte: str = organe if organe else "non_determine"
+
+    # Recherche vectorielle des templates pour l'iteration aussi
+    templates: list[tuple[TemplateOrgane, float]] = await rechercher_templates(
+        combined_text, top_k=2, seuil=0.3
+    )
+    organe_detecte: str = templates[0][0].organe if templates else "non_determine"
+
+    # Injecter les templates dans le prompt d'iteration
+    iteration_prompt: str = SYSTEM_PROMPT_ITERATION
+    if templates:
+        template_section: str = "\n\n".join(
+            f"--- TEMPLATE : {t.nom_affichage.upper()} ---\n"
+            + generer_prompt_template(t.organe)
+            for t, _score in templates
+            if generer_prompt_template(t.organe)
+        )
+        if template_section:
+            iteration_prompt += (
+                "\n\n═══════════════════════════════════════\n"
+                "TEMPLATES DE REFERENCE\n"
+                "═══════════════════════════════════════\n\n"
+                + template_section
+            )
+
     user_message: str = _build_user_prompt_iteration(rapport_actuel, corrected_new)
-    updated_report: str = await _call_claude(SYSTEM_PROMPT_ITERATION, user_message)
+    updated_report: str = await _call_claude(iteration_prompt, user_message)
     return updated_report, organe_detecte

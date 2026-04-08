@@ -392,8 +392,6 @@ def _masquer_negations(rapport_normalise: str) -> str:
        jusqu'au point ou a la fin de la ligne. Cela couvre les cas comme
        'il n est pas observe de granulome ni de proliferation tumorale.'
     """
-    import re as _re
-
     resultat: str = rapport_normalise
 
     # Passe 1 : phrases connues
@@ -414,7 +412,7 @@ def _masquer_negations(rapport_normalise: str) -> str:
         r"\bindemnes de\b",
     ]
     combined_pattern: str = "|".join(neg_markers)
-    for match in _re.finditer(combined_pattern, resultat):
+    for match in re.finditer(combined_pattern, resultat):
         start: int = match.start()
         # Trouver la fin : prochain point, prochain retour a la ligne, ou fin du texte
         end: int = len(resultat)
@@ -472,7 +470,8 @@ def _est_biopsie(rapport_normalise: str) -> bool:
     # Si les deux sont presents, c'est probablement une piece
     if has_piece:
         return False
-    return has_biopsie or not has_piece
+    # Si ni biopsie ni piece n'est detecte, retourner False (indetermine)
+    return has_biopsie
 
 
 def _est_pre_cancereux(rapport_normalise: str) -> bool:
@@ -691,11 +690,15 @@ def calculer_score_completude(
 ) -> dict[str, int | float]:
     """Calcule le score de completude INCa du rapport.
 
+    Utilise la meme logique que detecter_donnees_manquantes (via
+    specimen_type.champ_applicable) pour la coherence des resultats.
+
     Retourne le nombre de champs obligatoires presents sur le total,
     et le pourcentage de completude.
     """
     rapport_normalise: str = _normaliser_texte(rapport)
-    contexte_tumoral: bool = _est_contexte_tumoral(rapport_normalise)
+    specimen: SpecimenType = detecter_specimen_type(rapport)
+    contexte: DiagnosticContext = detecter_diagnostic_context(rapport)
 
     champs: list[ChampObligatoire] = get_champs_obligatoires(organe)
     total: int = 0
@@ -705,7 +708,7 @@ def calculer_score_completude(
         if not champ.obligatoire:
             continue
 
-        if not contexte_tumoral and _est_champ_tumeur_seul(champ.nom):
+        if not champ_applicable(champ.nom, specimen, contexte):
             continue
 
         total += 1
