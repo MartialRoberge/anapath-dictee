@@ -1199,5 +1199,61 @@
       "inflammatoire",
       "tumeur"
     ]
+  },
+  {
+    "filename": "ILLUSTRATIF_1.txt",
+    "organe": "poumon",
+    "sous_type_guess": "biopsie_bronchique",
+    "titre": "BIOPSIES D'UNE LESION PULMONAIRE DU LOBE INFERIEUR DROIT",
+    "full_text": "BIOPSIES D'UNE LESION PULMONAIRE DU LOBE INFERIEUR DROIT\nRenseignements cliniques : adénocarcinome muté KRAS G12C du lobe inférieur droit.\nUne carotte biopsique, mesurant 5 mm de longueur, a été adressée fixée en formol, incluse en paraffine et examinée sur deux plans de coupe.\nL'étude histologique trouve une prolifération tumorale faite de plages de cellules fortement atypiques, au sein desquelles on distingues de rares structures glandulaires. Il n'est pas observé de mucosécrétion. Il s'y associe un stroma fibro-hyalin, légèrement inflammatoire.\nImmunomarquage :  réalisé sur tissu fixé et coupes en paraffine, après restauration antigénique par la chaleur, utilisation de l'automate BOND III (Leica) et application des anticorps suivants :\nCONCLUSION :\nAdénocarcinome infiltrant non mucineux, d'architecture acineuse, de phénotype TTF1 + en accord avec une origine pulmonaire.\nExpression de PD-L1 par 5% des cellules tumorales environ.\nAbsence de détection de la protéine ALK en immunohistochimie.\n\tRESULTATS\tTémoin +\nTTF-1\tMarquage nucléaire d'intensité forte de l'ensemble des cellules tumorales\t\nPD-L1 (clone QR1)\tmarquage membranaire intéressant environ 5% des cellules tumorales (analyse difficile en raison de la présence de cellules immunes marquées et d'artéfacts d'écrasement)\t\nALK (clone 1A4)\tAbsence de marquage des cellules tumorales\tExterne+\n",
+    "section_conclusion": "Adénocarcinome infiltrant non mucineux, d'architecture acineuse, de phénotype TTF1 + en accord avec une origine pulmonaire. Expression de PD-L1 par 5% des cellules tumorales environ. Absence de détection de la protéine ALK en immunohistochimie. RESULTATS\tTémoin + TTF-1\tMarquage nucléaire d'intensité forte de l'ensemble des cellules tumorales PD-L1 (clone QR1)\tmarquage membranaire intéressant environ 5% des cellules tumorales (analyse difficile en raison de la présence de cellules immunes marquées et d'artéfacts d'écrasement) ALK (clone 1A4)\tAbsence de marquage des cellules tumorales\tExterne+",
+    "diagnostic_keywords": [
+      "carcinome",
+      "inflammatoire",
+      "kras"
+    ]
+  },
+  {
+    "filename": "ILLUSTRATIF_2.txt",
+    "organe": "poumon",
+    "sous_type_guess": "biopsie_bronchique",
+    "titre": "BIOPSIES BRONCHIQUES ET LIQUIDE DE LAVAGE BRONCHIOLO-ALVEOLAIRE",
+    "full_text": "BIOPSIES BRONCHIQUES ET LIQUIDE DE LAVAGE BRONCHIOLO-ALVEOLAIRE\nRenseignements cliniques : XX.\n1) Biopsies bronchiques :\nQuatre fragments biopsiques ont été adressés fixés en formol, inclus en paraffine en un bloc et examinés sur deux plans de coupe.\nL'étude histologique trouve une muqueuse bronchique tapissée par un revêtement épithélial de type respiratoire régulier sans atypie. Le chorion sous-jacent est le siège d'un infiltrat inflammatoire modérément abondant, à prédominance de petits lymphocytes. Il n'est pas observé de granulome ni de prolifération tumorale.\n2) Biopsies bronchiques :\nQuatre fragments biopsiques ont été adressés fixés en formol, inclus en paraffine en un bloc et examinés sur deux plans de coupe.\nL'étude histologique trouve une muqueuse bronchique tapissée par un revêtement épithélial de type respiratoire régulier sans atypie. Le chorion sous-jacent est le siège d'un infiltrat inflammatoire modérément abondant, à prédominance de petits lymphocytes. Il n'est pas observé de granulome ni de prolifération tumorale.\n3) Liquide de lavage bronchiolo-alvéolaire :\nVolume : 15 mL\nAspect : blanchâtre trouble\nRichesse cellulaire à l’état frais : 90 cellules / mm3, rares hématies\nÉtude cytologique sur produit de cytocentrifugation :\nColorations : MGG, Papanicolaou, Perls\nConservation cellulaire : moyenne\nL'étude cytologique met en évidence une contamination bronchique importante avec de larges plages de mucus, des cellules épithéliales sans anomalie, des éléments altérés. Les cellules inflammatoires sont par ailleurs à prédominance de polynucléaires neutrophiles associés à des macrophages et de très rares petits lymphocytes.\nLa coloration de Perls ne trouve pas de sidérophages.\nIl n'est pas observé de cellule anormale.\nCONCLUSION :\n- Biopsies bronchiques : remaniements inflammatoires chroniques sans caractère histologique spécifique.\n- Liquide de LBA avec contamination bronchique, riche en polynucléaires neutrophiles.\n",
+    "section_conclusion": "- Biopsies bronchiques : remaniements inflammatoires chroniques sans caractère histologique spécifique. - Liquide de LBA avec contamination bronchique, riche en polynucléaires neutrophiles.",
+    "diagnostic_keywords": [
+      "inflammatoire"
+    ]
+  },
+  {
+    "filename": "ILLUSTRATIF_3.txt",
+    "organe": "poumon",
+    "sous_type_guess": "piece_operatoire",
+    "titre": "LOBE PULMONAIRE INFERIEUR DROIT ET CURAGES GANGLIONNAIRES",
+    "full_text": "LOBE PULMONAIRE INFERIEUR DROIT ET CURAGES GANGLIONNAIRES\nRenseignement clinique : diagnostic d'adénocarcinome TTF1 +, ALK - et PDL un. Sur une ponction biopsie du 29/10/2024 (24H23587)\nMacroscopie\nLe lobe mesure 20 x 19 x 9 cm. Il est le siège d'une lésion blanchâtre mal limitée, hétérogène de 18 x 17 x 14 mm. Cette lésion est sous-pleurale et responsable d'une rétraction pleurale.\nCinq ganglions péribronchiques sont présents sur la pièce de lobectomie (loges 12 et 13). Deux autres ganglions intraparenchymateux.\nCurages parvenus séparément :\n3 ganglions sous carinaires (loge 7)\n1 ganglion du ligament triangulaire (loge 9)\n2 ganglions para-oesophagiens droits (loge 8)\n2 ganglions inter-lobaires (loge 11)\n1 ganglion inter-lobaire inférieur (loge 11)\n1 ganglion inter-lobaire moyen (loge 11)\n2 ganglions inter-lobaires supérieurs (loge 11)\n7 ganglions de la loge de Barety (loge 4R)\nInclusion : curage (blocs 1 à 7 et 9), coupes bronchiques et vasculaires (bloc 8), tumeur (blocs 1à à 13) ganglions hilaires (blocs 8 et 14), ganglion intra-parenchymateux (bloc 15), prélèvement de parenchyme systématique (bloc 16).\nMicroscopie\nLa tumeur correspond à un adénocarcinome d'architecture acineuse avec une importante composante papillaire et lépidique en périphérie. Les cellules tumorales sont cubiques ou cylindriques avec un cytoplasme éosinophile. La tumeur comporte un centre fibreux. Ailleurs, le stroma est peu abondant.\nLa tumeur s'étend sous la plèvre mais celle-ci ne paraît pas envahie.\nIl n'y a pas de lésion tumorale sur un prélèvement pleuropulmonaire systématique effectué à distance. Le parenchyme y est légèrement emphysémateux.\nLa coupe bronchique et les coupes vasculaires sont saines.\nLes 26 ganglions sont anthracosiques et indemnes de lésion métastatique.\nCONCLUSION\nAdénocarcinome 18 mm de grand axe ne s'accompagnant pas de métastase ganglionnaire.\n",
+    "section_conclusion": "Adénocarcinome 18 mm de grand axe ne s'accompagnant pas de métastase ganglionnaire.",
+    "diagnostic_keywords": [
+      "carcinome"
+    ]
+  },
+  {
+    "filename": "ILLUSTRATIF_4.txt",
+    "organe": "digestif",
+    "sous_type_guess": "biopsie_cutanee",
+    "titre": "BIOPSIE D’UNE LESION DE LA MARGE ANALE",
+    "full_text": "BIOPSIE D’UNE LESION DE LA MARGE ANALE\nRenseignements cliniques : lésion ASIL du canal anal antéro-droit.\nMacroscopie :\nUn prélèvement de 0,4 cm, adressé fixé en formol, non orienté. Inclusion en totalité en 1 bloc.\nL'étude histologique trouve une large lésion de néoplasie malpighienne intraépithéliale de haut grade. On observe une désorganisation architecturale intéressant toute l'épaisseur de l'épithélium, ainsi que des figures de mitose. Il n'est pas vu d'image d'infiltration carcinomateuse, sous réserve de la très faible représentation du chorion sur ce prélèvement.\nL'étude en immunohistochimie trouve une expression forte, diffuse, en bloc, de p16 par la lésion.\nCONCLUSION :\nLésion de néoplasie malpighienne intraépithéliale de haut grade (AIN3), de phénotype p16+.\nAbsence de carcinome infiltrant.\n",
+    "section_conclusion": "Lésion de néoplasie malpighienne intraépithéliale de haut grade (AIN3), de phénotype p16+. Absence de carcinome infiltrant.",
+    "diagnostic_keywords": [
+      "carcinome",
+      "asil"
+    ]
+  },
+  {
+    "filename": "ILLUSTRATIF_5.txt",
+    "organe": "digestif",
+    "sous_type_guess": "biopsie_colique",
+    "titre": "BIOPSIES DU CANAL ANAL",
+    "full_text": "BIOPSIES DU CANAL ANAL\n1) Canal anal postérieur\nMacroscopie : Un fragment biopsique de 4 mm de grand axe, examiné avec réalisation de plans de coupes sériés. Inclusion en un bloc (bloc1).\nMicroscopie  : Le fragment intéresse une lésion papillomateuse acanthosique, focalement parakératosique avec des signes de viroses.\nPrésence de nombreux koilocytes, certains bi ou multinucléés, ainsi que quelques cellules dyskératosiques. Les mitoses sont rares. La maturation est préservée. Absence de dysplasie ou de signe histologique de malignité.\n2) Canal anal latéral gauche\nMacroscopie: Un fragment biopsique de 2 mm  de grand axe, examiné avec réalisation de plans de coupes sériés. Inclusion en un bloc (bloc 2).\nMicroscopie: le fragment interesse une lésion hyperplasique malpighienne parakératosique. La maturation est préservée. Absence de mitoses. Absence de dysplasie ou de signe histologique de malignité.\nCONCLUSION :\n1) Aspect de lésion condylomateuse liée à HPV avec lésion malpighienne intraépithéliale de bas grade (AIN1)\n2) Fragment exigu d'épithélium malpighien discrètement hyperplasique, sans signe d'infection virale ni dysplasie.\n",
+    "section_conclusion": "1) Aspect de lésion condylomateuse liée à HPV avec lésion malpighienne intraépithéliale de bas grade (AIN1) 2) Fragment exigu d'épithélium malpighien discrètement hyperplasique, sans signe d'infection virale ni dysplasie.",
+    "diagnostic_keywords": []
   }
 ]
