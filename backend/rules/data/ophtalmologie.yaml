@@ -1,0 +1,225 @@
+# Regles metier ACP - Ophtalmologie
+#
+# Source primaire : classification OMS des tumeurs oculaires et
+# orbitaires, AJCC 8e edition pour le melanome uveal et le
+# retinoblastome, recommandations AFOV et SFO.
+
+organe: ophtalmologie
+nom_affichage: "Ophtalmologie"
+systeme_staging: "TNM 8e edition AJCC/UICC - tumeurs oculaires"
+description: >
+  Couvre les prelevements d'anatomopathologie ophtalmologique : biopsies
+  oculaires et orbitaires, enucleations, exenterations orbitaires,
+  biopsies conjonctivales et palpebrales.
+
+sous_types:
+
+  biopsie_oculaire:
+    nom: "Biopsie oculaire / orbitaire"
+    mots_cles_detection:
+      - biopsie oculaire
+      - biopsie orbitaire
+      - biopsie orbite
+      - biopsie retinienne
+      - biopsie choroïdienne
+      - biopsie intraoculaire
+      - vitrectomie diagnostique
+    champs_obligatoires:
+      - nom: "Localisation"
+        section: renseignements_cliniques
+        conditions: []
+        description: "Structure concernee : choroide, retine, iris, corps ciliaire, orbite, glande lacrymale, paupiere."
+      - nom: "Donnees d'imagerie"
+        section: renseignements_cliniques
+        conditions: []
+        description: "Echographie oculaire, IRM orbitaire, OCT si pertinent."
+      - nom: "Nombre de fragments"
+        section: macroscopie
+        conditions: []
+        description: "Nombre et dimensions des biopsies."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          Melanome uveal (fusiforme, epithelioide, mixte), retinoblastome,
+          lymphome oculaire (DLBCL vitreoretinien), carcinome de la
+          glande lacrymale, tumeur orbitaire (lymphome, rhabdomyosarcome,
+          meningiome, gliome du nerf optique), metastase, inflammation
+          (pseudotumeur orbitaire), autre.
+      - nom: "Type cellulaire (melanome uveal)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Fusiforme A, fusiforme B, epithelioide, mixte. Classification de Callender modifiee."
+      - nom: "Mitoses"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Nombre de mitoses pour 40 HPF (melanome uveal)."
+    marqueurs_ihc_attendus:
+      - Melan-A
+      - HMB45
+      - S100
+      - SOX10
+      - BAP1
+      - Ki67
+    template_macroscopie: >
+      Reception de [nombre] fragments biopsiques [oculaires/orbitaires],
+      fixes en formol, inclus en totalite.
+    notes: >
+      Le melanome uveal est la tumeur intraoculaire maligne la plus
+      frequente de l'adulte. La perte d'expression de BAP1 en IHC
+      est un facteur pronostique pejoratif (risque metastatique).
+
+  enucleation:
+    nom: "Enucleation / Exenteration orbitaire"
+    mots_cles_detection:
+      - enucleation
+      - exenteration
+      - exenteration orbitaire
+      - piece d'enucleation
+      - globe oculaire
+    champs_obligatoires:
+      - nom: "Type de procedure"
+        section: titre
+        conditions: []
+        description: "Enucleation simple, evisceration, exenteration (avec ou sans paupieres)."
+      - nom: "Dimensions du globe"
+        section: macroscopie
+        conditions: []
+        description: "Trois dimensions du globe oculaire en mm. Longueur du nerf optique."
+      - nom: "Taille tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Diametre basal et epaisseur maximale en mm (melanome uveal)."
+      - nom: "Localisation tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Choroide, corps ciliaire, iris, retine."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Classification OMS. Pour le melanome : type cellulaire de Callender."
+      - nom: "Type cellulaire (melanome uveal)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Fusiforme A/B, epithelioide, mixte. Le type epithelioide est de plus mauvais pronostic."
+      - nom: "Extension extrasclerale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'extension transclerale. Taille de l'extension en mm."
+      - nom: "Invasion du nerf optique (retinoblastome)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Niveau d'invasion : prelaminaire, laminaire, retrolaminaire,
+          tranche de section du nerf optique.
+      - nom: "Invasion choroidienne (retinoblastome)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Focale ou massive (> 3 mm ou epaisseur pleine de la choroide)."
+      - nom: "Invasion de la chambre anterieure"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Extension au segment anterieur, iris, angle irido-corneen."
+      - nom: "Marges (nerf optique)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Tranche de section du nerf optique : saine ou envahie."
+      - nom: "BAP1"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Perte d'expression nucleaire de BAP1 : marqueur pronostique pejoratif pour le melanome uveal (risque de metastases hepatiques)."
+      - nom: "Profil d'expression genique"
+        section: biologie_moleculaire
+        conditions: [carcinologique]
+        description: >
+          Classification pronostique du melanome uveal : classe 1A
+          (faible risque), 1B (intermediaire), 2 (haut risque
+          metastatique). Analyse de mutations : GNAQ, GNA11, BAP1,
+          SF3B1, EIF1AX. Chromosome 3 (monosomie = mauvais pronostic).
+      - nom: "pTNM"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pT selon AJCC 8e edition (melanome uveal : basee sur taille et extension ; retinoblastome : basee sur invasion)."
+    marqueurs_ihc_attendus:
+      - Melan-A
+      - HMB45
+      - S100
+      - SOX10
+      - BAP1
+      - Ki67
+      - synaptophysine
+      - NSE
+    template_macroscopie: >
+      Globe oculaire [droit/gauche] mesurant X x Y x Z mm. Nerf optique
+      de X mm de longueur. A la coupe : tumeur [localisation] mesurant
+      X mm de diametre basal et X mm d'epaisseur. Aspect pigmente/
+      amelanotique. Extension extrasclerale [oui/non]. Inclusion selon
+      le protocole ophtalmologique standard (calotte avec tumeur, nerf
+      optique en coupe transversale a la tranche, calottes laterales).
+    notes: >
+      Le protocol d'inclusion du globe oculaire prevoit une coupe
+      passant par le nerf optique et la tumeur. La tranche de
+      section du nerf optique doit etre examinee separement.
+      La monosomie 3 et les mutations BAP1 sont les principaux
+      facteurs pronostiques du melanome uveal.
+
+  biopsie_conjonctivale:
+    nom: "Biopsie conjonctivale"
+    mots_cles_detection:
+      - biopsie conjonctivale
+      - biopsie conjonctive
+      - exerese conjonctivale
+      - pterygion
+      - tumeur conjonctivale
+      - melanose conjonctivale
+    champs_obligatoires:
+      - nom: "Localisation"
+        section: renseignements_cliniques
+        conditions: []
+        description: "Bulbaire (nasale, temporale), tarsale, fornix, caroncule, limbe."
+      - nom: "Dimensions"
+        section: macroscopie
+        conditions: []
+        description: "Dimensions en mm. Pigmentation (oui/non)."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          Pterygion, pinguecula, papillome squameux, neoplasie intra-
+          epitheliale conjonctivale (CIN/OSSN), carcinome epidermoide,
+          naevus conjonctival, melanose acquise primitive (PAM),
+          melanome conjonctival, lymphome conjonctival (MALT), kyste
+          dermoide, granulome, autre.
+      - nom: "Dysplasie / CIN"
+        section: microscopie
+        conditions: []
+        description: "Grade de neoplasie intra-epitheliale : legere, moderee, severe, carcinome in situ."
+      - nom: "Atypies melanocytaires"
+        section: microscopie
+        conditions: []
+        description: "Melanose acquise primitive avec ou sans atypies. Extension pagetoide."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Distance tumeur-marge en mm."
+      - nom: "Invasion stromale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Profondeur d'invasion (melanome, carcinome)."
+    marqueurs_ihc_attendus:
+      - Melan-A
+      - HMB45
+      - S100
+      - SOX10
+      - Ki67
+      - p63
+      - CK
+    template_macroscopie: >
+      Reception d'une biopsie conjonctivale de X x Y mm, [pigmentee/
+      non pigmentee]. Inclusion en totalite.
+    notes: >
+      La melanose acquise primitive (PAM) avec atypies est un precurseur
+      du melanome conjonctival. La surveillance et le traitement
+      (cryotherapie, mitomycine C topique) dependent du degre d'atypie.
+      Le melanome conjonctival se propage par voie lymphatique
+      (ganglions preauriculaires et sous-mandibulaires).

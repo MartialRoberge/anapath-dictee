@@ -1,0 +1,220 @@
+# Regles metier ACP - Tissus mous
+#
+# Source primaire : classification OMS 2020 des tumeurs des os et des
+# tissus mous, grading FNCLCC (Federation Nationale des Centres de
+# Lutte Contre le Cancer), donnees minimales INCa, recommandations
+# du reseau NETSARC+/RESOS.
+
+organe: tissus_mous
+nom_affichage: "Tissus mous"
+systeme_staging: "TNM 8e edition AJCC/UICC - sarcomes des tissus mous"
+description: >
+  Couvre les prelevements d'anatomopathologie des tumeurs des tissus mous :
+  biopsies diagnostiques et pieces de resection de sarcomes, tumeurs
+  intermediaires et tumeurs benignes des tissus mous.
+
+sous_types:
+
+  biopsie_tissus_mous:
+    nom: "Biopsie de tissus mous"
+    mots_cles_detection:
+      - biopsie tissus mous
+      - biopsie partie molle
+      - biopsie parties molles
+      - biopsie musculaire
+      - biopsie sous-cutanee
+      - biopsie masse tissus mous
+      - microbiopsie tissus mous
+    champs_obligatoires:
+      - nom: "Localisation anatomique"
+        section: renseignements_cliniques
+        conditions: []
+        description: "Site precis : membre superieur/inferieur, tronc, retroperitoine, tete et cou. Profondeur (superficiel/profond par rapport au fascia)."
+      - nom: "Donnees d'imagerie"
+        section: renseignements_cliniques
+        conditions: []
+        description: "Taille IRM/TDM, aspect (solide, kystique, mixte), rehaussement."
+      - nom: "Nombre de carottes"
+        section: macroscopie
+        conditions: []
+        description: "Nombre et dimensions des carottes biopsiques."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          Classification OMS 2020 : liposarcome (bien differencie/
+          dedifferencie, myxoide/a cellules rondes, pleomorphe),
+          leiomyosarcome, rhabdomyosarcome (embryonnaire, alveolaire,
+          pleomorphe), synovialosarcome, sarcome fibroblastique myxoinflammatoire,
+          fibrosarcome, sarcome a cellules fusiformes, MPNST
+          (tumeur maligne des gaines nerveuses peripheriques), sarcome
+          indifferencie pleomorphe (ex-MFH), GIST, tumeur fibreuse
+          solitaire, tumeur desmoide, lipome, schwannome, neurofibrome,
+          histiocytofibrome, myxome, autre.
+      - nom: "Differenciation"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Score FNCLCC 1 : sarcomes ressemblant au tissu adulte normal
+          correspondant. Score 2 : sarcomes pour lesquels le typage est
+          certain. Score 3 : sarcomes embryonnaires, indifferencies,
+          synovialosarcomes, sarcomes epithelioides.
+      - nom: "Mitoses"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Nombre de mitoses pour 10 HPF. Score FNCLCC mitoses : 1 (0-9), 2 (10-19), 3 (>=20)."
+      - nom: "Necrose"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Score FNCLCC necrose : 0 (pas de necrose), 1 (<50%), 2 (>=50%)."
+    marqueurs_ihc_attendus:
+      - MDM2
+      - CDK4
+      - desmine
+      - actine muscle lisse
+      - myogenine
+      - S100
+      - EMA
+      - TLE1
+      - STAT6
+      - CD34
+      - DOG1
+      - CD117
+      - beta-catenine
+    template_macroscopie: >
+      Reception de [nombre] carottes biopsiques de tissus mous mesurant
+      X mm, fixees en formol. Inclusion en totalite. Congelation d'un
+      fragment pour biologie moleculaire si materiel suffisant.
+    notes: >
+      La correlation clinico-radiologique est ESSENTIELLE. Le
+      diagnostic des sarcomes des tissus mous repose de plus en
+      plus sur la biologie moleculaire (translocations specifiques :
+      SS18 pour synovialosarcome, EWSR1 pour Ewing, FUS-DDIT3 pour
+      liposarcome myxoide, MDM2 pour liposarcome bien differencie).
+      Tout cas suspect doit etre adresse en RCP NETSARC+.
+
+  resection_tissus_mous:
+    nom: "Piece de resection de tumeur des tissus mous"
+    mots_cles_detection:
+      - resection tissus mous
+      - piece tissus mous
+      - exerese sarcoma
+      - exerese sarcome
+      - resection sarcome
+      - piece de sarcome
+      - piece tumeur parties molles
+      - resection compartimentale
+    champs_obligatoires:
+      - nom: "Type de resection"
+        section: titre
+        conditions: []
+        description: "Exerese large, compartimentale, marginale, intratumorale."
+      - nom: "Orientation de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Reperage chirurgical, encrage des marges."
+      - nom: "Dimensions et poids"
+        section: macroscopie
+        conditions: []
+        description: "Trois dimensions en cm et poids en grammes."
+      - nom: "Taille tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Plus grand diametre tumoral en cm."
+      - nom: "Aspect macroscopique"
+        section: macroscopie
+        conditions: []
+        description: "Consistance, couleur, homogeneite, zones de necrose/hemorragie/myxoide."
+      - nom: "Distance aux marges"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Distance tumeur-marge la plus proche en mm."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Classification OMS 2020 precise avec sous-type."
+      - nom: "Grade FNCLCC"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Grade histologique FNCLCC en 3 composantes :
+          1) Differenciation (score 1-3),
+          2) Index mitotique (score 1-3 : 0-9 / 10-19 / >=20 mitoses/10 HPF),
+          3) Necrose tumorale (score 0-2 : 0% / <50% / >=50%).
+          Total : Grade 1 (2-3), Grade 2 (4-5), Grade 3 (6-8).
+      - nom: "Differenciation (score FNCLCC)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Score 1, 2 ou 3 selon le type histologique."
+      - nom: "Index mitotique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Nombre de mitoses pour 10 HPF. Score 1 (0-9), 2 (10-19), 3 (>=20)."
+      - nom: "Necrose tumorale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Pourcentage de necrose. Score 0 (0%), 1 (<50%), 2 (>=50%)."
+      - nom: "Emboles vasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Invasion perineurale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Qualite des marges : R0 (saine, distance en mm), R1 (microscopiquement
+          atteinte), R2 (macroscopiquement atteinte). La marge minimale
+          recommandee depend du type et du grade.
+      - nom: "Reponse a la chimiotherapie neoadjuvante"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Si chimiotherapie neoadjuvante : pourcentage de necrose tumorale induite, reponse evaluee."
+      - nom: "Biologie moleculaire"
+        section: biologie_moleculaire
+        conditions: [carcinologique]
+        description: >
+          Translocations specifiques : SS18-SSX (synovialosarcome),
+          EWSR1-FLI1 (Ewing), FUS-DDIT3 (liposarcome myxoide),
+          MDM2/CDK4 amplification (liposarcome bien differencie/
+          dedifferencie), ALK (rhabdomyosarcome, tumeur myofibroblastique
+          inflammatoire).
+      - nom: "pTNM"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pT pN (pM si connu) selon AJCC 8e edition. Le pT depend de la taille et de la profondeur."
+    marqueurs_ihc_attendus:
+      - MDM2
+      - CDK4
+      - desmine
+      - actine muscle lisse
+      - myogenine
+      - MyoD1
+      - S100
+      - EMA
+      - TLE1
+      - STAT6
+      - CD34
+      - DOG1
+      - CD117
+      - beta-catenine
+      - ERG
+      - INI1
+    template_macroscopie: >
+      Piece de resection de tumeur des tissus mous orientee par [repere],
+      mesurant X x Y x Z cm, pesant W g. Encrage des marges [couleurs].
+      A la coupe : tumeur de X cm, [aspect, couleur, consistance]. Zones
+      de necrose representant environ X% de la surface de coupe. Distance
+      a la marge la plus proche : X mm ([localisation]). Photographies
+      macroscopiques. Inclusion d'un prelevement par cm de tumeur (minimum).
+    notes: >
+      Le grade FNCLCC est le facteur pronostique histologique le plus
+      important pour les sarcomes des tissus mous. Il doit TOUJOURS
+      etre precise avec le detail des 3 composantes. Exception : le
+      grade ne s'applique pas a certains types histologiques
+      (angiosarcome, chondrosarcome, sarcome alveolaire des parties
+      molles, sarcome a cellules claires). Relecture obligatoire en
+      RCP NETSARC+ pour tout sarcoma suspect.

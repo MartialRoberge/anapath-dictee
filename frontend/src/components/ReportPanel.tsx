@@ -13,6 +13,8 @@ import {
   FileDown,
   FileText,
   FileType,
+  Undo2,
+  Redo2,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
@@ -23,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { exportDocx, getSections } from "../services/api";
-import type { DonneeManquante } from "../services/api";
+import type { Marker } from "../services/api";
 
 /* ------------------------------------------------------------------ */
 /*  Section config                                                     */
@@ -177,6 +179,76 @@ function countACompleter(text: string): number {
   const regex = new RegExp(A_COMPLETER_REGEX.source, "gi");
   const matches = text.match(regex);
   return matches ? matches.length : 0;
+}
+
+/* ------------------------------------------------------------------ */
+/*  useUndoStack — historique undo/redo pour l'edition de sections     */
+/* ------------------------------------------------------------------ */
+
+const MAX_UNDO_DEPTH = 50;
+
+interface UndoState {
+  past: Record<string, string>[];
+  present: Record<string, string> | null;
+  future: Record<string, string>[];
+}
+
+function useUndoStack(initial: Record<string, string> | null) {
+  const [state, setState] = useState<UndoState>({
+    past: [],
+    present: initial,
+    future: [],
+  });
+
+  // Synchroniser quand le rapport change de l'exterieur (nouveau formatage)
+  const lastExternalRef = useRef(initial);
+  useEffect(() => {
+    if (initial !== lastExternalRef.current) {
+      lastExternalRef.current = initial;
+      setState({ past: [], present: initial, future: [] });
+    }
+  }, [initial]);
+
+  const push = useCallback((next: Record<string, string>) => {
+    setState((prev) => ({
+      past: [...prev.past.slice(-MAX_UNDO_DEPTH), ...(prev.present ? [prev.present] : [])],
+      present: next,
+      future: [],
+    }));
+  }, []);
+
+  const undo = useCallback(() => {
+    setState((prev) => {
+      if (prev.past.length === 0) return prev;
+      const previous = prev.past[prev.past.length - 1];
+      return {
+        past: prev.past.slice(0, -1),
+        present: previous,
+        future: [prev.present!, ...prev.future],
+      };
+    });
+  }, []);
+
+  const redo = useCallback(() => {
+    setState((prev) => {
+      if (prev.future.length === 0) return prev;
+      const next = prev.future[0];
+      return {
+        past: [...prev.past, prev.present!],
+        present: next,
+        future: prev.future.slice(1),
+      };
+    });
+  }, []);
+
+  return {
+    sections: state.present,
+    push,
+    undo,
+    redo,
+    canUndo: state.past.length > 0,
+    canRedo: state.future.length > 0,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -561,21 +633,23 @@ function SectionCard({
 interface ReportPanelProps {
   report: string | null;
   onReportChange: (report: string) => void;
-  donneesManquantes: DonneeManquante[];
+  markers: Marker[];
   organeDetecte: string;
 }
 
 export default function ReportPanel({
   report,
   onReportChange,
-  donneesManquantes: _donneesManquantes,
+  markers: _markers,
   organeDetecte,
 }: ReportPanelProps) {
-  void _donneesManquantes;
+  void _markers;
 
-  const [sections, setSections] = useState<Record<string, string> | null>(null);
+  const [rawSections, setRawSections] = useState<Record<string, string> | null>(null);
   const [loadingSections, setLoadingSections] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const { sections, push: pushUndo, undo, redo, canUndo, canRedo } = useUndoStack(rawSections);
 
   const aCompleterCount = useMemo(() => {
     if (!report) return 0;
@@ -589,9 +663,9 @@ export default function ReportPanel({
     setLoadingSections(true);
     try {
       const result = await getSections(report);
-      setSections(result.sections);
+      setRawSections(result.sections);
     } catch {
-      setSections(null);
+      setRawSections(null);
     } finally {
       setLoadingSections(false);
     }
@@ -604,15 +678,38 @@ export default function ReportPanel({
     isUserEditRef.current = false;
   }, [report]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Raccourcis clavier undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
+        e.preventDefault();
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [undo, redo]);
+
+  // Synchroniser l'undo stack vers le rapport parent
+  useEffect(() => {
+    if (sections && isUserEditRef.current) {
+      onReportChange(rebuildReport(sections));
+    }
+  }, [sections]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSectionChange = useCallback(
     (key: string, newContent: string) => {
       if (!sections) return;
       const updated = { ...sections, [key]: newContent };
-      setSections(updated);
+      pushUndo(updated);
       isUserEditRef.current = true;
       onReportChange(rebuildReport(updated));
     },
-    [sections, onReportChange]
+    [sections, onReportChange, pushUndo]
   );
 
   const handleSectionDelete = useCallback(
@@ -620,11 +717,11 @@ export default function ReportPanel({
       if (!sections) return;
       const updated = { ...sections };
       delete updated[key];
-      setSections(updated);
+      pushUndo(updated);
       isUserEditRef.current = true;
       onReportChange(rebuildReport(updated));
     },
-    [sections, onReportChange]
+    [sections, onReportChange, pushUndo]
   );
 
   const _buildFieldRegex = (fieldName: string) =>
@@ -659,11 +756,11 @@ export default function ReportPanel({
         }
         updated[key] = cleaned.join("\n").replace(/\n{3,}/g, "\n\n").trim();
       }
-      setSections(updated);
+      pushUndo(updated);
       isUserEditRef.current = true;
       onReportChange(rebuildReport(updated));
     },
-    [sections, onReportChange]
+    [sections, onReportChange, pushUndo]
   );
 
   const handleReplaceField = useCallback(
@@ -674,11 +771,11 @@ export default function ReportPanel({
       for (const key of Object.keys(updated)) {
         updated[key] = updated[key].replace(regex, value);
       }
-      setSections(updated);
+      pushUndo(updated);
       isUserEditRef.current = true;
       onReportChange(rebuildReport(updated));
     },
-    [sections, onReportChange]
+    [sections, onReportChange, pushUndo]
   );
 
   const handleCopyAll = async () => {
@@ -753,12 +850,33 @@ export default function ReportPanel({
           {aCompleterCount > 0 && (
             <Badge variant="warning" className="gap-1.5 text-[0.7rem]">
               <span className="h-1.5 w-1.5 rounded-full bg-warning" />
-              {aCompleterCount} champ{aCompleterCount > 1 ? "s" : ""} a
-              completer
+              {aCompleterCount} champ{aCompleterCount > 1 ? "s" : ""} obligatoire{aCompleterCount > 1 ? "s" : ""}
             </Badge>
           )}
         </div>
         <div className="flex items-center gap-2">
+          <div className="flex items-center gap-0.5 border-r pr-2 mr-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={undo}
+              disabled={!canUndo}
+              title="Annuler (Ctrl+Z)"
+            >
+              <Undo2 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={redo}
+              disabled={!canRedo}
+              title="Retablir (Ctrl+Shift+Z)"
+            >
+              <Redo2 className="h-4 w-4" />
+            </Button>
+          </div>
           <Button
             variant="outline"
             size="sm"

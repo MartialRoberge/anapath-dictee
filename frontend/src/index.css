@@ -2,58 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   IRIS DESIGN SYSTEM
+   Botanical Clinical — teal/violet palette
+   ============================================================ */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --background: 150 10% 97%;
+    --foreground: 195 30% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 195 30% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 57%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --popover-foreground: 195 30% 12%;
+    --primary: 168 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 168 20% 93%;
+    --secondary-foreground: 195 30% 12%;
+    --muted: 168 15% 93%;
+    --muted-foreground: 195 10% 46%;
+    --accent: 168 20% 93%;
+    --accent-foreground: 195 30% 12%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 38 92% 20%;
-    --success: 142 71% 45%;
-    --success-foreground: 142 71% 95%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
-    --radius: 0.5rem;
+    --success: 162 63% 41%;
+    --success-foreground: 0 0% 100%;
+    --border: 168 15% 88%;
+    --input: 168 15% 88%;
+    --ring: 168 76% 36%;
+    --radius: 0.625rem;
   }
 
   .dark {
-    --background: 224 30% 8%;
-    --foreground: 210 40% 92%;
-    --card: 224 25% 11%;
-    --card-foreground: 210 40% 92%;
-    --popover: 224 25% 11%;
-    --popover-foreground: 210 40% 92%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 224 30% 8%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 92%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 92%;
+    --background: 192 25% 6%;
+    --foreground: 168 15% 88%;
+    --card: 192 22% 9%;
+    --card-foreground: 168 15% 88%;
+    --popover: 192 22% 9%;
+    --popover-foreground: 168 15% 88%;
+    --primary: 168 76% 42%;
+    --primary-foreground: 192 25% 6%;
+    --secondary: 192 18% 14%;
+    --secondary-foreground: 168 15% 88%;
+    --muted: 192 18% 14%;
+    --muted-foreground: 168 10% 50%;
+    --accent: 192 18% 14%;
+    --accent-foreground: 168 15% 88%;
     --destructive: 0 62% 50%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 38 92% 95%;
-    --success: 142 71% 45%;
-    --success-foreground: 142 71% 95%;
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
-    --ring: 217 91% 60%;
+    --success: 162 63% 41%;
+    --success-foreground: 0 0% 100%;
+    --border: 192 15% 16%;
+    --input: 192 15% 16%;
+    --ring: 168 76% 42%;
   }
 }
 
@@ -64,11 +69,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: "DM Sans", system-ui, sans-serif;
     margin: 0;
   }
 }
 
-/* Scrollbar styling for dark mode */
+/* ============================================================
+   Scrollbar
+   ============================================================ */
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
@@ -76,7 +84,7 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
@@ -90,15 +98,178 @@
 }
 
 /* ============================================================
-   Medical report typography
-   Reproduit le format des CR anatomopathologiques de reference :
-   - Arial 10pt, justifie
-   - Titres : centres, gras, soulignes, majuscules
-   - Conclusion : centree, gras, soulignee
-   - Renseignements cliniques : italique
-   - Tableaux IHC : grille propre
+   Botanical background pattern (CSS only, lightweight)
+   Subtle organic circles reminiscent of cell structures
    ============================================================ */
+.iris-bg-pattern {
+  background-image:
+    radial-gradient(ellipse 120px 120px at 15% 20%, hsl(168 76% 42% / 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 80px 80px at 75% 60%, hsl(270 60% 60% / 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 200px 200px at 50% 90%, hsl(168 76% 42% / 0.02) 0%, transparent 70%),
+    radial-gradient(circle 2px at 20% 30%, hsl(168 76% 42% / 0.08) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 60% 15%, hsl(270 60% 60% / 0.06) 0%, transparent 100%),
+    radial-gradient(circle 1px at 80% 70%, hsl(168 76% 42% / 0.06) 0%, transparent 100%),
+    radial-gradient(circle 2px at 40% 80%, hsl(270 60% 60% / 0.05) 0%, transparent 100%);
+}
 
+/* Animated botanical accents for login / dictation screens */
+.iris-botanical-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.iris-botanical-glow::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(ellipse 300px 300px at 30% 30%, hsl(168 76% 42% / 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 250px 250px at 70% 70%, hsl(270 60% 60% / 0.06) 0%, transparent 60%);
+  animation: leaf-sway 12s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* The Iris gradient — core brand identity */
+.iris-gradient {
+  background: linear-gradient(135deg, #14b8a6, #8b5cf6);
+}
+
+.iris-gradient-text {
+  background: linear-gradient(135deg, #14b8a6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass card effect for dark mode */
+.iris-glass {
+  background: hsl(var(--card) / 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+
+/* ============================================================
+   Shazam-style dictation button
+   ============================================================ */
+.iris-record-btn {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6, #8b5cf6);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow:
+    0 0 0 0 hsl(168 76% 42% / 0),
+    0 8px 32px hsl(168 76% 42% / 0.2);
+}
+
+.iris-record-btn:hover {
+  transform: scale(1.04);
+  box-shadow:
+    0 0 0 0 hsl(168 76% 42% / 0),
+    0 12px 40px hsl(168 76% 42% / 0.3);
+}
+
+.iris-record-btn:active,
+.iris-record-btn.recording {
+  transform: scale(0.97);
+}
+
+.iris-record-btn.recording {
+  box-shadow:
+    0 0 0 0 hsl(168 76% 42% / 0.4),
+    0 0 60px hsl(168 76% 42% / 0.2);
+  animation: breathe 2s ease-in-out infinite;
+}
+
+/* Pulsing rings when recording */
+.iris-record-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid hsl(168 76% 42% / 0.4);
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+.iris-record-ring:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.iris-record-ring:nth-child(3) {
+  animation-delay: 1s;
+}
+
+/* ============================================================
+   Sidebar
+   ============================================================ */
+.iris-sidebar {
+  width: 56px;
+  transition: width 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .iris-sidebar {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Mobile bottom tabs
+   ============================================================ */
+.iris-mobile-tabs {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .iris-mobile-tabs {
+    display: flex;
+  }
+}
+
+/* ============================================================
+   Completion drawer
+   ============================================================ */
+.iris-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 360px;
+  max-width: 90vw;
+  z-index: 40;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+
+.iris-drawer.open {
+  transform: translateX(0);
+}
+
+.iris-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: hsl(0 0% 0% / 0.4);
+  z-index: 39;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.iris-drawer-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ============================================================
+   Medical report typography (UNCHANGED - clinical precision)
+   ============================================================ */
 .report-typography {
   font-family: Arial, Helvetica, "Liberation Sans", sans-serif;
   font-size: 10pt;
@@ -115,7 +286,6 @@
   text-decoration: underline;
 }
 
-/* Titre principal et conclusion : **__TEXTE__** -> gras souligne majuscules, aligne a GAUCHE */
 .report-typography strong u {
   text-transform: uppercase;
   display: block;
@@ -130,7 +300,6 @@
   opacity: 0.8;
 }
 
-/* Headers markdown */
 .report-typography h1,
 .report-typography h2,
 .report-typography h3 {
@@ -164,7 +333,6 @@
   margin: 4px 0;
 }
 
-/* Listes a puces (prelevements multiples) */
 .report-typography ol,
 .report-typography ul {
   margin: 6px 0;
@@ -175,14 +343,12 @@
   margin: 3px 0;
 }
 
-/* Separateur horizontal */
 .report-typography hr {
   border: none;
   border-top: 1px solid hsl(var(--border));
   margin: 16px 0;
 }
 
-/* Tableaux IHC */
 .report-typography table {
   width: 100%;
   border-collapse: collapse;
@@ -203,7 +369,6 @@
   font-size: 10pt;
 }
 
-/* Indentation pour sous-elements */
 .report-typography blockquote {
   margin: 4px 0 4px 20px;
   padding: 0;
@@ -211,7 +376,9 @@
   font-style: normal;
 }
 
-/* Spin animation */
+/* ============================================================
+   Animations
+   ============================================================ */
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -220,4 +387,34 @@
 
 .animate-spin-slow {
   animation: spin 0.7s linear infinite;
+}
+
+/* Stagger children fade-in */
+.stagger-children > * {
+  opacity: 0;
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.4s; }
+
+/* ============================================================
+   Responsive utilities
+   ============================================================ */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .show-mobile-only {
+    display: none !important;
+  }
 }

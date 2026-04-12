@@ -19,11 +19,11 @@ interface StepDef {
 const STEPS: StepDef[] = [
   { key: "uploading", label: "Envoi de l'audio" },
   { key: "transcribing", label: "Transcription" },
-  { key: "formatting", label: "Lexia Intelligence" },
+  { key: "formatting", label: "Iris Intelligence" },
   { key: "done", label: "Termine" },
 ];
 
-const LEXIA_MESSAGES_INITIAL: string[] = [
+const IRIS_MESSAGES_INITIAL: string[] = [
   "Correction phonetique medicale...",
   "Identification de l'organe...",
   "Chargement du template INCa...",
@@ -37,7 +37,7 @@ const LEXIA_MESSAGES_INITIAL: string[] = [
   "Redaction de la conclusion...",
 ];
 
-const LEXIA_MESSAGES_ITERATION: string[] = [
+const IRIS_MESSAGES_ITERATION: string[] = [
   "Analyse du nouveau contenu...",
   "Fusion avec le rapport existant...",
   "Mise a jour des sections...",
@@ -80,15 +80,15 @@ export default function Pipeline({
         const status: StepStatus = isVisible
           ? computeStatus(idx, activeIdx, currentStep)
           : "pending";
-        const isLexia = step.key === "formatting";
+        const isIris = step.key === "formatting";
 
         return (
           <div key={step.key} className="flex flex-col items-center">
             <div
               className={cn(
                 "flex w-[180px] flex-col justify-center rounded-lg border p-2.5 transition-all duration-200",
-                isLexia && "h-[72px]",
-                !isLexia && "min-h-[52px]",
+                isIris && "h-[72px]",
+                !isIris && "min-h-[52px]",
                 status === "pending" && "border-border bg-card",
                 status === "active" &&
                   "border-primary/40 bg-primary/5 shadow-sm shadow-primary/10",
@@ -97,7 +97,7 @@ export default function Pipeline({
               )}
             >
               <div className="flex items-center gap-2.5">
-                <StepIcon status={status} isLexia={isLexia} />
+                <StepIcon status={status} isIris={isIris} />
                 <span
                   className={cn(
                     "text-[0.8rem] font-medium",
@@ -110,10 +110,10 @@ export default function Pipeline({
                   {step.label}
                 </span>
               </div>
-              {isLexia && (status === "active" || status === "done") && (
+              {isIris && (status === "active" || status === "done") && (
                 <div className="mt-1 flex h-5 items-center gap-1.5 overflow-hidden">
                   {status === "active" ? (
-                    <LexiaAnimation isIteration={isIteration} />
+                    <IrisAnimation isIteration={isIteration} />
                   ) : (
                     <span className="text-[0.68rem] font-medium text-success">
                       Analyse terminee
@@ -150,10 +150,10 @@ export default function Pipeline({
 
 function StepIcon({
   status,
-  isLexia,
+  isIris,
 }: {
   status: StepStatus;
-  isLexia: boolean;
+  isIris: boolean;
 }) {
   const baseClass =
     "flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[0.6rem] font-bold";
@@ -172,7 +172,7 @@ function StepIcon({
       </div>
     );
   }
-  if (status === "active" && isLexia) {
+  if (status === "active" && isIris) {
     return (
       <div className={cn(baseClass, "bg-primary text-white")}>
         <span className="animate-pulse-brain text-[0.65rem]">{"\u25C6"}</span>
@@ -193,10 +193,10 @@ function StepIcon({
   );
 }
 
-function LexiaAnimation({ isIteration }: { isIteration: boolean }) {
+function IrisAnimation({ isIteration }: { isIteration: boolean }) {
   const messages = isIteration
-    ? LEXIA_MESSAGES_ITERATION
-    : LEXIA_MESSAGES_INITIAL;
+    ? IRIS_MESSAGES_ITERATION
+    : IRIS_MESSAGES_INITIAL;
   const [msgIdx, setMsgIdx] = useState(0);
   const [visible, setVisible] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Info,
   Trash2,
@@ -14,8 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { DonneeManquante, AdicapResult, SnomedResult } from "../services/api";
-import { getAdicap, getSnomed } from "../services/api";
+import type { Marker } from "../services/api";
 import {
   findFieldKnowledge,
   ORGAN_GUIDANCE,
@@ -23,32 +22,27 @@ import {
 } from "../data/field-knowledge";
 
 /* ------------------------------------------------------------------ */
-/*  Admin field filter                                                 */
+/*  Admin field filter (RGPD et entete)                                */
 /* ------------------------------------------------------------------ */
 
 const EXCLUDED_ADMIN_FIELDS: string[] = [
-  // Identite patient (RGPD)
   "hopital", "hôpital", "nom du patient", "nom et prenom", "prenom",
   "patient", "date de naissance", "numero de dossier", "n° dossier",
   "numero", "numéro", "medecin prescripteur", "médecin prescripteur",
   "medecin referent", "médecin référent", "clinicien", "service demandeur",
   "nom du service", "adresse", "telephone", "téléphone",
   "securite sociale", "sécurité sociale", "ipp", "nda", "compte-rendu n",
-  // Renseignements cliniques (contient des infos patient RGPD)
   "renseignements cliniques", "renseignement clinique",
-  // Info pathologiste (fait sur Word)
   "nom et signature", "signature", "nom du pathologiste",
   "pathologiste", "medecin signataire",
-  // Admin fait sur Word
   "date du prelevement", "date de prélèvement", "date de reception",
   "date de réception", "date du compte", "date",
   "numero de compte", "reference", "référence",
-  // Generique
   "nom",
 ];
 
-function isAdminField(champ: string): boolean {
-  const normalized = champ.toLowerCase();
+function isAdminField(field: string): boolean {
+  const normalized = field.toLowerCase();
   return EXCLUDED_ADMIN_FIELDS.some((excl) => normalized.includes(excl));
 }
 
@@ -57,14 +51,13 @@ function isAdminField(champ: string): boolean {
 /* ------------------------------------------------------------------ */
 
 const SECTION_DISPLAY: Record<string, string> = {
-  macroscopie: "Macroscopie",
-  microscopie: "Etude histologique",
-  ihc: "Immunomarquage",
-  conclusion: "Conclusion",
-  biologie_moleculaire: "Biologie moleculaire",
-  renseignements_cliniques: "Renseignements cliniques",
   titre: "Titre",
-  non_determine: "Section non determinee",
+  renseignements_cliniques: "Renseignements cliniques",
+  macroscopie: "Macroscopie",
+  microscopie: "Microscopie",
+  immunomarquage: "Immunomarquage",
+  biologie_moleculaire: "Biologie moleculaire",
+  conclusion: "Conclusion",
 };
 
 /* ------------------------------------------------------------------ */
@@ -72,10 +65,9 @@ const SECTION_DISPLAY: Record<string, string> = {
 /* ------------------------------------------------------------------ */
 
 interface CompletionPanelProps {
-  donneesManquantes: DonneeManquante[];
+  markers: Marker[];
   organeDetecte: string;
-  report: string;
-  onDismiss: (champ: string) => void;
+  onDismiss: (fieldName: string) => void;
   dismissedFields: Set<string>;
 }
 
@@ -84,18 +76,18 @@ interface CompletionPanelProps {
 /* ------------------------------------------------------------------ */
 
 interface FieldCardProps {
-  donnee: DonneeManquante;
+  marker: Marker;
   knowledge: FieldKnowledge | null;
   onDismiss: () => void;
   isDismissed: boolean;
 }
 
-function FieldCard({ donnee, knowledge, onDismiss, isDismissed }: FieldCardProps) {
+function FieldCard({ marker, knowledge, onDismiss, isDismissed }: FieldCardProps) {
   const [infoOpen, setInfoOpen] = useState(false);
   const [dismissing, setDismissing] = useState(false);
 
-  const severity = knowledge?.severity ?? (donnee.obligatoire ? "error" : "warning");
-  const sectionLabel = SECTION_DISPLAY[donnee.section] ?? donnee.section;
+  const severity = knowledge?.severity ?? marker.severity;
+  const sectionLabel = SECTION_DISPLAY[marker.section] ?? marker.section;
 
   const handleDismiss = useCallback(() => {
     setDismissing(true);
@@ -111,10 +103,9 @@ function FieldCard({ donnee, knowledge, onDismiss, isDismissed }: FieldCardProps
         dismissing && "translate-x-4 scale-95 opacity-0",
         severity === "error"
           ? "border-destructive/20 bg-destructive/5"
-          : "border-warning/20 bg-warning/5"
+          : "border-warning/20 bg-warning/5",
       )}
     >
-      {/* Header */}
       <div className="flex items-start gap-2">
         <div className="mt-0.5 shrink-0">
           {severity === "error" ? (
@@ -127,7 +118,7 @@ function FieldCard({ donnee, knowledge, onDismiss, isDismissed }: FieldCardProps
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-foreground">
-              {knowledge?.title ?? donnee.champ}
+              {knowledge?.title ?? marker.field}
             </span>
             {knowledge && (
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[0.6rem] font-bold text-muted-foreground">
@@ -136,11 +127,11 @@ function FieldCard({ donnee, knowledge, onDismiss, isDismissed }: FieldCardProps
             )}
           </div>
 
-          {/* WHERE it belongs - prominent location */}
           <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
             <MapPin className="h-3 w-3 shrink-0" />
             <span>
-              Attendu dans : <span className="font-medium text-foreground">{sectionLabel}</span>
+              Attendu dans :{" "}
+              <span className="font-medium text-foreground">{sectionLabel}</span>
             </span>
           </div>
 
@@ -151,10 +142,18 @@ function FieldCard({ donnee, knowledge, onDismiss, isDismissed }: FieldCardProps
             >
               {severity === "error" ? "Obligatoire" : "Recommande"}
             </Badge>
+            {marker.auto_filled && (
+              <Badge
+                variant="secondary"
+                className="px-1.5 py-0 text-[0.6rem]"
+                title={`Rempli automatiquement via ${marker.rule_id}`}
+              >
+                Auto-complete
+              </Badge>
+            )}
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex shrink-0 gap-1">
           {knowledge && (
             <Button
@@ -179,7 +178,6 @@ function FieldCard({ donnee, knowledge, onDismiss, isDismissed }: FieldCardProps
         </div>
       </div>
 
-      {/* Info panel (expandable) */}
       {infoOpen && knowledge && (
         <div className="mt-3 space-y-2.5 rounded-md border border-border/50 bg-card p-3">
           <div className="flex items-start gap-2">
@@ -216,6 +214,12 @@ function FieldCard({ donnee, knowledge, onDismiss, isDismissed }: FieldCardProps
             </div>
           </div>
         </div>
+      )}
+
+      {!infoOpen && marker.message && (
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          {marker.message}
+        </p>
       )}
     </div>
   );
@@ -267,159 +271,39 @@ function OrganGuidance({ organe }: { organe: string }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  CodingTabs (ADICAP / SNOMED)                                       */
-/* ------------------------------------------------------------------ */
-
-function CodingTabs({
-  adicap,
-  snomed,
-  codeTab,
-  onTabChange,
-}: {
-  adicap: AdicapResult | null;
-  snomed: SnomedResult | null;
-  codeTab: "adicap" | "snomed";
-  onTabChange: (tab: "adicap" | "snomed") => void;
-}) {
-  return (
-    <div className="rounded-lg border bg-card overflow-hidden">
-      {/* Tab bar */}
-      <div className="flex border-b">
-        <button
-          className={cn(
-            "flex-1 px-3 py-2 text-xs font-semibold transition-colors",
-            codeTab === "adicap"
-              ? "bg-primary/10 text-primary border-b-2 border-primary"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-          onClick={() => onTabChange("adicap")}
-        >
-          ADICAP
-        </button>
-        <button
-          className={cn(
-            "flex-1 px-3 py-2 text-xs font-semibold transition-colors",
-            codeTab === "snomed"
-              ? "bg-primary/10 text-primary border-b-2 border-primary"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-          onClick={() => onTabChange("snomed")}
-        >
-          SNOMED CT
-        </button>
-      </div>
-
-      {/* Tab content */}
-      <div className="p-3">
-        {codeTab === "adicap" && (
-          <div>
-            {adicap && adicap.organe_code !== "XX" ? (
-              <>
-                <div className="flex items-center justify-center rounded-md bg-muted px-3 py-2">
-                  <span className="font-mono text-base font-bold tracking-widest text-primary">
-                    {adicap.code}
-                  </span>
-                </div>
-                <div className="mt-2 space-y-0.5 text-[0.65rem] text-muted-foreground">
-                  <p><span className="font-medium text-foreground">{adicap.prelevement_code}</span> {adicap.prelevement}</p>
-                  <p><span className="font-medium text-foreground">{adicap.technique_code}</span> {adicap.technique}</p>
-                  <p><span className="font-medium text-foreground">{adicap.organe_code}</span> {adicap.organe}</p>
-                  <p><span className="font-medium text-foreground">{adicap.lesion_code}</span> {adicap.lesion}</p>
-                </div>
-              </>
-            ) : (
-              <p className="text-center text-xs text-muted-foreground">
-                Code non determine automatiquement.
-              </p>
-            )}
-            <input
-              type="text"
-              placeholder="Saisir / corriger le code ADICAP"
-              defaultValue={adicap?.code ?? ""}
-              className="mt-2 w-full rounded-md border border-input bg-background px-2.5 py-1.5 font-mono text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-            <p className="mt-1 text-[0.6rem] italic text-muted-foreground/60">
-              A valider par le praticien. Source : thesaurus ADICAP/SFP.
-            </p>
-          </div>
-        )}
-
-        {codeTab === "snomed" && (
-          <div className="space-y-3">
-            <div>
-              <p className="text-[0.65rem] font-medium text-muted-foreground">Topographie</p>
-              <div className="mt-1 flex items-center gap-2 rounded-md bg-muted px-3 py-1.5">
-                <span className="font-mono text-sm font-bold text-primary">{snomed?.topography.code || "—"}</span>
-                <span className="text-xs text-muted-foreground">{snomed?.topography.display ?? "Non determine"}</span>
-              </div>
-            </div>
-            <div>
-              <p className="text-[0.65rem] font-medium text-muted-foreground">Morphologie</p>
-              <div className="mt-1 flex items-center gap-2 rounded-md bg-muted px-3 py-1.5">
-                <span className="font-mono text-sm font-bold text-primary">{snomed?.morphology.code || "—"}</span>
-                <span className="text-xs text-muted-foreground">{snomed?.morphology.display ?? "Non determine"}</span>
-              </div>
-            </div>
-            <input
-              type="text"
-              placeholder="Saisir / corriger le code SNOMED"
-              className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 font-mono text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-            <p className="text-[0.6rem] italic text-muted-foreground/60">
-              A valider par le praticien. Source : SNOMED International.
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /*  CompletionPanel                                                    */
 /* ------------------------------------------------------------------ */
 
 export default function CompletionPanel({
-  donneesManquantes,
+  markers,
   organeDetecte,
-  report,
   onDismiss,
   dismissedFields,
 }: CompletionPanelProps) {
-  const [adicap, setAdicap] = useState<AdicapResult | null>(null);
-  const [snomed, setSnomed] = useState<SnomedResult | null>(null);
-  const [codeTab, setCodeTab] = useState<"adicap" | "snomed">("adicap");
-
-  useEffect(() => {
-    if (!report) return;
-    getAdicap(report, organeDetecte).then(setAdicap).catch(() => setAdicap(null));
-    getSnomed(report, organeDetecte).then(setSnomed).catch(() => setSnomed(null));
-  }, [report, organeDetecte]);
-
-  const relevantFields = useMemo(
-    () => donneesManquantes.filter((d) => !isAdminField(d.champ)),
-    [donneesManquantes]
+  const relevantMarkers = useMemo(
+    () => markers.filter((m) => !isAdminField(m.field)),
+    [markers],
   );
 
-  const activeFields = useMemo(
-    () => relevantFields.filter((d) => !dismissedFields.has(d.champ)),
-    [relevantFields, dismissedFields]
+  const activeMarkers = useMemo(
+    () => relevantMarkers.filter((m) => !dismissedFields.has(m.field)),
+    [relevantMarkers, dismissedFields],
   );
 
-  const dismissedCount = relevantFields.length - activeFields.length;
+  const dismissedCount = relevantMarkers.length - activeMarkers.length;
 
   const errorCount = useMemo(
     () =>
-      activeFields.filter((d) => {
-        const k = findFieldKnowledge(d.champ, organeDetecte);
-        return (k?.severity ?? (d.obligatoire ? "error" : "warning")) === "error";
+      activeMarkers.filter((m) => {
+        const k = findFieldKnowledge(m.field, organeDetecte);
+        return (k?.severity ?? m.severity) === "error";
       }).length,
-    [activeFields, organeDetecte]
+    [activeMarkers, organeDetecte],
   );
 
-  const warningCount = activeFields.length - errorCount;
+  const warningCount = activeMarkers.length - errorCount;
 
-  if (relevantFields.length === 0) {
+  if (relevantMarkers.length === 0) {
     return (
       <div className="flex flex-col gap-3">
         <div className="flex flex-col items-center gap-3 rounded-lg border border-success/30 bg-success/5 p-6 text-center">
@@ -433,85 +317,72 @@ export default function CompletionPanel({
             </p>
           </div>
         </div>
-
-        {/* Coding tabs: ADICAP / SNOMED */}
-        {(adicap || snomed) && (
-          <CodingTabs
-            adicap={adicap}
-            snomed={snomed}
-            codeTab={codeTab}
-            onTabChange={setCodeTab}
-          />
-        )}
+        {organeDetecte && <OrganGuidance organe={organeDetecte} />}
       </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-foreground">Completude</h3>
         <div className="flex items-center gap-2">
           {errorCount > 0 && (
             <Badge variant="destructive" className="gap-1 text-[0.65rem]">
               <AlertCircle className="h-3 w-3" />
-              {errorCount}
+              {errorCount} obligatoire{errorCount > 1 ? "s" : ""}
             </Badge>
           )}
           {warningCount > 0 && (
             <Badge variant="warning" className="gap-1 text-[0.65rem]">
               <AlertTriangle className="h-3 w-3" />
-              {warningCount}
+              {warningCount} recommande{warningCount > 1 ? "s" : ""}
             </Badge>
           )}
         </div>
       </div>
 
-      {/* Count */}
-      {activeFields.length > 0 && (
-        <p className="text-xs text-muted-foreground">
-          {activeFields.length} element{activeFields.length > 1 ? "s" : ""} a verifier
-        </p>
+      {/* Barre de progression */}
+      {relevantMarkers.length > 0 && (
+        <div className="space-y-1">
+          <div className="flex items-center justify-between text-[0.65rem] text-muted-foreground">
+            <span>{dismissedCount + (relevantMarkers.length - activeMarkers.length)} / {relevantMarkers.length} verifie{dismissedCount > 1 ? "s" : ""}</span>
+            <span>{Math.round(((relevantMarkers.length - activeMarkers.length) / relevantMarkers.length) * 100)}%</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-muted">
+            <div
+              className="h-1.5 rounded-full bg-primary transition-all duration-500"
+              style={{ width: `${((relevantMarkers.length - activeMarkers.length) / relevantMarkers.length) * 100}%` }}
+            />
+          </div>
+        </div>
       )}
 
-      {/* Coding tabs: ADICAP / SNOMED */}
-      {(adicap || snomed) && (
-        <CodingTabs
-          adicap={adicap}
-          snomed={snomed}
-          codeTab={codeTab}
-          onTabChange={setCodeTab}
-        />
-      )}
-
-      {/* Iterative hint */}
       <p className="rounded-md bg-accent/50 px-3 py-2 text-[0.7rem] text-muted-foreground">
-        Dictez les elements manquants pour completer le CR. Le rapport sera mis a jour automatiquement.
+        Dictez les elements manquants ou cliquez sur un champ pour le remplir.
+        Utilisez le bouton info pour comprendre pourquoi chaque champ est important.
       </p>
 
-      {/* Organ guidance */}
       {organeDetecte && <OrganGuidance organe={organeDetecte} />}
 
-      {/* Field cards - sorted by severity, errors first */}
       <div className="space-y-2">
-        {activeFields
+        {activeMarkers
           .sort((a, b) => {
-            const ka = findFieldKnowledge(a.champ, organeDetecte);
-            const kb = findFieldKnowledge(b.champ, organeDetecte);
-            const sa = ka?.severity ?? (a.obligatoire ? "error" : "warning");
-            const sb = kb?.severity ?? (b.obligatoire ? "error" : "warning");
+            const ka = findFieldKnowledge(a.field, organeDetecte);
+            const kb = findFieldKnowledge(b.field, organeDetecte);
+            const sa = ka?.severity ?? a.severity;
+            const sb = kb?.severity ?? b.severity;
             if (sa === "error" && sb !== "error") return -1;
             if (sa !== "error" && sb === "error") return 1;
             return 0;
           })
-          .map((donnee) => (
+          .map((marker) => (
             <FieldCard
-              key={donnee.champ}
-              donnee={donnee}
-              knowledge={findFieldKnowledge(donnee.champ, organeDetecte)}
-              onDismiss={() => onDismiss(donnee.champ)}
-              isDismissed={dismissedFields.has(donnee.champ)}
+              key={`${marker.section}:${marker.field}`}
+              marker={marker}
+              knowledge={findFieldKnowledge(marker.field, organeDetecte)}
+              onDismiss={() => onDismiss(marker.field)}
+              isDismissed={dismissedFields.has(marker.field)}
             />
           ))}
       </div>

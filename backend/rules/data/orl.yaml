@@ -1,0 +1,358 @@
+# Regles metier ACP - ORL (Oto-Rhino-Laryngologie)
+#
+# Source primaire : donnees minimales INCa 2023 pour pathologie ORL,
+# classification OMS 2022 des tumeurs de la tete et du cou, recommandations
+# AJCC 8e edition (distinction HPV+ / HPV- pour oropharynx).
+
+organe: orl
+nom_affichage: "ORL / Tete et cou"
+systeme_staging: "TNM 8e edition AJCC/UICC - tumeurs de la tete et du cou"
+description: >
+  Couvre les prelevements d'anatomopathologie ORL : cavite buccale,
+  oropharynx, hypopharynx, larynx, nasopharynx, cavites nasosinusiennes,
+  glandes salivaires, oreille. Inclut les biopsies diagnostiques et les
+  pieces de resection chirurgicale.
+
+sous_types:
+
+  biopsie_orl:
+    nom: "Biopsie ORL (cavite buccale, pharynx, larynx, nez, sinus)"
+    mots_cles_detection:
+      - biopsie orl
+      - biopsie buccale
+      - biopsie larynx
+      - biopsie pharynx
+      - biopsie oropharynx
+      - biopsie amygdale
+      - biopsie langue
+      - biopsie plancher buccal
+      - biopsie hypopharynx
+      - biopsie nasopharynx
+      - biopsie cavum
+      - biopsie sinus
+      - biopsie nasal
+      - biopsie corde vocale
+    champs_obligatoires:
+      - nom: "Localisation anatomique"
+        section: renseignements_cliniques
+        conditions: []
+        description: "Site precis : cavite buccale (langue, plancher, palais, gencive), oropharynx (amygdale, base de langue, voile), hypopharynx, larynx (sus-glottique, glottique, sous-glottique), cavum, nez, sinus."
+      - nom: "Nombre de fragments"
+        section: macroscopie
+        conditions: []
+        description: "Nombre et dimensions des biopsies."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: "Nature de la lesion : inflammatoire, dysplasie, carcinome, lymphome, tumeur salivaire, autre."
+      - nom: "Type de carcinome"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Carcinome epidermoide (keratinisant, non keratinisant, basaloide,
+          verruqueux, a cellules fusiformes), adenocarcinome, carcinome
+          adenoide kystique, carcinome mucoepidermoide, carcinome
+          indifferencie du nasopharynx (UCNT), autre OMS 2022.
+      - nom: "Grade de differenciation"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Bien, moyennement, peu differencie."
+      - nom: "p16 / HPV (oropharynx)"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: >
+          Expression de p16 obligatoire pour tout carcinome de l'oropharynx.
+          p16 positif = surrogate HPV+. Le TNM oropharynx HPV+ est
+          specifique (AJCC 8e edition, meilleur pronostic).
+      - nom: "EBV (nasopharynx)"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Recherche d'EBV (EBER-ISH) pour les carcinomes du nasopharynx."
+    marqueurs_ihc_attendus:
+      - p16
+      - p63
+      - CK5/6
+      - Ki67
+    template_macroscopie: >
+      Reception de [nombre] biopsies de [localisation], fixees en formol,
+      incluses en totalite.
+    notes: >
+      Pour les carcinomes de l'oropharynx, le statut p16/HPV modifie
+      completement la stadification TNM (8e edition). Les carcinomes
+      p16+ ont un TNM separe avec un meilleur pronostic stage par
+      stage. La distinction est obligatoire.
+
+  laryngectomie:
+    nom: "Laryngectomie"
+    mots_cles_detection:
+      - laryngectomie
+      - laryngectomie totale
+      - laryngectomie partielle
+      - cordectomie
+      - hemilaryngectomie
+      - laryngectomie supraglottique
+    champs_obligatoires:
+      - nom: "Type de resection"
+        section: titre
+        conditions: []
+        description: "Totale, partielle (cordectomie, hemilaryngectomie, supraglottique, supracricoïdienne)."
+      - nom: "Dimensions de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Dimensions en cm."
+      - nom: "Localisation tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Sus-glottique, glottique, sous-glottique, transglottique."
+      - nom: "Taille tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Plus grand diametre tumoral en cm."
+      - nom: "Extension macroscopique"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Franchissement des limites anatomiques (commissure, espace paraglottique, cartilage)."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Sous-type OMS 2022 du carcinome."
+      - nom: "Grade de differenciation"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Bien, moyennement, peu differencie."
+      - nom: "Invasion cartilagineuse"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Invasion du cartilage thyroide, cricoide. Critere T3/T4."
+      - nom: "Invasion de l'espace paraglottique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Emboles lymphovasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Invasion perineurale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Distance tumeur-marge pour chaque berge (superieure, inferieure, laterale, profonde). Saine >= 5 mm."
+      - nom: "Ganglions envahis / examines"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Si curage associe : ratio par niveau cervical, taille, effraction capsulaire (ENE)."
+      - nom: "Extension extranodale (ENE)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'effraction capsulaire ganglionnaire. Facteur pronostique majeur."
+      - nom: "pTNM"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pT pN (pM si connu) selon AJCC 8e edition."
+    marqueurs_ihc_attendus:
+      - p63
+      - CK5/6
+      - Ki67
+    template_macroscopie: >
+      Piece de laryngectomie [type] mesurant X x Y x Z cm. A la coupe :
+      tumeur de X cm localisee au niveau [sus-glottique/glottique/
+      sous-glottique], a X mm de la marge [superieure/inferieure].
+      Extension aux structures adjacentes : [description]. Curage
+      cervical [niveaux] : [nombre] ganglions identifies.
+    notes: >
+      L'extension extranodale (ENE) ganglionnaire est un facteur
+      pronostique independant majeur dans les carcinomes ORL et
+      modifie la classification pN (AJCC 8e edition).
+
+  glossectomie:
+    nom: "Glossectomie / Resection cavite buccale"
+    mots_cles_detection:
+      - glossectomie
+      - hemiglossectomie
+      - pelvi-glossectomie
+      - pelviglossectomie
+      - resection langue
+      - buccopharyngectomie
+      - mandibulectomie
+      - maxillectomie
+    champs_obligatoires:
+      - nom: "Type de resection"
+        section: titre
+        conditions: []
+        description: "Glossectomie partielle, hemiglossectomie, pelviglossectomie, mandibulectomie associee."
+      - nom: "Dimensions de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Trois dimensions en cm."
+      - nom: "Taille tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Plus grand diametre et profondeur d'invasion clinique."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Sous-type OMS 2022."
+      - nom: "Profondeur d'invasion (DOI)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Depth of Invasion en mm. Critere T majeur pour la cavite
+          buccale (AJCC 8e) : DOI <= 5 mm, > 5 et <= 10 mm, > 10 mm.
+      - nom: "Grade de differenciation"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Bien, moyennement, peu differencie."
+      - nom: "Emboles lymphovasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Invasion perineurale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Invasion osseuse"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Si mandibulectomie associee : invasion osseuse corticale ou medullaire."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Distance tumeur-marge muqueuse et profonde en mm."
+      - nom: "Ganglions envahis / examines"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Ratio par niveau cervical, ENE."
+      - nom: "pTNM"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pT pN selon AJCC 8e edition. Le pT tient compte du DOI."
+    marqueurs_ihc_attendus:
+      - p63
+      - CK5/6
+    template_macroscopie: >
+      Piece de [type] glossectomie mesurant X x Y x Z cm. Tumeur de X cm,
+      a X mm de la marge [muqueuse/profonde] la plus proche. Encrage des
+      marges. Inclusion en totalite de la tumeur.
+    notes: >
+      La profondeur d'invasion (DOI) est un critere majeur dans
+      l'AJCC 8e edition pour la cavite buccale. Elle se mesure depuis
+      la ligne de base de la muqueuse adjacente normale, pas depuis
+      la surface tumorale.
+
+  parotidectomie:
+    nom: "Parotidectomie / Resection glande salivaire"
+    mots_cles_detection:
+      - parotidectomie
+      - sous-maxillectomie
+      - submandibulectomie
+      - resection parotide
+      - piece parotidienne
+      - tumeur parotide
+    champs_obligatoires:
+      - nom: "Type de resection"
+        section: titre
+        conditions: []
+        description: "Parotidectomie superficielle, totale, sous-maxillectomie."
+      - nom: "Dimensions et poids"
+        section: macroscopie
+        conditions: []
+        description: "Dimensions en cm et poids en grammes."
+      - nom: "Taille tumorale"
+        section: macroscopie
+        conditions: []
+        description: "Plus grand diametre tumoral."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          Classification OMS 2022 des tumeurs salivaires : adenome
+          pleomorphe, tumeur de Warthin, carcinome mucoepidermoide
+          (bas/intermediaire/haut grade), carcinome adenoide kystique,
+          carcinome a cellules acineuses, carcinome canalaire salivaire,
+          carcinome ex-adenome pleomorphe, adenocarcinome NOS, autre.
+      - nom: "Grade histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Bas, intermediaire ou haut grade selon le type (variable selon histotype)."
+      - nom: "Invasion perineurale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence. Nerf facial (VII) si identifiable."
+      - nom: "Emboles lymphovasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Extension extraglandulaire"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Extension au-dela de la capsule glandulaire."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Distance tumeur-marge en mm. Saine ou atteinte."
+      - nom: "Ganglions envahis / examines"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Si curage associe."
+      - nom: "pTNM"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pT pN selon AJCC 8e edition (glandes salivaires majeures)."
+    marqueurs_ihc_attendus:
+      - p63
+      - CK7
+      - CK5/6
+      - S100
+      - SMA
+      - DOG1
+      - SOX10
+      - mammaglobine
+      - androgen receptor (AR)
+    template_macroscopie: >
+      Piece de [type] parotidectomie mesurant X x Y x Z cm, pesant W g.
+      A la coupe : tumeur de X cm, [bien limitee/infiltrante], [aspect].
+      Distance a la marge la plus proche : X mm. Inclusion en totalite.
+    notes: >
+      Le carcinome adenoide kystique a un tropisme perineural majeur
+      et peut infiltrer le nerf facial sur de longues distances.
+      L'examen des berges chirurgicales perineurales est essentiel.
+
+  biopsie_salivaire:
+    nom: "Biopsie de glande salivaire accessoire"
+    mots_cles_detection:
+      - biopsie salivaire
+      - biopsie glande salivaire accessoire
+      - biopsie gsa
+      - biopsie levrale
+      - biopsie levre
+      - sialadenie
+    champs_obligatoires:
+      - nom: "Nombre de glandes prelevees"
+        section: macroscopie
+        conditions: []
+        description: "Minimum 4-6 glandes salivaires accessoires pour une evaluation adequate."
+      - nom: "Score de Chisholm et Mason"
+        section: microscopie
+        conditions: []
+        description: >
+          Nombre de focus lymphocytaires (>= 50 lymphocytes) par 4 mm2.
+          Focus score >= 1 : compatible avec syndrome de Sjogren.
+      - nom: "Fibrose et atrophie acineuse"
+        section: microscopie
+        conditions: []
+        description: "Degre de fibrose interstitielle et d'atrophie des acini."
+      - nom: "Autres lesions"
+        section: microscopie
+        conditions: []
+        description: "Granulomes (sarcoidose), amylose, tumeur."
+    marqueurs_ihc_attendus: []
+    template_macroscopie: >
+      Reception de [nombre] biopsies de glandes salivaires accessoires
+      de la levre inferieure, fixees en formol, incluses en totalite.
+    notes: >
+      Le focus score (critere ACR/EULAR 2016 pour le syndrome de
+      Sjogren) necessite un minimum de 4 glandes salivaires
+      evaluables et une surface de 4 mm2 de tissu glandulaire.

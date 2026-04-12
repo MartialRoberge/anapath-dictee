@@ -1,0 +1,13 @@
+BIOPSIES D'UNE LESION PULMONAIRE DU LOBE INFERIEUR DROIT
+Renseignements cliniques : adénocarcinome muté KRAS G12C du lobe inférieur droit.
+Une carotte biopsique, mesurant 5 mm de longueur, a été adressée fixée en formol, incluse en paraffine et examinée sur deux plans de coupe.
+L'étude histologique trouve une prolifération tumorale faite de plages de cellules fortement atypiques, au sein desquelles on distingues de rares structures glandulaires. Il n'est pas observé de mucosécrétion. Il s'y associe un stroma fibro-hyalin, légèrement inflammatoire.
+Immunomarquage :  réalisé sur tissu fixé et coupes en paraffine, après restauration antigénique par la chaleur, utilisation de l'automate BOND III (Leica) et application des anticorps suivants :
+CONCLUSION :
+Adénocarcinome infiltrant non mucineux, d'architecture acineuse, de phénotype TTF1 + en accord avec une origine pulmonaire.
+Expression de PD-L1 par 5% des cellules tumorales environ.
+Absence de détection de la protéine ALK en immunohistochimie.
+	RESULTATS	Témoin +
+TTF-1	Marquage nucléaire d'intensité forte de l'ensemble des cellules tumorales	
+PD-L1 (clone QR1)	marquage membranaire intéressant environ 5% des cellules tumorales (analyse difficile en raison de la présence de cellules immunes marquées et d'artéfacts d'écrasement)	
+ALK (clone 1A4)	Absence de marquage des cellules tumorales	Externe+

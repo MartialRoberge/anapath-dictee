@@ -404,7 +404,127 @@ export const FIELD_KNOWLEDGE: FieldKnowledge[] = [
     risk: "Staging imprecis.",
     severity: "warning",
     icon: "E",
-    organs: ["thyroide"],
+    organs: ["endocrinologie"],
+  },
+  {
+    keywords: ["bethesda"],
+    title: "Classification Bethesda",
+    why: "Systeme standardise de classification des cytoponctions thyroidiennes. Determine la conduite a tenir.",
+    norm: "Bethesda System for Reporting Thyroid Cytopathology, 3e edition (2023)",
+    risk: "Conduite a tenir non determinable sans classification Bethesda.",
+    severity: "error",
+    icon: "B",
+    organs: ["endocrinologie"],
+  },
+
+  // ═══════════════════════════════════════
+  // UROLOGIE
+  // ═══════════════════════════════════════
+  {
+    keywords: ["fuhrman", "isup nucleaire", "grade nucleaire"],
+    title: "Grade nucleaire Fuhrman/ISUP",
+    why: "Systeme de gradation specifique aux carcinomes renaux. Facteur pronostique independant.",
+    norm: "OMS 2022 / ISUP 2013 / INCa Donnees minimales rein",
+    risk: "Gradation tumorale absente. Pronostic non evaluable.",
+    severity: "error",
+    icon: "G",
+    organs: ["urologie"],
+  },
+  {
+    keywords: ["invasion sinusale", "graisse sinusale"],
+    title: "Invasion de la graisse sinusale",
+    why: "Modifie le pT dans les cancers du rein (pT3a). Facteur pronostique majeur.",
+    norm: "AJCC 8e edition Rein / INCa",
+    risk: "Sous-staging si non recherche.",
+    severity: "warning",
+    icon: "S",
+    organs: ["urologie"],
+  },
+
+  // ═══════════════════════════════════════
+  // GYNECOLOGIE
+  // ═══════════════════════════════════════
+  {
+    keywords: ["cin", "lsil", "hsil", "neoplasie intraepitheliale"],
+    title: "Grade CIN / LSIL / HSIL",
+    why: "Classification des lesions precancereuses du col uterin. Determine la surveillance ou le traitement.",
+    norm: "OMS 2020 / Bethesda cervical / INCa",
+    risk: "Risque de progression vers le carcinome non evalue.",
+    severity: "error",
+    icon: "C",
+    organs: ["gynecologie"],
+  },
+  {
+    keywords: ["invasion myometre", "myometre", "profondeur invasion"],
+    title: "Invasion du myometre",
+    why: "Determine le staging FIGO de l'adenocarcinome endometrial. < 50% vs >= 50%.",
+    norm: "FIGO 2023 / OMS 2020 / INCa",
+    risk: "Staging FIGO indeterminable.",
+    severity: "error",
+    icon: "M",
+    organs: ["gynecologie"],
+  },
+
+  // ═══════════════════════════════════════
+  // HEMATOLOGIE
+  // ═══════════════════════════════════════
+  {
+    keywords: ["classification oms lymphome", "type lymphome", "sous-type lymphome"],
+    title: "Classification OMS des lymphomes",
+    why: "La classification OMS 2022 est le standard pour les neoplasies hematopoietiques. Conditionne le traitement.",
+    norm: "OMS Classification of Haematolymphoid Tumours, 5e edition (2022)",
+    risk: "Traitement non decidable sans classification precise.",
+    severity: "error",
+    icon: "L",
+    organs: ["hematologie"],
+  },
+
+  // ═══════════════════════════════════════
+  // NEUROLOGIE
+  // ═══════════════════════════════════════
+  {
+    keywords: ["idh", "idh1", "idh2", "statut idh"],
+    title: "Statut IDH",
+    why: "Biomarqueur obligatoire pour la classification OMS 2021 des gliomes. IDH-mutant vs IDH-wildtype.",
+    norm: "OMS Classification of CNS Tumours, 5e edition (2021)",
+    risk: "Classification moleculaire du gliome impossible.",
+    severity: "error",
+    icon: "I",
+    organs: ["neurologie"],
+  },
+  {
+    keywords: ["grade oms", "grade 1", "grade 2", "grade 3", "grade 4"],
+    title: "Grade OMS (1-4)",
+    why: "Determine l'agressivite de la tumeur cerebrale et conditionne le traitement adjuvant.",
+    norm: "OMS CNS 2021 / EANO Guidelines",
+    risk: "Pronostic et traitement non evaluables.",
+    severity: "error",
+    icon: "G",
+    organs: ["neurologie"],
+  },
+
+  // ═══════════════════════════════════════
+  // TISSUS MOUS / OS
+  // ═══════════════════════════════════════
+  {
+    keywords: ["fnclcc", "grade fnclcc"],
+    title: "Grade FNCLCC",
+    why: "Systeme de gradation des sarcomes (3 composantes : differenciation, mitoses, necrose). Standard en France.",
+    norm: "FNCLCC / OMS Soft Tissue Tumours 2020 / ESMO",
+    risk: "Gradation tumorale absente. Decision therapeutique impossible.",
+    severity: "error",
+    icon: "F",
+    organs: ["tissus_mous", "os_articulations"],
+  },
+  {
+    keywords: ["necrose tumorale", "pourcentage necrose"],
+    title: "Necrose tumorale",
+    why: "Composante du grade FNCLCC. > 50% de necrose = grade 3. Facteur pronostique independant.",
+    norm: "FNCLCC / OMS 2020",
+    risk: "Grade FNCLCC non calculable sans evaluation de la necrose.",
+    severity: "warning",
+    icon: "N",
+    organs: ["tissus_mous", "os_articulations"],
   },
 ];
 
@@ -472,6 +592,101 @@ export const ORGAN_GUIDANCE: Record<string, { title: string; tips: string[] }> =
       "Statut p16 obligatoire pour les HSIL",
       "Mentionner la presence de koilocytes (HPV)",
       "Recherche de composante infiltrante obligatoire",
+    ],
+  },
+  urologie: {
+    title: "Urologie",
+    tips: [
+      "Score de Gleason et Grade Group ISUP obligatoires (prostate)",
+      "Mentionner le pourcentage de chaque pattern Gleason",
+      "Rein : grade Fuhrman/ISUP, type OMS, invasion sinusale et veineuse",
+      "Vessie : profondeur d'invasion (pTa, pT1, pT2+)",
+    ],
+  },
+  digestif: {
+    title: "Digestif",
+    tips: [
+      "Colon : minimum 12 ganglions, budding (ITBCC 2024), statut MMR/MSI",
+      "Rectum : marge circonferentielle (CRM) obligatoire",
+      "Estomac : classification de Lauren, statut HER2 si ADK",
+      "Foie : score METAVIR pour biopsies hepatiques",
+    ],
+  },
+  gynecologie: {
+    title: "Gynecologie",
+    tips: [
+      "Col : classification CIN/LSIL/HSIL, statut p16 obligatoire pour HSIL",
+      "Endometre : type histologique, grade FIGO, invasion du myometre",
+      "Ovaire : type OMS 2020, staging FIGO",
+    ],
+  },
+  orl: {
+    title: "ORL",
+    tips: [
+      "Oropharynx : statut p16/HPV obligatoire",
+      "Classification OMS des tumeurs de la tete et du cou",
+      "Marges de resection en mm",
+    ],
+  },
+  hematologie: {
+    title: "Hematologie",
+    tips: [
+      "Classification OMS 2022 des tumeurs hematopoietiques",
+      "Panel IHC complet : CD20, CD3, CD5, CD10, BCL2, BCL6, Ki67",
+      "Recherche EBV si lymphome agressif",
+    ],
+  },
+  dermatologie: {
+    title: "Dermatologie",
+    tips: [
+      "Melanome : Breslow (mm), Clark, ulceration, index mitotique",
+      "Carcinomes cutanes : grade, marges laterales et profondes, PNI",
+      "Statut BRAF si melanome stade III/IV",
+    ],
+  },
+  endocrinologie: {
+    title: "Endocrinologie / Thyroide",
+    tips: [
+      "Cytoponction : classification Bethesda (I-VI)",
+      "Chirurgie : classification OMS 2022, extension extrathyroidienne",
+      "Recherche invasion vasculaire et capsulaire",
+    ],
+  },
+  cardiovasculaire: {
+    title: "Cardiovasculaire",
+    tips: [
+      "Biopsie myocardique : grade de rejet ISHLT (0, 1R, 2R, 3R)",
+      "Pieces vasculaires : nature de la lesion, degre d'atherosclerose",
+    ],
+  },
+  neurologie: {
+    title: "Neurologie",
+    tips: [
+      "Classification OMS 2021 des tumeurs du SNC",
+      "Grade OMS (1-4), statut IDH, ATRX, 1p/19q, MGMT",
+      "Ki67 pour evaluation de la proliferation",
+    ],
+  },
+  os_articulations: {
+    title: "Os et articulations",
+    tips: [
+      "Grade FNCLCC pour les sarcomes osseux",
+      "Type OMS, marges de resection, pourcentage de necrose",
+    ],
+  },
+  tissus_mous: {
+    title: "Tissus mous",
+    tips: [
+      "Sarcomes : grade FNCLCC (3 composantes), type OMS 2020",
+      "Marges de resection, necrose tumorale, index mitotique",
+    ],
+  },
+  generic: {
+    title: "Organe non determine",
+    tips: [
+      "Les sections obligatoires universelles seront verifiees",
+      "L'organe sera detecte automatiquement a la prochaine iteration",
+      "Dictez le type de prelevement et l'organe pour une analyse plus precise",
     ],
   },
   non_determine: {

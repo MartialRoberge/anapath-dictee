@@ -1,41 +1,137 @@
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
 function getAuthHeaders(): Record<string, string> {
-  const token = localStorage.getItem("lexia_access_token");
+  const token = localStorage.getItem("iris_access_token");
   if (!token) return {};
   return { Authorization: `Bearer ${token}` };
 }
+
+/* ------------------------------------------------------------------ */
+/*  Types v4 — miroir des schemas.py backend                           */
+/* ------------------------------------------------------------------ */
 
 export interface TranscriptionResult {
   raw_transcription: string;
 }
 
-export interface DonneeManquante {
-  champ: string;
-  description: string;
-  section: string;
-  obligatoire: boolean;
+export type MarkerSection =
+  | "titre"
+  | "renseignements_cliniques"
+  | "macroscopie"
+  | "microscopie"
+  | "immunomarquage"
+  | "biologie_moleculaire"
+  | "conclusion";
+
+export interface Marker {
+  field: string;
+  section: MarkerSection;
+  rule_id: string;
+  severity: "error" | "warning" | "info";
+  message: string;
+  auto_filled: boolean;
+  auto_filled_value: string;
+}
+
+export interface IhcRow {
+  anticorps: string;
+  resultat: string;
+  temoin: string;
+}
+
+export interface IhcTable {
+  phrase_introduction: string;
+  lignes: IhcRow[];
+}
+
+export interface Prelevement {
+  numero: number;
+  titre_court: string;
+  macroscopie: string;
+  microscopie: string;
+  immunomarquage: IhcTable | null;
+  biologie_moleculaire: string;
+}
+
+export interface CRDocument {
+  titre: string;
+  renseignements_cliniques: string;
+  prelevements: Prelevement[];
+  conclusion: string;
+  ptnm: string;
+  commentaire_final: string;
+  code_adicap: string;
+  codes_snomed: string[];
+}
+
+export interface ClassificationCandidate {
+  organe: string;
+  sous_type: string;
+  est_carcinologique: boolean;
+  diagnostic_presume: string;
+  confidence: number;
+}
+
+export interface Classification {
+  top: ClassificationCandidate;
+  alternative: ClassificationCandidate | null;
+  transcript_normalise: string;
+  confidence_threshold: number;
 }
 
 export interface FormatResult {
+  trace_id: string;
   formatted_report: string;
-  organe_detecte: string;
-  donnees_manquantes: DonneeManquante[];
+  document: CRDocument;
+  classification: Classification;
+  markers: Marker[];
 }
 
-export interface IterationResult {
-  formatted_report: string;
-  organe_detecte: string;
-  donnees_manquantes: DonneeManquante[];
-}
+export type IterationResult = FormatResult;
 
 export interface SectionsResult {
   sections: Record<string, string>;
 }
 
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+const DEFAULT_TIMEOUT_MS = 120_000; // 2 min pour les appels Claude
+
+async function handleResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ detail: "Erreur inconnue" }));
+    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
+  }
+  return response.json() as Promise<T>;
+}
+
+function jsonHeaders(): Record<string, string> {
+  return { "Content-Type": "application/json", ...getAuthHeaders() };
+}
+
+function fetchWithTimeout(
+  url: string,
+  options: RequestInit,
+  timeoutMs: number = DEFAULT_TIMEOUT_MS,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() =>
+    clearTimeout(timer),
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Endpoints                                                          */
+/* ------------------------------------------------------------------ */
+
 export async function transcribeAudio(
   audioBlob: Blob,
-  filename: string = "recording.webm"
+  filename: string = "recording.webm",
 ): Promise<string> {
   const formData = new FormData();
   formData.append("file", audioBlob, filename);
@@ -46,189 +142,69 @@ export async function transcribeAudio(
     body: formData,
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
-    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
-  }
-
-  const data: TranscriptionResult = await response.json();
+  const data = await handleResponse<TranscriptionResult>(response);
   return data.raw_transcription;
 }
 
 export async function formatTranscription(
   rawText: string,
-  rapportPrecedent?: string
 ): Promise<FormatResult> {
   const body: Record<string, string> = { raw_text: rawText };
-  if (rapportPrecedent) {
-    body.rapport_precedent = rapportPrecedent;
-  }
 
-  const response = await fetch(`${API_BASE}/format`, {
+  const response = await fetchWithTimeout(`${API_BASE}/format`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+    headers: jsonHeaders(),
     body: JSON.stringify(body),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
-    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
-  }
-
-  const data: FormatResult = await response.json();
-  return data;
+  return handleResponse<FormatResult>(response);
 }
 
 export async function iterateReport(
   rapportActuel: string,
-  nouveauTranscript: string
+  nouveauTranscript: string,
 ): Promise<IterationResult> {
-  const response = await fetch(`${API_BASE}/iterate`, {
+  const response = await fetchWithTimeout(`${API_BASE}/iterate`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+    headers: jsonHeaders(),
     body: JSON.stringify({
       rapport_actuel: rapportActuel,
       nouveau_transcript: nouveauTranscript,
     }),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
-    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
-  }
-
-  const data: IterationResult = await response.json();
-  return data;
+  return handleResponse<IterationResult>(response);
 }
 
 export async function getSections(
-  formattedReport: string
+  formattedReport: string,
 ): Promise<SectionsResult> {
   const response = await fetch(`${API_BASE}/sections`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+    headers: jsonHeaders(),
     body: JSON.stringify({ formatted_report: formattedReport }),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
-    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
-  }
-
-  const data: SectionsResult = await response.json();
-  return data;
-}
-
-export interface AdicapResult {
-  code: string;
-  prelevement: string;
-  prelevement_code: string;
-  technique: string;
-  technique_code: string;
-  organe: string;
-  organe_code: string;
-  lesion: string;
-  lesion_code: string;
-}
-
-export interface CompletudeResult {
-  score: number;
-  total_champs: number;
-  champs_presents: number;
-  pourcentage: number;
-}
-
-export async function getAdicap(
-  formattedReport: string,
-  organeDetecte: string
-): Promise<AdicapResult> {
-  const response = await fetch(`${API_BASE}/adicap`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-    body: JSON.stringify({
-      formatted_report: formattedReport,
-      organe_detecte: organeDetecte,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
-    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
-  }
-
-  return response.json();
-}
-
-export async function getCompletude(
-  formattedReport: string,
-  organeDetecte: string
-): Promise<CompletudeResult> {
-  const response = await fetch(`${API_BASE}/completude`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-    body: JSON.stringify({
-      formatted_report: formattedReport,
-      organe_detecte: organeDetecte,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
-    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
-  }
-
-  return response.json();
-}
-
-export interface SnomedCode {
-  code: string;
-  display: string;
-  system: string;
-}
-
-export interface SnomedResult {
-  topography: SnomedCode;
-  morphology: SnomedCode;
-}
-
-export async function getSnomed(
-  formattedReport: string,
-  organeDetecte: string
-): Promise<SnomedResult> {
-  const response = await fetch(`${API_BASE}/snomed`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-    body: JSON.stringify({
-      formatted_report: formattedReport,
-      organe_detecte: organeDetecte,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
-    throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
-  }
-
-  return response.json();
+  return handleResponse<SectionsResult>(response);
 }
 
 export async function exportDocx(
   formattedReport: string,
-  title?: string
+  title?: string,
 ): Promise<Blob> {
   const body: Record<string, string> = { formatted_report: formattedReport };
-  if (title) {
-    body.title = title;
-  }
+  if (title) body.title = title;
 
   const response = await fetch(`${API_BASE}/export`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+    headers: jsonHeaders(),
     body: JSON.stringify(body),
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: "Erreur inconnue" }));
+    const error = await response
+      .json()
+      .catch(() => ({ detail: "Erreur inconnue" }));
     throw new Error(error.detail ?? `Erreur HTTP ${response.status}`);
   }
 

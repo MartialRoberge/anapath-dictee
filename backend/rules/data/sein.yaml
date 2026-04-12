@@ -1,0 +1,404 @@
+# Regles metier ACP - Sein
+#
+# Source primaire : donnees minimales INCa 2023 pour pathologie mammaire,
+# classification OMS 2022 des tumeurs du sein, recommandations ASCO/CAP
+# pour RE/RP/HER2/Ki67, grading SBR modifie Elston & Ellis (Nottingham).
+#
+# Les champs avec ``conditions: [carcinologique]`` ne sont obligatoires
+# que si la lesion est carcinomateuse. Ceux avec des conditions
+# supplementaires (ex: [carcinologique, carcinome_infiltrant]) requierent
+# en plus un diagnostic specifique.
+
+organe: sein
+nom_affichage: "Sein"
+systeme_staging: "TNM 8e edition AJCC/UICC - cancer du sein"
+description: >
+  Couvre toutes les pratiques d'anatomopathologie mammaire : microbiopsies,
+  macrobiopsies, tumorectomies, mastectomies, ganglions sentinelles,
+  curages axillaires, pieces de recoupe et oncoplasties.
+
+sous_types:
+
+  biopsie_mammaire:
+    nom: "Biopsie mammaire (microbiopsie)"
+    mots_cles_detection:
+      - biopsie mammaire
+      - microbiopsie mammaire
+      - biopsie sein
+      - microbiopsie sein
+      - biopsie du sein
+      - ponction biopsie mammaire
+    champs_obligatoires:
+      - nom: "Nombre de carottes"
+        section: macroscopie
+        conditions: []
+        description: "Nombre et dimensions des carottes biopsiques."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: "Nature de la lesion (inflammatoire, fibrokystique, tumorale...)."
+      - nom: "Type de carcinome"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Sous-type selon OMS 2022 : carcinome infiltrant de type non
+          specifique (NST), lobulaire, tubuleux, mucineux, micropapillaire,
+          medullaire-like, metaplasique, autre.
+      - nom: "Composante in situ"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence de carcinome in situ associe (canalaire ou lobulaire), et son grade nucleaire."
+      - nom: "Grade SBR modifie (Nottingham)"
+        section: microscopie
+        conditions: [carcinologique, carcinome_infiltrant]
+        description: >
+          Score Elston & Ellis sur 9 : differenciation tubulaire (1-3),
+          pleomorphisme nucleaire (1-3), index mitotique (1-3). Grade I/II/III.
+      - nom: "Emboles vasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'emboles lymphovasculaires."
+      - nom: "Recepteurs aux estrogenes (RE)"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Pourcentage de cellules tumorales marquees et intensite. Score Allred recommande."
+      - nom: "Recepteurs a la progesterone (RP)"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Pourcentage de cellules tumorales marquees et intensite. Score Allred recommande."
+      - nom: "HER2"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Score HER2 en IHC (0, 1+, 2+, 3+). Si 2+ equivoque : hybridation in situ (FISH/CISH) recommandee."
+      - nom: "Ki67"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Index de proliferation Ki67 en pourcentage de cellules tumorales marquees."
+    marqueurs_ihc_attendus:
+      - RE
+      - RP
+      - HER2
+      - Ki67
+      - E-cadherine
+    template_macroscopie: >
+      Reception de [nombre] carottes biopsiques mesurant de X a Y mm de
+      longueur, fixees en formol, incluses en totalite en un bloc et
+      examinees sur deux plans de coupe.
+    notes: >
+      Pour une biopsie non carcinologique (mastopathie fibrokystique,
+      adenose, fibroadenome), seul le type histologique est requis.
+      Le panel IHC RE/RP/HER2/Ki67 est OBLIGATOIRE pour tout carcinome
+      infiltrant selon les recommandations ASCO/CAP.
+
+  macrobiopsie:
+    nom: "Macrobiopsie mammaire (vacuum-assisted)"
+    mots_cles_detection:
+      - macrobiopsie
+      - macrobiopsie mammaire
+      - macrobiopsie sein
+      - mammotome
+      - biopsie assistee par aspiration
+      - vacuum
+    champs_obligatoires:
+      - nom: "Nombre de carottes et calibre"
+        section: macroscopie
+        conditions: []
+        description: "Nombre de carottes, calibre de l'aiguille (8G, 10G, 11G...), dimensions."
+      - nom: "Presence de microcalcifications"
+        section: macroscopie
+        conditions: []
+        description: "Verification radiologique des microcalcifications sur les carottes (radiographie des prelevements)."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: "Nature de la lesion identifiee."
+      - nom: "Lesion a risque"
+        section: microscopie
+        conditions: []
+        description: "Presence d'hyperplasie canalaire atypique (HCA), neoplasie lobulaire in situ (LIN), cicatrice radiaire, lesion papillaire."
+      - nom: "Composante in situ"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "CCIS : grade nucleaire (bas, intermediaire, haut), architecture, necrose comedonienne."
+      - nom: "Grade SBR modifie (Nottingham)"
+        section: microscopie
+        conditions: [carcinologique, carcinome_infiltrant]
+        description: "Score Elston & Ellis. Grade I/II/III."
+      - nom: "Recepteurs aux estrogenes (RE)"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Pourcentage et intensite."
+      - nom: "Recepteurs a la progesterone (RP)"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Pourcentage et intensite."
+      - nom: "HER2"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Score IHC (0, 1+, 2+, 3+)."
+      - nom: "Ki67"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Index de proliferation en pourcentage."
+    marqueurs_ihc_attendus:
+      - RE
+      - RP
+      - HER2
+      - Ki67
+      - E-cadherine
+      - p63
+      - CK5/6
+    template_macroscopie: >
+      Reception de [nombre] carottes de macrobiopsie au mammotome calibre
+      [X]G, mesurant de X a Y mm. Radiographie des prelevements confirmant
+      la presence de microcalcifications. Inclusion en totalite en [N] blocs.
+    notes: >
+      La verification de la presence de microcalcifications sur la
+      radiographie des carottes est essentielle pour les indications
+      radiologiques. Mentionner leur presence sur coupes histologiques.
+
+  tumorectomie:
+    nom: "Tumorectomie / Zonectomie mammaire"
+    mots_cles_detection:
+      - tumorectomie
+      - zonectomie
+      - lumpectomie
+      - segmentectomie mammaire
+      - quadrantectomie
+      - exerese mammaire
+      - piece de tumorectomie
+    champs_obligatoires:
+      - nom: "Orientation de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Reperage par fils ou clips (superieur, lateral, profond...)."
+      - nom: "Dimensions de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Trois dimensions en cm."
+      - nom: "Encrage des marges"
+        section: macroscopie
+        conditions: []
+        description: "Couleurs utilisees pour chaque marge (ex: bleu=superieur, noir=profond)."
+      - nom: "Taille tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Plus grand diametre tumoral macroscopique en mm."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Sous-type OMS 2022 du carcinome infiltrant."
+      - nom: "Composante in situ"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence, grade nucleaire, etendue, necrose comedonienne. Distance aux marges pour le CCIS."
+      - nom: "Grade SBR modifie (Nottingham)"
+        section: microscopie
+        conditions: [carcinologique, carcinome_infiltrant]
+        description: "Score detaille (differenciation + pleomorphisme + mitoses) et grade global I/II/III."
+      - nom: "Emboles lymphovasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Invasion perineurale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Distance minimale tumeur-marge pour chaque berge (superieure,
+          inferieure, mediale, laterale, anterieure, profonde). Marge
+          saine >= 2 mm pour composante infiltrante, >= 2 mm pour CCIS.
+      - nom: "Recepteurs aux estrogenes (RE)"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Pourcentage et intensite. Score Allred."
+      - nom: "Recepteurs a la progesterone (RP)"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Pourcentage et intensite. Score Allred."
+      - nom: "HER2"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Score IHC. FISH/CISH si 2+."
+      - nom: "Ki67"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Index de proliferation en pourcentage."
+      - nom: "pTNM"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pT pN selon AJCC 8e edition."
+    marqueurs_ihc_attendus:
+      - RE
+      - RP
+      - HER2
+      - Ki67
+      - E-cadherine
+    template_macroscopie: >
+      Piece de tumorectomie mammaire orientee par fils, mesurant X x Y x Z cm.
+      Encrage : bleu = superieur, noir = profond, vert = inferieur. A la
+      coupe : tumeur de X cm de grand axe, blanchatre, ferme, situee a X mm
+      de la marge la plus proche ([nom de la marge]). Inclusion en totalite
+      de la tumeur et des berges.
+    notes: >
+      Les marges doivent etre evaluees pour la composante infiltrante ET
+      la composante in situ separement. Les referentiels INCa 2023
+      recommandent >= 2 mm pour le CCIS.
+
+  mastectomie:
+    nom: "Mastectomie"
+    mots_cles_detection:
+      - mastectomie
+      - mastectomie totale
+      - mastectomie radicale
+      - mastectomie peau
+      - mastectomie avec conservation etui cutane
+      - piece de mastectomie
+    champs_obligatoires:
+      - nom: "Type de mastectomie"
+        section: titre
+        conditions: []
+        description: "Totale, radicale modifiee, avec conservation de l'etui cutane, skin-sparing, nipple-sparing."
+      - nom: "Dimensions et poids de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Trois dimensions en cm et poids en grammes."
+      - nom: "Orientation de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Reperage chirurgical."
+      - nom: "Taille tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Plus grand diametre tumoral en mm."
+      - nom: "Multifocalite / multicentricite"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Nombre de foyers tumoraux, localisation dans les quadrants."
+      - nom: "Distance aux marges"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Distance tumeur-peau, tumeur-plan profond, tumeur-berges laterales."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Sous-type OMS 2022."
+      - nom: "Composante in situ"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence, type, grade nucleaire, etendue, necrose."
+      - nom: "Grade SBR modifie (Nottingham)"
+        section: microscopie
+        conditions: [carcinologique, carcinome_infiltrant]
+        description: "Score detaille et grade global."
+      - nom: "Emboles lymphovasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence, extensifs ou non."
+      - nom: "Invasion perineurale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Atteinte cutanee"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Extension au derme, invasion cutanee, ulceration, maladie de Paget."
+      - nom: "Atteinte du muscle pectoral"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'extension au plan profond."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Distance minimale pour chaque berge, atteinte ou non."
+      - nom: "Ganglions envahis / examines"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Si curage axillaire associe : ratio, taille des metastases, effraction capsulaire."
+      - nom: "Recepteurs aux estrogenes (RE)"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Pourcentage et intensite."
+      - nom: "Recepteurs a la progesterone (RP)"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Pourcentage et intensite."
+      - nom: "HER2"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Score IHC. FISH/CISH si equivoque."
+      - nom: "Ki67"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Index de proliferation."
+      - nom: "pTNM"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pT pN (pM si connu) selon AJCC 8e edition."
+    marqueurs_ihc_attendus:
+      - RE
+      - RP
+      - HER2
+      - Ki67
+      - E-cadherine
+    template_macroscopie: >
+      Piece de mastectomie [type] [droite/gauche] mesurant X x Y x Z cm,
+      pesant W g. Reperage chirurgical. A la coupe : tumeur de X cm de
+      grand axe dans le quadrant [position], situee a X mm de la peau et
+      X mm du plan profond. Recherche de foyers satellites. Inclusion
+      en totalite de la tumeur et des berges.
+    notes: >
+      En cas de chimiotherapie neoadjuvante, evaluer la reponse
+      histologique selon le score RCB (Residual Cancer Burden) ou
+      la classification Chevallier/Sataloff. Le ypTNM remplace le pTNM.
+
+  ganglion_sentinelle:
+    nom: "Ganglion sentinelle mammaire"
+    mots_cles_detection:
+      - ganglion sentinelle
+      - gs
+      - sentinelle
+      - ganglion sentinelle mammaire
+      - technique du ganglion sentinelle
+    champs_obligatoires:
+      - nom: "Nombre de ganglions"
+        section: macroscopie
+        conditions: []
+        description: "Nombre de ganglions recus et dimensions de chacun."
+      - nom: "Technique d'examen"
+        section: macroscopie
+        conditions: []
+        description: "Examen extemporane (empreinte cytologique, coupe congelee) ou non."
+      - nom: "Statut metastatique"
+        section: microscopie
+        conditions: []
+        description: >
+          Classification AJCC : cellules tumorales isolees (ITC, <= 0.2 mm,
+          pN0(i+)), micrometastase (> 0.2 mm et <= 2 mm, pN1mi),
+          macrometastase (> 2 mm, pN1).
+      - nom: "Taille du plus grand foyer metastatique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Plus grand diametre de la metastase en mm."
+      - nom: "Effraction capsulaire"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'extension extraganglionnaire."
+      - nom: "Immunohistochimie anti-cytokeratine"
+        section: immunomarquage
+        conditions: []
+        description: "Realisation systematique de CK AE1/AE3 ou CK19 sur coupes seriees."
+    marqueurs_ihc_attendus:
+      - CK AE1/AE3
+      - CK19
+    template_macroscopie: >
+      Reception de [nombre] ganglion(s) sentinelle(s) mesurant X mm chacun.
+      Examen extemporane par empreinte cytologique / coupe congelee.
+      Inclusion en totalite avec coupes seriees et IHC anti-cytokeratine.
+    notes: >
+      Le protocole OSNA (One-Step Nucleic Acid Amplification) est une
+      alternative a l'examen histologique standard. Si utilise, noter
+      le resultat en copies de CK19 mRNA.

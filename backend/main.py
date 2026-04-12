@@ -1,69 +1,59 @@
-"""API FastAPI pour l'application de dictee anatomopathologique.
+"""API FastAPI Anapath v4.
 
-Endpoints :
-- POST /transcribe   : Transcription audio via Voxtral
-- POST /format       : Mise en forme du transcript en compte-rendu structure
-- POST /iterate      : Ajout d'une dictee complementaire a un rapport existant
-- POST /sections     : Decoupage d'un rapport en sections nommees
-- POST /export       : Export du compte-rendu en .docx
-- GET  /health       : Verification du statut de l'API
+Endpoints principaux :
+- POST /transcribe : transcription audio via Voxtral
+- POST /format     : dictee -> CRDocument structure + markdown rendu (agent v4)
+- POST /iterate    : ajout d'une dictee complementaire a un rapport
+- POST /export     : export Word .docx
+- GET  /health     : verification du statut
 
-Note proxy frontend : le frontend doit proxifier /transcribe, /format,
-/iterate, /sections et /export vers ce backend.
+Le pipeline metier vit dans ``agent.py``. Ce fichier ne contient que la
+plomberie HTTP, validation de fichier audio, gestion d'erreurs et
+montage du frontend en production.
 """
 
 import io
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated
 
 import anthropic
 import httpx
-from fastapi import Depends, FastAPI, UploadFile, File, HTTPException
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from starlette.requests import Request
 
+from agent import produce_cr
+from auth import get_current_user
+from config import get_settings, validate_settings_at_startup
+from database import close_engine, create_tables
+from db_models import User
 from models import (
-    TranscriptionResponse,
+    ExportRequest,
     FormatRequest,
     FormatResponse,
     IterationRequest,
     IterationResponse,
-    ExportRequest,
-    SectionsResponse,
-    DonneeManquante,
-    AdicapRequest,
-    AdicapResponse,
-    SnomedCode,
-    SnomedResponse,
-    CompletudeRequest,
-    CompletudeResponse,
+    TranscriptionResponse,
 )
-from transcription import transcribe_audio
-from formatting import format_transcription, iterer_rapport
-from export_docx import markdown_to_docx, split_report_sections
-from detection_manquantes import detecter_donnees_manquantes, calculer_score_completude
-from adicap import suggerer_adicap
-from snomed import suggerer_snomed
-from config import get_settings, validate_settings_at_startup
-from database import close_engine, create_tables
-from auth import get_current_user
-from db_models import User
+from pydantic import BaseModel
+from routes_admin import router as admin_router
 from routes_auth import router as auth_router
 from routes_reports import router as reports_router
-from routes_admin import router as admin_router
+from transcription import transcribe_audio
+from export_docx import markdown_to_docx, split_report_sections
+
 
 limiter = Limiter(key_func=get_remote_address)
 
 
 # ---------------------------------------------------------------------------
-# Application lifecycle
+# Lifecycle
 # ---------------------------------------------------------------------------
 
 
@@ -78,7 +68,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 app: FastAPI = FastAPI(
     title="Anapath - Dictee medicale",
-    version="0.6.0",
+    version="4.0.0",
     lifespan=lifespan,
 )
 
@@ -111,11 +101,11 @@ app.include_router(admin_router)
 @app.get("/health")
 async def health() -> dict[str, str]:
     """Verification du statut de l'API."""
-    return {"status": "ok"}
+    return {"status": "ok", "version": "4.0.0"}
 
 
 # ---------------------------------------------------------------------------
-# Transcription audio
+# Transcription audio (inchange par rapport a v3)
 # ---------------------------------------------------------------------------
 
 
@@ -137,8 +127,10 @@ def _validate_audio_file(content_type: str, filename: str) -> None:
     if not type_ok and not ext_ok:
         raise HTTPException(
             status_code=400,
-            detail=f"Format non supporte ({content_type}, {ext}). "
-            f"Formats acceptes : {', '.join(sorted(ALLOWED_EXTENSIONS))}",
+            detail=(
+                f"Format non supporte ({content_type}, {ext}). "
+                f"Formats acceptes : {', '.join(sorted(ALLOWED_EXTENSIONS))}"
+            ),
         )
 
 
@@ -148,11 +140,11 @@ _MAX_UPLOAD_BYTES: int = _settings.max_upload_size_mb * 1024 * 1024
 @app.post("/transcribe", response_model=TranscriptionResponse)
 @limiter.limit("30/minute")
 async def transcribe(
-    request: Request,
+    request: Request,  # noqa: ARG001  # requis par slowapi
     _user: Annotated[User, Depends(get_current_user)],
     file: UploadFile = File(...),
 ) -> TranscriptionResponse:
-    """Etape 1 : Transcription audio via Voxtral."""
+    """Etape 1 : transcription audio via Voxtral."""
     content_type: str = file.content_type or ""
     filename: str = file.filename or "recording.webm"
 
@@ -185,191 +177,117 @@ async def transcribe(
 
 
 # ---------------------------------------------------------------------------
-# Mise en forme
+# Formatage v4 — appelle l'agent
 # ---------------------------------------------------------------------------
 
 
 @app.post("/format", response_model=FormatResponse)
 @limiter.limit("20/minute")
 async def format_text(
-    request: Request,
+    request: Request,  # noqa: ARG001
     _user: Annotated[User, Depends(get_current_user)],
     req: FormatRequest,
 ) -> FormatResponse:
-    """Etape 2 : Mise en forme du transcript en compte-rendu structure."""
+    """Etape 2 : dictee -> CR structure via le pipeline v4."""
     if not req.raw_text.strip():
         raise HTTPException(status_code=400, detail="Texte vide.")
 
     try:
-        formatted: str
-        organe: str
-        formatted, organe = await format_transcription(
-            req.raw_text, req.rapport_precedent
-        )
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=422, detail=f"Erreur de validation : {exc}"
-        )
+        result = await produce_cr(req.raw_text)
     except anthropic.APIStatusError as exc:
         raise HTTPException(
-            status_code=502, detail=f"Erreur formatting Claude : {exc}"
+            status_code=502, detail=f"Erreur Claude : {exc}"
         )
     except anthropic.APIConnectionError as exc:
         raise HTTPException(
             status_code=502, detail=f"Erreur connexion Claude : {exc}"
         )
 
-    donnees_manquantes: list[DonneeManquante] = detecter_donnees_manquantes(
-        formatted, organe
-    )
-
     return FormatResponse(
-        formatted_report=formatted,
-        organe_detecte=organe,
-        donnees_manquantes=donnees_manquantes,
+        trace_id=result.trace_id,
+        formatted_report=result.formatted_report,
+        document=result.document,
+        classification=result.classification,
+        markers=result.markers,
     )
 
 
 # ---------------------------------------------------------------------------
-# Iteration (ajout a un rapport existant)
+# Iteration v4
 # ---------------------------------------------------------------------------
 
 
 @app.post("/iterate", response_model=IterationResponse)
 @limiter.limit("20/minute")
 async def iterate_report(
-    request: Request,
+    request: Request,  # noqa: ARG001
     _user: Annotated[User, Depends(get_current_user)],
     req: IterationRequest,
 ) -> IterationResponse:
-    """Etape 2bis : Ajout d'une dictee complementaire a un rapport existant."""
+    """Etape 2bis : integrer une nouvelle dictee dans un rapport existant.
+
+    Strategie simple : on concatene le rapport actuel (contexte) et le
+    nouveau transcript, on passe le tout au pipeline. L'agent relit ses
+    exemples et regle a jour la structure. Pas de branche d'iteration
+    specifique : la determination d'un rapport existant se fait par la
+    presence du texte prefixe dans la dictee.
+    """
     if not req.rapport_actuel.strip():
         raise HTTPException(status_code=400, detail="Rapport actuel vide.")
     if not req.nouveau_transcript.strip():
         raise HTTPException(status_code=400, detail="Nouveau transcript vide.")
 
+    combined: str = (
+        f"{req.rapport_actuel}\n\n[NOUVELLE DICTEE]\n{req.nouveau_transcript}"
+    )
+
     try:
-        updated: str
-        organe: str
-        updated, organe = await iterer_rapport(
-            req.rapport_actuel, req.nouveau_transcript
-        )
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=422, detail=f"Erreur de validation : {exc}"
-        )
+        result = await produce_cr(combined)
     except anthropic.APIStatusError as exc:
         raise HTTPException(
-            status_code=502, detail=f"Erreur iteration Claude : {exc}"
+            status_code=502, detail=f"Erreur Claude : {exc}"
         )
     except anthropic.APIConnectionError as exc:
         raise HTTPException(
             status_code=502, detail=f"Erreur connexion Claude : {exc}"
         )
 
-    donnees_manquantes: list[DonneeManquante] = detecter_donnees_manquantes(
-        updated, organe
-    )
-
     return IterationResponse(
-        formatted_report=updated,
-        organe_detecte=organe,
-        donnees_manquantes=donnees_manquantes,
+        trace_id=result.trace_id,
+        formatted_report=result.formatted_report,
+        document=result.document,
+        classification=result.classification,
+        markers=result.markers,
     )
 
 
 # ---------------------------------------------------------------------------
-# Decoupage en sections
+# Sections (helper pour l'edition par section dans le frontend)
 # ---------------------------------------------------------------------------
 
 
 class _SectionsRequest(BaseModel):
-    """Requete interne pour le decoupage en sections."""
+    """Requete pour decouper un rapport en sections editables."""
 
     formatted_report: str
 
 
-@app.post("/sections", response_model=SectionsResponse)
+class _SectionsResponse(BaseModel):
+    """Reponse avec les sections nommees extraites du markdown."""
+
+    sections: dict[str, str]
+
+
+@app.post("/sections", response_model=_SectionsResponse)
 async def get_sections(
     _user: Annotated[User, Depends(get_current_user)],
     req: _SectionsRequest,
-) -> SectionsResponse:
-    """Decoupe un rapport formate en sections nommees."""
+) -> _SectionsResponse:
+    """Decoupe un rapport markdown en sections nommees pour l'editeur frontend."""
     if not req.formatted_report.strip():
         raise HTTPException(status_code=400, detail="Rapport vide.")
-
     sections: dict[str, str] = split_report_sections(req.formatted_report)
-
-    return SectionsResponse(sections=sections)
-
-
-# ---------------------------------------------------------------------------
-# ADICAP
-# ---------------------------------------------------------------------------
-
-
-@app.post("/adicap", response_model=AdicapResponse)
-async def get_adicap(
-    _user: Annotated[User, Depends(get_current_user)],
-    req: AdicapRequest,
-) -> AdicapResponse:
-    """Suggere un code ADICAP depuis le rapport structure."""
-    if not req.formatted_report.strip():
-        raise HTTPException(status_code=400, detail="Rapport vide.")
-
-    result: dict[str, str] = suggerer_adicap(
-        req.formatted_report, req.organe_detecte
-    )
-    return AdicapResponse(**result)
-
-
-# ---------------------------------------------------------------------------
-# SNOMED CT
-# ---------------------------------------------------------------------------
-
-
-@app.post("/snomed", response_model=SnomedResponse)
-async def get_snomed(
-    _user: Annotated[User, Depends(get_current_user)],
-    req: AdicapRequest,
-) -> SnomedResponse:
-    """Suggere des codes SNOMED CT depuis le rapport structure."""
-    if not req.formatted_report.strip():
-        raise HTTPException(status_code=400, detail="Rapport vide.")
-
-    result = suggerer_snomed(req.formatted_report, req.organe_detecte)
-    topo = result["topography"]
-    morpho = result["morphology"]
-
-    return SnomedResponse(
-        topography=SnomedCode(**topo),  # type: ignore[arg-type]
-        morphology=SnomedCode(**morpho),  # type: ignore[arg-type]
-    )
-
-
-# ---------------------------------------------------------------------------
-# Completude INCa
-# ---------------------------------------------------------------------------
-
-
-@app.post("/completude", response_model=CompletudeResponse)
-async def get_completude(
-    _user: Annotated[User, Depends(get_current_user)],
-    req: CompletudeRequest,
-) -> CompletudeResponse:
-    """Calcule le score de completude INCa du rapport."""
-    if not req.formatted_report.strip():
-        raise HTTPException(status_code=400, detail="Rapport vide.")
-
-    result: dict[str, int | float] = calculer_score_completude(
-        req.formatted_report, req.organe_detecte
-    )
-    return CompletudeResponse(
-        score=int(result["score"]),
-        total_champs=int(result["total_champs"]),
-        champs_presents=int(result["champs_presents"]),
-        pourcentage=float(result["pourcentage"]),
-    )
+    return _SectionsResponse(sections=sections)
 
 
 # ---------------------------------------------------------------------------
@@ -382,7 +300,7 @@ async def export_docx(
     _user: Annotated[User, Depends(get_current_user)],
     req: ExportRequest,
 ) -> StreamingResponse:
-    """Etape 3 : Export du compte-rendu en document Word .docx."""
+    """Export du compte-rendu en document Word .docx."""
     try:
         doc_bytes: bytes = markdown_to_docx(req.formatted_report, req.title)
     except ValueError as exc:
@@ -393,7 +311,10 @@ async def export_docx(
     buffer: io.BytesIO = io.BytesIO(doc_bytes)
     return StreamingResponse(
         buffer,
-        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        media_type=(
+            "application/vnd.openxmlformats-officedocument."
+            "wordprocessingml.document"
+        ),
         headers={
             "Content-Disposition": "attachment; filename=compte-rendu.docx"
         },
@@ -403,6 +324,7 @@ async def export_docx(
 # ---------------------------------------------------------------------------
 # Serving du frontend (production)
 # ---------------------------------------------------------------------------
+
 
 _FRONTEND_DIST: Path = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
@@ -419,7 +341,6 @@ if _FRONTEND_DIST.is_dir():
     async def serve_frontend(full_path: str) -> FileResponse:
         """Sert le frontend React pour toutes les routes non-API."""
         file_path: Path = (_FRONTEND_DIST / full_path).resolve()
-        # Protection contre le path traversal
         if not str(file_path).startswith(str(_FRONTEND_DIST.resolve())):
             return FileResponse(str(_FRONTEND_DIST / "index.html"))
         if file_path.is_file():

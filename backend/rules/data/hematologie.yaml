@@ -1,0 +1,262 @@
+# Regles metier ACP - Hematologie / Hematopathologie
+#
+# Source primaire : classification OMS 2022 des neoplasies hematolymphoïdes
+# (5e edition), classification ICC 2022, donnees minimales INCa,
+# recommandations SFH/GELA.
+
+organe: hematologie
+nom_affichage: "Hematologie / Hematopathologie"
+systeme_staging: "Ann Arbor modifie (Lugano 2014) - lymphomes"
+description: >
+  Couvre les prelevements d'hematopathologie : biopsies ganglionnaires,
+  biopsies osteomedullaires (BOM), biopsies de rate, biopsies d'organes
+  extra-ganglionnaires pour suspicion de lymphome.
+
+sous_types:
+
+  biopsie_ganglionnaire:
+    nom: "Biopsie ganglionnaire"
+    mots_cles_detection:
+      - biopsie ganglionnaire
+      - ganglion
+      - adenectomie
+      - biopsie de ganglion
+      - adenopathie
+      - curage ganglionnaire
+      - lymphadenectomie
+    champs_obligatoires:
+      - nom: "Nombre et localisation"
+        section: macroscopie
+        conditions: []
+        description: "Nombre de ganglions, site anatomique, taille du plus gros."
+      - nom: "Aspect macroscopique"
+        section: macroscopie
+        conditions: []
+        description: "Homogene/heterogene, couleur, consistance, necrose, capsule."
+      - nom: "Architecture ganglionnaire"
+        section: microscopie
+        conditions: []
+        description: >
+          Conservation ou effacement de l'architecture ganglionnaire.
+          Pattern : folliculaire, diffus, paracortical, sinusal,
+          interfolliculaire.
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          Classification OMS 2022 : lymphome folliculaire, lymphome
+          diffus a grandes cellules B (DLBCL), lymphome du manteau,
+          lymphome de Burkitt, lymphome de Hodgkin classique (sclerose
+          nodulaire, cellularite mixte, depletion lymphocytaire,
+          predominance lymphocytaire), lymphome de la zone marginale,
+          lymphome lymphocytique / LLC, lymphome T peripherique,
+          lymphome T angio-immunoblastique, lymphome anaplasique a
+          grandes cellules, hyperplasie reactionnelle, maladie de
+          Castleman, sarcoidose, metastase, autre.
+      - nom: "Grade (si applicable)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Lymphome folliculaire : grade 1-2 (indolent), grade 3A, grade 3B
+          (agressif). DLBCL : sous-type GCB vs ABC (Hans algorithm).
+          Hodgkin : type histologique.
+      - nom: "Cellules de Reed-Sternberg"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Recherche de cellules de Reed-Sternberg et variantes (Hodgkin)."
+      - nom: "CD20"
+        section: immunomarquage
+        conditions: []
+        description: "Marqueur B pan-lymphocytaire. Positif dans la plupart des lymphomes B."
+      - nom: "CD3"
+        section: immunomarquage
+        conditions: []
+        description: "Marqueur T pan-lymphocytaire."
+      - nom: "CD5"
+        section: immunomarquage
+        conditions: []
+        description: "Positif dans LLC/lymphome du manteau. Co-expression CD5+/CD20+ orientant."
+      - nom: "CD10"
+        section: immunomarquage
+        conditions: []
+        description: "Marqueur du centre germinatif. Positif dans lymphome folliculaire, Burkitt."
+      - nom: "BCL2"
+        section: immunomarquage
+        conditions: []
+        description: "Surexpression dans le lymphome folliculaire (translocation t(14;18))."
+      - nom: "BCL6"
+        section: immunomarquage
+        conditions: []
+        description: "Marqueur du centre germinatif."
+      - nom: "Ki67"
+        section: immunomarquage
+        conditions: []
+        description: "Index de proliferation. Critique pour Burkitt (>95%), folliculaire (variable)."
+      - nom: "Cycline D1"
+        section: immunomarquage
+        conditions: []
+        description: "Positif dans le lymphome du manteau (translocation t(11;14))."
+      - nom: "CD30"
+        section: immunomarquage
+        conditions: []
+        description: "Positif dans le lymphome de Hodgkin classique et le lymphome anaplasique."
+      - nom: "CD15"
+        section: immunomarquage
+        conditions: []
+        description: "Positif dans le lymphome de Hodgkin classique."
+      - nom: "MUM1/IRF4"
+        section: immunomarquage
+        conditions: []
+        description: "Algorithme de Hans pour le sous-typage du DLBCL (GCB vs non-GCB)."
+      - nom: "EBV (EBER-ISH)"
+        section: immunomarquage
+        conditions: []
+        description: "Recherche d'EBV par hybridation in situ. Hodgkin, Burkitt endemique, DLBCL EBV+, lymphomes T."
+    marqueurs_ihc_attendus:
+      - CD20
+      - CD3
+      - CD5
+      - CD10
+      - CD23
+      - BCL2
+      - BCL6
+      - Ki67
+      - cycline D1
+      - CD30
+      - CD15
+      - MUM1
+      - PAX5
+      - CD138
+    template_macroscopie: >
+      Reception de [nombre] ganglion(s) mesurant X cm de grand axe,
+      [localisation]. Aspect macroscopique : [homogene/heterogene],
+      [couleur], capsule [intacte/rompue]. Inclusion en totalite.
+      Congelation d'un fragment pour biologie moleculaire.
+    notes: >
+      TOUJOURS conserver un fragment congele pour les etudes de
+      biologie moleculaire (clonalite B ou T, FISH pour
+      translocations). Le panel IHC doit etre adapte a l'hypothese
+      diagnostique principale. Le panel minimal de base inclut
+      CD20, CD3, Ki67.
+
+  biopsie_osteomedullaire:
+    nom: "Biopsie osteomedullaire (BOM)"
+    mots_cles_detection:
+      - biopsie osteomedullaire
+      - bom
+      - biopsie moelle osseuse
+      - biopsie medullaire
+      - trepanobiopsie
+    champs_obligatoires:
+      - nom: "Longueur de la carotte"
+        section: macroscopie
+        conditions: []
+        description: "Longueur en mm. Minimum 15-20 mm pour une evaluation adequate."
+      - nom: "Richesse medullaire"
+        section: microscopie
+        conditions: []
+        description: "Pourcentage de cellularite medullaire par rapport a l'age du patient."
+      - nom: "Lignee granulocytaire"
+        section: microscopie
+        conditions: []
+        description: "Maturation, dysplasie, exces de blastes."
+      - nom: "Lignee erythroblastique"
+        section: microscopie
+        conditions: []
+        description: "Maturation, dysplasie (megaloblastose, sideroblastes en couronne)."
+      - nom: "Lignee megacaryocytaire"
+        section: microscopie
+        conditions: []
+        description: "Nombre, morphologie (micromegacaryocytes, dysplasie, clustering)."
+      - nom: "Fibrose medullaire"
+        section: microscopie
+        conditions: []
+        description: "Score de reticuline (MF-0 a MF-3) selon la classification OMS."
+      - nom: "Infiltration lymphoide"
+        section: microscopie
+        conditions: []
+        description: "Presence, pattern (nodulaire, interstitiel, diffus, paratrabiculaire), phenotype."
+      - nom: "Infiltration tumorale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Metastase carcinomateuse, sarcomateuse. Localisation et pourcentage."
+      - nom: "Depots (amylose, fer)"
+        section: microscopie
+        conditions: []
+        description: "Coloration de Perls (reserves en fer), rouge Congo (amylose)."
+      - nom: "Osteosclerose / Osteoporose"
+        section: microscopie
+        conditions: []
+        description: "Remodelage osseux, epaississement trabeculaire."
+    marqueurs_ihc_attendus:
+      - CD20
+      - CD3
+      - CD34
+      - CD138
+      - Ki67
+      - CD61
+      - glycophorine A
+    template_macroscopie: >
+      Reception d'une biopsie osteomedullaire de X mm de longueur,
+      fixee en formol (ou Bouin/AFA). Decalcification. Inclusion en
+      totalite. Colorations : HES, Giemsa, Perls, reticuline (Gordon-Sweet).
+    notes: >
+      La BOM est essentielle pour la stadification des lymphomes
+      (Ann Arbor stade IV si atteinte medullaire), le diagnostic
+      des syndromes myeloproliferatifs et des syndromes
+      myelodysplasiques. La reticuline (fibrose) est un critere
+      diagnostique majeur pour la myelofibrose primaire.
+
+  biopsie_rate:
+    nom: "Splenectomie / Biopsie de rate"
+    mots_cles_detection:
+      - splenectomie
+      - biopsie splenique
+      - biopsie rate
+      - piece de splenectomie
+      - rate
+    champs_obligatoires:
+      - nom: "Dimensions et poids"
+        section: macroscopie
+        conditions: []
+        description: "Trois dimensions en cm et poids en grammes (rate normale ~150 g)."
+      - nom: "Aspect macroscopique"
+        section: macroscopie
+        conditions: []
+        description: "Homogene, nodulaire, congestif. Couleur de la pulpe."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          Lymphome de la zone marginale splenique, lymphome splenique
+          diffus de la pulpe rouge a petites cellules B, leucemie a
+          tricholeucocytes, lymphome folliculaire splenique, DLBCL,
+          congestif, infarctus, autre.
+      - nom: "Pattern d'infiltration"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Pulpe blanche (nodulaire), pulpe rouge (diffus, sinusoidal), mixte."
+      - nom: "Phenotype immunohistochimique"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Panel adapte au type de lymphome suspecte."
+    marqueurs_ihc_attendus:
+      - CD20
+      - CD3
+      - CD5
+      - CD10
+      - CD23
+      - BCL2
+      - cycline D1
+      - annexine A1
+      - DBA.44
+    template_macroscopie: >
+      Piece de splenectomie mesurant X x Y x Z cm, pesant W g.
+      A la coupe : aspect [homogene/nodulaire], pulpe [rouge/blanche]
+      predominante. Inclusion systematique en plusieurs blocs.
+      Congelation d'un fragment.
+    notes: >
+      La leucemie a tricholeucocytes (HCL) a un pattern d'infiltration
+      diffus de la pulpe rouge avec marquage DBA.44+ et annexine A1+.
+      Le lymphome de la zone marginale splenique est le lymphome
+      splenique le plus frequent.

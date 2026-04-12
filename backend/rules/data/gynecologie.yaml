@@ -1,0 +1,435 @@
+# Regles metier ACP - Gynecologie
+#
+# Source primaire : donnees minimales INCa 2023 pour pathologie
+# gynecologique, classification OMS 2020 des tumeurs du tractus genital
+# feminin, recommandations FIGO 2018, protocoles CAP.
+
+organe: gynecologie
+nom_affichage: "Gynecologie"
+systeme_staging: "TNM 8e edition AJCC/UICC et FIGO - tumeurs gynecologiques"
+description: >
+  Couvre toutes les pratiques d'anatomopathologie gynecologique : col
+  uterin (biopsie, conisation, hysterectomie), endometre (biopsie,
+  curetage, hysterectomie), ovaire et trompe (biopsie, annexectomie,
+  debulking), vulve et vagin.
+
+sous_types:
+
+  biopsie_cervicale:
+    nom: "Biopsie cervicale"
+    mots_cles_detection:
+      - biopsie cervicale
+      - biopsie col uterin
+      - biopsie du col
+      - biopsie col
+      - biopsie colposcopique
+    champs_obligatoires:
+      - nom: "Nombre de fragments et localisation"
+        section: macroscopie
+        conditions: []
+        description: "Nombre de biopsies et localisation (levre anterieure, posterieure, cadran horaire)."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: "Nature de la lesion : cervicite, CIN/SIL, carcinome, polype, autre."
+      - nom: "Grade de la neoplasie intra-epitheliale"
+        section: microscopie
+        conditions: []
+        description: >
+          Terminologie OMS 2020 : LSIL (CIN1), HSIL (CIN2/CIN3).
+          Ou classification CIN traditionnelle si les deux sont
+          mentionnees.
+      - nom: "Invasion stromale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'invasion. Profondeur et extension horizontale si invasion."
+      - nom: "Type de carcinome"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Carcinome epidermoide, adenocarcinome (HPV-associe ou non), adenosquameux, neuroendocrine."
+      - nom: "p16"
+        section: immunomarquage
+        conditions: []
+        description: "Expression de p16 en bloc (surrogate de l'infection HPV a haut risque). Aide au diagnostic HSIL vs mimiques."
+    marqueurs_ihc_attendus:
+      - p16
+      - Ki67
+    template_macroscopie: >
+      Reception de [nombre] biopsies cervicales fixees en formol,
+      incluses en totalite.
+    notes: >
+      Le p16 en bloc est un marqueur surrogat de l'infection par HPV
+      a haut risque. Son expression diffuse et forte soutient le
+      diagnostic de HSIL. Un marquage heterogene ou faible n'est
+      pas contributif.
+
+  conisation:
+    nom: "Conisation cervicale"
+    mots_cles_detection:
+      - conisation
+      - cone cervical
+      - leep
+      - resection a l'anse
+      - raz
+      - conisation au bistouri froid
+    champs_obligatoires:
+      - nom: "Type de conisation"
+        section: titre
+        conditions: []
+        description: "A l'anse diathermique (LEEP/LLETZ), au bistouri froid, au laser."
+      - nom: "Dimensions du cone"
+        section: macroscopie
+        conditions: []
+        description: "Diametre, hauteur, epaisseur en mm."
+      - nom: "Orientation et encrage"
+        section: macroscopie
+        conditions: []
+        description: "Reperage (fil a 12h), encrage des marges endocervicale et exocervicale."
+      - nom: "Grade de la lesion"
+        section: microscopie
+        conditions: []
+        description: "LSIL, HSIL (CIN2, CIN3), AIS (adenocarcinome in situ)."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: []
+        description: >
+          Marge endocervicale, exocervicale et profonde (stromale).
+          Saines ou atteintes. Distance tumeur-marge en mm si saine.
+          La marge endocervicale est la plus critique.
+      - nom: "Extension glandulaire"
+        section: microscopie
+        conditions: []
+        description: "Extension de la dysplasie dans les cryptes endocervicales."
+      - nom: "Invasion stromale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Profondeur d'invasion en mm et extension horizontale en mm (criterium FIGO IA)."
+      - nom: "Emboles lymphovasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "p16"
+        section: immunomarquage
+        conditions: []
+        description: "Confirmation de la lesion HPV-dependante."
+    marqueurs_ihc_attendus:
+      - p16
+      - Ki67
+    template_macroscopie: >
+      Piece de conisation cervicale a l'anse/au bistouri froid, mesurant
+      X mm de diametre et X mm de hauteur. Reperage par fil a 12h.
+      Encrage : [couleurs]. Ouverture a 6h, inclusion en totalite en
+      coupes seriees de 3h en 3h (protocole horaire).
+    notes: >
+      Le protocole d'inclusion horaire (coupes seriees de 3h en 3h
+      ou tous les 2-3 mm) est essentiel pour evaluer les marges de
+      facon exhaustive. Mentionner si les berges sont thermiquement
+      alterees (anse diathermique).
+
+  hysterectomie:
+    nom: "Hysterectomie"
+    mots_cles_detection:
+      - hysterectomie
+      - hysterectomie totale
+      - hysterectomie subtotale
+      - colpohysterectomie
+      - piece d'hysterectomie
+      - wertheim
+    champs_obligatoires:
+      - nom: "Type d'hysterectomie"
+        section: titre
+        conditions: []
+        description: "Totale, subtotale, radicale (Wertheim), avec ou sans annexes."
+      - nom: "Dimensions et poids"
+        section: macroscopie
+        conditions: []
+        description: "Dimensions de l'uterus en cm et poids en grammes."
+      - nom: "Aspect de l'endometre"
+        section: macroscopie
+        conditions: []
+        description: "Epaisseur endometriale, aspect (proliferatif, secretoire, atrophique, polypoide, tumoral)."
+      - nom: "Aspect du myometre"
+        section: macroscopie
+        conditions: []
+        description: "Leiomyomes, adenomyose, aspect normal."
+      - nom: "Aspect du col"
+        section: macroscopie
+        conditions: []
+        description: "Lesion visible, zone de transformation."
+      - nom: "Type histologique (endometre)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Classification OMS 2020 : carcinome endometrioide, sereux,
+          a cellules claires, carcinosarcome, indifferencie,
+          dedifferencie, mucineux, mixte.
+      - nom: "Grade FIGO (endometre)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Grade 1 (<=5% composante solide), Grade 2 (6-50%), Grade 3 (>50%). Pour le carcinome endometrioide uniquement."
+      - nom: "Profondeur d'invasion myometriale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Moitie interne (<50%) ou moitie externe (>=50%). Mesure en mm."
+      - nom: "Invasion lymphovasculaire"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence, focale ou substantielle (LVSI)."
+      - nom: "Extension cervicale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Invasion du stroma cervical (FIGO II)."
+      - nom: "Invasion sereuse / parametriale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Extension a la sereuse uterine, aux parametres."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Marge vaginale, parametriale. Saine ou atteinte."
+      - nom: "Ganglions envahis / examines"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Pelviens et lombo-aortiques si preleves. Ratio et taille des metastases."
+      - nom: "Classification moleculaire (TCGA)"
+        section: biologie_moleculaire
+        conditions: [carcinologique]
+        description: >
+          Quatre groupes pronostiques : POLE ultramute, MSI hypermute
+          (dMMR), copy-number low (p53 wt), copy-number high (p53 mut).
+          Determinee par IHC (p53, MMR) et/ou sequencage.
+      - nom: "MMR / MSI"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Statut MMR : MLH1, PMS2, MSH2, MSH6."
+      - nom: "p53"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Expression de p53 : wild type, surexpression (mutant), absence complete (null)."
+      - nom: "RE / RP"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Recepteurs hormonaux pour le carcinome endometrioide."
+      - nom: "pTNM / stade FIGO"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pTNM AJCC 8e et stade FIGO 2018."
+    marqueurs_ihc_attendus:
+      - RE
+      - RP
+      - p53
+      - MLH1
+      - PMS2
+      - MSH2
+      - MSH6
+      - p16
+      - WT1
+      - napsin A
+    template_macroscopie: >
+      Piece d'hysterectomie [type] mesurant X x Y x Z cm, pesant W g.
+      Endometre de X mm d'epaisseur, [aspect]. Tumeur endometriale de
+      X cm, localisation [fundus/corps/segment inferieur]. Myometre de
+      X mm d'epaisseur au niveau tumoral. Extension cervicale [oui/non].
+      Col uterin : [description]. Annexes [si presentes] : [description].
+    notes: >
+      La classification moleculaire TCGA (ProMisE/PORTEC) est desormais
+      recommandee pour TOUS les carcinomes de l'endometre selon ESGO/
+      ESTRO/ESP 2021, car elle modifie les indications de traitement
+      adjuvant. L'IHC p53 + MMR suffit dans la plupart des cas,
+      completes par POLE si necessaire.
+
+  biopsie_endometriale:
+    nom: "Biopsie endometriale / Pipelle"
+    mots_cles_detection:
+      - biopsie endometriale
+      - biopsie endometre
+      - pipelle
+      - pipelle de cornier
+      - aspiration endometriale
+    champs_obligatoires:
+      - nom: "Quantite de materiel"
+        section: macroscopie
+        conditions: []
+        description: "Abondant, moderee, minime. Fixation en formol."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          Endometre proliferatif, secretoire, atrophique, hyperplasie
+          simple ou complexe, hyperplasie atypique (EIN), carcinome.
+      - nom: "Atypies"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence d'atypies cytologiques."
+      - nom: "Type de carcinome"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Sous-type OMS 2020 et grade FIGO pour le carcinome endometrioide."
+    marqueurs_ihc_attendus:
+      - RE
+      - RP
+      - p53
+      - MLH1
+      - PMS2
+      - MSH2
+      - MSH6
+    template_macroscopie: >
+      Reception de fragments endometriaux [abondants/moderees/minimes],
+      fixes en formol, inclus en totalite.
+    notes: >
+      La classification EIN (Endometrial Intraepithelial Neoplasia)
+      remplace l'ancienne terminologie "hyperplasie atypique" dans
+      la classification OMS 2020.
+
+  curetage:
+    nom: "Curetage uterin"
+    mots_cles_detection:
+      - curetage
+      - curetage uterin
+      - curetage biopsique
+      - curetage aspiratif
+      - produit de curetage
+    champs_obligatoires:
+      - nom: "Quantite de materiel"
+        section: macroscopie
+        conditions: []
+        description: "Volume en cc ou poids en grammes."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: "Endometre normal (datation), hyperplasie, EIN, carcinome, produit de conception."
+      - nom: "Villosites choriales"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence. Si grossesse : aspect normal, mole hydatiforme partielle ou complete."
+      - nom: "Decidualisation"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence de reaction deciduale."
+    marqueurs_ihc_attendus:
+      - p57
+      - Ki67
+    template_macroscopie: >
+      Reception de produit de curetage uterin de X cc, d'aspect
+      [hemorragique/blanchatre/villeux]. Inclusion en totalite.
+    notes: >
+      Pour la recherche de mole hydatiforme, l'IHC p57 est essentielle
+      (perte d'expression dans la mole complete). L'analyse en
+      cytogenetique ou FISH peut completer.
+
+  biopsie_ovarienne:
+    nom: "Biopsie ovarienne"
+    mots_cles_detection:
+      - biopsie ovarienne
+      - biopsie ovaire
+      - biopsie de l'ovaire
+    champs_obligatoires:
+      - nom: "Nombre de fragments"
+        section: macroscopie
+        conditions: []
+        description: "Nombre et dimensions des biopsies."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          Tumeur epitheliale (sereuse, mucineuse, endometrioide, a cellules
+          claires, Brenner), tumeur germinale, tumeur des cordons sexuels,
+          metastase, autre.
+      - nom: "Type OMS"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Classification OMS 2020 precise."
+      - nom: "Grade"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Bas grade / haut grade pour les carcinomes sereux. Grade FIGO pour les endometrioides."
+    marqueurs_ihc_attendus:
+      - WT1
+      - PAX8
+      - p53
+      - CK7
+      - CK20
+      - RE
+      - RP
+    template_macroscopie: >
+      Reception de [nombre] biopsies ovariennes fixees en formol,
+      incluses en totalite.
+    notes: >
+      Le diagnostic differentiel entre carcinome sereux de haut grade
+      ovarien et metastase peritoneale d'un autre primitif repose
+      sur le panel IHC (WT1+, PAX8+, p53 mutant).
+
+  annexectomie:
+    nom: "Annexectomie / Ovarectomie"
+    mots_cles_detection:
+      - annexectomie
+      - ovarectomie
+      - ovariectomie
+      - salpingo-ovarectomie
+      - piece d'annexectomie
+      - kyste ovarien
+    champs_obligatoires:
+      - nom: "Dimensions et poids"
+        section: macroscopie
+        conditions: []
+        description: "Dimensions de l'ovaire et de la trompe. Poids total."
+      - nom: "Aspect macroscopique de l'ovaire"
+        section: macroscopie
+        conditions: []
+        description: "Kystique, solide, mixte. Contenu (sereux, mucineux, sebace, hemorragique)."
+      - nom: "Aspect de la trompe"
+        section: macroscopie
+        conditions: []
+        description: "Normale, dilatee, nodulaire. Examen du pavilion (protocole SEE-FIM)."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: "Classification OMS 2020 des tumeurs ovariennes et tubaires."
+      - nom: "Architecture tumorale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Pattern predominant, composante solide, papillaire, glandulaire."
+      - nom: "Grade"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Systeme de grading selon le type histologique."
+      - nom: "Extension capsulaire"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Integrite de la capsule ovarienne. Rupture pre ou per-operatoire."
+      - nom: "Implants peritoneaux"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Invasifs ou non invasifs si tumeur borderline/STBR."
+      - nom: "Emboles lymphovasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Trompe (protocole SEE-FIM)"
+        section: microscopie
+        conditions: []
+        description: "Examen systematique de la trompe en totalite (STIC : carcinome sereux tubaire intra-epithelial)."
+      - nom: "pTNM / stade FIGO"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pTNM AJCC et stade FIGO 2014 (revise 2018)."
+    marqueurs_ihc_attendus:
+      - WT1
+      - PAX8
+      - p53
+      - CK7
+      - CK20
+      - RE
+      - RP
+      - inhibine
+      - calretinine
+    template_macroscopie: >
+      Piece d'annexectomie [droite/gauche] : ovaire de X x Y x Z cm pesant
+      W g, trompe de X cm. A la coupe de l'ovaire : [description kystique/
+      solide]. Contenu [type]. Protocole SEE-FIM sur la trompe. Inclusion
+      en totalite de la tumeur ovarienne et de la trompe.
+    notes: >
+      Le protocole SEE-FIM (Sectioning and Extensively Examining the
+      FIMbriated end) est obligatoire pour toute annexectomie en
+      contexte oncologique et prophylactique (BRCA). Il permet de
+      detecter le STIC (precurseur du carcinome sereux de haut grade).

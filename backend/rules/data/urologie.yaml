@@ -1,0 +1,287 @@
+# Regles metier ACP - Urologie (rein, prostate, vessie, testicule)
+#
+# Priorite Phase 2 : le rein est le cas que Martial utilise comme
+# reference pour valider la refonte v4. Les autres sous-types urologiques
+# sont definis avec un niveau de detail moindre ; ils seront enrichis
+# quand Martial ajoutera des CR correspondants au corpus.
+
+organe: urologie
+nom_affichage: "Urologie"
+systeme_staging: "TNM 8e edition AJCC/UICC"
+description: >
+  Couvre les prelevements urologiques : rein (biopsie, nephrectomie),
+  prostate (biopsie, prostatectomie), vessie (biopsie, RTUV, cystectomie),
+  testicule, penis, epididyme.
+
+sous_types:
+
+  biopsie_renale:
+    nom: "Biopsie renale (tumorale ou medicale)"
+    mots_cles_detection:
+      - biopsie renale
+      - biopsie du rein
+      - ponction biopsie renale
+      - biopsie renale percutanee
+    champs_obligatoires:
+      - nom: "Nombre de carottes"
+        section: macroscopie
+        conditions: []
+        description: "Nombre et dimensions des carottes biopsiques."
+      - nom: "Nombre de glomeruli"
+        section: microscopie
+        conditions: [medicale]
+        description: "Pour biopsie medicale : nombre de glomeruli analyses."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Sous-type tumoral selon OMS 2022."
+      - nom: "Grade"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Grade ISUP / WHO pour carcinome a cellules claires."
+    marqueurs_ihc_attendus:
+      - CD10
+      - CAIX
+      - PAX8
+      - CK7
+      - vimentine
+    template_macroscopie: ""
+    notes: >
+      Distinguer biopsie medicale (recherche glomerulopathie) et
+      biopsie tumorale (suspicion de cancer du rein). Le panel IHC ne
+      s'applique que si contexte carcinologique.
+
+  nephrectomie_partielle:
+    nom: "Nephrectomie partielle"
+    mots_cles_detection:
+      - nephrectomie partielle
+      - tumorectomie renale
+      - resection renale
+      - nephron-sparing
+    champs_obligatoires:
+      - nom: "Dimensions de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Poids et trois dimensions."
+      - nom: "Taille tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Plus grand diametre tumoral en cm."
+      - nom: "Distance aux marges"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Distance tumeur / recoupe parenchymateuse en mm."
+      - nom: "Encrage des marges"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Couleurs utilisees pour reperer les recoupes."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Sous-type selon OMS 2022 : cellules claires, papillaire type 1/2,
+          chromophobe, oncocytome, autre.
+      - nom: "Grade nucleaire ISUP"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Grade 1 a 4 selon ISUP/WHO 2016."
+      - nom: "Invasion graisse sinusale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'invasion de la graisse du sinus."
+      - nom: "Invasion veine renale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'extension vasculaire."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Saines ou atteintes, preciser laquelle."
+      - nom: "Necrose tumorale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence et pourcentage approximatif."
+      - nom: "Emboles vasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'emboles microvasculaires."
+      - nom: "pTNM"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pT pN (pM si connu) selon AJCC 8e."
+    marqueurs_ihc_attendus:
+      - CAIX
+      - PAX8
+      - CD10
+      - CK7
+      - vimentine
+      - AMACR
+    template_macroscopie: >
+      Piece de nephrectomie partielle de X x Y x Z cm pesant W g.
+      Encrage des recoupes. A la coupe : tumeur de X cm de grand axe,
+      situee a X mm de la recoupe parenchymateuse la plus proche.
+      Aspect et couleur de la lesion. Inclusion en totalite.
+    notes: >
+      Le grade ISUP ne s'applique PAS au chromophobe et a l'oncocytome.
+      Pour ces sous-types, omettre le grade dans la conclusion.
+
+  nephrectomie_totale:
+    nom: "Nephrectomie totale (ou elargie)"
+    mots_cles_detection:
+      - nephrectomie totale
+      - nephrectomie elargie
+      - nephrectomie radicale
+    champs_obligatoires:
+      - nom: "Dimensions et poids"
+        section: macroscopie
+        conditions: []
+        description: "Poids et trois dimensions de la piece."
+      - nom: "Taille tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Plus grand diametre tumoral."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Sous-type selon OMS 2022."
+      - nom: "Grade nucleaire ISUP"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Grade 1 a 4."
+      - nom: "Invasion graisse sinusale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+      - nom: "Invasion graisse perirenale (capsule de Gerota)"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'extension capsulaire."
+      - nom: "Invasion veine renale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence + niveau."
+      - nom: "Invasion surrenale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence quand la surrenale est prelevee."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Uretere, vaisseaux, tissus peri-renaux."
+      - nom: "Ganglions envahis / examines"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Ratio par station avec effraction capsulaire."
+      - nom: "Necrose tumorale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence et pourcentage."
+      - nom: "Sarcomatoide / rhabdoide"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Contingent indifferencie et son pourcentage."
+      - nom: "pTNM"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification pT pN (pM si connu) selon AJCC 8e edition."
+    marqueurs_ihc_attendus:
+      - CAIX
+      - PAX8
+      - CD10
+      - CK7
+      - vimentine
+      - AMACR
+    template_macroscopie: >
+      Piece de nephrectomie totale droite/gauche mesurant X x Y x Z cm
+      et pesant W g. A la coupe : tumeur unique mesurant X cm de grand
+      axe, occupant le pole superieur/moyen/inferieur. Aspect et couleur.
+      Extension eventuelle a la graisse sinusale, peri-renale, ou a la
+      veine renale. Inclusion en totalite de la lesion et des recoupes.
+    notes: >
+      La 9e edition TNM AJCC 2024 n'est pas encore en vigueur pour le
+      rein. Continuer a utiliser la 8e edition pour le pTNM.
+
+  biopsie_prostatique:
+    nom: "Biopsie prostatique"
+    mots_cles_detection:
+      - biopsie prostatique
+      - biopsies prostatiques
+      - carotte prostatique
+      - biopsies de prostate
+    champs_obligatoires:
+      - nom: "Nombre de carottes par site"
+        section: macroscopie
+        conditions: []
+        description: "Nombre de prelevements par zone anatomique."
+      - nom: "Score de Gleason"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Score primaire + secondaire (+ tertiaire si applicable)."
+      - nom: "ISUP grade group"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Grade 1 a 5 selon ISUP 2014."
+      - nom: "Pourcentage de carottes positives"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Fraction et longueur d'envahissement par carotte."
+      - nom: "Perineural invasion"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'engainement perinerveux."
+    marqueurs_ihc_attendus:
+      - AMACR
+      - p63
+      - CK5/6
+      - HMWK
+    template_macroscopie: ""
+    notes: >
+      La separation des carottes par site est critique pour la
+      stadification (droite/gauche, base/milieu/apex).
+
+  biopsie_vesicale:
+    nom: "Biopsie vesicale / RTUV"
+    mots_cles_detection:
+      - biopsie vesicale
+      - rtuv
+      - resection endoscopique
+      - copeaux vesicaux
+    champs_obligatoires:
+      - nom: "Poids des copeaux"
+        section: macroscopie
+        conditions: []
+        description: "Poids total des copeaux de resection."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Urothelial, squameux, adenocarcinome, autre OMS 2022."
+      - nom: "Grade OMS 2004"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Bas grade / haut grade."
+      - nom: "Envahissement du chorion"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "pTa, pT1 (avec subdivision T1a/b/c), pT2..."
+      - nom: "Envahissement musculaire"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'envahissement du detrusor ; preciser si la musculeuse est representee."
+      - nom: "Carcinome in situ associe"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence de CIS associe."
+      - nom: "Emboles vasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence."
+    marqueurs_ihc_attendus:
+      - CK20
+      - CD44
+      - p53
+      - GATA3
+    template_macroscopie: ""
+    notes: >
+      Un RTUV sans musculeuse representative doit mentionner explicitement
+      cette limitation dans la conclusion, car elle empeche la
+      stadification definitive.

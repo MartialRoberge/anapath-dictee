@@ -1,0 +1,299 @@
+# Regles metier ACP - Dermatologie
+#
+# Source primaire : donnees minimales INCa 2023 pour pathologie cutanee,
+# classification OMS 2018 des tumeurs cutanees, recommandations AJCC 8e
+# edition pour melanome et carcinomes cutanes, protocole CAP, SFDermato.
+
+organe: dermatologie
+nom_affichage: "Dermatologie"
+systeme_staging: "TNM 8e edition AJCC/UICC - tumeurs cutanees"
+description: >
+  Couvre toutes les pratiques d'anatomopathologie cutanee : biopsies
+  cutanees diagnostiques, exereses de tumeurs cutanees (melanome,
+  carcinome basocellulaire, carcinome epidermoide, carcinome de
+  Merkel), pieces de reprise chirurgicale.
+
+sous_types:
+
+  biopsie_cutanee:
+    nom: "Biopsie cutanee"
+    mots_cles_detection:
+      - biopsie cutanee
+      - biopsie peau
+      - biopsie de peau
+      - biopsie dermatologique
+      - punch biopsie
+      - shave biopsie
+      - biopsie au punch
+    champs_obligatoires:
+      - nom: "Localisation anatomique"
+        section: renseignements_cliniques
+        conditions: []
+        description: "Site anatomique precis du prelevement."
+      - nom: "Dimensions du prelevement"
+        section: macroscopie
+        conditions: []
+        description: "Dimensions en mm, type de prelevement (punch, shave, incisionnel)."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          Nature de la lesion : dermatose inflammatoire, tumeur benigne
+          (naevus, keratose seborrheique, dermatofibrome), tumeur maligne,
+          infection, autre.
+      - nom: "Architecture et cytologie"
+        section: microscopie
+        conditions: []
+        description: "Description architecturale (epiderme, derme, hypoderme) et cytologique."
+      - nom: "Immunofluorescence directe"
+        section: immunomarquage
+        conditions: []
+        description: "Si suspicion de dermatose bulleuse auto-immune : depot d'IgG, IgA, IgM, C3, fibrinogene."
+    marqueurs_ihc_attendus: []
+    template_macroscopie: >
+      Reception d'une biopsie cutanee au punch de X mm, fixee en formol,
+      incluse en totalite.
+    notes: >
+      Pour les dermatoses inflammatoires, une description syndromique
+      (patron reactionnel) est recommandee : spongiotique, psoriasiforme,
+      lichenoide, interface, vasculitique, granulomateuse, fibrosante.
+
+  exerese_cutanee:
+    nom: "Exerese cutanee (non melanome)"
+    mots_cles_detection:
+      - exerese cutanee
+      - exerese peau
+      - exerese de peau
+      - resection cutanee
+      - piece d'exerese cutanee
+    champs_obligatoires:
+      - nom: "Localisation anatomique"
+        section: renseignements_cliniques
+        conditions: []
+        description: "Site anatomique precis."
+      - nom: "Dimensions de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Trois dimensions en mm, orientation si reperee."
+      - nom: "Encrage des marges"
+        section: macroscopie
+        conditions: []
+        description: "Couleurs d'encrage pour l'evaluation des marges."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: "Nature de la lesion excisee."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Distance tumeur-marge laterale et profonde en mm."
+      - nom: "Type de carcinome"
+        section: microscopie
+        conditions: [carcinologique]
+        description: >
+          Carcinome basocellulaire (nodulaire, superficiel, infiltrant,
+          morpheiforme, baso-squameux) ou carcinome epidermoide
+          (bien/moyennement/peu differencie).
+      - nom: "Invasion perineurale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence. Facteur de risque majeur pour le carcinome epidermoide."
+      - nom: "Epaisseur tumorale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Epaisseur maximale en mm pour les carcinomes epidermoides."
+    marqueurs_ihc_attendus:
+      - BerEP4
+      - EMA
+      - p63
+    template_macroscopie: >
+      Reception d'une piece d'exerese cutanee de X x Y x Z mm, orientee
+      [oui/non]. Encrage des marges. A la coupe : lesion de X mm, [description].
+      Inclusion en totalite.
+    notes: >
+      Pour les carcinomes basocellulaires infiltrants/morpheiformes,
+      verifier les marges profondes avec attention. Pour les CBC
+      superficiels, les coupes en totalite sont indispensables.
+
+  melanome_piece:
+    nom: "Exerese de melanome"
+    mots_cles_detection:
+      - melanome
+      - exerese melanome
+      - reprise melanome
+      - piece melanome
+      - naevus atypique
+      - tumeur melanocytaire atypique
+    champs_obligatoires:
+      - nom: "Localisation anatomique"
+        section: renseignements_cliniques
+        conditions: []
+        description: "Site anatomique precis. Exposition solaire intermittente ou chronique."
+      - nom: "Dimensions de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Trois dimensions, orientation si reperee."
+      - nom: "Taille clinique de la lesion"
+        section: macroscopie
+        conditions: []
+        description: "Plus grand diametre de la lesion pigmentee en mm."
+      - nom: "Encrage des marges"
+        section: macroscopie
+        conditions: []
+        description: "Couleurs d'encrage. Inclusion en totalite obligatoire."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          SSM (melanome a extension superficielle), melanome nodulaire,
+          lentigo malin melanome, melanome acrolentigineux, melanome
+          desmoplastique, melanome sur naevus congenital, inclassable.
+      - nom: "Indice de Breslow"
+        section: microscopie
+        conditions: []
+        description: >
+          Epaisseur maximale en mm mesuree de la couche granuleuse a la
+          cellule tumorale la plus profonde. Facteur pronostique majeur.
+      - nom: "Ulceration"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence d'ulceration epidermique. Facteur pronostique AJCC."
+      - nom: "Index mitotique"
+        section: microscopie
+        conditions: []
+        description: "Nombre de mitoses par mm2 dans le derme (hot spot)."
+      - nom: "Niveau de Clark"
+        section: microscopie
+        conditions: []
+        description: "I (in situ), II (derme papillaire), III (remplissage derme papillaire), IV (derme reticulaire), V (hypoderme)."
+      - nom: "Regression"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence. Si presente : precoce (active) ou tardive (fibrose)."
+      - nom: "Invasion lymphovasculaire"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence d'emboles lymphovasculaires."
+      - nom: "Invasion perineurale"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence (surtout melanome desmoplastique)."
+      - nom: "Satellites microscopiques"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence de microsatellites (nodules tumoraux dans le derme ou l'hypoderme > 0.05 mm)."
+      - nom: "Infiltrat lymphocytaire (TILs)"
+        section: microscopie
+        conditions: []
+        description: "Absent, non actif (non infiltrant), actif (brisk/non-brisk)."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: []
+        description: >
+          Distance tumeur-marge laterale et profonde en mm. Marges
+          recommandees : melanome in situ 5 mm, Breslow <= 2 mm : 1 cm,
+          Breslow > 2 mm : 2 cm.
+      - nom: "Composante in situ associee"
+        section: microscopie
+        conditions: []
+        description: "Presence et extension laterale de la composante in situ."
+      - nom: "Naevus preexistant"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence d'un naevus residuel sous-jacent."
+      - nom: "pTNM"
+        section: conclusion
+        conditions: []
+        description: "Classification pT selon AJCC 8e edition (basee sur Breslow et ulceration)."
+    marqueurs_ihc_attendus:
+      - SOX10
+      - Melan-A
+      - HMB45
+      - S100
+      - Ki67
+      - PRAME
+    template_macroscopie: >
+      Reception d'une piece d'exerese cutanee de X x Y x Z mm orientee
+      par [repere]. Lesion pigmentee de X mm de grand axe. Encrage des
+      marges laterales et profondes. Inclusion en totalite avec coupes
+      seriees tous les 2-3 mm.
+    notes: >
+      Le BRAF V600E doit etre recherche pour tout melanome de stade III
+      ou plus (ou stade IIC a haut risque) en vue d'un traitement
+      adjuvant ou en situation metastatique. La biologie moleculaire
+      (NGS panel : BRAF, NRAS, cKIT, NF1) est recommandee.
+
+  carcinome_cutane:
+    nom: "Carcinome cutane (basocellulaire ou epidermoide)"
+    mots_cles_detection:
+      - carcinome basocellulaire
+      - cbc
+      - carcinome epidermoide cutane
+      - carcinome spinocellulaire
+      - cec
+      - maladie de bowen
+      - keratoacanthome
+    champs_obligatoires:
+      - nom: "Localisation anatomique"
+        section: renseignements_cliniques
+        conditions: []
+        description: "Site anatomique. Zone a risque (centrofaciale, periorificielle)."
+      - nom: "Dimensions de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Trois dimensions. Orientation si reperee."
+      - nom: "Encrage des marges"
+        section: macroscopie
+        conditions: []
+        description: "Couleurs d'encrage."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: >
+          CBC : nodulaire, superficiel, infiltrant, morpheiforme (sclerodermiforme),
+          metatypique (baso-squameux), micronodulaire.
+          CEC : bien differencie, moyennement differencie, peu differencie,
+          verruqueux, acantholytique, a cellules fusiformes, desmoplastique.
+      - nom: "Grade de differenciation (CEC)"
+        section: microscopie
+        conditions: [carcinologique, carcinome_epidermoide]
+        description: "Bien, moyennement, peu differencie."
+      - nom: "Epaisseur tumorale"
+        section: microscopie
+        conditions: []
+        description: "Epaisseur maximale en mm (Breslow-like pour CEC)."
+      - nom: "Profondeur d'invasion"
+        section: microscopie
+        conditions: []
+        description: "Derme papillaire, reticulaire, hypoderme, structures profondes."
+      - nom: "Invasion perineurale"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence. Calibre du nerf envahi si possible."
+      - nom: "Invasion lymphovasculaire"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: []
+        description: "Distance tumeur-marge laterale et profonde en mm. Preciser si atteinte."
+      - nom: "pTNM"
+        section: conclusion
+        conditions: []
+        description: "Classification pT selon AJCC 8e edition pour le CEC. Le CBC n'a pas de classification TNM standard utilisee en routine."
+    marqueurs_ihc_attendus:
+      - p63
+      - CK5/6
+      - BerEP4
+      - EMA
+    template_macroscopie: >
+      Reception d'une piece d'exerese cutanee de X x Y x Z mm. Lesion
+      [nodulaire/ulceree/crouteuse] de X mm. Encrage des marges. Inclusion
+      en totalite avec coupes perpendiculaires aux marges.
+    notes: >
+      Les CBC morpheiformes et infiltrants sont a risque eleve de
+      recidive locale et necessitent des marges larges. La technique
+      de Mohs est recommandee en zone centrofaciale.
+      Pour les CEC a haut risque (epaisseur > 6 mm, invasion perineurale,
+      peu differencie), un bilan ganglionnaire est indique.

@@ -4,8 +4,8 @@
 import { useState, useCallback, useEffect } from "react";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
-const TOKEN_KEY = "lexia_access_token";
-const REFRESH_KEY = "lexia_refresh_token";
+const TOKEN_KEY = "iris_access_token";
+const REFRESH_KEY = "iris_refresh_token";
 
 export interface AuthUser {
   id: string;

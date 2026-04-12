@@ -1,0 +1,286 @@
+# Regles metier ACP - Poumon
+#
+# Source primaire : donnees minimales INCa 2023 pour pathologie thoracique,
+# croisees avec les CR reels de Ressources/Modeles CR (55 exemples poumon)
+# et le contenu de Bibles Greg.xlsx feuille THO.
+#
+# Les champs avec ``conditions: [carcinologique]`` ne sont obligatoires
+# que si ``Classification.top.est_carcinologique`` est True. Ceux avec
+# ``conditions: [adenocarcinome]`` requierent en plus que le diagnostic
+# presume contienne "adenocarcinome" ou "adk".
+
+organe: poumon
+nom_affichage: "Poumon / Thorax"
+systeme_staging: "TNM 9e edition AJCC/UICC (2024) - cancer du poumon"
+description: >
+  Couvre toutes les pratiques d'anatomopathologie thoracique : biopsies
+  endoscopiques, cytologies, ponctions transthoraciques, pieces
+  operatoires, prelevements pleuraux et mediastinaux.
+
+sous_types:
+
+  biopsie_bronchique:
+    nom: "Biopsie bronchique"
+    mots_cles_detection:
+      - biopsie bronchique
+      - biopsies bronchiques
+      - bb
+      - fibroscopie
+      - biopsie carene
+    champs_obligatoires:
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: []
+        description: "Nature de la lesion (inflammatoire, metaplasique, tumorale...)."
+      - nom: "Sous-type histologique precis"
+        section: conclusion
+        conditions: [carcinologique]
+        description: >
+          Pour un carcinome : adenocarcinome, carcinome epidermoide,
+          carcinome a petites cellules, carcinome a grandes cellules,
+          tumeur carcinoide, autre sous-type de l'OMS 2021.
+      - nom: "TTF1"
+        section: immunomarquage
+        conditions: [carcinologique, adenocarcinome]
+        description: "Statut TTF1 requis pour confirmer une origine pulmonaire primitive."
+      - nom: "p40"
+        section: immunomarquage
+        conditions: [carcinologique, carcinome_epidermoide]
+        description: "Statut p40 pour differencier un carcinome epidermoide."
+      - nom: "PD-L1"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Expression de PD-L1 : pourcentage de cellules tumorales marquees (TPS)."
+      - nom: "ALK"
+        section: biologie_moleculaire
+        conditions: [carcinologique, adenocarcinome]
+        description: "Statut ALK (immunohistochimie ou FISH) pour ADK non epidermoide."
+      - nom: "ROS1"
+        section: biologie_moleculaire
+        conditions: [carcinologique, adenocarcinome]
+        description: "Statut ROS1 pour adenocarcinome pulmonaire."
+    marqueurs_ihc_attendus:
+      - TTF1
+      - p40
+      - Napsine A
+      - CK7
+      - PD-L1
+    template_macroscopie: >
+      Quatre fragments biopsiques ont ete adresses fixes en formol, inclus
+      en paraffine en un bloc et examines sur deux plans de coupe.
+    notes: >
+      Pour une biopsie simple NON carcinologique (inflammatoire,
+      metaplasique, granulomateuse), aucun des champs conditionnels
+      tumoraux n'est exige : pas de grade, pas de pTNM, pas de marges.
+
+  aspiration_bronchique:
+    nom: "Aspiration bronchique (cytologie)"
+    mots_cles_detection:
+      - aspiration bronchique
+      - aspirations bronchiques
+      - ab
+      - cytologie bronchique
+    champs_obligatoires:
+      - nom: "Qualite du prelevement"
+        section: macroscopie
+        conditions: []
+        description: "Mention de la representativite cellulaire."
+      - nom: "Description cytologique"
+        section: microscopie
+        conditions: []
+        description: "Analyse sur cytocentrifugation ou milieu liquide."
+      - nom: "Conclusion cytologique"
+        section: conclusion
+        conditions: []
+        description: "Effectif / non effectif, presence ou absence de cellules atypiques."
+    marqueurs_ihc_attendus: []
+    template_macroscopie: ""
+    notes: >
+      Les aspirations bronchiques sont souvent combinees aux biopsies
+      bronchiques dans un meme CR. Dans ce cas, creer deux sections
+      numerotees.
+
+  lba:
+    nom: "Liquide de lavage bronchiolo-alveolaire (LBA)"
+    mots_cles_detection:
+      - lba
+      - lavage bronchiolo
+      - lavage broncho alveolaire
+      - bal
+    champs_obligatoires:
+      - nom: "Volume"
+        section: macroscopie
+        conditions: []
+        description: "Volume de liquide recueilli en millilitres."
+      - nom: "Aspect macroscopique"
+        section: macroscopie
+        conditions: []
+        description: "Aspect du liquide (clair, trouble, hemorragique, purulent)."
+      - nom: "Richesse cellulaire"
+        section: macroscopie
+        conditions: []
+        description: "Nombre de cellules / mm3 a l'etat frais."
+      - nom: "Formule cytologique"
+        section: microscopie
+        conditions: []
+        description: "Repartition macrophages / lymphocytes / polynucleaires / eosinophiles."
+      - nom: "Colorations realisees"
+        section: microscopie
+        conditions: []
+        description: "MGG, Papanicolaou, Perls au minimum."
+      - nom: "Conclusion cytologique"
+        section: conclusion
+        conditions: []
+        description: "Diagnostic cytologique etiologique si possible."
+    marqueurs_ihc_attendus: []
+    template_macroscopie: ""
+    notes: >
+      Un LBA normal doit presenter >85% de macrophages alveolaires.
+      Une alveolite est suggeree si un type cellulaire predomine.
+
+  ebus:
+    nom: "Cytoponction ganglionnaire par EBUS"
+    mots_cles_detection:
+      - ebus
+      - cytoponction ganglionnaire
+      - echoendoscopie
+      - ponction mediastinale
+    champs_obligatoires:
+      - nom: "Loge ganglionnaire"
+        section: titre
+        conditions: []
+        description: "Station ganglionnaire prelevee (4R, 7, 10, 11 ...)."
+      - nom: "Qualite du prelevement"
+        section: microscopie
+        conditions: []
+        description: "Presence ou absence de lymphocytes (prelevement effectif ou non)."
+      - nom: "Conclusion diagnostique"
+        section: conclusion
+        conditions: []
+        description: "Effectif/non, presence de cellules atypiques, diagnostic etiologique."
+    marqueurs_ihc_attendus:
+      - TTF1
+      - CK
+      - CD3
+      - CD20
+    template_macroscopie: ""
+    notes: >
+      Un EBUS est effectif des qu'on voit des lymphocytes matures.
+      Sinon, preciser "non representatif".
+
+  piece_operatoire:
+    nom: "Piece operatoire pulmonaire"
+    mots_cles_detection:
+      - lobectomie
+      - pneumonectomie
+      - segmentectomie
+      - wedge
+      - resection atypique
+      - piece operatoire pulmonaire
+    champs_obligatoires:
+      - nom: "Type de resection"
+        section: titre
+        conditions: []
+        description: "Lobectomie, segmentectomie, pneumonectomie, wedge..."
+      - nom: "Dimensions de la piece"
+        section: macroscopie
+        conditions: []
+        description: "Trois dimensions en cm."
+      - nom: "Taille tumorale"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Plus grand diametre tumoral en mm ou cm."
+      - nom: "Distance aux marges"
+        section: macroscopie
+        conditions: [carcinologique]
+        description: "Distance tumeur / tranche bronchique / coupes parenchymateuses."
+      - nom: "Type histologique"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Classification OMS 2021 des tumeurs thoraciques."
+      - nom: "Grade / differenciation"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Pour ADK : pattern predominant et architecture ; pour CE : grade."
+      - nom: "Invasion pleurale viscerale"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Classification PL0 / PL1 / PL2 / PL3."
+      - nom: "Emboles vasculaires"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'emboles lymphatiques et sanguins."
+      - nom: "Engainements perinerveux"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Presence ou absence d'engainements perinerveux."
+      - nom: "Marges de resection"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Saines ou atteintes ; preciser laquelle si atteinte."
+      - nom: "Ganglions envahis / examines"
+        section: microscopie
+        conditions: [carcinologique]
+        description: "Ratio par station avec effraction capsulaire eventuelle."
+      - nom: "pTNM"
+        section: conclusion
+        conditions: [carcinologique]
+        description: "Classification complete pT pN (pM si connu) edition AJCC 8."
+      - nom: "PD-L1"
+        section: immunomarquage
+        conditions: [carcinologique]
+        description: "Expression PD-L1 : pourcentage de cellules tumorales marquees (TPS)."
+      - nom: "Biologie moleculaire"
+        section: biologie_moleculaire
+        conditions: [carcinologique, adenocarcinome]
+        description: "EGFR, ALK, ROS1, KRAS, BRAF, NTRK (recherches ciblees)."
+    marqueurs_ihc_attendus:
+      - TTF1
+      - p40
+      - Napsine A
+      - CK7
+      - CK5/6
+      - PD-L1
+      - Ki-67
+    template_macroscopie: >
+      Piece de [type de resection] mesurant X x Y x Z cm, pesant W g.
+      A la coupe : tumeur mesurant X cm de grand axe, situee a X cm de
+      la coupe bronchique et a X cm de la coupe parenchymateuse la plus
+      proche. Aspect blanchatre ferme. Inclusion en totalite de la lesion.
+      Ganglions pretuberculeux / interlobaires / mediastinaux identifies.
+    notes: >
+      Le pTNM est OBLIGATOIRE pour toute piece operatoire carcinologique
+      et doit suivre la 9e edition AJCC 2024. Pour une piece non
+      carcinologique (tumeur benigne, kyste, nodule inflammatoire),
+      omettre entierement le bloc pTNM et marges.
+
+  biopsie_pleurale:
+    nom: "Biopsie pleurale / liquide pleural"
+    mots_cles_detection:
+      - biopsie pleurale
+      - liquide pleural
+      - ponction pleurale
+      - plevre
+    champs_obligatoires:
+      - nom: "Type de prelevement"
+        section: titre
+        conditions: []
+        description: "Biopsie tissulaire, liquide pleural, ou les deux."
+      - nom: "Description histologique ou cytologique"
+        section: microscopie
+        conditions: []
+        description: "Selon le type de prelevement."
+      - nom: "Presence de cellules tumorales"
+        section: conclusion
+        conditions: []
+        description: "Affirmer ou infirmer la presence de cellules carcinomateuses."
+    marqueurs_ihc_attendus:
+      - TTF1
+      - Ber-EP4
+      - calretinine
+      - CK5/6
+      - WT1
+    template_macroscopie: ""
+    notes: >
+      Pour le diagnostic differentiel adenocarcinome / mesotheliome
+      epithelioide, un panel IHC biphasique est recommande.
