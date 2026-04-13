@@ -1,31 +1,37 @@
-"""Orchestrateur du pipeline v5 Anapath.
+"""Orchestrateur du pipeline Anapath.
 
-Workflow deterministe en 6 etapes (vs 7 en v4) :
+Workflow deterministe en 7 etapes :
 
     transcript
        |
        v
     1. corriger_phonetique   (dict phonetique ACP)
        v
-    2. retrieve               (BM25 cr_index + bibles)
+    2. classify_specimen     (Claude #1, JSON — prompt cache)
        v
-    3. produce_with_claude    (UN SEUL appel Claude : classification + CRDocument)
+    3. get_rules             (YAML cache par organe)
        v
-    4. validate_cr            (python contre rules YAML)
+    4. retrieve              (BM25 filtre par organe)
        v
-    5. render_markdown        (Jinja deterministe)
+    5. generate_cr_json      (Claude #2, JSON — prompt cache)
+       v
+    6. validate_cr           (python contre rules YAML)
+       v
+    7. render_markdown       (Jinja deterministe)
        v
     FormatResponseV4
 
-UN seul appel Claude avec prompt caching. La classification et la
-generation du CRDocument sont faites dans le meme appel pour :
-- diviser la latence par ~2
-- diviser le cout par ~2
-- permettre a Claude de raisonner sur le document en ayant la classification
-  fraiche en contexte
+Deux appels Claude, zero boucle, tout est tracable.
 
-Si l'appel echoue, le pipeline retourne un CR generique. La dictee
-du pathologiste ne doit jamais etre perdue.
+L'appel #1 classifie l'organe avec un prompt dedie et leger.
+L'appel #2 genere le CR avec le contexte SPECIFIQUE a l'organe
+(regles YAML + exemples CR + bibles). C'est cette specificite
+qui fait la qualite : Claude recoit les bonnes regles et les
+bons exemples pour le bon organe.
+
+Prompt caching Anthropic sur les deux system prompts (5 min TTL).
+Si une etape echoue, le pipeline retourne un CR generique.
+La dictee du pathologiste ne doit jamais etre perdue.
 """
 
 from __future__ import annotations
@@ -33,7 +39,7 @@ from __future__ import annotations
 import json
 import logging
 import uuid
-from typing import Any
+from typing import Any, cast
 
 import anthropic
 from anthropic.types import TextBlock
@@ -46,12 +52,15 @@ from rules import get_rules
 from schemas import (
     AgentTrace,
     AgentTraceStep,
+    BiblesEntry,
     Classification,
     CRDocument,
+    ExampleCR,
     FormatResponseV4,
     OrganRules,
     Prelevement,
     RetrievalResult,
+    SousTypeRules,
     ValidationResult,
 )
 from validation import validate_cr
@@ -61,221 +70,219 @@ logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
-# Prompt systeme expert — cache par Anthropic (ephemeral cache, 5 min TTL)
+# Prompt classification (appel #1) — leger et focalise
 # ---------------------------------------------------------------------------
 
 
-SYSTEM_PROMPT: str = """\
-Tu es un pathologiste senior francais avec 20 ans d'experience en \
-anatomopathologie. Tu supervises un interne qui vient de te lire sa \
-dictee vocale brute. Tu dois la transformer en un compte-rendu \
-anatomopathologique structure et professionnel.
+SYSTEM_PROMPT_CLASSIFY: str = """\
+Tu es un expert en anatomopathologie francaise.
+Tu recois une dictee vocale brute d'un pathologiste et tu identifies \
+le type de prelevement.
 
-Tu reponds STRICTEMENT avec un JSON, sans texte avant ni apres, \
-sans balises markdown.
-
-# TON ROLE
-
-Tu n'es PAS un outil de diagnostic. Tu es un REDACTEUR EXPERT qui :
-1. Structure la dictee selon les standards INCa / OMS
-2. Developpe la microscopie dans le vocabulaire ACP standard francais
-3. Verifie mentalement la checklist des donnees minimales pour cet organe
-4. Signale les lacunes par des marqueurs [A COMPLETER: xxx]
-5. Produit une conclusion synthetique et precise
-
-Le praticien garde le dernier mot. Tu l'aides a rediger, pas a diagnostiquer.
-
-# FORMAT DE SORTIE
-
-```json
+Tu retournes STRICTEMENT un JSON avec cette structure, rien d'autre :
 {
-  "classification": {
-    "top": {
-      "organe": "<organe>",
-      "sous_type": "<sous_type>",
-      "est_carcinologique": true|false,
-      "diagnostic_presume": "<diagnostic court en francais>",
-      "confidence": 0.0-1.0
-    },
-    "alternative": {
-      "organe": "<organe>",
-      "sous_type": "<sous_type>",
-      "est_carcinologique": true|false,
-      "diagnostic_presume": "<diagnostic>",
-      "confidence": 0.0-1.0
-    }
+  "top": {
+    "organe": "<un des organes valides>",
+    "sous_type": "<identifiant du sous-type>",
+    "est_carcinologique": true|false,
+    "diagnostic_presume": "<diagnostic en 3-10 mots, minuscules>",
+    "confidence": 0.0-1.0
   },
-  "document": {
-    "titre": "<TITRE EN MAJUSCULES>",
-    "renseignements_cliniques": "<contexte ou chaine vide>",
-    "prelevements": [
-      {
-        "numero": 1,
-        "titre_court": "",
-        "macroscopie": "<description macroscopique>",
-        "microscopie": "<description microscopique DEVELOPPEE>",
-        "immunomarquage": {
-          "phrase_introduction": "",
-          "lignes": [
-            {"anticorps": "TTF1", "resultat": "positif", "temoin": ""}
-          ]
-        },
-        "biologie_moleculaire": ""
-      }
-    ],
-    "conclusion": "<conclusion synthetique 3-5 phrases>",
-    "ptnm": "<pT pN (edition AJCC) ou chaine vide>",
-    "commentaire_final": "",
-    "code_adicap": "",
-    "codes_snomed": []
+  "alternative": {
+    "organe": "<...>",
+    "sous_type": "<...>",
+    "est_carcinologique": true|false,
+    "diagnostic_presume": "<...>",
+    "confidence": 0.0-1.0
   }
 }
-```
 
-# ORGANES VALIDES
-
+ORGANES VALIDES (utilise exactement ces identifiants) :
 poumon, sein, digestif, gynecologie, urologie, orl, dermatologie, \
 hematologie, os_articulations, tissus_mous, neurologie, ophtalmologie, \
 cardiovasculaire, endocrinologie, generic
 
-# REGLES ABSOLUES
+REGLES :
+1. est_carcinologique = true UNIQUEMENT si la dictee decrit une lesion \
+tumorale maligne (carcinome, adenocarcinome, sarcome, metastase, malin, \
+infiltrant) HORS negation.
+2. diagnostic_presume : description courte en francais minuscule.
+3. confidence : 0.0 = inconnu, 1.0 = certitude. Si ambigu, < 0.7.
+4. Si pas medical : organe "generic", confidence 0.0.
 
-1. **Ne JAMAIS inventer** d'information medicale absente de la dictee. \
-Si un element manque, utilise [A COMPLETER: nom_du_champ].
-
-2. **titre** : nom anatomique + type de prelevement, EN MAJUSCULES. \
-Exemple : "BIOPSIES BRONCHIQUES DU LOBE SUPERIEUR GAUCHE".
-
-3. **microscopie** : DEVELOPPEE — architecture tissulaire, atypies \
-cellulaires, mitoses, stroma, infiltrats, rapport aux structures \
-adjacentes. Au moins 5 phrases pour un cas tumoral. Utilise le \
-vocabulaire ACP standard francais.
-
-4. **conclusion** : SYNTHETIQUE — diagnostic principal + staging si \
-applicable. 3-5 phrases courtes. JAMAIS de repetition de la microscopie.
-
-5. **multi-prelevement** : si le praticien numerote (1, 2, 3 ou \
-"premier", "deuxieme"), cree une entree par prelevement avec \
-titre_court rempli. Sinon, une seule entree numero 1.
-
-6. **immunomarquage** : tableau uniquement si IHC mentionne. Le champ \
-temoin reste vide SAUF si explicitement dicte.
-
-7. **ptnm** : UNIQUEMENT pour piece operatoire carcinologique avec \
-tous les elements dictes. Sinon chaine vide.
-
-8. **biologie_moleculaire** : UNIQUEMENT si resultats dictes.
-
-9. **est_carcinologique = true** seulement si termes de malignite \
-(carcinome, adenocarcinome, sarcome, metastase, malin, infiltrant) \
-HORS negation. Biopsie negative/inflammatoire = false.
-
-10. **confidence** : reflète ta certitude. < 0.7 si ambigu. \
-Si la dictee n'est pas medicale : organe "generic", confidence 0.0.
-
-11. **code_adicap** : si tu connais le code ADICAP correspondant \
-(mode+technique+organe+lesion), fournis-le. Sinon chaine vide.
-
-12. **codes_snomed** : si tu identifies des concepts SNOMED CT \
-pertinents pour le diagnostic, fournis les codes. Sinon liste vide.
-
-# EXPERTISE METIER PAR ORGANE
-
-**Poumon** : Pattern predominant obligatoire pour ADK (OMS 2021). \
-PD-L1 (TPS%), panel moleculaire (EGFR, ALK, ROS1, KRAS, BRAF). \
-Invasion pleurale (PL0-3), emboles, engainements. \
-Staging TNM 9e ed. AJCC 2024.
-
-**Sein** : RE, RP, HER2, Ki-67 obligatoires. Grade SBR/Nottingham \
-(3 composantes). Composante in situ. \
-HER2 score 2+ → FISH/CISH requise.
-
-**Digestif** : Colon/rectum → grade, budding (ITBCC), statut MMR/MSI, \
-CRM (rectum). Estomac → Lauren, HER2. Foie → METAVIR pour biopsies. \
-Minimum 12 ganglions pour staging colique.
-
-**Thyroide** : Classification OMS 2022. Bethesda pour cytoponctions. \
-Extension extrathyroidienne. BRAF si papillaire.
-
-**Dermatologie** : Melanome → Breslow (mm), Clark, ulceration, \
-index mitotique, regression. Carcinomes cutanes → grade, marges, PNI.
-
-**Gynecologie** : Col → CIN/LSIL/HSIL, p16, HPV. \
-Endometre → type, grade FIGO, invasion myometre. Ovaire → FIGO staging.
-
-**Urologie** : Prostate → Gleason, ISUP grade group, % pattern. \
-Rein → grade Fuhrman/ISUP, type OMS, invasion sinusale/veineuse.
-
-**ORL** : p16/HPV obligatoire pour oropharynx. Type OMS. Marges.
-
-**Hematologie** : Classification OMS 2022. Panel IHC complet. \
-CD20, CD3, CD5, CD10, BCL2, BCL6, Ki67.
-
-**Tissus mous / Os** : Grade FNCLCC (3 composantes). \
-Type OMS. Necrose, mitoses, marges.
-
-**Neurologie** : Type et grade OMS 2021. IDH, ATRX, 1p/19q, MGMT, Ki67.
-
-RESPECTE les regles metier et exemples fournis dans le contexte \
-utilisateur. Reponds UNIQUEMENT avec le JSON."""
+Reponds UNIQUEMENT avec le JSON."""
 
 
 # ---------------------------------------------------------------------------
-# Construction du message utilisateur
+# Prompt generation (appel #2) — expert avec contexte organe
 # ---------------------------------------------------------------------------
+
+
+SYSTEM_PROMPT_GENERATE: str = """\
+Tu es un pathologiste senior francais avec 20 ans d'experience. \
+Tu recois une dictee vocale et tu la structures en CRDocument JSON.
+
+Tu n'es PAS un outil de diagnostic. Tu REDIGES le compte-rendu \
+dans le vocabulaire ACP standard francais. Le praticien a le dernier mot.
+
+REGLE ABSOLUE : ne JAMAIS inventer d'information absente de la dictee. \
+Si un element manque, signale-le avec [A COMPLETER: nom_du_champ].
+
+Le JSON de sortie DOIT respecter exactement ce schema :
+{
+  "titre": "<TITRE EN MAJUSCULES>",
+  "renseignements_cliniques": "<contexte ou chaine vide>",
+  "prelevements": [
+    {
+      "numero": 1,
+      "titre_court": "",
+      "macroscopie": "<description macroscopique>",
+      "microscopie": "<description microscopique DEVELOPPEE>",
+      "immunomarquage": {
+        "phrase_introduction": "",
+        "lignes": [
+          {"anticorps": "TTF1", "resultat": "positif", "temoin": ""}
+        ]
+      },
+      "biologie_moleculaire": ""
+    }
+  ],
+  "conclusion": "<conclusion synthetique 3-5 phrases>",
+  "ptnm": "<ex: pT1a N0 (AJCC 8e edition), ou chaine vide>",
+  "commentaire_final": "",
+  "code_adicap": "",
+  "codes_snomed": []
+}
+
+REGLES DE CONTENU :
+
+1. **titre** : nom anatomique + type de prelevement EN MAJUSCULES.
+
+2. **microscopie** : DEVELOPPEE — architecture, atypies, mitoses, stroma, \
+infiltrats. Au moins 5 phrases pour un cas tumoral. Vocabulaire ACP standard.
+
+3. **conclusion** : SYNTHETIQUE — diagnostic + pronostic. 3-5 phrases. \
+JAMAIS de repetition de la microscopie.
+
+4. **multi-prelevement** : si le praticien numerote, une entree par \
+prelevement avec titre_court. Sinon, numero 1 et titre_court vide.
+
+5. **immunomarquage** : tableau uniquement si IHC mentionnee. \
+Temoin vide SAUF si explicitement dicte.
+
+6. **ptnm** : UNIQUEMENT pour piece operatoire carcinologique avec tous \
+les elements dictes. Sinon chaine vide.
+
+7. **biologie_moleculaire** : UNIQUEMENT si resultats dictes.
+
+8. **code_adicap** : si tu connais le code ADICAP, fournis-le. Sinon vide.
+
+RESPECTE les regles metier et exemples fournis en contexte utilisateur.
+Reponds UNIQUEMENT avec le JSON, sans balises markdown."""
+
+
+# ---------------------------------------------------------------------------
+# Serialisation du contexte pour l'appel #2
+# ---------------------------------------------------------------------------
+
+
+def _serialize_sous_type(sous_type: SousTypeRules) -> str:
+    """Rend une section SousTypeRules lisible pour Claude."""
+    lines: list[str] = [f"SOUS-TYPE : {sous_type.nom}"]
+
+    if sous_type.champs_obligatoires:
+        lines.append("Champs obligatoires :")
+        for champ in sous_type.champs_obligatoires:
+            cond_text: str = (
+                f" (si {', '.join(champ.conditions)})"
+                if champ.conditions
+                else ""
+            )
+            lines.append(f"  - {champ.nom} [section {champ.section}]{cond_text}")
+
+    if sous_type.marqueurs_ihc_attendus:
+        lines.append(
+            "Panel IHC attendu : " + ", ".join(sous_type.marqueurs_ihc_attendus)
+        )
+
+    if sous_type.template_macroscopie:
+        lines.append(f"Template macroscopie : {sous_type.template_macroscopie}")
+
+    if sous_type.notes:
+        lines.append(f"Notes : {sous_type.notes}")
+
+    return "\n".join(lines)
+
+
+def _serialize_rules(rules: OrganRules, sous_type_key: str) -> str:
+    """Rend l'OrganRules ciblee sur le sous-type detecte."""
+    lines: list[str] = [
+        f"ORGANE : {rules.nom_affichage} ({rules.organe})",
+        f"Systeme de staging : {rules.systeme_staging or 'non applicable'}",
+    ]
+
+    target: SousTypeRules | None = rules.sous_types.get(sous_type_key)
+    if target is not None:
+        lines.append("")
+        lines.append(_serialize_sous_type(target))
+
+    return "\n".join(lines)
+
+
+def _serialize_example(example: ExampleCR) -> str:
+    """Rend un ExampleCR en bloc texte compact."""
+    snippet: str = example.full_text
+    if len(snippet) > 1200:
+        snippet = snippet[:1200] + "..."
+    return (
+        f"--- EXEMPLE CR : {example.filename} "
+        f"(organe={example.organe}, type={example.sous_type_guess}) ---\n"
+        f"{snippet}"
+    )
+
+
+def _serialize_bible_entry(entry: BiblesEntry) -> str:
+    """Rend une entree Bibles Greg en bloc texte."""
+    header: str = f"[{entry.organe}] {entry.topographie} / {entry.lesion}"
+    if entry.code_adicap:
+        header += f" (ADICAP: {entry.code_adicap})"
+    return f"{header}\n{entry.texte_standard}"
 
 
 def _build_user_message(
     transcript: str,
+    classification: Classification,
+    rules: OrganRules,
     retrieval: RetrievalResult,
-    rules: OrganRules | None,
 ) -> str:
-    """Construit le message utilisateur avec contexte retrieval et regles."""
+    """Construit le message utilisateur complet pour l'appel #2."""
     parts: list[str] = []
 
-    if rules is not None and rules.organe != "generic":
-        parts.append("REGLES METIER APPLICABLES :")
-        parts.append(f"  Organe : {rules.nom_affichage}")
-        parts.append(f"  Staging : {rules.systeme_staging or 'non applicable'}")
-        for sous_type_key, st_rules in rules.sous_types.items():
-            parts.append(f"\n  SOUS-TYPE : {st_rules.nom} ({sous_type_key})")
-            if st_rules.champs_obligatoires:
-                parts.append("  Champs obligatoires :")
-                for champ in st_rules.champs_obligatoires:
-                    cond: str = (
-                        f" (si {', '.join(champ.conditions)})"
-                        if champ.conditions
-                        else ""
-                    )
-                    parts.append(
-                        f"    - {champ.nom} [{champ.section}]{cond}"
-                    )
-            if st_rules.marqueurs_ihc_attendus:
-                parts.append(
-                    "  Panel IHC : "
-                    + ", ".join(st_rules.marqueurs_ihc_attendus)
-                )
-        parts.append("")
+    parts.append("CLASSIFICATION :")
+    parts.append(
+        f"  organe={classification.top.organe}, "
+        f"sous_type={classification.top.sous_type}, "
+        f"carcinologique={classification.top.est_carcinologique}, "
+        f"diagnostic_presume={classification.top.diagnostic_presume}"
+    )
+    parts.append("")
+
+    parts.append("REGLES METIER APPLICABLES :")
+    parts.append(_serialize_rules(rules, classification.top.sous_type))
+    parts.append("")
 
     if retrieval.exemples_cr:
-        parts.append("EXEMPLES DE CR (style et terminologie) :")
-        for ex in retrieval.exemples_cr:
-            snippet: str = ex.full_text[:1200]
-            if len(ex.full_text) > 1200:
-                snippet += "..."
-            parts.append(
-                f"--- {ex.filename} (organe={ex.organe}) ---"
-            )
-            parts.append(snippet)
+        parts.append(
+            "EXEMPLES DE CR REELS (pour le style et la terminologie) :"
+        )
+        for example in retrieval.exemples_cr:
+            parts.append(_serialize_example(example))
             parts.append("")
 
     if retrieval.entrees_bibles:
-        parts.append("TEXTES STANDARDS (Bibles) :")
+        parts.append("TEXTES STANDARDS (Bibles Greg, si applicables) :")
         for entry in retrieval.entrees_bibles:
-            header: str = f"[{entry.organe}] {entry.topographie} / {entry.lesion}"
-            if entry.code_adicap:
-                header += f" (ADICAP: {entry.code_adicap})"
-            parts.append(f"{header}\n{entry.texte_standard}")
+            parts.append(_serialize_bible_entry(entry))
             parts.append("")
 
     parts.append("DICTEE A STRUCTURER :")
@@ -306,17 +313,37 @@ def _get_client() -> anthropic.AsyncAnthropic:
 
 
 # ---------------------------------------------------------------------------
-# Appel Claude unique avec prompt caching
+# Appels Claude avec prompt caching
 # ---------------------------------------------------------------------------
 
 
-async def _call_claude(user_message: str) -> str:
-    """Appelle Claude avec prompt caching sur le system prompt.
+async def _call_claude_classify(transcript: str) -> str:
+    """Appel #1 : classification du prelevement."""
+    client = _get_client()
+    settings = get_settings()
 
-    Le system prompt est marque ``cache_control: ephemeral`` pour que
-    les appels suivants (dans les 5 min) reutilisent le cache et
-    economisent ~90% du cout des tokens systeme.
-    """
+    response = await client.messages.create(
+        model=settings.claude_model,
+        max_tokens=512,
+        temperature=0.0,
+        system=[
+            {
+                "type": "text",
+                "text": SYSTEM_PROMPT_CLASSIFY,
+                "cache_control": {"type": "ephemeral"},
+            }
+        ],
+        messages=[{"role": "user", "content": transcript}],
+    )
+
+    first_block = response.content[0]
+    if not isinstance(first_block, TextBlock):
+        return "{}"
+    return first_block.text.strip()
+
+
+async def _call_claude_generate(user_message: str) -> str:
+    """Appel #2 : generation du CRDocument JSON."""
     client = _get_client()
     settings = get_settings()
 
@@ -327,7 +354,7 @@ async def _call_claude(user_message: str) -> str:
         system=[
             {
                 "type": "text",
-                "text": SYSTEM_PROMPT,
+                "text": SYSTEM_PROMPT_GENERATE,
                 "cache_control": {"type": "ephemeral"},
             }
         ],
@@ -341,7 +368,7 @@ async def _call_claude(user_message: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Parsing defensif de la reponse JSON
+# Parsing defensif
 # ---------------------------------------------------------------------------
 
 
@@ -367,43 +394,21 @@ def _empty_document(titre: str = "DICTEE NON EXPLOITABLE") -> CRDocument:
     )
 
 
-def _parse_response(
-    raw_text: str, transcript: str
-) -> tuple[Classification, CRDocument]:
-    """Parse la reponse JSON combinee classification+document.
-
-    Tolere les reponses malformees et retourne des valeurs de secours.
-    """
+def parse_cr_document(raw_text: str) -> CRDocument:
+    """Convertit la reponse JSON de Claude en CRDocument typed."""
     cleaned: str = _strip_markdown_fence(raw_text)
     try:
-        data: dict[str, Any] = json.loads(cleaned)
+        data: Any = json.loads(cleaned)
     except json.JSONDecodeError:
-        logger.warning("JSON invalide de Claude, fallback generique")
-        classification = parse_classification_json("{}", transcript)
-        return classification, _empty_document()
+        return _empty_document()
 
     if not isinstance(data, dict):
-        classification = parse_classification_json("{}", transcript)
-        return classification, _empty_document()
-
-    # Parser la classification
-    classification_raw: dict[str, Any] = data.get("classification", {})
-    classification = parse_classification_json(
-        json.dumps(classification_raw), transcript
-    )
-
-    # Parser le document
-    doc_raw: dict[str, Any] = data.get("document", {})
-    if not doc_raw:
-        return classification, _empty_document()
+        return _empty_document()
 
     try:
-        document = CRDocument.model_validate(doc_raw)
-    except (ValueError, TypeError) as exc:
-        logger.warning("CRDocument invalide: %s", exc)
-        return classification, _empty_document()
-
-    return classification, document
+        return CRDocument.model_validate(data)
+    except (ValueError, TypeError):
+        return _empty_document()
 
 
 # ---------------------------------------------------------------------------
@@ -415,7 +420,7 @@ async def produce_cr(transcript: str) -> FormatResponseV4:
     """Pipeline complet transcript -> CRDocument rendu + markers.
 
     Point d'entree unique appele par ``main.py:/format``.
-    6 etapes, 1 seul appel Claude, tout est tracable.
+    7 etapes, 2 appels Claude (classify puis generate), tout est tracable.
     """
     trace_id: str = str(uuid.uuid4())
     trace_steps: list[AgentTraceStep] = []
@@ -432,13 +437,53 @@ async def produce_cr(transcript: str) -> FormatResponseV4:
         )
     )
 
-    # --- Etape 2 : retrieval pre-classification (best-effort sur mots-cles) ---
-    # On lance un retrieval generique sur le texte brut pour fournir du contexte.
-    # Apres classification, on pourrait affiner mais un seul retrieval suffit
-    # car Claude recoit les exemples en contexte et classe en meme temps.
+    # --- Etape 2 : classification (appel Claude #1) ---
+    try:
+        raw_classify: str = await _call_claude_classify(corrected)
+    except (anthropic.APIStatusError, anthropic.APIConnectionError) as exc:
+        logger.error("Erreur Claude classify: %s", exc)
+        raw_classify = "{}"
+
+    classification: Classification = parse_classification_json(
+        raw_classify, corrected
+    )
+    trace_steps.append(
+        AgentTraceStep(
+            step_name="classify",
+            duration_ms=0,
+            input_summary=corrected[:120],
+            output_summary=(
+                f"{classification.top.organe}/{classification.top.sous_type} "
+                f"conf={classification.top.confidence:.2f}"
+            ),
+        )
+    )
+
+    # --- Etape 3 : chargement des regles specifiques a l'organe ---
+    organe_for_rules: str = (
+        "generic" if classification.needs_fallback
+        else classification.top.organe
+    )
+    rules: OrganRules = get_rules(
+        cast("OrganRules.model_fields['organe'].annotation", organe_for_rules)  # type: ignore[valid-type]
+    )
+    trace_steps.append(
+        AgentTraceStep(
+            step_name="load_rules",
+            duration_ms=0,
+            input_summary=f"organe={organe_for_rules}",
+            output_summary=f"{len(rules.sous_types)} sous-types",
+        )
+    )
+
+    # --- Etape 4 : retrieval FILTRE PAR ORGANE ---
+    query: str = (
+        f"{classification.top.organe} {classification.top.sous_type} "
+        f"{classification.top.diagnostic_presume}"
+    )
     retrieval: RetrievalResult = retrieve(
-        organe="generic",
-        query=corrected[:300],
+        organe=classification.top.organe,
+        query=query,
         top_k_cr=settings.retrieval_top_k_cr,
         top_k_bibles=settings.retrieval_top_k_bibles,
     )
@@ -446,7 +491,7 @@ async def produce_cr(transcript: str) -> FormatResponseV4:
         AgentTraceStep(
             step_name="retrieve",
             duration_ms=0,
-            input_summary=corrected[:120],
+            input_summary=query[:120],
             output_summary=(
                 f"{len(retrieval.exemples_cr)} CR + "
                 f"{len(retrieval.entrees_bibles)} bibles"
@@ -454,24 +499,21 @@ async def produce_cr(transcript: str) -> FormatResponseV4:
         )
     )
 
-    # --- Etape 3 : appel Claude unique (classification + generation) ---
-    # On charge les regles generiques pour le contexte initial.
-    # Apres classification, on rechargera les regles specifiques si besoin.
-    generic_rules: OrganRules = get_rules("generic")
+    # --- Etape 5 : generation du CR (appel Claude #2) ---
     user_message: str = _build_user_message(
         transcript=corrected,
+        classification=classification,
+        rules=rules,
         retrieval=retrieval,
-        rules=generic_rules,
     )
 
     try:
-        raw_response: str = await _call_claude(user_message)
+        raw_response: str = await _call_claude_generate(user_message)
     except (anthropic.APIStatusError, anthropic.APIConnectionError) as exc:
-        logger.error("Erreur Claude API: %s", exc)
-        classification = parse_classification_json("{}", corrected)
-        document = _empty_document(titre="ERREUR RESEAU CLAUDE")
+        logger.error("Erreur Claude generate: %s", exc)
+        document: CRDocument = _empty_document(titre="ERREUR RESEAU CLAUDE")
     else:
-        classification, document = _parse_response(raw_response, corrected)
+        document = parse_cr_document(raw_response)
 
     trace_steps.append(
         AgentTraceStep(
@@ -482,39 +524,7 @@ async def produce_cr(transcript: str) -> FormatResponseV4:
         )
     )
 
-    # --- Etape 3b : re-retrieval specifique a l'organe detecte ---
-    # Si l'organe est specifique, on refait un retrieval cible et on
-    # charge les regles de cet organe pour la validation.
-    organe_detecte: str = classification.top.organe
-    if organe_detecte != "generic" and not classification.needs_fallback:
-        specific_retrieval = retrieve(
-            organe=classification.top.organe,
-            query=(
-                f"{classification.top.organe} "
-                f"{classification.top.sous_type} "
-                f"{classification.top.diagnostic_presume}"
-            ),
-            top_k_cr=settings.retrieval_top_k_cr,
-            top_k_bibles=settings.retrieval_top_k_bibles,
-        )
-        retrieval = specific_retrieval
-
-    # --- Etape 4 : chargement des regles specifiques ---
-    organe_for_rules: str = (
-        "generic" if classification.needs_fallback
-        else classification.top.organe
-    )
-    rules: OrganRules = get_rules(organe_for_rules)  # type: ignore[arg-type]
-    trace_steps.append(
-        AgentTraceStep(
-            step_name="load_rules",
-            duration_ms=0,
-            input_summary=f"organe={organe_for_rules}",
-            output_summary=f"{len(rules.sous_types)} sous-types",
-        )
-    )
-
-    # --- Etape 5 : validation ---
+    # --- Etape 6 : validation ---
     validation_result: ValidationResult = validate_cr(
         document, classification, rules
     )
@@ -527,7 +537,7 @@ async def produce_cr(transcript: str) -> FormatResponseV4:
         )
     )
 
-    # --- Etape 6 : rendu markdown ---
+    # --- Etape 7 : rendu markdown ---
     formatted_md: str = render_markdown(validation_result.document)
     trace_steps.append(
         AgentTraceStep(
@@ -538,7 +548,6 @@ async def produce_cr(transcript: str) -> FormatResponseV4:
         )
     )
 
-    # Trace d'audit (a persister en DB dans une version ulterieure)
     _trace = AgentTrace(
         trace_id=trace_id,
         report_id=None,
