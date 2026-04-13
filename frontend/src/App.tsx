@@ -507,11 +507,11 @@ export default function App() {
         {/* Header */}
         <header className="flex h-14 shrink-0 items-center justify-between border-b bg-card/30 px-5">
           <div className="flex items-center gap-3">
-            <IrisWordmark className="text-lg show-mobile-only" />
+            <div className="flex items-center gap-2">
+              <IrisLogo size={22} />
+              <IrisWordmark className="text-lg" />
+            </div>
             <div className="flex items-center gap-2 hide-mobile">
-              <h2 className="text-sm font-semibold">
-                {activeView === "record" ? "Dictee" : "Compte-rendu"}
-              </h2>
               {organeDetecte && organeDetecte !== "non_determine" && (
                 <Badge variant="default" className="text-[10px] font-mono uppercase tracking-wider">
                   {organeDetecte.replace(/_/g, " ")}
@@ -579,7 +579,7 @@ export default function App() {
           ) : (
           <>
           {/* Left: Recorder */}
-          <section className="w-[380px] shrink-0 overflow-y-auto border-r p-4 scrollbar-thin max-md:hidden">
+          <section className="iris-leaves-bg w-[380px] shrink-0 overflow-y-auto border-r p-4 scrollbar-thin max-md:hidden">
             <RecorderPanel
               rawTranscription={rawTranscription}
               report={report}
@@ -593,7 +593,7 @@ export default function App() {
           </section>
 
           {/* Center: Report */}
-          <section className="flex-1 overflow-y-auto p-5 scrollbar-thin">
+          <section className="iris-leaves-bg iris-leaves-bg-subtle flex-1 overflow-y-auto p-5 scrollbar-thin">
             <ReportPanel
               report={report}
               onReportChange={setReport}

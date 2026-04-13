@@ -377,6 +377,53 @@
 }
 
 /* ============================================================
+   Botanical background — feuilles et branches en transparence
+   ============================================================ */
+.iris-leaves-bg {
+  position: relative;
+}
+
+.iris-leaves-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  background-image:
+    /* Feuille 1 — grande, haut gauche */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 120' fill='%230d9488'%3E%3Cpath d='M40 0C20 20 5 50 10 80c5 30 25 35 30 40c5-5 25-10 30-40C75 50 60 20 40 0zM40 15c10 15 20 35 17 55-3 15-12 22-17 25-5-3-14-10-17-25C20 50 30 30 40 15z'/%3E%3C/svg%3E");
+    /* Feuille 2 — moyenne, bas droite */
+  background-position: 5% 10%, 90% 85%;
+  background-size: 120px, 80px;
+  background-repeat: no-repeat;
+}
+
+.iris-leaves-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.025;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 120' fill='%238b5cf6'%3E%3Cpath d='M40 0C20 20 5 50 10 80c5 30 25 35 30 40c5-5 25-10 30-40C75 50 60 20 40 0zM40 15c10 15 20 35 17 55-3 15-12 22-17 25-5-3-14-10-17-25C20 50 30 30 40 15z'/%3E%3C/svg%3E");
+  background-position: 85% 15%, 15% 75%;
+  background-size: 100px, 60px;
+  background-repeat: no-repeat;
+  transform: rotate(180deg);
+}
+
+/* Plus subtil pour derriere le CR */
+.iris-leaves-bg-subtle::before {
+  opacity: 0.02;
+}
+
+.iris-leaves-bg-subtle::after {
+  opacity: 0.015;
+}
+
+/* ============================================================
    Animations
    ============================================================ */
 @keyframes spin {
