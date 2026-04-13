@@ -206,8 +206,9 @@ CHAQUE prelevement numerote a SA PROPRE section :
 --- TEMPLATE TABLEAU IHC ---
 Declenche si >= 2 marqueurs IHC.
 *Immunomarquage : realise sur tissu fixe et coupes en paraffine, apres restauration antigenique par la chaleur, utilisation de l'automate BOND III (Leica) et application des anticorps suivants :*
-| Anticorps | Resultats | Temoin + |
-|---|---|---|
+| Anticorps | Resultats |
+|---|---|
+IMPORTANT : la colonne "Temoin +" ne doit apparaitre que si le praticien a explicitement dicte un temoin. Par defaut, le tableau n'a que 2 colonnes (Anticorps | Resultats).
 
 --- TEMPLATE LBA ---
 **Volume :** X mL
@@ -272,12 +273,14 @@ REGLES DE CONCLUSION
 ═══════════════════════════════════════
 
 - Toujours en **gras**
-- Numerotee ou avec tirets si plusieurs prelevements
+- SYNTHETIQUE : le diagnostic principal et le staging, pas une repetition de la microscopie
+- Numerotee si plusieurs prelevements
 - Termes nosologiques complets, aucune abreviation
 - Phenotype IHC integre si mentionne
-- Absence de carcinome infiltrant mentionnee explicitement si diagnostic in situ
+- Absence de carcinome infiltrant mentionnee si diagnostic in situ
 - pTNM si piece operatoire carcinologique (sinon omettre)
 - La conclusion DOIT reprendre CHAQUE prelevement dicte
+- Pas de recommandations de suivi sauf si le praticien les a dictees
 
 ═══════════════════════════════════════
 STAGING pTNM
@@ -303,6 +306,16 @@ Si aucun template organe n'est fourni ci-dessus, tu dois QUAND MEME :
 5. Ne JAMAIS produire un CR de qualite inferieure parce qu'un template n'est pas disponible.
 
 Tu es un expert en anatomopathologie. Tu connais les donnees minimales INCa pour tous les organes. Applique-les.
+
+═══════════════════════════════════════
+REGLES STRUCTURELLES OBLIGATOIRES
+═══════════════════════════════════════
+
+1. Le titre **__TITRE EN MAJUSCULES__** est TOUJOURS present en premiere ligne. Il indique l'organe et le type de prelevement.
+2. La section **Macroscopie :** est TOUJOURS presente (meme si breve).
+3. La section **L'etude histologique** ou **Microscopie :** est TOUJOURS presente avec ce titre explicite. Ne jamais omettre le titre de section.
+4. La section **__CONCLUSION :__** est TOUJOURS presente.
+5. Si le praticien dicte la taille tumorale et le statut ganglionnaire pour une piece operatoire, tu DOIS calculer le pTNM (edition AJCC 8e).
 
 ═══════════════════════════════════════
 REGLES DE FORMAT DE SORTIE
@@ -471,7 +484,13 @@ async def _call_claude(system_prompt: str, user_message: str) -> str:
         model=settings.claude_model,
         max_tokens=8192,
         temperature=0.0,
-        system=system_prompt,
+        system=[
+            {
+                "type": "text",
+                "text": system_prompt,
+                "cache_control": {"type": "ephemeral"},
+            }
+        ],
         messages=[{"role": "user", "content": user_message}],
     )
 
