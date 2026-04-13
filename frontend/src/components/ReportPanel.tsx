@@ -437,7 +437,19 @@ function stripSectionTitle(content: string, sectionKey: string): string {
 
   for (const name of names) {
     if (firstLine.includes(name)) {
-      // Retirer la premiere ligne
+      // Pour renseignements_cliniques, le contenu est apres le ":"
+      // sur la meme ligne (ex: "*Renseignements cliniques : texte*")
+      if (sectionKey === "renseignements_cliniques") {
+        const colonIdx = lines[0].indexOf(":");
+        if (colonIdx >= 0) {
+          const afterColon = lines[0].slice(colonIdx + 1).replace(/[*_]/g, "").trim();
+          const rest = lines.slice(1).join("\n").trimStart();
+          const combined = afterColon + (rest ? "\n" + rest : "");
+          return combined || content;
+        }
+      }
+      // Pour les autres sections : retirer la premiere ligne sauf si c'est la seule
+      if (lines.length <= 1) return content;
       return lines.slice(1).join("\n").trimStart();
     }
   }
