@@ -28,15 +28,6 @@ class Settings(BaseSettings):
 
     # LLM : modele Claude a utiliser
     claude_model: str = "claude-sonnet-4-6"
-    claude_temperature: float = 0.0
-    claude_max_tokens: int = 4096
-
-    # Retrieval : nombre de resultats
-    retrieval_top_k_cr: int = 2
-    retrieval_top_k_bibles: int = 5
-
-    # Classification : seuil de confiance
-    classification_confidence_threshold: float = 0.7
 
     # Upload : taille max en Mo
     max_upload_size_mb: int = 200

@@ -7,25 +7,24 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Types v4 — miroir des schemas.py backend                           */
+/*  Types — miroir du backend v3                                       */
 /* ------------------------------------------------------------------ */
 
 export interface TranscriptionResult {
   raw_transcription: string;
 }
 
-export type MarkerSection =
-  | "titre"
-  | "renseignements_cliniques"
-  | "macroscopie"
-  | "microscopie"
-  | "immunomarquage"
-  | "biologie_moleculaire"
-  | "conclusion";
+export interface DonneeManquante {
+  champ: string;
+  description: string;
+  section: string;
+  obligatoire: boolean;
+}
 
+/** Marker unifie pour le CompletionPanel (adapte depuis DonneeManquante). */
 export interface Marker {
   field: string;
-  section: MarkerSection;
+  section: string;
   rule_id: string;
   severity: "error" | "warning" | "info";
   message: string;
@@ -33,57 +32,9 @@ export interface Marker {
   auto_filled_value: string;
 }
 
-export interface IhcRow {
-  anticorps: string;
-  resultat: string;
-  temoin: string;
-}
-
-export interface IhcTable {
-  phrase_introduction: string;
-  lignes: IhcRow[];
-}
-
-export interface Prelevement {
-  numero: number;
-  titre_court: string;
-  macroscopie: string;
-  microscopie: string;
-  immunomarquage: IhcTable | null;
-  biologie_moleculaire: string;
-}
-
-export interface CRDocument {
-  titre: string;
-  renseignements_cliniques: string;
-  prelevements: Prelevement[];
-  conclusion: string;
-  ptnm: string;
-  commentaire_final: string;
-  code_adicap: string;
-  codes_snomed: string[];
-}
-
-export interface ClassificationCandidate {
-  organe: string;
-  sous_type: string;
-  est_carcinologique: boolean;
-  diagnostic_presume: string;
-  confidence: number;
-}
-
-export interface Classification {
-  top: ClassificationCandidate;
-  alternative: ClassificationCandidate | null;
-  transcript_normalise: string;
-  confidence_threshold: number;
-}
-
 export interface FormatResult {
-  trace_id: string;
   formatted_report: string;
-  document: CRDocument;
-  classification: Classification;
+  organe_detecte: string;
   markers: Marker[];
 }
 
@@ -94,10 +45,26 @@ export interface SectionsResult {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Conversion v3 -> Marker unifie                                     */
+/* ------------------------------------------------------------------ */
+
+function donneeToMarker(d: DonneeManquante): Marker {
+  return {
+    field: d.champ,
+    section: d.section as Marker["section"],
+    rule_id: `v3.${d.section}.${d.champ}`,
+    severity: d.obligatoire ? "error" : "warning",
+    message: d.description,
+    auto_filled: false,
+    auto_filled_value: "",
+  };
+}
+
+/* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-const DEFAULT_TIMEOUT_MS = 120_000; // 2 min pour les appels Claude
+const DEFAULT_TIMEOUT_MS = 120_000;
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -146,10 +113,18 @@ export async function transcribeAudio(
   return data.raw_transcription;
 }
 
+interface V3FormatResponse {
+  formatted_report: string;
+  organe_detecte: string;
+  donnees_manquantes: DonneeManquante[];
+}
+
 export async function formatTranscription(
   rawText: string,
+  rapportPrecedent?: string,
 ): Promise<FormatResult> {
   const body: Record<string, string> = { raw_text: rawText };
+  if (rapportPrecedent) body.rapport_precedent = rapportPrecedent;
 
   const response = await fetchWithTimeout(`${API_BASE}/format`, {
     method: "POST",
@@ -157,7 +132,18 @@ export async function formatTranscription(
     body: JSON.stringify(body),
   });
 
-  return handleResponse<FormatResult>(response);
+  const v3 = await handleResponse<V3FormatResponse>(response);
+  return {
+    formatted_report: v3.formatted_report,
+    organe_detecte: v3.organe_detecte,
+    markers: v3.donnees_manquantes.map(donneeToMarker),
+  };
+}
+
+interface V3IterationResponse {
+  formatted_report: string;
+  organe_detecte: string;
+  donnees_manquantes: DonneeManquante[];
 }
 
 export async function iterateReport(
@@ -173,7 +159,12 @@ export async function iterateReport(
     }),
   });
 
-  return handleResponse<IterationResult>(response);
+  const v3 = await handleResponse<V3IterationResponse>(response);
+  return {
+    formatted_report: v3.formatted_report,
+    organe_detecte: v3.organe_detecte,
+    markers: v3.donnees_manquantes.map(donneeToMarker),
+  };
 }
 
 export async function getSections(

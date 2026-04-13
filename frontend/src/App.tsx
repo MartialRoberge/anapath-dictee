@@ -24,6 +24,7 @@ import ReportPanel from "./components/ReportPanel";
 import CompletionPanel from "./components/CompletionPanel";
 import { formatTranscription } from "./services/api";
 import type { FormatResult, Marker } from "./services/api";
+// v3 backend: FormatResult has formatted_report, organe_detecte, markers (adapted from donnees_manquantes)
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
@@ -384,7 +385,7 @@ export default function App() {
 
   const handleFormatted = useCallback((result: FormatResult) => {
     setReport(result.formatted_report);
-    setOrganeDetecte(result.classification.top.organe);
+    setOrganeDetecte(result.organe_detecte);
     setMarkers(result.markers);
     setDismissedFields(new Set());
     setSavedReportId(null);
@@ -397,7 +398,7 @@ export default function App() {
       if (!text.trim() || reformatting) return;
       setReformatting(true);
       try {
-        const result = await formatTranscription(text);
+        const result = await formatTranscription(text, report ?? undefined);
         handleFormatted(result);
       } catch {
         toast("Erreur lors du formatage", "error");
