@@ -319,23 +319,11 @@ _SECTION_KEYWORDS: dict[str, list[str]] = {
 
 
 def _detect_section_from_line(line: str) -> str | None:
-    """Detecte si une ligne correspond au debut d'une section.
-
-    Gere les multi-prelevements : une ligne comme
-    ``**__2) Canal anal lateral gauche :__**`` cree une section
-    ``prelevement_2`` pour eviter qu'elle soit avalee par la
-    section precedente (ihc, microscopie, etc.).
-    """
+    """Detecte si une ligne correspond au debut d'une section."""
     clean_line: str = re.sub(r"[*_#|]", "", line).strip().lower()
 
     if re.search(r"\bconclusion\b", clean_line):
         return "conclusion"
-
-    # Detection des numeros de prelevement (1), 2), 3)...)
-    prel_match = re.match(r"^(\d+)\s*[)\.]\s*", clean_line)
-    if prel_match:
-        numero: str = prel_match.group(1)
-        return f"prelevement_{numero}"
 
     for section_name, keywords in _SECTION_KEYWORDS.items():
         for keyword in keywords:
@@ -345,12 +333,44 @@ def _detect_section_from_line(line: str) -> str | None:
     return None
 
 
+def _is_prelevement_header(line: str) -> str | None:
+    """Detecte si une ligne est un titre de prelevement numerote.
+
+    Reconnait : ``**__1) Canal anal :__**``, ``**__2) Biopsie :__**``, etc.
+    Retourne le numero sous forme ``prelevement_1`` ou None.
+    """
+    clean: str = re.sub(r"[*_#]", "", line).strip()
+    match = re.match(r"^(\d+)\s*[)\.]\s*", clean)
+    if match:
+        return f"prelevement_{match.group(1)}"
+    return None
+
+
+def _is_multi_prelevement(text: str) -> bool:
+    """Detecte si le rapport contient plusieurs prelevements numerotes."""
+    clean: str = re.sub(r"[*_#]", "", text)
+    # Cherche au moins "1)" et "2)" dans le texte
+    has_one: bool = bool(re.search(r"(?m)^\s*1\s*[)\.]\s*", clean))
+    has_two: bool = bool(re.search(r"(?m)^\s*2\s*[)\.]\s*", clean))
+    return has_one and has_two
+
+
 def split_report_sections(markdown_text: str) -> dict[str, str]:
-    """Decoupe un rapport Markdown en sections nommees."""
+    """Decoupe un rapport Markdown en sections nommees.
+
+    Deux modes :
+    - Mono-prelevement : decoupe par mots-cles (macro, micro, ihc, conclusion)
+    - Multi-prelevement : chaque prelevement est un bloc autonome contenant
+      ses propres macro/micro/ihc. Les mots-cles internes ne creent PAS
+      de nouvelles sections.
+    """
     lines: list[str] = markdown_text.split("\n")
+    multi: bool = _is_multi_prelevement(markdown_text)
+
     sections: dict[str, list[str]] = {}
     current_section: str = "titre"
     sections[current_section] = []
+    in_prelevement: bool = False
 
     for line in lines:
         stripped: str = line.strip()
@@ -360,12 +380,47 @@ def split_report_sections(markdown_text: str) -> dict[str, str]:
                 sections[current_section].append(line)
             continue
 
-        detected_section: str | None = _detect_section_from_line(stripped)
-
-        if detected_section and detected_section != current_section:
-            current_section = detected_section
+        # Toujours detecter la conclusion (fin du rapport)
+        clean_check: str = re.sub(r"[*_#|]", "", stripped).strip().lower()
+        if re.search(r"\bconclusion\b", clean_check):
+            current_section = "conclusion"
+            in_prelevement = False
             if current_section not in sections:
                 sections[current_section] = []
+            sections[current_section].append(line)
+            continue
+
+        if multi:
+            # En multi-prelevement : detecter les titres de prelevement
+            prel: str | None = _is_prelevement_header(stripped)
+            if prel is not None:
+                current_section = prel
+                in_prelevement = True
+                if current_section not in sections:
+                    sections[current_section] = []
+                sections[current_section].append(line)
+                continue
+
+            # Si on est dans un prelevement, tout reste dans ce prelevement
+            # (les mots-cles macro/micro/ihc ne creent PAS de section)
+            if in_prelevement:
+                sections[current_section].append(line)
+                continue
+
+            # Avant le premier prelevement : detecter titre, renseignements
+            detected: str | None = _detect_section_from_line(stripped)
+            if detected and detected != current_section:
+                current_section = detected
+                in_prelevement = False
+                if current_section not in sections:
+                    sections[current_section] = []
+        else:
+            # Mono-prelevement : comportement standard par mots-cles
+            detected = _detect_section_from_line(stripped)
+            if detected and detected != current_section:
+                current_section = detected
+                if current_section not in sections:
+                    sections[current_section] = []
 
         if current_section not in sections:
             sections[current_section] = []
