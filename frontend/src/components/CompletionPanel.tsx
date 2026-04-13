@@ -154,26 +154,26 @@ function FieldCard({ marker, knowledge, onDismiss, isDismissed }: FieldCardProps
           </div>
         </div>
 
-        <div className="flex shrink-0 gap-1">
+        <div className="flex shrink-0 items-start gap-1">
           {knowledge && (
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-muted-foreground hover:text-primary"
+              className="h-8 w-8 text-muted-foreground hover:text-primary"
               onClick={() => setInfoOpen(!infoOpen)}
               title="Pourquoi ce champ est important"
             >
-              <Info className="h-3.5 w-3.5" />
+              <Info className="h-4 w-4" />
             </Button>
           )}
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-muted-foreground hover:text-destructive"
+            className="h-8 w-8 text-muted-foreground hover:text-destructive"
             onClick={handleDismiss}
             title="Ignorer cette suggestion"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </div>

@@ -377,50 +377,65 @@
 }
 
 /* ============================================================
-   Botanical background — feuilles et branches en transparence
+   Botanical background — feuilles animees en fond
+   z-index: -1 pour rester DERRIERE tout le contenu
+   isolation: isolate sur le parent pour creer un stacking context
    ============================================================ */
 .iris-leaves-bg {
   position: relative;
+  isolation: isolate;
 }
 
-.iris-leaves-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.035;
-  background-image:
-    /* Feuille 1 — grande, haut gauche */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 120' fill='%230d9488'%3E%3Cpath d='M40 0C20 20 5 50 10 80c5 30 25 35 30 40c5-5 25-10 30-40C75 50 60 20 40 0zM40 15c10 15 20 35 17 55-3 15-12 22-17 25-5-3-14-10-17-25C20 50 30 30 40 15z'/%3E%3C/svg%3E");
-    /* Feuille 2 — moyenne, bas droite */
-  background-position: 5% 10%, 90% 85%;
-  background-size: 120px, 80px;
-  background-repeat: no-repeat;
-}
-
+.iris-leaves-bg::before,
 .iris-leaves-bg::after {
   content: "";
   position: absolute;
-  inset: 0;
   pointer-events: none;
-  z-index: 0;
-  opacity: 0.025;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 120' fill='%238b5cf6'%3E%3Cpath d='M40 0C20 20 5 50 10 80c5 30 25 35 30 40c5-5 25-10 30-40C75 50 60 20 40 0zM40 15c10 15 20 35 17 55-3 15-12 22-17 25-5-3-14-10-17-25C20 50 30 30 40 15z'/%3E%3C/svg%3E");
-  background-position: 85% 15%, 15% 75%;
-  background-size: 100px, 60px;
+  z-index: -1;
+}
+
+.iris-leaves-bg::before {
+  top: 5%;
+  left: 3%;
+  width: 140px;
+  height: 200px;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 160'%3E%3Cpath d='M50 5 C35 25 15 55 18 90 c3 35 27 50 32 65 5-15 29-30 32-65 C85 55 65 25 50 5z' fill='%230d9488' /%3E%3Cpath d='M50 20 c-8 12-18 30-16 52 2 18 13 28 16 33 3-5 14-15 16-33 C68 50 58 32 50 20z' fill='none' stroke='%230d9488' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='50' y1='20' x2='50' y2='140' stroke='%230d9488' stroke-width='0.4' opacity='0.3'/%3E%3C/svg%3E");
+  background-size: contain;
   background-repeat: no-repeat;
-  transform: rotate(180deg);
+  animation: leaf-drift-1 8s ease-in-out infinite;
 }
 
-/* Plus subtil pour derriere le CR */
-.iris-leaves-bg-subtle::before {
-  opacity: 0.02;
+.iris-leaves-bg::after {
+  bottom: 8%;
+  right: 5%;
+  width: 100px;
+  height: 150px;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 160'%3E%3Cpath d='M50 5 C35 25 15 55 18 90 c3 35 27 50 32 65 5-15 29-30 32-65 C85 55 65 25 50 5z' fill='%238b5cf6' /%3E%3Cpath d='M50 20 c-8 12-18 30-16 52 2 18 13 28 16 33 3-5 14-15 16-33 C68 50 58 32 50 20z' fill='none' stroke='%238b5cf6' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='50' y1='20' x2='50' y2='140' stroke='%238b5cf6' stroke-width='0.4' opacity='0.3'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transform: rotate(160deg);
+  animation: leaf-drift-2 10s ease-in-out infinite;
 }
 
-.iris-leaves-bg-subtle::after {
-  opacity: 0.015;
+/* Version plus subtile pour la zone rapport */
+.iris-leaves-bg-subtle::before { opacity: 0.025; }
+.iris-leaves-bg-subtle::after { opacity: 0.018; }
+
+/* Animations de vent doux */
+@keyframes leaf-drift-1 {
+  0%, 100% { transform: rotate(-3deg) translateY(0); }
+  25% { transform: rotate(1deg) translateY(-4px); }
+  50% { transform: rotate(-1deg) translateY(2px); }
+  75% { transform: rotate(2deg) translateY(-2px); }
+}
+
+@keyframes leaf-drift-2 {
+  0%, 100% { transform: rotate(160deg) translateX(0); }
+  30% { transform: rotate(163deg) translateX(3px); }
+  60% { transform: rotate(158deg) translateX(-2px); }
+  80% { transform: rotate(161deg) translateX(1px); }
 }
 
 /* ============================================================
