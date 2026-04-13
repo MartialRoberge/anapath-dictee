@@ -20,7 +20,6 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
-import { marked } from "marked";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -95,93 +94,6 @@ function preprocessMarkdown(md: string): string {
   );
 
   return result;
-}
-
-/**
- * Convertit le HTML d'un contentEditable en markdown ACP.
- * Gere les balises produites par `marked` et par contentEditable.
- */
-function htmlToMarkdown(html: string): string {
-  // Utiliser un DOMParser pour un parsing fiable
-  const doc = new DOMParser().parseFromString(
-    `<div>${html}</div>`,
-    "text/html"
-  );
-
-  function walk(node: Node): string {
-    if (node.nodeType === Node.TEXT_NODE) {
-      return node.textContent ?? "";
-    }
-    if (node.nodeType !== Node.ELEMENT_NODE) return "";
-
-    const el = node as HTMLElement;
-    const tag = el.tagName.toLowerCase();
-    const inner = Array.from(el.childNodes).map(walk).join("");
-
-    switch (tag) {
-      case "strong":
-      case "b":
-        // Detecter si le contenu a du souligne
-        if (el.querySelector("u")) return inner;
-        return `**${inner}**`;
-      case "em":
-      case "i":
-        return `*${inner}*`;
-      case "u":
-        // Detecter si parent est bold
-        if (el.parentElement?.tagName.toLowerCase() === "strong" ||
-            el.parentElement?.tagName.toLowerCase() === "b") {
-          return `**__${inner}__**`;
-        }
-        return `__${inner}__`;
-      case "br":
-        return "\n";
-      case "p":
-        return inner + "\n\n";
-      case "div":
-        return inner + "\n";
-      case "h1":
-        return `# ${inner}\n\n`;
-      case "h2":
-        return `## ${inner}\n\n`;
-      case "h3":
-        return `### ${inner}\n\n`;
-      case "li":
-        return `- ${inner}\n`;
-      case "ul":
-      case "ol":
-        return inner + "\n";
-      case "table":
-        return inner + "\n";
-      case "thead":
-      case "tbody":
-        return inner;
-      case "tr": {
-        const cells = Array.from(el.children).map(
-          (c) => walk(c).trim()
-        );
-        const row = `| ${cells.join(" | ")} |`;
-        // Ajouter le separateur apres le header
-        if (el.parentElement?.tagName.toLowerCase() === "thead") {
-          const sep = cells.map(() => "---").join(" | ");
-          return `${row}\n| ${sep} |\n`;
-        }
-        return row + "\n";
-      }
-      case "th":
-      case "td":
-        return inner;
-      case "span":
-        return inner;
-      default:
-        return inner;
-    }
-  }
-
-  const root = doc.body.firstElementChild;
-  if (!root) return html;
-  const result = walk(root);
-  return result.replace(/\n{3,}/g, "\n\n").trim();
 }
 
 function countACompleter(text: string): number {
@@ -523,22 +435,23 @@ function SectionCard({
   onReplaceField,
 }: SectionCardProps) {
   const [editing, setEditing] = useState(false);
+  const [editText, setEditText] = useState("");
   const [copied, setCopied] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const editRef = useRef<HTMLDivElement>(null);
+  const editRef = useRef<HTMLTextAreaElement>(null);
 
   const label = getSectionLabel(sectionKey);
   const displayContent = stripSectionTitle(content, sectionKey);
 
   const handleStartEdit = () => {
+    setEditText(displayContent);
     setEditing(true);
+    // Focus le textarea au prochain rendu
+    setTimeout(() => editRef.current?.focus(), 50);
   };
 
   const handleSave = () => {
-    if (editRef.current) {
-      const md = htmlToMarkdown(editRef.current.innerHTML);
-      onContentChange(sectionKey, md);
-    }
+    onContentChange(sectionKey, editText);
     setEditing(false);
   };
 
@@ -636,20 +549,17 @@ function SectionCard({
       {/* Content */}
       <div className="pb-4">
         {editing ? (
-          <div
+          <textarea
             ref={editRef}
-            contentEditable
-            suppressContentEditableWarning
-            className="report-typography min-h-[80px] rounded-md border-2 border-primary/30 bg-background p-3 outline-none focus:border-primary"
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            className="min-h-[120px] w-full rounded-md border-2 border-primary/30 bg-background p-3 font-mono text-sm leading-relaxed outline-none focus:border-primary"
             onKeyDown={(e) => {
               if (e.key === "Escape") handleCancel();
               if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
                 handleSave();
               }
-            }}
-            dangerouslySetInnerHTML={{
-              __html: marked.parse(displayContent, { async: false }) as string,
             }}
           />
         ) : (

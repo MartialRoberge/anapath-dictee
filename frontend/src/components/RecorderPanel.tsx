@@ -106,6 +106,7 @@ export default function RecorderPanel({
   const processedBlobRef = useRef<Blob | null>(null);
   const reportRef = useRef<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cancelledRef = useRef(false);
 
   useEffect(() => {
     reportRef.current = report;
@@ -113,9 +114,12 @@ export default function RecorderPanel({
 
   useEffect(() => {
     if (report === null && rawTranscription === null) {
+      // "Nouveau CR" clique — annuler toute requete en vol
+      cancelledRef.current = true;
       reset();
       setError(null);
       setStep("idle");
+      setProcessing(false);
       setDroppedFileName(null);
       processedBlobRef.current = null;
     }
@@ -126,6 +130,7 @@ export default function RecorderPanel({
 
   const processAudioBlob = useCallback(
     async (blob: Blob, filename: string) => {
+      cancelledRef.current = false;
       setProcessing(true);
       setError(null);
       setDroppedFileName(truncateFilename(filename));
@@ -135,6 +140,7 @@ export default function RecorderPanel({
 
         setStep("transcribing");
         const raw = await transcribeAudio(blob, filename);
+        if (cancelledRef.current) return;
         onTranscription(raw);
         playStepDone();
 
@@ -143,21 +149,24 @@ export default function RecorderPanel({
 
         if (currentReport) {
           const result = await iterateReport(currentReport, raw);
+          if (cancelledRef.current) return;
           onFormatted(result);
         } else {
           const result = await formatTranscription(raw);
+          if (cancelledRef.current) return;
           onFormatted(result);
         }
         playStepDone();
         setStep("done");
         playAllDone();
       } catch (err: unknown) {
+        if (cancelledRef.current) return;
         setStep("error");
         const msg = err instanceof Error ? err.message : "Erreur inconnue";
         setError(msg);
         toast(msg, "error");
       } finally {
-        setProcessing(false);
+        if (!cancelledRef.current) setProcessing(false);
       }
     },
     [onTranscription, onFormatted, playStepDone, playAllDone, toast]
