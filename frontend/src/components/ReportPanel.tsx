@@ -479,6 +479,102 @@ function splitContentParts(content: string): Array<{ type: "text" | "table"; val
   return parts;
 }
 
+/** Convertit du markdown simple en HTML pour contentEditable. */
+function simpleMarkdownToHtml(md: string): string {
+  let html = md
+    .replace(/\*\*__(.+?)__\*\*/g, "<strong><u>$1</u></strong>")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/\[A COMPLETER:\s*([^\]]+)\]/gi, '<span style="color:#d97706;border:1px dashed #d97706;padding:0 4px;border-radius:3px">[A COMPLETER: $1]</span>');
+
+  // Paragraphes
+  html = html
+    .split("\n\n")
+    .map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`)
+    .join("");
+
+  return html;
+}
+
+/** Convertit le HTML d'un contentEditable en markdown (texte seulement, pas de tableau). */
+function htmlToSimpleMarkdown(html: string): string {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
+
+  function walk(node: Node): string {
+    if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? "";
+    if (node.nodeType !== Node.ELEMENT_NODE) return "";
+
+    const el = node as HTMLElement;
+    const tag = el.tagName.toLowerCase();
+    const inner = Array.from(el.childNodes).map(walk).join("");
+
+    switch (tag) {
+      case "strong":
+      case "b":
+        if (el.querySelector("u")) return inner;
+        return `**${inner}**`;
+      case "em":
+      case "i":
+        return `*${inner}*`;
+      case "u":
+        if (el.parentElement?.tagName.toLowerCase() === "strong" ||
+            el.parentElement?.tagName.toLowerCase() === "b") {
+          return `**__${inner}__**`;
+        }
+        return `__${inner}__`;
+      case "br":
+        return "\n";
+      case "p":
+        return inner + "\n\n";
+      case "div":
+        return inner + "\n";
+      case "span":
+        return inner;
+      default:
+        return inner;
+    }
+  }
+
+  const root = doc.body.firstElementChild;
+  if (!root) return html;
+  return walk(root).replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function TextBlockEditor({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (md: string) => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const internalRef = useRef(false);
+
+  // Synchroniser le HTML initial
+  useEffect(() => {
+    if (ref.current && !internalRef.current) {
+      ref.current.innerHTML = simpleMarkdownToHtml(value);
+    }
+    internalRef.current = false;
+  }, [value]);
+
+  const handleInput = useCallback(() => {
+    if (!ref.current) return;
+    internalRef.current = true;
+    onChange(htmlToSimpleMarkdown(ref.current.innerHTML));
+  }, [onChange]);
+
+  return (
+    <div
+      ref={ref}
+      contentEditable
+      suppressContentEditableWarning
+      onInput={handleInput}
+      className="report-typography min-h-[40px] rounded border border-border/50 bg-background px-3 py-2 outline-none focus:border-primary"
+    />
+  );
+}
+
 function SectionEditor({
   content,
   onChange,
@@ -490,15 +586,22 @@ function SectionEditor({
   onCancel: () => void;
   onSave: () => void;
 }) {
-  const parts = splitContentParts(content);
+  const partsRef = useRef(splitContentParts(content));
 
-  const handlePartChange = (index: number, newValue: string) => {
-    const updated = parts.map((p, i) => (i === index ? { ...p, value: newValue } : p));
-    onChange(updated.map((p) => p.value).join("\n"));
-  };
+  // Mettre à jour les parts quand le contenu change de l'extérieur
+  useEffect(() => {
+    partsRef.current = splitContentParts(content);
+  }, [content]);
 
-  const handleCellChange = (partIndex: number, rowIndex: number, colIndex: number, value: string) => {
-    const table = parseMarkdownTable(parts[partIndex].value);
+  const handlePartChange = useCallback((index: number, newValue: string) => {
+    partsRef.current = partsRef.current.map((p, i) =>
+      i === index ? { ...p, value: newValue } : p
+    );
+    onChange(partsRef.current.map((p) => p.value).join("\n"));
+  }, [onChange]);
+
+  const handleCellChange = useCallback((partIndex: number, rowIndex: number, colIndex: number, value: string) => {
+    const table = parseMarkdownTable(partsRef.current[partIndex].value);
     if (!table) return;
 
     if (rowIndex === -1) {
@@ -509,11 +612,13 @@ function SectionEditor({
     }
 
     handlePartChange(partIndex, rebuildMarkdownTable(table));
-  };
+  }, [handlePartChange]);
+
+  const parts = splitContentParts(content);
 
   return (
     <div
-      className="space-y-2 rounded-md border-2 border-primary/30 bg-background p-3"
+      className="space-y-2 rounded-md border-2 border-primary/30 p-3"
       onKeyDown={(e) => {
         if (e.key === "Escape") onCancel();
         if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -527,12 +632,10 @@ function SectionEditor({
           const table = parseMarkdownTable(part.value);
           if (!table) {
             return (
-              <textarea
+              <TextBlockEditor
                 key={idx}
                 value={part.value}
-                onChange={(e) => handlePartChange(idx, e.target.value)}
-                className="w-full rounded border bg-muted/30 p-2 font-mono text-sm"
-                rows={3}
+                onChange={(v) => handlePartChange(idx, v)}
               />
             );
           }
@@ -574,12 +677,10 @@ function SectionEditor({
         }
 
         return (
-          <textarea
+          <TextBlockEditor
             key={idx}
             value={part.value}
-            onChange={(e) => handlePartChange(idx, e.target.value)}
-            className="w-full rounded border border-border/50 bg-background p-2 text-sm leading-relaxed outline-none focus:border-primary"
-            rows={Math.max(2, part.value.split("\n").length)}
+            onChange={(v) => handlePartChange(idx, v)}
           />
         );
       })}
