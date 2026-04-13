@@ -467,12 +467,13 @@ function buildOrderedSections(
       return na - nb;
     });
 
-  // Inserer les prelevements AVANT la conclusion
+  // Inserer les prelevements AVANT la conclusion, dans l'ordre
   const conclusionIdx = result.findIndex((s) => s.key === "conclusion");
-  const insertAt = conclusionIdx >= 0 ? conclusionIdx : result.length;
+  let insertAt = conclusionIdx >= 0 ? conclusionIdx : result.length;
 
   for (const key of dynamicKeys) {
     result.splice(insertAt, 0, { key, content: sections[key] });
+    insertAt++;
   }
 
   return result;
