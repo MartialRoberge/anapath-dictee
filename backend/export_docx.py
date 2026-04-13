@@ -371,6 +371,7 @@ def split_report_sections(markdown_text: str) -> dict[str, str]:
     current_section: str = "titre"
     sections[current_section] = []
     in_prelevement: bool = False
+    in_conclusion: bool = False
 
     for line in lines:
         stripped: str = line.strip()
@@ -385,8 +386,15 @@ def split_report_sections(markdown_text: str) -> dict[str, str]:
         if re.search(r"\bconclusion\b", clean_check):
             current_section = "conclusion"
             in_prelevement = False
+            in_conclusion = True
             if current_section not in sections:
                 sections[current_section] = []
+            sections[current_section].append(line)
+            continue
+
+        # Une fois dans la conclusion, tout y reste (les "1)" dans la
+        # conclusion sont des items de diagnostic, pas des prelevements)
+        if in_conclusion:
             sections[current_section].append(line)
             continue
 
