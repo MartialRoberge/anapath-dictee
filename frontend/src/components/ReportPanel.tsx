@@ -414,6 +414,180 @@ function rebuildReport(sections: Record<string, string>): string {
 }
 
 /* ------------------------------------------------------------------ */
+/*  SectionEditor — textarea + editeur visuel pour les tableaux        */
+/* ------------------------------------------------------------------ */
+
+interface TableData {
+  headers: string[];
+  separator: string[];
+  rows: string[][];
+}
+
+function parseMarkdownTable(tableBlock: string): TableData | null {
+  const lines = tableBlock.trim().split("\n").filter((l) => l.trim());
+  if (lines.length < 2) return null;
+
+  const parseLine = (line: string): string[] =>
+    line
+      .split("|")
+      .map((c) => c.trim())
+      .filter((c) => c !== "");
+
+  const headers = parseLine(lines[0]);
+  const separator = parseLine(lines[1]);
+  if (!separator.every((s) => /^-+$/.test(s))) return null;
+
+  const rows = lines.slice(2).map(parseLine);
+  return { headers, separator, rows };
+}
+
+function rebuildMarkdownTable(table: TableData): string {
+  const line = (cells: string[]) => `| ${cells.join(" | ")} |`;
+  const sep = table.headers.map(() => "---");
+  return [line(table.headers), line(sep), ...table.rows.map(line)].join("\n");
+}
+
+/** Split du contenu en segments texte/table pour edition mixte. */
+function splitContentParts(content: string): Array<{ type: "text" | "table"; value: string }> {
+  const lines = content.split("\n");
+  const parts: Array<{ type: "text" | "table"; value: string }> = [];
+  let current: string[] = [];
+  let inTable = false;
+
+  for (const line of lines) {
+    const isTableLine = line.trim().startsWith("|") && line.trim().endsWith("|");
+
+    if (isTableLine && !inTable) {
+      if (current.length > 0) {
+        parts.push({ type: "text", value: current.join("\n") });
+        current = [];
+      }
+      inTable = true;
+    } else if (!isTableLine && inTable) {
+      parts.push({ type: "table", value: current.join("\n") });
+      current = [];
+      inTable = false;
+    }
+
+    current.push(line);
+  }
+
+  if (current.length > 0) {
+    parts.push({ type: inTable ? "table" : "text", value: current.join("\n") });
+  }
+
+  return parts;
+}
+
+function SectionEditor({
+  content,
+  onChange,
+  onCancel,
+  onSave,
+}: {
+  content: string;
+  onChange: (newContent: string) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  const parts = splitContentParts(content);
+
+  const handlePartChange = (index: number, newValue: string) => {
+    const updated = parts.map((p, i) => (i === index ? { ...p, value: newValue } : p));
+    onChange(updated.map((p) => p.value).join("\n"));
+  };
+
+  const handleCellChange = (partIndex: number, rowIndex: number, colIndex: number, value: string) => {
+    const table = parseMarkdownTable(parts[partIndex].value);
+    if (!table) return;
+
+    if (rowIndex === -1) {
+      table.headers[colIndex] = value;
+    } else {
+      if (!table.rows[rowIndex]) return;
+      table.rows[rowIndex][colIndex] = value;
+    }
+
+    handlePartChange(partIndex, rebuildMarkdownTable(table));
+  };
+
+  return (
+    <div
+      className="space-y-2 rounded-md border-2 border-primary/30 bg-background p-3"
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onCancel();
+        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          onSave();
+        }
+      }}
+    >
+      {parts.map((part, idx) => {
+        if (part.type === "table") {
+          const table = parseMarkdownTable(part.value);
+          if (!table) {
+            return (
+              <textarea
+                key={idx}
+                value={part.value}
+                onChange={(e) => handlePartChange(idx, e.target.value)}
+                className="w-full rounded border bg-muted/30 p-2 font-mono text-sm"
+                rows={3}
+              />
+            );
+          }
+
+          return (
+            <table key={idx} className="w-full border-collapse text-sm">
+              <thead>
+                <tr>
+                  {table.headers.map((h, ci) => (
+                    <th key={ci} className="border border-border bg-muted px-2 py-1.5">
+                      <input
+                        type="text"
+                        value={h}
+                        onChange={(e) => handleCellChange(idx, -1, ci, e.target.value)}
+                        className="w-full bg-transparent text-center text-xs font-bold outline-none"
+                      />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {table.rows.map((row, ri) => (
+                  <tr key={ri}>
+                    {row.map((cell, ci) => (
+                      <td key={ci} className="border border-border px-2 py-1.5">
+                        <input
+                          type="text"
+                          value={cell}
+                          onChange={(e) => handleCellChange(idx, ri, ci, e.target.value)}
+                          className="w-full bg-transparent text-sm outline-none"
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          );
+        }
+
+        return (
+          <textarea
+            key={idx}
+            value={part.value}
+            onChange={(e) => handlePartChange(idx, e.target.value)}
+            className="w-full rounded border border-border/50 bg-background p-2 text-sm leading-relaxed outline-none focus:border-primary"
+            rows={Math.max(2, part.value.split("\n").length)}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  SectionCard                                                        */
 /* ------------------------------------------------------------------ */
 
@@ -438,7 +612,6 @@ function SectionCard({
   const [editText, setEditText] = useState("");
   const [copied, setCopied] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const editRef = useRef<HTMLTextAreaElement>(null);
 
   const label = getSectionLabel(sectionKey);
   const displayContent = stripSectionTitle(content, sectionKey);
@@ -446,8 +619,6 @@ function SectionCard({
   const handleStartEdit = () => {
     setEditText(displayContent);
     setEditing(true);
-    // Focus le textarea au prochain rendu
-    setTimeout(() => editRef.current?.focus(), 50);
   };
 
   const handleSave = () => {
@@ -549,18 +720,11 @@ function SectionCard({
       {/* Content */}
       <div className="pb-4">
         {editing ? (
-          <textarea
-            ref={editRef}
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            className="min-h-[120px] w-full rounded-md border-2 border-primary/30 bg-background p-3 font-mono text-sm leading-relaxed outline-none focus:border-primary"
-            onKeyDown={(e) => {
-              if (e.key === "Escape") handleCancel();
-              if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                handleSave();
-              }
-            }}
+          <SectionEditor
+            content={editText}
+            onChange={setEditText}
+            onCancel={handleCancel}
+            onSave={handleSave}
           />
         ) : (
           <MarkdownReport
