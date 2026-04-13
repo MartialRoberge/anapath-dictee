@@ -41,6 +41,15 @@ const SECTION_LABELS: Record<string, string> = {
   conclusion: "Conclusion",
 };
 
+/** Genere un label lisible pour les sections dynamiques (prelevements). */
+function getSectionLabel(key: string): string {
+  if (SECTION_LABELS[key]) return SECTION_LABELS[key];
+  // prelevement_1, prelevement_2, etc.
+  const match = key.match(/^prelevement_(\d+)$/);
+  if (match) return `Prelevement ${match[1]}`;
+  return key;
+}
+
 const SECTION_ORDER: string[] = [
   "titre",
   "renseignements_cliniques",
@@ -440,16 +449,32 @@ function buildOrderedSections(
   sections: Record<string, string>
 ): Array<{ key: string; content: string }> {
   const result: Array<{ key: string; content: string }> = [];
+
+  // D'abord les sections standard dans l'ordre defini
   for (const key of SECTION_ORDER) {
     if (sections[key]?.trim()) {
       result.push({ key, content: sections[key] });
     }
   }
-  for (const key of Object.keys(sections)) {
-    if (!SECTION_ORDER.includes(key) && sections[key]?.trim()) {
-      result.push({ key, content: sections[key] });
-    }
+
+  // Ensuite les sections dynamiques (prelevements) triees par numero
+  const dynamicKeys = Object.keys(sections)
+    .filter((k) => !SECTION_ORDER.includes(k) && sections[k]?.trim())
+    .sort((a, b) => {
+      // prelevement_1 avant prelevement_2
+      const na = parseInt(a.replace(/\D/g, "") || "999", 10);
+      const nb = parseInt(b.replace(/\D/g, "") || "999", 10);
+      return na - nb;
+    });
+
+  // Inserer les prelevements AVANT la conclusion
+  const conclusionIdx = result.findIndex((s) => s.key === "conclusion");
+  const insertAt = conclusionIdx >= 0 ? conclusionIdx : result.length;
+
+  for (const key of dynamicKeys) {
+    result.splice(insertAt, 0, { key, content: sections[key] });
   }
+
   return result;
 }
 
@@ -489,7 +514,7 @@ function SectionCard({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const editRef = useRef<HTMLDivElement>(null);
 
-  const label = SECTION_LABELS[sectionKey] ?? sectionKey;
+  const label = getSectionLabel(sectionKey);
   const displayContent = stripSectionTitle(content, sectionKey);
 
   const handleStartEdit = () => {

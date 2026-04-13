@@ -319,11 +319,23 @@ _SECTION_KEYWORDS: dict[str, list[str]] = {
 
 
 def _detect_section_from_line(line: str) -> str | None:
-    """Detecte si une ligne correspond au debut d'une section."""
+    """Detecte si une ligne correspond au debut d'une section.
+
+    Gere les multi-prelevements : une ligne comme
+    ``**__2) Canal anal lateral gauche :__**`` cree une section
+    ``prelevement_2`` pour eviter qu'elle soit avalee par la
+    section precedente (ihc, microscopie, etc.).
+    """
     clean_line: str = re.sub(r"[*_#|]", "", line).strip().lower()
 
     if re.search(r"\bconclusion\b", clean_line):
         return "conclusion"
+
+    # Detection des numeros de prelevement (1), 2), 3)...)
+    prel_match = re.match(r"^(\d+)\s*[)\.]\s*", clean_line)
+    if prel_match:
+        numero: str = prel_match.group(1)
+        return f"prelevement_{numero}"
 
     for section_name, keywords in _SECTION_KEYWORDS.items():
         for keyword in keywords:
