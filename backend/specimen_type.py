@@ -197,33 +197,63 @@ def _contient_hors_negation(texte: str, keywords: list[str]) -> bool:
 def detecter_specimen_type(rapport: str) -> SpecimenType:
     """Detecte le type de prelevement depuis le contenu du rapport.
 
-    La detection se fait par priorite : piece operatoire > curage >
-    cytologie > biopsie. En cas de doute, retourne BIOPSIE (le cas
-    le plus conservateur — moins de champs suggeres).
+    Priorite : biopsie/cytologie explicites > piece operatoire > curage >
+    defaut piece. Si la dictee ne mentionne PAS explicitement
+    "biopsie" ou "cytologie", on presume PIECE_OPERATOIRE (retour
+    praticienne : la description macroscopique volumineuse est un
+    signal fort de piece operatoire).
     """
     texte: str = _normaliser(rapport)
 
-    # Piece operatoire — priorite haute
-    for kw in _PIECE_KEYWORDS:
-        if _normaliser(kw) in texte:
-            return SpecimenType.PIECE_OPERATOIRE
-
-    # Curage ganglionnaire
-    for kw in _CURAGE_KEYWORDS:
-        if _normaliser(kw) in texte:
-            return SpecimenType.CURAGE
-
-    # Cytologie / LBA
-    for kw in _CYTOLOGIE_KEYWORDS:
-        if _normaliser(kw) in texte:
-            return SpecimenType.CYTOLOGIE
-
-    # Biopsie — defaut conservateur
+    # 1. Biopsie explicite (mot-cle biopsie/carotte/punch) — priorite haute
+    #    Retour praticienne : si le praticien dit "biopsie de" c'est une biopsie
     for kw in _BIOPSIE_KEYWORDS:
         if _normaliser(kw) in texte:
             return SpecimenType.BIOPSIE
 
-    return SpecimenType.BIOPSIE
+    # 2. Cytologie explicite (LBA, ponction, frottis)
+    for kw in _CYTOLOGIE_KEYWORDS:
+        if _normaliser(kw) in texte:
+            return SpecimenType.CYTOLOGIE
+
+    # 3. Piece operatoire explicite (acte chirurgical nomme)
+    for kw in _PIECE_KEYWORDS:
+        if _normaliser(kw) in texte:
+            return SpecimenType.PIECE_OPERATOIRE
+
+    # 4. Curage ganglionnaire isole
+    for kw in _CURAGE_KEYWORDS:
+        if _normaliser(kw) in texte:
+            return SpecimenType.CURAGE
+
+    # 5. Heuristique macroscopique : description volumineuse avec mesures
+    #    en cm ou curages ganglionnaires -> signal piece operatoire
+    if _macroscopie_suggere_piece(texte):
+        return SpecimenType.PIECE_OPERATOIRE
+
+    # 6. Defaut : PIECE_OPERATOIRE (cf retour praticienne)
+    #    "si on ne dit pas 'biopsie de' ou 'cytologie de', partir du
+    #    principe que c'est une piece operatoire"
+    return SpecimenType.PIECE_OPERATOIRE
+
+
+def _macroscopie_suggere_piece(texte_normalise: str) -> bool:
+    """Indice macroscopique en faveur d'une piece operatoire.
+
+    Signaux : mesures en cm, plusieurs loges ganglionnaires, nombre
+    de ganglions examines, mention d'inclusion par blocs multiples.
+    """
+    import re
+
+    # Mesures en cm type "20 x 19 x 9 cm" ou "18 x 17 x 14 mm" pour un organe
+    if re.search(r"\d+\s*[x×]\s*\d+\s*[x×]\s*\d+\s*(cm|mm)", texte_normalise):
+        return True
+
+    # Enumeration de ganglions par loges (piece avec curages)
+    if re.search(r"\b\d+\s*ganglions?\b", texte_normalise) and "loge" in texte_normalise:
+        return True
+
+    return False
 
 
 def detecter_diagnostic_context(rapport: str) -> DiagnosticContext:

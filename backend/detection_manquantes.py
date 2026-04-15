@@ -682,6 +682,69 @@ def detecter_donnees_manquantes(
             )
             champs_deja_signales.add(nom_normalise_champ)
 
+    # ----- Passe 3 : validation structurelle multi-specimens -----
+    manquantes.extend(_detecter_sections_multispecimens_manquantes(rapport))
+
+    return manquantes
+
+
+# Pattern : sous-sections numerotees type "**__1) ...__**" ou "1) ..." ou "1°/ ..."
+_PATTERN_SOUS_SECTION: re.Pattern[str] = re.compile(
+    r"(?:^|\n)\s*(?:\*\*__)?(\d+)\s*[)°][/°]?\s*([^\n:]+?)\s*:?\s*(?:__\*\*)?\s*$",
+    re.MULTILINE,
+)
+
+
+def _detecter_sections_multispecimens_manquantes(
+    rapport: str,
+) -> list[DonneeManquante]:
+    """Si le rapport contient plusieurs specimens numerotes, verifie que
+    CHAQUE specimen possede une Macroscopie et une Microscopie titrees.
+
+    Corrige le bug multi-specimens (ex: pelviglossectomie + curages +
+    recoupes) ou le systeme marquait le CR comme complet alors qu'il
+    manquait des sections.
+    """
+    matches: list[re.Match[str]] = list(_PATTERN_SOUS_SECTION.finditer(rapport))
+    if len(matches) < 2:
+        return []
+
+    manquantes: list[DonneeManquante] = []
+
+    for idx, match in enumerate(matches):
+        numero: str = match.group(1)
+        titre_specimen: str = match.group(2).strip()
+        debut: int = match.end()
+        fin: int = matches[idx + 1].start() if idx + 1 < len(matches) else len(rapport)
+        bloc: str = rapport[debut:fin]
+        bloc_normalise: str = _normaliser_texte(bloc)
+
+        if not _section_presente("macroscopie", bloc_normalise):
+            manquantes.append(
+                DonneeManquante(
+                    champ=f"Macroscopie du specimen {numero} ({titre_specimen})",
+                    description=(
+                        "Chaque specimen numerote doit avoir sa propre "
+                        "section Macroscopie."
+                    ),
+                    section="macroscopie",
+                    obligatoire=True,
+                )
+            )
+
+        if not _section_presente("microscopie", bloc_normalise):
+            manquantes.append(
+                DonneeManquante(
+                    champ=f"Microscopie du specimen {numero} ({titre_specimen})",
+                    description=(
+                        "Chaque specimen numerote doit avoir sa propre "
+                        "section Microscopie avec une description morphologique."
+                    ),
+                    section="microscopie",
+                    obligatoire=True,
+                )
+            )
+
     return manquantes
 
 

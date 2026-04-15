@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://localhost:8000"
 
     # LLM : modele Claude a utiliser
-    claude_model: str = "claude-sonnet-4-6"
+    claude_model: str = "claude-opus-4-6"
 
     # Upload : taille max en Mo
     max_upload_size_mb: int = 200

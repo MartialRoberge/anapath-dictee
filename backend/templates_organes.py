@@ -223,7 +223,15 @@ TEMPLATE_COLON_RECTUM: TemplateOrgane = TemplateOrgane(
         "Pour le rectum, la marge de résection circonférentielle (CRM) est critique : positive si ≤ 1 mm. "
         "Qualité du mésorectum à évaluer pour le rectum. "
         "Statut MMR systématique recommandé (dépistage syndrome de Lynch). "
-        "Statut KRAS, NRAS, BRAF à déterminer si maladie métastatique."
+        "Statut KRAS, NRAS, BRAF à déterminer si maladie métastatique. "
+        "\n\nPOUR LES ADÉNOMES (biopsie / polypectomie) : "
+        "Classification de Vienne modifiée obligatoire. "
+        "Catégorie 1 : négatif. Catégorie 2 : indéfini. "
+        "Catégorie 3 : néoplasie de bas grade (adénome en dysplasie de bas grade). "
+        "Catégorie 4 : néoplasie de haut grade (4.1 adénome haut grade, 4.2 carcinome in situ non invasif, 4.3 suspicion d'invasion, 4.4 carcinome intra-muqueux). "
+        "Catégorie 5 : adénocarcinome invasif sous-muqueux ou au-delà. "
+        "La description microscopique d'un adénome doit préciser : architecture (tubuleuse/villeuse/tubulo-villeuse), "
+        "degré de dysplasie, atypies cytonucléaires, mitoses, statut de la membrane basale."
     ),
     champs_obligatoires=[
         ChampObligatoire(
@@ -344,6 +352,14 @@ TEMPLATE_COLON_RECTUM: TemplateOrgane = TemplateOrgane(
             section="microscopie",
             mots_cles_detection=["TRG", "régression", "réponse", "néoadjuvant", "Mandard", "Dworak", "Ryan"],
             exemple_formulation="Score de régression tumorale (TRG) selon Mandard : TRG 3 (régression partielle, fibrose prédominante)",
+            obligatoire=False
+        ),
+        ChampObligatoire(
+            nom="Classification de Vienne modifiée (adénome)",
+            description="Classification de Vienne modifiée pour les adénomes / néoplasies colorectales (catégorie 1 à 5)",
+            section="microscopie",
+            mots_cles_detection=["vienne", "catégorie 3", "catégorie 4", "cat. 3", "cat. 4", "cat 3", "cat 4", "bas grade", "haut grade", "dysplasie"],
+            exemple_formulation="Adénome tubuleux en dysplasie de bas grade, catégorie 3 de la classification de Vienne modifiée.",
             obligatoire=False
         ),
     ]
@@ -662,7 +678,17 @@ TEMPLATE_ESTOMAC: TemplateOrgane = TemplateOrgane(
         "HER2 : grille de scoring spécifique pour l'estomac (différente du sein). "
         "PD-L1 exprimé en CPS (Combined Positive Score) et non en TPS. "
         "Claudin 18.2 : nouveau biomarqueur thérapeutique (zolbetuximab). "
-        "Classification de Lauren à intégrer systématiquement."
+        "Classification de Lauren à intégrer systématiquement. "
+        "\n\nPOUR LES BIOPSIES GASTRIQUES NON TUMORALES (gastrite) : "
+        "Classification de Sydney actualisée obligatoire, par topographie (antre, angulus, fundus) : "
+        "1) inflammation chronique (légère/modérée/marquée), "
+        "2) activité (neutrophiles dans l'épithélium, légère/modérée/marquée), "
+        "3) atrophie (présente/absente, degré), "
+        "4) métaplasie intestinale (présente/absente, complète/incomplète), "
+        "5) Helicobacter pylori (présent/absent). "
+        "Si atrophie ou métaplasie : stades OLGA (atrophie) et OLGIM (métaplasie), de 0 à IV, "
+        "pour évaluer le risque néoplasique. "
+        "Mentionner aussi la maladie de Biermer si gastrite atrophique fundique sévère."
     ),
     champs_obligatoires=[
         ChampObligatoire(
@@ -776,6 +802,54 @@ TEMPLATE_ESTOMAC: TemplateOrgane = TemplateOrgane(
             mots_cles_detection=["pTNM", "pT", "pN", "stade", "TNM"],
             exemple_formulation="pT3 pN2 (AJCC 8e édition)",
             obligatoire=True
+        ),
+        ChampObligatoire(
+            nom="Topographie (Sydney)",
+            description="Topographie du prélèvement selon Sydney (antre, angulus, fundus)",
+            section="microscopie",
+            mots_cles_detection=["antre", "antral", "angulus", "fundus", "fundique", "cardia"],
+            exemple_formulation="Muqueuse antrale et fundique.",
+            obligatoire=False
+        ),
+        ChampObligatoire(
+            nom="Inflammation chronique (Sydney)",
+            description="Degré d'infiltrat lympho-plasmocytaire du chorion (légère/modérée/marquée)",
+            section="microscopie",
+            mots_cles_detection=["inflammation chronique", "lympho-plasmocytaire", "infiltrat chronique", "chorion"],
+            exemple_formulation="Inflammation chronique modérée.",
+            obligatoire=False
+        ),
+        ChampObligatoire(
+            nom="Activité (Sydney)",
+            description="Neutrophiles dans l'épithélium glandulaire (absente/légère/modérée/marquée)",
+            section="microscopie",
+            mots_cles_detection=["activité", "neutrophiles", "polynucléaires dans l'épithélium", "gastrite active"],
+            exemple_formulation="Activité légère avec quelques polynucléaires neutrophiles dans les cryptes.",
+            obligatoire=False
+        ),
+        ChampObligatoire(
+            nom="Atrophie glandulaire (Sydney / OLGA)",
+            description="Présence et degré d'atrophie glandulaire ; si présente, stade OLGA (0 à IV)",
+            section="microscopie",
+            mots_cles_detection=["atrophie", "atrophique", "OLGA", "raréfaction glandulaire"],
+            exemple_formulation="Atrophie sévère du fundus, stade OLGA III.",
+            obligatoire=False
+        ),
+        ChampObligatoire(
+            nom="Métaplasie intestinale (Sydney / OLGIM)",
+            description="Présence, type (complète/incomplète) et stade OLGIM (0 à IV) de métaplasie intestinale",
+            section="microscopie",
+            mots_cles_detection=["métaplasie intestinale", "OLGIM", "métaplasie", "cellules caliciformes"],
+            exemple_formulation="Métaplasie intestinale complète, stade OLGIM II.",
+            obligatoire=False
+        ),
+        ChampObligatoire(
+            nom="Helicobacter pylori",
+            description="Présence ou absence de Helicobacter pylori (coloration Giemsa ou IHC si doute)",
+            section="microscopie",
+            mots_cles_detection=["helicobacter", "hp", "helicobacter pylori", "giemsa"],
+            exemple_formulation="Absence de Helicobacter pylori.",
+            obligatoire=False
         ),
     ]
 )
