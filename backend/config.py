@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite+aiosqlite:///./lexia.db"
     jwt_secret: str = _INSECURE_JWT_SECRET
     jwt_algorithm: str = "HS256"
-    jwt_access_token_minutes: int = 60
+    jwt_access_token_minutes: int = 480
     jwt_refresh_token_days: int = 7
 
     # CORS : origines autorisees (separer par virgule)

@@ -201,9 +201,7 @@ async def format_text(
         raise HTTPException(status_code=400, detail="Texte vide.")
 
     try:
-        formatted: str
-        organe: str
-        formatted, organe = await format_transcription(
+        result = await format_transcription(
             req.raw_text, req.rapport_precedent
         )
     except ValueError as exc:
@@ -219,13 +217,15 @@ async def format_text(
             status_code=502, detail=f"Erreur connexion Claude : {exc}"
         )
 
-    donnees_manquantes: list[DonneeManquante] = detecter_donnees_manquantes(
-        formatted, organe
+    # Alertes generees par Claude + validation structurelle multi-specimens
+    alertes_multispec: list[DonneeManquante] = detecter_donnees_manquantes(
+        result.cr, result.organe
     )
+    donnees_manquantes: list[DonneeManquante] = result.alertes + alertes_multispec
 
     return FormatResponse(
-        formatted_report=formatted,
-        organe_detecte=organe,
+        formatted_report=result.cr,
+        organe_detecte=result.organe,
         donnees_manquantes=donnees_manquantes,
     )
 
@@ -249,9 +249,7 @@ async def iterate_report(
         raise HTTPException(status_code=400, detail="Nouveau transcript vide.")
 
     try:
-        updated: str
-        organe: str
-        updated, organe = await iterer_rapport(
+        result = await iterer_rapport(
             req.rapport_actuel, req.nouveau_transcript
         )
     except ValueError as exc:
@@ -267,13 +265,14 @@ async def iterate_report(
             status_code=502, detail=f"Erreur connexion Claude : {exc}"
         )
 
-    donnees_manquantes: list[DonneeManquante] = detecter_donnees_manquantes(
-        updated, organe
+    alertes_multispec: list[DonneeManquante] = detecter_donnees_manquantes(
+        result.cr, result.organe
     )
+    donnees_manquantes: list[DonneeManquante] = result.alertes + alertes_multispec
 
     return IterationResponse(
-        formatted_report=updated,
-        organe_detecte=organe,
+        formatted_report=result.cr,
+        organe_detecte=result.organe,
         donnees_manquantes=donnees_manquantes,
     )
 

@@ -1,24 +1,25 @@
 """Mise en forme des transcriptions en comptes-rendus anatomopathologiques.
 
-Utilise Claude (Anthropic) pour structurer les dictees vocales brutes en
-comptes-rendus conformes aux standards ACP, avec detection d'organe par
-recherche vectorielle et marqueurs de donnees manquantes.
+Pipeline minimale : la dictee brute est passee a Claude qui renvoie un JSON
+contenant le compte-rendu markdown, l'organe deduit, le type de prelevement
+et la liste des alertes (champs manquants ou incoherences) jugees pertinentes
+par Claude lui-meme, sans liste statique.
 
-Architecture : chaque fonction fait UNE action.
-- _build_system_prompt_with_templates : injection des templates organes detectes
-- _build_user_prompt_format : construction du message utilisateur
-- _call_claude : appel API Claude (Anthropic)
-- format_transcription : orchestration de la mise en forme initiale
-- iterer_rapport : orchestration de l'iteration
+Plus de RAG, plus d'injection de templates organe, plus de correction
+phonetique pre-Claude : Claude fait tout en un seul appel.
 """
+
+from __future__ import annotations
+
+import json
+import re
+from dataclasses import dataclass
 
 import anthropic
 from anthropic.types import TextBlock
 
 from config import get_settings
-from vocabulaire_acp import corriger_phonetique
-from templates_organes import TemplateOrgane, generer_prompt_template
-from rag import rechercher_templates
+from models import DonneeManquante
 
 # ---------------------------------------------------------------------------
 # SYSTEM PROMPT — Mise en forme initiale
@@ -170,65 +171,87 @@ pas de siderophage->La coloration de Perls ne trouve pas de siderophages.
 marges saines->Marges de resection en tissu sain.
 ganglions negatifs/sains->Absence de metastase ganglionnaire.
 
-{TEMPLATE_ORGANE}
+════════ FORMAT DE SORTIE — JSON STRICT ════════
 
-════════ FORMAT DE SORTIE ════════
+Tu reponds UNIQUEMENT avec un objet JSON valide, sans aucun texte avant ou apres,
+sans bloc de code Markdown autour. Le JSON a exactement cette forme :
 
-Reponds UNIQUEMENT avec le CR en Markdown :
-**__TITRE__** (titre souligne) ; **Gras** ; *italique* ; | col1 | col2 | pour tableaux ;
-[A COMPLETER: xxx] pour donnees manquantes.
-Pas de HTML. Pas d'introduction. Pas d'explication. Pas de "Compte-rendu anatomopathologique"
-comme titre generique — tu dois deduire un vrai titre."""
+{
+  "cr": "<compte-rendu complet en Markdown>",
+  "organe": "<organe deduit (libre, minuscules, ex: sein, poumon, colon, foie, thyroide, prostate, ganglion, peau, autre)>",
+  "type_prelevement": "<biopsie | cytologie | piece_operatoire | curage | autre>",
+  "alertes": [
+    {
+      "champ": "<nom court du champ manquant ou anomalie>",
+      "description": "<phrase courte d'aide>",
+      "section": "<macroscopie | microscopie | ihc | conclusion | biologie_moleculaire | structure>",
+      "raison": "<pourquoi ce champ est attendu ici : organe + type de prelevement + caractere de la lesion>"
+    }
+  ]
+}
+
+REGLES POUR "cr" :
+- Markdown pur : **__TITRE__** pour le titre souligne ; **gras** ; *italique* ; | col1 | col2 | pour tableaux IHC.
+- Pas de HTML brut.
+- Pas de "Compte-rendu anatomopathologique" ni "EXAMEN DE" comme titre — deduis un vrai titre.
+- Inclure [A COMPLETER: xxx] dans la section ou le champ manque.
+
+REGLES POUR "alertes" :
+- UNIQUEMENT les champs pertinents pour CE prelevement et CETTE lesion — pas de liste automatique.
+- Sur biopsie : tres peu d'alertes (type histologique + peut-etre phenotype IHC minimal).
+- Sur piece operatoire tumorale : panel pronostique complet (marges, ganglions, emboles,
+  engainements, pTNM, grade/classification officielle).
+- Sur lesion benigne/inflammatoire : 0 ou tres peu d'alertes (on ne demande pas pTNM sur une gastrite).
+- Sur chaque alerte, "raison" explique POURQUOI tu la leves ("biopsie de sein infiltrant -> grade
+  SBR et phenotype RE/RP/HER2/Ki67 obligatoires", "piece de colectomie tumorale -> CRM et qualite
+  du mesorectum").
+- Une alerte peut aussi etre une incoherence ("macroscopie dit '12 ganglions' mais conclusion
+  dit '8 ganglions examines'").
+- Ne JAMAIS lever d'alerte sur un champ incompatible avec le type de prelevement (pas de
+  pTNM/marges/ganglions sur biopsie)."""
 
 
 # ---------------------------------------------------------------------------
 # SYSTEM PROMPT — Iteration (ajout a un rapport existant)
 # ---------------------------------------------------------------------------
 
-SYSTEM_PROMPT_ITERATION: str = """Tu es un assistant expert en anatomopathologie francaise.
-Tu recois un compte-rendu anatomopathologique EXISTANT et une NOUVELLE transcription vocale
-contenant des informations complementaires a integrer.
+SYSTEM_PROMPT_ITERATION: str = """Tu es un anatomopathologiste francais expert. Tu recois un compte-rendu ACP
+EXISTANT et une NOUVELLE dictee vocale a integrer (ajouts, precisions, corrections,
+resultats IHC ou biologie moleculaire complementaires).
 
-═══════════════════════════════════════
-REGLES D'ITERATION
-═══════════════════════════════════════
+REGLES :
+- CONSERVE tout le rapport existant — ne supprime que si le praticien le demande explicitement.
+- INTEGRE les nouvelles informations dans les sections appropriees.
+- Si le praticien CORRIGE ("en fait c'est...", "correction...", "non plutot..."), applique.
+- RETIRE les [A COMPLETER: xxx] qui sont maintenant remplis.
+- AJOUTE des [A COMPLETER: xxx] si la nouvelle dictee revele d'autres champs manquants.
+- Ne JAMAIS inventer d'information medicale.
+- Garde les memes regles structurelles (titre sans "EXAMEN DE", section Microscopie titree
+  avec description avant diagnostic, conclusion ultra synthetique sans detail IHC,
+  multi-specimens avec macro+micro chacun, biopsie vs piece operatoire).
 
-1. CONSERVER l'integralite du rapport existant — ne supprime RIEN sauf si le praticien dit explicitement de corriger ou supprimer un element.
-2. INTEGRER les nouvelles informations dans les sections appropriees du rapport existant.
-3. Si le praticien dicte des resultats IHC supplementaires, les ajouter au tableau existant ou en creer un.
-4. Si le praticien corrige une information ("en fait c'est...", "correction...", "non plutot..."), appliquer la correction.
-5. Si le praticien ajoute des resultats de biologie moleculaire, creer ou completer la section correspondante.
-6. RETIRER les marqueurs [A COMPLETER: xxx] pour les champs qui sont maintenant remplis par la nouvelle dictee.
-7. AJOUTER de nouveaux marqueurs [A COMPLETER: xxx] si la nouvelle dictee revele des champs obligatoires manquants.
-8. Ne JAMAIS inventer d'information medicale.
-9. Le format de sortie est identique : Markdown structure avec les memes regles de formatage.
+CORRECTIONS PHONETIQUES (vocabulaire ACP standard) :
+branchique->bronchique ; mucose/equeuse->muqueuse ; fibro-yalin->fibro-hyalin ;
+racineuse->acineuse ; DTF1->TTF1 ; yaline->hyaline ; cananal->canal ; uliere->hilaire ;
+parenchymate->parenchymateuse ; imbole/embol->embole ; lobullaire->lobulaire ;
+canallaire->canalaire ; pdl un/pdl1->PD-L1 ; alk moins->ALK negatif.
+Ne JAMAIS inverser une negation medicale.
 
-═══════════════════════════════════════
-CORRECTIONS PHONETIQUES
-═══════════════════════════════════════
+════════ FORMAT DE SORTIE — JSON STRICT ════════
 
-Applique les memes corrections phonetiques que pour la mise en forme initiale :
-- branchique -> bronchique
-- mucose -> muqueuse
-- fibro-yalin -> fibro-hyalin
-- racineuse -> acineuse
-- DTF1 -> TTF1
-- yaline -> hyaline
-- cananal -> canal
-- uliere -> hilaire
-- parenchymate -> parenchymateuse
-- imbole / embol -> embole
-- lobullaire -> lobulaire
-- canallaire -> canalaire
+Tu reponds UNIQUEMENT avec un objet JSON valide, sans aucun texte avant ou apres :
 
-═══════════════════════════════════════
-FORMAT DE SORTIE
-═══════════════════════════════════════
+{
+  "cr": "<compte-rendu COMPLET mis a jour en Markdown — pas seulement la partie modifiee>",
+  "organe": "<organe>",
+  "type_prelevement": "<biopsie | cytologie | piece_operatoire | curage | autre>",
+  "alertes": [
+    {"champ": "...", "description": "...", "section": "...", "raison": "..."}
+  ]
+}
 
-Reponds UNIQUEMENT avec le compte-rendu COMPLET mis a jour en Markdown.
-Ne reponds PAS avec uniquement les parties modifiees.
-Inclus l'integralite du rapport avec les ajouts integres.
-Pas de commentaire, pas d'introduction, pas d'explication."""
+Les alertes refletent l'etat APRES integration. Si tous les champs pertinents
+sont maintenant presents, retourne "alertes": []."""
 
 
 # ---------------------------------------------------------------------------
@@ -276,36 +299,77 @@ def _build_user_prompt_iteration(
     )
 
 
-def _build_system_prompt_with_templates(
-    templates: list[tuple[TemplateOrgane, float]],
-) -> str:
-    """Injecte les templates organes detectes dans le system prompt.
+@dataclass
+class ClaudeFormatResult:
+    """Sortie structuree du JSON renvoye par Claude."""
 
-    Supporte le multi-prelevement : si plusieurs organes sont detectes,
-    tous les templates pertinents sont injectes.
+    cr: str
+    organe: str
+    type_prelevement: str
+    alertes: list[DonneeManquante]
+
+
+_JSON_FENCE: re.Pattern[str] = re.compile(
+    r"^\s*```(?:json)?\s*|\s*```\s*$", re.MULTILINE
+)
+
+
+def _parse_claude_json(raw: str) -> ClaudeFormatResult:
+    """Parse le JSON renvoye par Claude en extrayant cr, organe, alertes.
+
+    Tolerant : si Claude entoure accidentellement le JSON d'un fence markdown,
+    on le nettoie. Si le parsing echoue, on leve ValueError.
     """
-    template_section: str = ""
+    cleaned: str = _JSON_FENCE.sub("", raw.strip())
+    try:
+        payload: dict[str, object] = json.loads(cleaned, strict=False)
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"Claude n'a pas renvoye un JSON valide : {exc.msg}"
+        ) from exc
 
-    if templates:
-        parts: list[str] = []
-        for template, score in templates:
-            template_text: str = generer_prompt_template(template.organe)
-            if template_text:
-                parts.append(
-                    f"--- TEMPLATE : {template.nom_affichage.upper()} "
-                    f"(pertinence: {score:.0%}) ---\n\n"
-                    f"{template_text}"
+    cr_val = payload.get("cr")
+    if not isinstance(cr_val, str) or not cr_val.strip():
+        raise ValueError("JSON Claude : champ 'cr' manquant ou vide.")
+
+    organe_val = payload.get("organe")
+    organe: str = organe_val if isinstance(organe_val, str) else "non_determine"
+
+    type_val = payload.get("type_prelevement")
+    type_prelevement: str = type_val if isinstance(type_val, str) else "autre"
+
+    alertes_raw = payload.get("alertes")
+    alertes: list[DonneeManquante] = []
+    if isinstance(alertes_raw, list):
+        for item in alertes_raw:
+            if not isinstance(item, dict):
+                continue
+            champ = item.get("champ")
+            description = item.get("description") or item.get("raison") or ""
+            section = item.get("section") or "microscopie"
+            if not isinstance(champ, str) or not champ.strip():
+                continue
+            alertes.append(
+                DonneeManquante(
+                    champ=champ.strip(),
+                    description=(
+                        description.strip()
+                        if isinstance(description, str)
+                        else ""
+                    ),
+                    section=(
+                        section.strip() if isinstance(section, str) else "microscopie"
+                    ),
+                    obligatoire=True,
                 )
-
-        if parts:
-            template_section = (
-                "\n═══════════════════════════════════════\n"
-                "TEMPLATES SPECIFIQUES DETECTES\n"
-                "═══════════════════════════════════════\n\n"
-                + "\n\n".join(parts) + "\n"
             )
 
-    return SYSTEM_PROMPT_FORMAT.replace("{TEMPLATE_ORGANE}", template_section)
+    return ClaudeFormatResult(
+        cr=cr_val,
+        organe=organe,
+        type_prelevement=type_prelevement,
+        alertes=alertes,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -367,65 +431,27 @@ async def _call_claude(system_prompt: str, user_message: str) -> str:
 
 async def format_transcription(
     raw_text: str, rapport_precedent: str = ""
-) -> tuple[str, str]:
-    """Met en forme une transcription brute en compte-rendu structure.
+) -> ClaudeFormatResult:
+    """Met en forme une dictee brute en compte-rendu structure.
 
-    Utilise la recherche vectorielle pour trouver les templates pertinents.
-    Supporte le multi-prelevement (plusieurs organes detectes).
-
-    Returns:
-        Tuple (rapport_formate, organe_detecte).
+    Un seul appel Claude qui renvoie un JSON avec cr + organe +
+    type_prelevement + alertes. Pas de RAG, pas de correction phonetique
+    prealable (Claude gere tout dans son prompt).
     """
-    corrected_text: str = corriger_phonetique(raw_text)
-
-    # Recherche vectorielle des templates pertinents
-    templates: list[tuple[TemplateOrgane, float]] = await rechercher_templates(
-        corrected_text, top_k=3, seuil=0.3
-    )
-    organe_detecte: str = templates[0][0].organe if templates else "non_determine"
-
-    system_prompt: str = _build_system_prompt_with_templates(templates)
-    user_message: str = _build_user_prompt_format(corrected_text, rapport_precedent)
-    formatted_report: str = await _call_claude(system_prompt, user_message)
-    return formatted_report, organe_detecte
+    user_message: str = _build_user_prompt_format(raw_text, rapport_precedent)
+    response: str = await _call_claude(SYSTEM_PROMPT_FORMAT, user_message)
+    return _parse_claude_json(response)
 
 
 async def iterer_rapport(
     rapport_actuel: str, nouveau_transcript: str
-) -> tuple[str, str]:
+) -> ClaudeFormatResult:
     """Integre une nouvelle dictee dans un rapport existant.
 
-    Injecte aussi le template organe pour guider l'iteration.
-
-    Returns:
-        Tuple (rapport_mis_a_jour, organe_detecte).
+    Meme contrat JSON que format_transcription.
     """
-    corrected_new: str = corriger_phonetique(nouveau_transcript)
-    combined_text: str = f"{rapport_actuel}\n{corrected_new}"
-
-    # Recherche vectorielle des templates pour l'iteration aussi
-    templates: list[tuple[TemplateOrgane, float]] = await rechercher_templates(
-        combined_text, top_k=2, seuil=0.3
+    user_message: str = _build_user_prompt_iteration(
+        rapport_actuel, nouveau_transcript
     )
-    organe_detecte: str = templates[0][0].organe if templates else "non_determine"
-
-    # Injecter les templates dans le prompt d'iteration
-    iteration_prompt: str = SYSTEM_PROMPT_ITERATION
-    if templates:
-        template_section: str = "\n\n".join(
-            f"--- TEMPLATE : {t.nom_affichage.upper()} ---\n"
-            + generer_prompt_template(t.organe)
-            for t, _score in templates
-            if generer_prompt_template(t.organe)
-        )
-        if template_section:
-            iteration_prompt += (
-                "\n\n═══════════════════════════════════════\n"
-                "TEMPLATES DE REFERENCE\n"
-                "═══════════════════════════════════════\n\n"
-                + template_section
-            )
-
-    user_message: str = _build_user_prompt_iteration(rapport_actuel, corrected_new)
-    updated_report: str = await _call_claude(iteration_prompt, user_message)
-    return updated_report, organe_detecte
+    response: str = await _call_claude(SYSTEM_PROMPT_ITERATION, user_message)
+    return _parse_claude_json(response)

@@ -607,82 +607,40 @@ def extraire_marqueurs_a_completer(rapport: str) -> list[DonneeManquante]:
 def detecter_donnees_manquantes(
     rapport: str, organe: str
 ) -> list[DonneeManquante]:
-    """Analyse un rapport et retourne la liste des champs obligatoires manquants.
+    """Validations structurelles du CR — complement des alertes de Claude.
 
-    Strategie context-aware en deux passes :
+    Claude genere deja les alertes pertinentes via son JSON de sortie.
+    Ce module ajoute uniquement des validations structurelles que Claude
+    peut oublier de lever :
 
-    1. **Source primaire** : marqueurs ``[A COMPLETER: xxx]`` inseres par
-       le LLM. Le LLM connait le contexte clinique et n'insere ces
-       marqueurs que pour les champs reellement pertinents. Ils sont
-       toujours inclus.
+    1. Marqueurs ``[A COMPLETER: xxx]`` que Claude a inseres dans le CR
+       (extraction texte -> liste DonneeManquante).
+    2. Validation multi-specimens : chaque specimen numerote doit avoir
+       sa Macroscopie et sa Microscopie titrees.
 
-    2. **Source secondaire** : verification par mots-cles du template
-       organe. Cette passe n'est executee **que si le rapport contient
-       des mots-cles tumoraux** (carcinome, adenocarcinome, tumeur,
-       neoplasie, infiltrant, malin, etc.). Pour les rapports non
-       tumoraux (inflammatoire, sans atypie, benin…), les champs
-       specifiques aux tumeurs (pTNM, marges, ganglions, emboles,
-       engainements, grades, scores) sont ignores afin d'eviter les
-       faux positifs.
+    Les parametres ``organe`` et le contexte diagnostique ne sont plus
+    utilises — Claude gere tout le raisonnement par organe lui-meme.
 
     Args:
         rapport: Le compte-rendu formate en Markdown.
-        organe: L'identifiant de l'organe detecte.
+        organe: Identifiant de l'organe deduit par Claude (non utilise ici).
 
     Returns:
-        Liste de DonneeManquante pour chaque champ obligatoire absent.
+        Liste de DonneeManquante (marqueurs + multi-specimens).
     """
-    rapport_normalise: str = _normaliser_texte(rapport)
-
-    # Detection du contexte via le module specimen_type
-    specimen: SpecimenType = detecter_specimen_type(rapport)
-    contexte: DiagnosticContext = detecter_diagnostic_context(rapport)
+    del organe  # signature conservee pour compatibilite des appelants
 
     manquantes: list[DonneeManquante] = []
     champs_deja_signales: set[str] = set()
 
-    # ----- Passe 1 : marqueurs [A COMPLETER] du LLM -----
-    marqueurs: list[DonneeManquante] = extraire_marqueurs_a_completer(rapport)
-    for marqueur in marqueurs:
+    # ----- Passe A : marqueurs [A COMPLETER: xxx] inseres dans le CR -----
+    for marqueur in extraire_marqueurs_a_completer(rapport):
         nom_normalise: str = _normaliser_texte(marqueur.champ)
-
-        # Filtrage par le module specimen_type
-        if not champ_applicable(marqueur.champ, specimen, contexte):
-            continue
-
         if nom_normalise not in champs_deja_signales:
             manquantes.append(marqueur)
             champs_deja_signales.add(nom_normalise)
 
-    # ----- Passe 2 : verification par template organe -----
-    champs: list[ChampObligatoire] = get_champs_obligatoires(organe)
-
-    for champ in champs:
-        if not champ.obligatoire:
-            continue
-
-        # Filtrage par le module specimen_type
-        if not champ_applicable(champ.nom, specimen, contexte):
-            continue
-
-        nom_normalise_champ: str = _normaliser_texte(champ.nom)
-        if nom_normalise_champ in champs_deja_signales:
-            continue
-
-        champ_present: bool = _champ_present_dans_rapport(champ, rapport_normalise)
-
-        if not champ_present:
-            manquantes.append(
-                DonneeManquante(
-                    champ=champ.nom,
-                    description=champ.description,
-                    section=champ.section,
-                    obligatoire=champ.obligatoire,
-                )
-            )
-            champs_deja_signales.add(nom_normalise_champ)
-
-    # ----- Passe 3 : validation structurelle multi-specimens -----
+    # ----- Passe B : validation structurelle multi-specimens -----
     manquantes.extend(_detecter_sections_multispecimens_manquantes(rapport))
 
     return manquantes
