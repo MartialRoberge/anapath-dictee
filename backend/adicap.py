@@ -68,6 +68,8 @@ ORGANES: dict[str, str] = {
     "TE": "Testicule",
     "TH": "Thyroide",
     "VE": "Vessie",
+    "AP": "Appendice",
+    "VB": "Vesicule biliaire",
 }
 
 # Correspondance organe detecte -> code ADICAP

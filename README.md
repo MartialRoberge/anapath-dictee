@@ -62,28 +62,39 @@ Ouvrir **http://localhost:5173** dans le navigateur.
 | Couche | Technologie |
 |--------|-------------|
 | Frontend | React 19 + TypeScript (Vite) |
-| Backend | Python 3 + FastAPI |
-| Transcription | Voxtral Mini (API Mistral Audio) |
-| Mise en forme | Mistral Large (Chat) |
+| Backend | Python 3.11+ + FastAPI |
+| Transcription (STT) | Voxtral Mini (API Mistral Audio) |
+| Génération (LLM) | Mistral Large par défaut, via une abstraction de fournisseur (`LLM_PROVIDER`) |
+| Moteur de CR | `REPORT_ENGINE=local` (Voxtral + LLM + templates) ou `gilbert` (moteur distant Lexia) |
+
+Le moteur de génération est **agnostique du fournisseur** : Mistral aujourd'hui,
+un moteur type Gilbert demain, sans réécrire le code métier. Voir
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) et
+[docs/INTEGRATION_GILBERT.md](docs/INTEGRATION_GILBERT.md).
 
 ## Structure
 
 ```
 ├── backend/
-│   ├── main.py              # Serveur FastAPI (endpoints /transcribe, /format, /export)
-│   ├── config.py            # Gestion cles API via .env
-│   ├── transcription.py     # Appel Voxtral
-│   ├── formatting.py        # Prompt metier + appel Mistral
-│   ├── export_docx.py       # Generation Word
+│   ├── main.py              # API FastAPI (transcribe/format/iterate/templates/export/...)
+│   ├── config.py            # Configuration via .env
+│   ├── transcription.py     # Appel Voxtral (STT)
+│   ├── llm/                 # Abstraction fournisseur LLM (Mistral, Anthropic) + factory
+│   ├── templates_cr/        # Catalogue de templates métier (structure + slots + formulations)
+│   ├── reports/             # Moteur de CR : engine (local/gilbert), prompts, guardrails, retry
+│   ├── adicap.py / snomed.py / detection_manquantes.py  # Codification & complétude
+│   ├── export_docx.py       # Génération Word
+│   ├── tests/               # Suite pytest (déterministe) + campagne fonctionnelle live
 │   └── requirements.txt
-├── frontend/
-│   └── src/
-│       ├── App.tsx           # Layout principal
-│       ├── components/       # RecorderPanel, ReportPanel, Pipeline
-│       ├── hooks/            # useAudioRecorder, useSoundFeedback
-│       └── services/api.ts   # Client HTTP
-├── regles_metier_anapath.md  # Regles metier (reference)
-├── start.sh                  # Script de lancement
-├── .env.example              # Template variables d'environnement
-└── .gitignore
+├── frontend/                # React 19 + TS (RecorderPanel, ReportPanel, ...)
+├── docs/                    # ARCHITECTURE.md, INTEGRATION_GILBERT.md
+├── start.sh, .env.example
+```
+
+## Tests
+
+```bash
+cd backend
+python -m pytest                       # suite déterministe (aucun appel réseau)
+python tests/functional_campaign.py    # campagne live Voxtral+Mistral (consomme des crédits API)
 ```

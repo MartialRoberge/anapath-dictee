@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { exportDocx, getSections } from "../services/api";
 import type { Marker } from "../services/api";
+import CodificationPanel from "./CodificationPanel";
 
 /* ------------------------------------------------------------------ */
 /*  Section config                                                     */
@@ -1150,6 +1151,9 @@ export default function ReportPanel({
             <MarkdownReport content={report} />
           )}
         </div>
+
+        {/* Codification ADICAP / SNOMED (auto, copiable) */}
+        <CodificationPanel report={report} organe={organeDetecte} />
       </div>
     </div>
   );

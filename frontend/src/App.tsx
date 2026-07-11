@@ -393,6 +393,37 @@ export default function App() {
     setActiveView("report");
   }, []);
 
+  // Rouvre un CR de l'historique dans l'editeur (charge le detail complet).
+  const handleOpenReport = useCallback(
+    async (reportId: string) => {
+      try {
+        const res = await fetch(`${API_BASE}/reports/${reportId}`, {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        if (!res.ok) throw new Error("Impossible de charger le compte-rendu.");
+        const data = await res.json();
+        setReport(data.structured_report ?? "");
+        setRawTranscription(data.raw_transcription ?? null);
+        setOrganeDetecte(data.organe_detecte ?? "");
+        setMarkers([]);
+        setDismissedFields(new Set());
+        setSavedReportId(data.id ?? reportId);
+        setFeedbackSent(
+          data.feedback_rating !== null && data.feedback_rating !== undefined,
+        );
+        setPage("app");
+        setActiveView("report");
+        toast("Compte-rendu ouvert", "success");
+      } catch (err) {
+        toast(
+          err instanceof Error ? err.message : "Erreur de chargement",
+          "error",
+        );
+      }
+    },
+    [toast],
+  );
+
   const handleReformat = useCallback(
     async (text: string) => {
       if (!text.trim() || reformatting) return;
@@ -574,7 +605,7 @@ export default function App() {
         <main className="flex flex-1 overflow-hidden">
           {page === "history" ? (
             <section className="flex-1 overflow-y-auto p-6 scrollbar-thin">
-              <HistoryPage token={getToken()} onBack={() => setPage("app")} onOpenReport={() => setPage("app")} />
+              <HistoryPage token={getToken()} onBack={() => setPage("app")} onOpenReport={handleOpenReport} />
             </section>
           ) : (
           <>

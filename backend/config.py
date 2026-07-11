@@ -26,8 +26,36 @@ class Settings(BaseSettings):
     # CORS : origines autorisees (separer par virgule)
     cors_origins: str = "http://localhost:5173,http://localhost:8000"
 
-    # LLM : modele Claude a utiliser
-    claude_model: str = "claude-opus-4-6"
+    # ------------------------------------------------------------------
+    # Moteur de generation (LLM) — abstraction fournisseur
+    # ------------------------------------------------------------------
+    # Fournisseur actif pour la mise en forme : "mistral" (defaut, souverain)
+    # ou "anthropic". Le moteur de CR passe par la couche llm/ quel que soit
+    # le fournisseur (voir llm/factory.py).
+    llm_provider: str = "mistral"
+
+    # Modeles par fournisseur (surchargeable par variable d'environnement).
+    mistral_model: str = "mistral-large-latest"
+    claude_model: str = "claude-sonnet-4-6"
+
+    # Parametres de generation communs a tous les fournisseurs.
+    llm_temperature: float = 0.0
+    llm_max_tokens: int = 8192
+    llm_timeout_seconds: float = 120.0
+    llm_max_retries: int = 2
+
+    # ------------------------------------------------------------------
+    # Moteur de compte-rendu (orchestration STT + generation)
+    # ------------------------------------------------------------------
+    # "local" (defaut) = Voxtral + LLM local ; "gilbert" = moteur distant Lexia.
+    report_engine: str = "local"
+    gilbert_api_key: str = ""
+
+    # ------------------------------------------------------------------
+    # Transcription (STT)
+    # ------------------------------------------------------------------
+    voxtral_model: str = "voxtral-mini-latest"
+    stt_timeout_seconds: float = 180.0
 
     # Upload : taille max en Mo
     max_upload_size_mb: int = 200

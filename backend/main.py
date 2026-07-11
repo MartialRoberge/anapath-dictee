@@ -13,19 +13,20 @@ Note proxy frontend : le frontend doit proxifier /transcribe, /format,
 """
 
 import io
+import logging
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Annotated
 
-import anthropic
 import httpx
 from fastapi import Depends, FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from slowapi import Limiter
+from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from starlette.requests import Request
 
@@ -45,8 +46,6 @@ from models import (
     CompletudeRequest,
     CompletudeResponse,
 )
-from transcription import transcribe_audio
-from formatting import format_transcription, iterer_rapport
 from export_docx import markdown_to_docx, split_report_sections
 from detection_manquantes import detecter_donnees_manquantes, calculer_score_completude
 from adicap import suggerer_adicap
@@ -55,9 +54,14 @@ from config import get_settings, validate_settings_at_startup
 from database import close_engine, create_tables
 from auth import get_current_user
 from db_models import User
+from llm.base import LLMError, LLMTimeoutError
+from reports import GeneratedReport, ReportEngine, get_report_engine, reset_report_engine
+from reports.guardrails import GenerationParseError
 from routes_auth import router as auth_router
 from routes_reports import router as reports_router
 from routes_admin import router as admin_router
+
+logger = logging.getLogger("anapath.api")
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -73,16 +77,30 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     validate_settings_at_startup()
     await create_tables()
     yield
+    engine = reset_report_engine()
+    if engine is not None:
+        await engine.aclose()
     await close_engine()
 
 
 app: FastAPI = FastAPI(
     title="Anapath - Dictee medicale",
-    version="0.6.0",
+    version="0.7.0",
     lifespan=lifespan,
 )
 
 app.state.limiter = limiter
+
+
+@app.exception_handler(RateLimitExceeded)
+async def _rate_limit_handler(
+    _request: Request, exc: RateLimitExceeded
+) -> JSONResponse:
+    """Renvoie 429 (et non 500) en cas de depassement de quota."""
+    return JSONResponse(
+        status_code=429,
+        content={"detail": f"Trop de requetes. Reessayez ({exc.detail})."},
+    )
 
 _settings = get_settings()
 _cors_origins: list[str] = [
@@ -150,6 +168,7 @@ _MAX_UPLOAD_BYTES: int = _settings.max_upload_size_mb * 1024 * 1024
 async def transcribe(
     request: Request,
     _user: Annotated[User, Depends(get_current_user)],
+    engine: Annotated[ReportEngine, Depends(get_report_engine)],
     file: UploadFile = File(...),
 ) -> TranscriptionResponse:
     """Etape 1 : Transcription audio via Voxtral."""
@@ -169,19 +188,36 @@ async def transcribe(
         )
 
     try:
-        raw_text: str = await transcribe_audio(audio_bytes, filename)
+        transcript = await engine.transcribe(audio_bytes, filename)
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
-            status_code=502,
-            detail=f"Erreur transcription Voxtral : {exc}",
+            status_code=502, detail=f"Erreur transcription : {exc}"
         )
     except httpx.RequestError as exc:
         raise HTTPException(
-            status_code=502,
-            detail=f"Erreur connexion Voxtral : {exc}",
+            status_code=502, detail=f"Erreur connexion transcription : {exc}"
         )
 
-    return TranscriptionResponse(raw_transcription=raw_text)
+    return TranscriptionResponse(raw_transcription=transcript.text)
+
+
+def _map_generation_error(exc: Exception) -> HTTPException:
+    """Traduit une erreur du moteur en HTTPException adaptee."""
+    if isinstance(exc, GenerationParseError):
+        return HTTPException(
+            status_code=502,
+            detail=f"Reponse du moteur inexploitable : {exc}",
+        )
+    if isinstance(exc, LLMTimeoutError):
+        return HTTPException(
+            status_code=504, detail="Le moteur de generation n'a pas repondu a temps."
+        )
+    if isinstance(exc, LLMError):
+        return HTTPException(status_code=502, detail=f"Erreur moteur : {exc}")
+    if isinstance(exc, ValueError):
+        return HTTPException(status_code=422, detail=f"Erreur de validation : {exc}")
+    logger.exception("Erreur inattendue du moteur de generation")
+    return HTTPException(status_code=500, detail="Erreur interne de generation.")
 
 
 # ---------------------------------------------------------------------------
@@ -194,6 +230,7 @@ async def transcribe(
 async def format_text(
     request: Request,
     _user: Annotated[User, Depends(get_current_user)],
+    engine: Annotated[ReportEngine, Depends(get_report_engine)],
     req: FormatRequest,
 ) -> FormatResponse:
     """Etape 2 : Mise en forme du transcript en compte-rendu structure."""
@@ -201,32 +238,29 @@ async def format_text(
         raise HTTPException(status_code=400, detail="Texte vide.")
 
     try:
-        result = await format_transcription(
-            req.raw_text, req.rapport_precedent
+        result: GeneratedReport = await engine.generate(
+            req.raw_text,
+            rapport_precedent=req.rapport_precedent,
         )
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=422, detail=f"Erreur de validation : {exc}"
-        )
-    except anthropic.APIStatusError as exc:
-        raise HTTPException(
-            status_code=502, detail=f"Erreur formatting Claude : {exc}"
-        )
-    except anthropic.APIConnectionError as exc:
-        raise HTTPException(
-            status_code=502, detail=f"Erreur connexion Claude : {exc}"
-        )
+    except Exception as exc:  # noqa: BLE001 - traduit en HTTPException typee
+        raise _map_generation_error(exc)
 
-    # Alertes generees par Claude + validation structurelle multi-specimens
+    return _to_format_response(result)
+
+
+def _to_format_response(result: GeneratedReport) -> FormatResponse:
+    """Assemble la reponse API : alertes moteur + validation multi-specimens."""
     alertes_multispec: list[DonneeManquante] = detecter_donnees_manquantes(
         result.cr, result.organe
     )
     donnees_manquantes: list[DonneeManquante] = result.alertes + alertes_multispec
-
     return FormatResponse(
         formatted_report=result.cr,
         organe_detecte=result.organe,
         donnees_manquantes=donnees_manquantes,
+        warnings=result.warnings,
+        organes_detectes=result.organes_detectes,
+        type_prelevement=result.type_prelevement,
     )
 
 
@@ -240,6 +274,7 @@ async def format_text(
 async def iterate_report(
     request: Request,
     _user: Annotated[User, Depends(get_current_user)],
+    engine: Annotated[ReportEngine, Depends(get_report_engine)],
     req: IterationRequest,
 ) -> IterationResponse:
     """Etape 2bis : Ajout d'une dictee complementaire a un rapport existant."""
@@ -249,21 +284,11 @@ async def iterate_report(
         raise HTTPException(status_code=400, detail="Nouveau transcript vide.")
 
     try:
-        result = await iterer_rapport(
+        result: GeneratedReport = await engine.iterate(
             req.rapport_actuel, req.nouveau_transcript
         )
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=422, detail=f"Erreur de validation : {exc}"
-        )
-    except anthropic.APIStatusError as exc:
-        raise HTTPException(
-            status_code=502, detail=f"Erreur iteration Claude : {exc}"
-        )
-    except anthropic.APIConnectionError as exc:
-        raise HTTPException(
-            status_code=502, detail=f"Erreur connexion Claude : {exc}"
-        )
+    except Exception as exc:  # noqa: BLE001 - traduit en HTTPException typee
+        raise _map_generation_error(exc)
 
     alertes_multispec: list[DonneeManquante] = detecter_donnees_manquantes(
         result.cr, result.organe
@@ -274,6 +299,9 @@ async def iterate_report(
         formatted_report=result.cr,
         organe_detecte=result.organe,
         donnees_manquantes=donnees_manquantes,
+        warnings=result.warnings,
+        organes_detectes=result.organes_detectes,
+        type_prelevement=result.type_prelevement,
     )
 
 

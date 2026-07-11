@@ -10,7 +10,10 @@ class TranscriptionResponse(BaseModel):
 
 
 class FormatRequest(BaseModel):
-    """Requête de mise en forme d'un transcript."""
+    """Requête de mise en forme d'un transcript.
+
+    La génération est entièrement automatique : aucun template à choisir.
+    """
 
     raw_text: str
     rapport_precedent: str = ""
@@ -31,6 +34,10 @@ class FormatResponse(BaseModel):
     formatted_report: str
     organe_detecte: str
     donnees_manquantes: list[DonneeManquante]
+    # Champs additifs (retrocompatibles) : garde-fous + traçabilité auto-détection.
+    warnings: list[str] = []
+    organes_detectes: list[str] = []
+    type_prelevement: str = "autre"
 
 
 class IterationRequest(BaseModel):
@@ -46,6 +53,9 @@ class IterationResponse(BaseModel):
     formatted_report: str
     organe_detecte: str
     donnees_manquantes: list[DonneeManquante]
+    warnings: list[str] = []
+    template_id: str = "generic"
+    type_prelevement: str = "autre"
 
 
 class ExportRequest(BaseModel):

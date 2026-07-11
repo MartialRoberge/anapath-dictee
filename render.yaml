@@ -17,3 +17,8 @@ services:
         sync: false
       - key: CORS_ORIGINS
         value: https://anapath-dictee.onrender.com
+      # Moteur de generation : mistral (souverain, defaut) — necessite MISTRAL_API_KEY.
+      - key: LLM_PROVIDER
+        value: mistral
+      - key: REPORT_ENGINE
+        value: local

@@ -167,6 +167,80 @@ export async function iterateReport(
   };
 }
 
+/* ------------------------------------------------------------------ */
+/*  Codification ADICAP / SNOMED CT                                    */
+/* ------------------------------------------------------------------ */
+
+export interface AdicapResult {
+  code: string;
+  prelevement: string;
+  prelevement_code: string;
+  technique: string;
+  technique_code: string;
+  organe: string;
+  organe_code: string;
+  lesion: string;
+  lesion_code: string;
+}
+
+export interface SnomedCode {
+  code: string;
+  display: string;
+  system: string;
+}
+
+export interface SnomedResult {
+  topography: SnomedCode;
+  morphology: SnomedCode;
+}
+
+export interface CodificationResult {
+  adicap: AdicapResult;
+  snomed: SnomedResult;
+}
+
+export async function getAdicap(
+  formattedReport: string,
+  organeDetecte: string,
+): Promise<AdicapResult> {
+  const response = await fetch(`${API_BASE}/adicap`, {
+    method: "POST",
+    headers: jsonHeaders(),
+    body: JSON.stringify({
+      formatted_report: formattedReport,
+      organe_detecte: organeDetecte,
+    }),
+  });
+  return handleResponse<AdicapResult>(response);
+}
+
+export async function getSnomed(
+  formattedReport: string,
+  organeDetecte: string,
+): Promise<SnomedResult> {
+  const response = await fetch(`${API_BASE}/snomed`, {
+    method: "POST",
+    headers: jsonHeaders(),
+    body: JSON.stringify({
+      formatted_report: formattedReport,
+      organe_detecte: organeDetecte,
+    }),
+  });
+  return handleResponse<SnomedResult>(response);
+}
+
+/** Recupere ADICAP + SNOMED en parallele. */
+export async function getCodification(
+  formattedReport: string,
+  organeDetecte: string,
+): Promise<CodificationResult> {
+  const [adicap, snomed] = await Promise.all([
+    getAdicap(formattedReport, organeDetecte),
+    getSnomed(formattedReport, organeDetecte),
+  ]);
+  return { adicap, snomed };
+}
+
 export async function getSections(
   formattedReport: string,
 ): Promise<SectionsResult> {

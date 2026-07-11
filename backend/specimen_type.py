@@ -30,6 +30,14 @@ class SpecimenType(str, Enum):
     CURAGE = "curage"
     INDETERMINE = "indetermine"
 
+    @classmethod
+    def from_str(cls, value: str) -> "SpecimenType":
+        """Convertit une chaine libre en SpecimenType (defaut INDETERMINE)."""
+        try:
+            return cls(value.strip().lower())
+        except ValueError:
+            return cls.INDETERMINE
+
 
 class DiagnosticContext(str, Enum):
     """Contexte diagnostique du rapport."""
