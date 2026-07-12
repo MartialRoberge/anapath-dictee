@@ -275,6 +275,27 @@ def _merge_donnees_manquantes(
     return resultat
 
 
+def _safety_filter_panel(
+    donnees: list[DonneeManquante], result: GeneratedReport
+) -> list[DonneeManquante]:
+    """Filtre de securite du panneau FINAL (marqueurs deterministes inclus).
+
+    Garantit qu'aucun champ hors-contexte organe / prelevement / nature de lesion
+    ne peut apparaitre, quelle que soit sa source (LLM ou marqueur [A COMPLETER]) :
+    un champ tumoral ne peut pas apparaitre sur une lesion benigne.
+    """
+    from reports.guardrails import filter_alertes
+    from specimen_type import SpecimenType, detecter_diagnostic_context
+
+    try:
+        specimen = SpecimenType(result.type_prelevement)
+    except ValueError:
+        specimen = SpecimenType.INDETERMINE
+    contexte = detecter_diagnostic_context(result.cr).value
+    filtres, _ = filter_alertes(donnees, result.organes_detectes, specimen, contexte)
+    return filtres
+
+
 def _to_format_response(result: GeneratedReport) -> FormatResponse:
     """Assemble la reponse API : marqueurs deterministes + recommandations filtrees."""
     deterministes: list[DonneeManquante] = detecter_donnees_manquantes(
@@ -283,6 +304,10 @@ def _to_format_response(result: GeneratedReport) -> FormatResponse:
     donnees_manquantes: list[DonneeManquante] = _merge_donnees_manquantes(
         deterministes, result.alertes
     )
+    # Passe finale de SECURITE : retirer du panneau final tout champ hors-contexte
+    # organe / prelevement / nature de lesion, quelle que soit sa source (LLM ou
+    # marqueur [A COMPLETER]) — un champ tumoral ne peut pas apparaitre sur du benin.
+    donnees_manquantes = _safety_filter_panel(donnees_manquantes, result)
     # Passe finale anti-faux-positif : retirer du PANNEAU tout champ dont le contenu
     # est deja present dans le CR (le blanc reste visible inline). Priorite absolue :
     # ne jamais reclamer un element deja dicte.
