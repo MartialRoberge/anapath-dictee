@@ -45,39 +45,6 @@ function truncateFilename(name: string, max: number = 28): string {
 /*  Floating botanical leaves (CSS animated SVG)                       */
 /* ------------------------------------------------------------------ */
 
-function FloatingLeaves() {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.07]">
-      {/* Leaf 1 — slow drift */}
-      <svg className="absolute left-[10%] top-[15%] h-12 w-12 animate-float text-iris-600" style={{ animationDuration: "7s" }} viewBox="0 0 40 40" fill="currentColor">
-        <path d="M20 2C24 8 34 14 36 22C38 30 28 36 20 38C12 36 2 30 4 22C6 14 16 8 20 2Z" />
-        <path d="M20 8V34" stroke="white" strokeWidth="0.5" fill="none" opacity="0.5" />
-        <path d="M12 18Q20 22 28 18" stroke="white" strokeWidth="0.3" fill="none" opacity="0.4" />
-        <path d="M10 26Q20 28 30 24" stroke="white" strokeWidth="0.3" fill="none" opacity="0.3" />
-      </svg>
-      {/* Leaf 2 — medium drift */}
-      <svg className="absolute right-[15%] top-[30%] h-8 w-8 animate-float text-iris-500" style={{ animationDuration: "9s", animationDelay: "2s" }} viewBox="0 0 40 40" fill="currentColor">
-        <path d="M20 4C26 10 32 18 30 26C28 34 22 36 20 36C18 36 12 34 10 26C8 18 14 10 20 4Z" />
-        <path d="M20 10V32" stroke="white" strokeWidth="0.4" fill="none" opacity="0.4" />
-      </svg>
-      {/* Leaf 3 — slow sway */}
-      <svg className="absolute left-[60%] top-[60%] h-10 w-10 animate-leaf-sway text-iris-400" style={{ animationDuration: "11s" }} viewBox="0 0 40 40" fill="currentColor">
-        <path d="M8 20Q14 6 28 4Q34 16 28 28Q20 36 8 20Z" />
-        <path d="M14 16Q22 18 26 12" stroke="white" strokeWidth="0.3" fill="none" opacity="0.3" />
-      </svg>
-      {/* Petal — gentle float */}
-      <svg className="absolute left-[30%] top-[75%] h-6 w-6 animate-float text-violet-400" style={{ animationDuration: "8s", animationDelay: "4s" }} viewBox="0 0 24 24" fill="currentColor">
-        <ellipse cx="12" cy="12" rx="5" ry="10" transform="rotate(-30 12 12)" opacity="0.6" />
-      </svg>
-      {/* Small circles — cell structures */}
-      <svg className="absolute right-[25%] top-[10%] h-5 w-5 animate-float text-iris-300" style={{ animationDuration: "10s", animationDelay: "1s" }} viewBox="0 0 20 20">
-        <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1" fill="none" />
-        <circle cx="10" cy="10" r="3" fill="currentColor" opacity="0.3" />
-      </svg>
-    </div>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /*  Main component                                                     */
 /* ------------------------------------------------------------------ */
@@ -286,10 +253,10 @@ export default function RecorderPanel({
       {/* Push-to-talk zone — full width, with floating botanical elements */}
       <div
         className={cn(
-          "relative flex h-[100px] cursor-pointer select-none items-center justify-center overflow-hidden rounded-xl border-2 transition-all",
+          "marc-aurora relative flex h-[100px] cursor-pointer select-none items-center justify-center overflow-hidden rounded-2xl border-2 transition-all",
           isRecording
             ? "border-iris-500 bg-iris-50 dark:bg-iris-950/30"
-            : "border-dashed border-border hover:border-iris-400/50 hover:bg-iris-50/30 dark:hover:bg-iris-950/10"
+            : "border-dashed border-border hover:border-iris-400/60 hover:bg-iris-50/40 dark:hover:bg-iris-950/10"
         )}
         onMouseDown={handleStart}
         onMouseUp={handleStop}
@@ -297,8 +264,6 @@ export default function RecorderPanel({
         onTouchStart={handleStart}
         onTouchEnd={handleStop}
       >
-        {/* Botanical floating elements */}
-        <FloatingLeaves />
 
         <div className="relative z-10 flex flex-col items-center gap-1.5">
           <Mic

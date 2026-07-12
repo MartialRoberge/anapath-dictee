@@ -35,35 +35,20 @@ export default function LoginPage({ onLogin, onRegister }: LoginPageProps) {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background iris-botanical-glow">
-      {/* Botanical background pattern */}
-      <div className="absolute inset-0 iris-bg-pattern" />
-
-      {/* Decorative botanical SVG — leaf veins and cell structures */}
-      <svg className="absolute inset-0 h-full w-full opacity-[0.025] pointer-events-none" preserveAspectRatio="xMidYMid slice" viewBox="0 0 800 600">
-        <path d="M50 300 Q200 200 350 300 Q500 400 650 300" stroke="currentColor" strokeWidth="1" fill="none" />
-        <path d="M50 350 Q200 280 350 350 Q500 420 650 350" stroke="currentColor" strokeWidth="0.5" fill="none" />
-        <path d="M100 100 Q250 180 400 100" stroke="currentColor" strokeWidth="0.8" fill="none" />
-        <path d="M400 500 Q550 420 700 500" stroke="currentColor" strokeWidth="0.8" fill="none" />
-        <circle cx="150" cy="150" r="40" stroke="currentColor" strokeWidth="0.5" fill="none" />
-        <circle cx="600" cy="400" r="60" stroke="currentColor" strokeWidth="0.5" fill="none" />
-        <circle cx="700" cy="150" r="30" stroke="currentColor" strokeWidth="0.5" fill="none" />
-        <circle cx="100" cy="450" r="50" stroke="currentColor" strokeWidth="0.5" fill="none" />
-      </svg>
-
+    <div className="marc-aurora relative flex min-h-screen items-center justify-center bg-background">
       {/* Login card */}
       <div className="relative z-10 mx-4 w-full max-w-md animate-fade-in">
         <div className="rounded-2xl border bg-card/80 backdrop-blur-sm p-8 shadow-xl">
           {/* Brand */}
           <div className="mb-8 flex flex-col items-center gap-3">
-            <MarcLogo size={48} className="animate-float" />
-            <h1 className="font-heading text-3xl font-extrabold tracking-tight">
-              <span className="text-iris-700 dark:text-iris-400">MAR</span>
-              <span className="text-gilbert-500">C</span>
+            <MarcLogo size={52} className="animate-float drop-shadow-sm" />
+            <h1 className="font-heading text-4xl font-extrabold tracking-tight text-foreground">
+              MARC
             </h1>
             <p className="text-center text-sm text-muted-foreground leading-relaxed">
               Module d'Assistance à la Rédaction des Comptes-rendus<br />
-              <span className="text-[0.7rem] text-muted-foreground/70">une solution Gilbert · souveraine &amp; médicale</span>
+              <span className="font-hand text-base text-primary">une solution Gilbert</span>
+              <span className="text-[0.7rem] text-muted-foreground/70"> · souveraine &amp; médicale</span>
             </p>
           </div>
 

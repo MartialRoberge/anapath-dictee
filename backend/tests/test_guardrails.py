@@ -201,6 +201,40 @@ def test_filter_keeps_piece_fields_on_piece():
     assert len(kept) == 2
 
 
+def test_filter_tumoral_field_dropped_on_benign():
+    # Lésion bénigne : aucun champ tumoral (grade, stade, mitoses, emboles).
+    alertes = [_alerte("Grade histopronostique SBR"), _alerte("Index mitotique"),
+               _alerte("Emboles vasculaires"), _alerte("Type histologique")]
+    kept, dropped = filter_alertes(alertes, ["colon_rectum"], SpecimenType.BIOPSIE, "benin")
+    champs = [a.champ for a in kept]
+    assert "Type histologique" in champs
+    assert "Grade histopronostique SBR" not in champs
+    assert "Index mitotique" not in champs
+    assert "Emboles vasculaires" not in champs
+    assert len(dropped) == 3
+
+
+def test_filter_tumoral_field_kept_on_infiltrant():
+    alertes = [_alerte("Grade histopronostique SBR"), _alerte("Statut pTNM")]
+    kept, _ = filter_alertes(alertes, ["sein"], SpecimenType.PIECE_OPERATOIRE, "infiltrant")
+    assert len(kept) == 2
+
+
+def test_filter_invasive_field_dropped_on_precancer():
+    alertes = [_alerte("Statut pTNM"), _alerte("Grade de dysplasie")]
+    kept, _ = filter_alertes(alertes, ["col_uterin"], SpecimenType.BIOPSIE, "pre_cancereux")
+    champs = [a.champ for a in kept]
+    assert "Grade de dysplasie" in champs
+    assert "Statut pTNM" not in champs
+
+
+def test_filter_indetermine_context_does_not_over_filter():
+    # Contexte indéterminé -> on ne filtre pas par nature de lésion.
+    alertes = [_alerte("Grade histopronostique")]
+    kept, _ = filter_alertes(alertes, ["sein"], SpecimenType.BIOPSIE, "indetermine")
+    assert len(kept) == 1
+
+
 def test_filter_no_organ_keeps_all():
     # Sans organe détecté, on ne filtre pas par classification (mais piece-only reste).
     alertes = [_alerte("Indice de Breslow")]

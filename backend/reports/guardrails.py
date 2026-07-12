@@ -206,23 +206,47 @@ _PIECE_ONLY_FIELD_TERMS: tuple[str, ...] = (
 )
 
 
-def filter_alertes(
-    alertes: list[DonneeManquante], organes: list[str], specimen: SpecimenType
-) -> tuple[list[DonneeManquante], list[str]]:
-    """Retire les alertes (champs a verifier) hors-contexte organe/prelevement.
+# Champs pronostiques propres a une TUMEUR (grade, stade, agressivite). N'ont
+# aucun sens sur une lesion benigne/inflammatoire.
+_TUMORAL_FIELD_TERMS: tuple[str, ...] = (
+    "grade histopronostique", "grade sbr", "sbr", "gleason", "isup", "fuhrman",
+    "fnclcc", "nottingham", "elston", "breslow", "clark", "index mitotique",
+    "mitotique", "mitose", "ptnm", "pt1", "pt2", "pt3", "pt4", "stade tnm",
+    "figo", "embole", "engainement", "metasta", "extension extra",
+    "atteinte ganglionnaire", "statut ganglionnaire", "ulceration",
+)
+# Sous-ensemble reserve a la MALIGNITE INVASIVE (a exclure aussi sur pre-cancer).
+_INVASIVE_FIELD_TERMS: tuple[str, ...] = (
+    "ptnm", "pt1", "pt2", "pt3", "pt4", "embole", "engainement", "metasta",
+    "extension extra", "marge de resection", "marges de resection",
+    "atteinte ganglionnaire", "statut ganglionnaire",
+)
 
-    SECURITE : un champ obligatoire ne doit JAMAIS concerner un autre organe ni
-    un type de prelevement incompatible. Sinon l'analyse est fausse. On supprime :
+
+def filter_alertes(
+    alertes: list[DonneeManquante],
+    organes: list[str],
+    specimen: SpecimenType,
+    contexte: str = "indetermine",
+) -> tuple[list[DonneeManquante], list[str]]:
+    """Retire les alertes (champs a verifier) hors-contexte organe/prelevement/lesion.
+
+    SECURITE : un champ obligatoire ne doit JAMAIS concerner un autre organe, un
+    type de prelevement incompatible, ni une nature de lesion incompatible. Sinon
+    l'analyse est fausse. On supprime :
     * les champs citant une classification verrouillee a un organe absent
-      (ex : Breslow demande hors melanome, Gleason hors prostate) ;
-    * les champs de piece operatoire sur une biopsie/cytologie
-      (pTNM, marges, ganglions, emboles...).
+      (Breslow hors melanome, Gleason hors prostate) ;
+    * les champs de piece operatoire sur une biopsie/cytologie (pTNM, marges...) ;
+    * les champs pronostiques TUMORAUX sur une lesion BENIGNE (grade, stade,
+      emboles, mitoses... n'ont pas de sens sur une lesion benigne/inflammatoire) ;
+    * les champs de malignite invasive sur une lesion PRE-CANCEREUSE (in situ).
     Retourne (alertes_conservees, warnings de suppression).
     """
     detected: set[str] = set(organes)
     kept: list[DonneeManquante] = []
     dropped: list[str] = []
     is_small_specimen = specimen in (SpecimenType.BIOPSIE, SpecimenType.CYTOLOGIE)
+    ctx = contexte.strip().lower()
 
     for alerte in alertes:
         text = _strip_accents_lower(f"{alerte.champ} {alerte.description}")
@@ -245,6 +269,22 @@ def filter_alertes(
             dropped.append(
                 f"Champ '{alerte.champ}' retire : reserve aux pieces operatoires, "
                 f"non applicable sur {specimen.value}."
+            )
+            continue
+
+        # 3. champ TUMORAL sur lesion benigne
+        if ctx == "benin" and any(t in text for t in _TUMORAL_FIELD_TERMS):
+            dropped.append(
+                f"Champ '{alerte.champ}' retire : champ tumoral non applicable sur "
+                f"une lesion benigne."
+            )
+            continue
+
+        # 4. champ de malignite invasive sur lesion pre-cancereuse (in situ)
+        if ctx == "pre_cancereux" and any(t in text for t in _INVASIVE_FIELD_TERMS):
+            dropped.append(
+                f"Champ '{alerte.champ}' retire : champ de malignite invasive non "
+                f"applicable sur une lesion pre-cancereuse (in situ)."
             )
             continue
 
@@ -506,8 +546,12 @@ def build_validated_report(
     alertes: list[DonneeManquante] = _extract_alertes(payload)
     warnings: list[str] = []
 
-    # SECURITE champs obligatoires : retirer tout champ hors-contexte organe/prelevement.
-    alertes, dropped = filter_alertes(alertes, detected_organes, specimen)
+    # SECURITE champs obligatoires : retirer tout champ hors-contexte
+    # organe / prelevement / nature de la lesion (tumoral vs benin).
+    from specimen_type import detecter_diagnostic_context
+
+    contexte = detecter_diagnostic_context(cr).value
+    alertes, dropped = filter_alertes(alertes, detected_organes, specimen, contexte)
     warnings += dropped
     # ANTI-FAUX-POSITIF : retirer les champs deja presents dans le CR.
     alertes, n_present = filter_present_alertes(alertes, cr)
