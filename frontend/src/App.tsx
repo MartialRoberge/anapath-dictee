@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { IrisLogo, IrisWordmark } from "./components/IrisLogo";
+import { MarcLogo, MarcWordmark } from "./components/MarcLogo";
 import { useToast } from "./components/Toast";
 import { useAuth } from "./hooks/useAuth";
 import LoginPage from "./pages/LoginPage";
@@ -111,9 +111,9 @@ function Sidebar({
       <button
         onClick={() => { setPage("app"); setActiveView("record"); }}
         className="mb-6 transition-transform hover:scale-110"
-        title="Iris"
+        title="MARC"
       >
-        <IrisLogo size={28} />
+        <MarcLogo size={28} />
       </button>
 
       {/* Nav items */}
@@ -501,7 +501,7 @@ export default function App() {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <IrisLogo size={40} className="animate-breathe" />
+          <MarcLogo size={40} className="animate-breathe" />
           <span className="text-sm text-muted-foreground">Chargement...</span>
         </div>
       </div>
@@ -539,8 +539,8 @@ export default function App() {
         <header className="flex h-14 shrink-0 items-center justify-between border-b bg-card/30 px-5">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <IrisLogo size={22} />
-              <IrisWordmark className="text-lg" />
+              <MarcLogo size={22} />
+              <MarcWordmark className="text-lg" />
             </div>
             <div className="flex items-center gap-2 hide-mobile">
               {organeDetecte && organeDetecte !== "non_determine" && (
@@ -675,7 +675,7 @@ export default function App() {
         {/* Footer */}
         <footer className="flex h-7 shrink-0 items-center justify-center border-t px-4">
           <p className="text-[0.55rem] text-muted-foreground/50">
-            Iris est un outil de productivite. Il ne constitue pas un dispositif medical (UE 2017/745). Le praticien reste seul responsable du contenu.
+            MARC est un outil de productivite. Il ne constitue pas un dispositif medical (UE 2017/745). Le praticien reste seul responsable du contenu.
           </p>
         </footer>
       </div>

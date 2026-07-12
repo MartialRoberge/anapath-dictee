@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IrisLogo } from "../components/IrisLogo";
+import { MarcLogo } from "../components/MarcLogo";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -56,13 +56,14 @@ export default function LoginPage({ onLogin, onRegister }: LoginPageProps) {
         <div className="rounded-2xl border bg-card/80 backdrop-blur-sm p-8 shadow-xl">
           {/* Brand */}
           <div className="mb-8 flex flex-col items-center gap-3">
-            <IrisLogo size={48} className="animate-float" />
-            <h1 className="text-3xl font-bold tracking-tight text-iris-700 dark:text-iris-400">
-              Iris
+            <MarcLogo size={48} className="animate-float" />
+            <h1 className="font-heading text-3xl font-extrabold tracking-tight">
+              <span className="text-iris-700 dark:text-iris-400">MAR</span>
+              <span className="text-gilbert-500">C</span>
             </h1>
             <p className="text-center text-sm text-muted-foreground leading-relaxed">
-              Comptes rendus anatomopathologiques<br />
-              structures par intelligence artificielle
+              Module d'Assistance à la Rédaction des Comptes-rendus<br />
+              <span className="text-[0.7rem] text-muted-foreground/70">une solution Gilbert · souveraine &amp; médicale</span>
             </p>
           </div>
 
@@ -151,7 +152,7 @@ export default function LoginPage({ onLogin, onRegister }: LoginPageProps) {
 
         {/* Disclaimer */}
         <p className="mt-4 text-center text-[10px] text-muted-foreground/40 leading-relaxed">
-          Iris est un outil d'aide a la redaction. Il ne constitue pas un dispositif medical.<br />
+          MARC est un outil d'aide a la redaction. Il ne constitue pas un dispositif medical.<br />
           Le praticien reste seul responsable du contenu du compte-rendu.
         </p>
       </div>

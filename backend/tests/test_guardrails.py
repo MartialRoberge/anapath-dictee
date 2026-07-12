@@ -7,8 +7,11 @@ import pytest
 from reports.guardrails import (
     GenerationParseError,
     build_validated_report,
+    filter_alertes,
     parse_llm_json,
 )
+from specimen_type import SpecimenType
+from models import DonneeManquante
 
 
 def _payload(cr: str, organe="poumon", tp="biopsie", alertes=None):
@@ -156,6 +159,53 @@ def test_tnm_not_flagged_when_dictated():
 
 
 # -- champs de base --------------------------------------------------------
+
+
+def _alerte(champ, desc=""):
+    return DonneeManquante(champ=champ, description=desc, section="microscopie")
+
+
+def test_filter_drops_wrong_organ_classification():
+    alertes = [_alerte("Indice de Breslow"), _alerte("Degre de differenciation")]
+    kept, dropped = filter_alertes(alertes, ["colon_rectum"], SpecimenType.PIECE_OPERATOIRE)
+    champs = [a.champ for a in kept]
+    assert "Indice de Breslow" not in champs
+    assert "Degre de differenciation" in champs
+    assert dropped
+
+
+def test_filter_drops_gleason_outside_prostate():
+    alertes = [_alerte("Score de Gleason")]
+    kept, _ = filter_alertes(alertes, ["sein"], SpecimenType.BIOPSIE)
+    assert kept == []
+
+
+def test_filter_keeps_gleason_for_prostate():
+    alertes = [_alerte("Score de Gleason / ISUP")]
+    kept, _ = filter_alertes(alertes, ["prostate"], SpecimenType.BIOPSIE)
+    assert len(kept) == 1
+
+
+def test_filter_drops_piece_fields_on_biopsy():
+    alertes = [_alerte("Statut pTNM"), _alerte("Marges de resection"), _alerte("Grade SBR")]
+    kept, dropped = filter_alertes(alertes, ["sein"], SpecimenType.BIOPSIE)
+    champs = [a.champ for a in kept]
+    assert "Grade SBR" in champs
+    assert "Statut pTNM" not in champs
+    assert "Marges de resection" not in champs
+
+
+def test_filter_keeps_piece_fields_on_piece():
+    alertes = [_alerte("Statut pTNM"), _alerte("Marges de resection")]
+    kept, _ = filter_alertes(alertes, ["colon_rectum"], SpecimenType.PIECE_OPERATOIRE)
+    assert len(kept) == 2
+
+
+def test_filter_no_organ_keeps_all():
+    # Sans organe détecté, on ne filtre pas par classification (mais piece-only reste).
+    alertes = [_alerte("Indice de Breslow")]
+    kept, _ = filter_alertes(alertes, [], SpecimenType.PIECE_OPERATOIRE)
+    assert len(kept) == 1
 
 
 def test_report_fields_populated():

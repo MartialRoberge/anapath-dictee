@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Star, FileText, Clock, RefreshCw, Calendar, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { IrisLogo } from "../components/IrisLogo";
+import { MarcLogo } from "../components/MarcLogo";
 import { useToast } from "../components/Toast";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
@@ -151,7 +151,7 @@ export default function HistoryPage({
         </div>
       ) : reports.length === 0 ? (
         <div className="flex flex-col items-center gap-4 py-20 text-center">
-          <IrisLogo size={48} className="opacity-20" />
+          <MarcLogo size={48} className="opacity-20" />
           <div>
             <p className="text-sm font-medium text-muted-foreground">
               Aucun compte-rendu sauvegarde

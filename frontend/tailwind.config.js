@@ -59,6 +59,15 @@ export default {
           900: "#134e4a",
           950: "#042f2e",
         },
+        // Accent de marque Gilbert (bleu souverain) — clin d'oeil a l'ecosysteme Gilbert.
+        gilbert: {
+          50: "#eef1fe",
+          100: "#dbe1fd",
+          400: "#4f6aff",
+          500: "#2140e8",
+          600: "#1b34c4",
+          navy: "#1a1a2e",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -67,7 +76,8 @@ export default {
       },
       fontFamily: {
         sans: ['"DM Sans"', "system-ui", "-apple-system", "sans-serif"],
-        display: ['"Playfair Display"', "Georgia", "serif"],
+        heading: ['"Bricolage Grotesque"', '"DM Sans"', "system-ui", "sans-serif"],
+        display: ['"Bricolage Grotesque"', '"DM Sans"', "sans-serif"],
         medical: ["Arial", "Helvetica", "Liberation Sans", "sans-serif"],
         mono: ['"JetBrains Mono"', "Consolas", "Monaco", "monospace"],
       },

@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { exportDocx, getSections } from "../services/api";
 import type { Marker } from "../services/api";
 import CodificationPanel from "./CodificationPanel";
+import { copyReportRich, markdownToPlainText } from "../lib/reportText";
 
 /* ------------------------------------------------------------------ */
 /*  Section config                                                     */
@@ -733,7 +734,7 @@ function SectionCard({
   };
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(displayContent);
+    await copyReportRich(displayContent);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -994,7 +995,7 @@ export default function ReportPanel({
 
   const handleCopyAll = async () => {
     if (!report) return;
-    await navigator.clipboard.writeText(report);
+    await copyReportRich(report);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -1022,7 +1023,7 @@ export default function ReportPanel({
 
   const handleExportTxt = () => {
     if (!report) return;
-    const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
+    const blob = new Blob([markdownToPlainText(report)], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;

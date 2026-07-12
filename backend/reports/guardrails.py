@@ -189,6 +189,70 @@ def _check_tnm_derivation(cr: str, source_text: str) -> list[str]:
     ]
 
 
+def _strip_accents_lower(s: str) -> str:
+    import unicodedata
+
+    return (
+        unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode("ascii").lower()
+    )
+
+
+# Champs reserves aux pieces operatoires (jamais attendus sur biopsie/cytologie).
+_PIECE_ONLY_FIELD_TERMS: tuple[str, ...] = (
+    "ptnm", "pt1", "pt2", "pt3", "pt4", "marge", "recoupe", "curage",
+    "ganglions examines", "ganglions preleves", "statut ganglionnaire",
+    "taille tumorale", "engainement", "embole", "crm", "mesorectum",
+    "rupture capsulaire", "effraction",
+)
+
+
+def filter_alertes(
+    alertes: list[DonneeManquante], organes: list[str], specimen: SpecimenType
+) -> tuple[list[DonneeManquante], list[str]]:
+    """Retire les alertes (champs a verifier) hors-contexte organe/prelevement.
+
+    SECURITE : un champ obligatoire ne doit JAMAIS concerner un autre organe ni
+    un type de prelevement incompatible. Sinon l'analyse est fausse. On supprime :
+    * les champs citant une classification verrouillee a un organe absent
+      (ex : Breslow demande hors melanome, Gleason hors prostate) ;
+    * les champs de piece operatoire sur une biopsie/cytologie
+      (pTNM, marges, ganglions, emboles...).
+    Retourne (alertes_conservees, warnings de suppression).
+    """
+    detected: set[str] = set(organes)
+    kept: list[DonneeManquante] = []
+    dropped: list[str] = []
+    is_small_specimen = specimen in (SpecimenType.BIOPSIE, SpecimenType.CYTOLOGIE)
+
+    for alerte in alertes:
+        text = _strip_accents_lower(f"{alerte.champ} {alerte.description}")
+
+        # 1. classification hors organe
+        wrong_class = False
+        for pattern, valid_organs, label in _CLASSIFICATION_SCOPE:
+            if pattern.search(text) and detected and detected.isdisjoint(valid_organs):
+                dropped.append(
+                    f"Champ '{alerte.champ}' retire : {label} non concerne par "
+                    f"l'organe detecte ({', '.join(organes)})."
+                )
+                wrong_class = True
+                break
+        if wrong_class:
+            continue
+
+        # 2. champ de piece operatoire sur petit prelevement
+        if is_small_specimen and any(t in text for t in _PIECE_ONLY_FIELD_TERMS):
+            dropped.append(
+                f"Champ '{alerte.champ}' retire : reserve aux pieces operatoires, "
+                f"non applicable sur {specimen.value}."
+            )
+            continue
+
+        kept.append(alerte)
+
+    return kept, dropped
+
+
 def _check_classification_scope(cr: str, organes: list[str]) -> list[str]:
     """Signale une classification citee hors de son organe (recommandation erronee)."""
     detected: set[str] = set(organes)
@@ -335,6 +399,10 @@ def build_validated_report(
 
     alertes: list[DonneeManquante] = _extract_alertes(payload)
     warnings: list[str] = []
+
+    # SECURITE champs obligatoires : retirer tout champ hors-contexte organe/prelevement.
+    alertes, dropped = filter_alertes(alertes, detected_organes, specimen)
+    warnings += dropped
 
     warnings += _check_conclusion_no_todo(cr)
     warnings += _check_negation_flags(cr, source_text)

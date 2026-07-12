@@ -19,7 +19,7 @@ interface StepDef {
 const STEPS: StepDef[] = [
   { key: "uploading", label: "Envoi de l'audio" },
   { key: "transcribing", label: "Transcription" },
-  { key: "formatting", label: "Iris Intelligence" },
+  { key: "formatting", label: "Analyse MARC" },
   { key: "done", label: "Termine" },
 ];
 
