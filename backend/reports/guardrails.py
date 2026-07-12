@@ -483,6 +483,10 @@ def strip_conclusion_markers(cr: str) -> str:
     tail = re.sub(r"\(\s*\)", "", tail)
     tail = re.sub(r"[ \t]{2,}", " ", tail)
     tail = re.sub(r"[ \t]+([.\n])", r"\1", tail)  # espace avant point/retour
+    # Lignes-puces devenues vides ("-", "-.", "- ." , "*") -> supprimees.
+    tail = re.sub(r"(?m)^\s*[-*•]\s*\.?\s*$\n?", "", tail)
+    tail = re.sub(r"\.{2,}", ".", tail)             # doubles points
+    tail = re.sub(r"\n{3,}", "\n\n", tail)          # lignes vides multiples
     return head + tail
 
 

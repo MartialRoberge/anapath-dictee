@@ -32,6 +32,15 @@ _PATTERN_A_COMPLETER: re.Pattern[str] = re.compile(
     r"\[A COMPLETER\s*:\s*([^\]]+)\]", re.IGNORECASE
 )
 
+# Termes trop generiques pour constituer a eux seuls un champ affichable
+# (un marqueur "[A COMPLETER: grade]" ou "[A COMPLETER: resultat]" est inexploitable).
+_MARQUEURS_GENERIQUES: frozenset[str] = frozenset({
+    "grade", "resultat", "resultats", "valeur", "valeurs", "score", "statut",
+    "type", "preciser", "precisez", "a", "completer", "le", "la", "les", "de",
+    "du", "des", "un", "une", "si", "realise", "realisee", "en", "et", "ou",
+    "detail", "details", "information", "donnee", "donnees",
+})
+
 # Sections connues et leur correspondance dans le rapport
 _SECTIONS_MAPPING: dict[str, list[str]] = {
     "macroscopie": ["macroscopie", "macro", "examen macroscopique"],
@@ -592,6 +601,15 @@ def extraire_marqueurs_a_completer(rapport: str) -> list[DonneeManquante]:
         if cle in noms_vus:
             continue
         noms_vus.add(cle)
+
+        # Marqueur GENERIQUE NU inexploitable ("grade", "resultat", "valeur"...) :
+        # on ne l'affiche pas au panneau (le rappel deterministe fournit le vrai
+        # champ nomme). Le "coeur" avant une parenthese doit contenir un terme non
+        # generique.
+        coeur = _normaliser_texte(description_brute.split("(")[0])
+        tokens_utiles = [t for t in coeur.split() if t not in _MARQUEURS_GENERIQUES]
+        if not tokens_utiles:
+            continue
 
         # Deviner la section depuis le contexte
         section: str = _deviner_section_depuis_contexte(rapport, match.start())
