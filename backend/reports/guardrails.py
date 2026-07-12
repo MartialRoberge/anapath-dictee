@@ -253,6 +253,112 @@ def filter_alertes(
     return kept, dropped
 
 
+# Termes generiques d'un intitule de champ (ne discriminent pas la presence).
+_FIELD_GENERIC: frozenset[str] = frozenset({
+    "statut", "type", "grade", "score", "indice", "niveau", "classification",
+    "champ", "donnee", "information", "preciser", "valeur", "resultat", "presence",
+    "evaluation", "description", "histologique", "histopronostique", "tumoral",
+    "tumorale", "obligatoire", "recommande", "complet", "detail", "detaille",
+    "caractere", "aspect", "examen", "analyse",
+    # Mots de SECTION / generiques (n'attestent pas la presence d'un champ precis)
+    "immunomarquage", "immunohistochimie", "macroscopie", "microscopie",
+    "conclusion", "cytologie", "marqueur", "marqueurs", "realise", "realises",
+    "resultats", "molecular", "moleculaire", "biologie",
+})
+
+_A_COMPLETER_REGION: re.Pattern[str] = re.compile(
+    r"\[a\s*completer[^\]]*\]", re.IGNORECASE
+)
+
+
+def _asserted_content(cr: str) -> str:
+    """Contenu AFFIRME du CR : le texte hors marqueurs [A COMPLETER]."""
+    without_blanks = _A_COMPLETER_REGION.sub(" ", cr)
+    return _strip_accents_lower(without_blanks)
+
+
+def _field_markers(champ: str) -> tuple[set[str], set[str]]:
+    """Marqueurs de presence d'un champ : (termes longs, abreviations/sigles).
+
+    Termes longs (>=3 lettres, non generiques) -> recherche par sous-chaine.
+    Abreviations (contenu entre parentheses + sigles en MAJUSCULES du libelle
+    original, ex "RE", "HER2", "SBR", "TTF1") -> recherche a limites de mots.
+    """
+    def _is_generic(t: str) -> bool:
+        # gere le pluriel (immunomarquages -> immunomarquage, marqueurs -> marqueur)
+        return t in _FIELD_GENERIC or t.rstrip("sx") in _FIELD_GENERIC
+
+    # Retirer les parentheses d'EXEMPLES / de conditions : listes d'exemples
+    # ("(ex: SOX10, Melan-A...)", "(EGFR, KRAS, etc.)") et conditions
+    # ("(si applicable)") illustrent le champ mais ne l'identifient pas -> ne
+    # servent pas a juger la presence (evite "Melan-A" matchant "melanome", etc.).
+    def _strip_paren(m: re.Match[str]) -> str:
+        inner = m.group(1).lower()
+        if ("," in inner or "etc" in inner or inner.strip().startswith(("ex", "si ", "p ex", "par ex"))):
+            return " "
+        return m.group(0)  # vrai sigle court -> conserver
+
+    champ_core = re.sub(r"\(([^)]*)\)", _strip_paren, champ)
+
+    long_tokens = {
+        t
+        for t in re.findall(r"[a-z0-9]+", _strip_accents_lower(champ_core))
+        if len(t) >= 3 and not _is_generic(t)
+    }
+    abbrevs: set[str] = set()
+    # Parentheses restantes = vrai sigle court (ex "(RE)", "(CRM)"), pas une liste.
+    for m in re.finditer(r"\(([^),]{1,8})\)", champ_core):
+        tok = re.sub(r"[^A-Za-z0-9]", "", m.group(1))
+        if tok:
+            abbrevs.add(tok.lower())
+    for tok in re.findall(r"\b[A-Z][A-Z0-9]{1,6}\b", champ_core):  # sigles majuscules
+        abbrevs.add(tok.lower())
+    abbrevs = {a for a in abbrevs if len(a) >= 2}
+    return long_tokens, abbrevs
+
+
+def _field_present(champ: str, asserted: str) -> bool:
+    """Le champ est-il deja renseigne dans le contenu affirme du CR ?
+
+    Matching par RACINE (prefixe de 4 lettres pour les mots >=6 lettres) afin de
+    capter les variantes morphologiques (mitotique/mitoses, ganglions/
+    ganglionnaire, differencie/differenciation), avec limite de mot pour eviter
+    le sur-match. Plus sensible = moins de faux positifs (biais volontaire).
+    """
+    long_tokens, abbrevs = _field_markers(champ)
+    for tok in long_tokens:
+        stem = tok[:4] if len(tok) >= 6 else tok
+        if re.search(rf"\b{re.escape(stem)}", asserted):
+            return True
+    for ab in abbrevs:
+        if re.search(rf"\b{re.escape(ab)}\b", asserted):
+            return True
+    return False
+
+
+def filter_present_alertes(
+    alertes: list[DonneeManquante], cr: str
+) -> tuple[list[DonneeManquante], int]:
+    """Elimine les FAUX POSITIFS : un champ deja present dans le CR n'est pas manquant.
+
+    Principe (robustesse face au non-determinisme du LLM) : la liste d'alertes du
+    LLM peut reclamer un champ pourtant deja dicte/present. On verifie de facon
+    DETERMINISTE si l'information est deja dans le contenu affirme du CR (hors
+    marqueurs [A COMPLETER]), y compris via l'abreviation du champ (ex "RE",
+    "HER2"). Si oui -> alerte supprimee. Biais volontaire : en cas de doute, ne PAS
+    reclamer (priorite absolue a l'absence de faux positif).
+    """
+    asserted = _asserted_content(cr)
+    kept: list[DonneeManquante] = []
+    removed = 0
+    for alerte in alertes:
+        if _field_present(alerte.champ, asserted):
+            removed += 1  # deja present -> faux positif ecarte
+            continue
+        kept.append(alerte)
+    return kept, removed
+
+
 def _check_classification_scope(cr: str, organes: list[str]) -> list[str]:
     """Signale une classification citee hors de son organe (recommandation erronee)."""
     detected: set[str] = set(organes)
@@ -403,6 +509,21 @@ def build_validated_report(
     # SECURITE champs obligatoires : retirer tout champ hors-contexte organe/prelevement.
     alertes, dropped = filter_alertes(alertes, detected_organes, specimen)
     warnings += dropped
+    # ANTI-FAUX-POSITIF : retirer les champs deja presents dans le CR.
+    alertes, n_present = filter_present_alertes(alertes, cr)
+    if n_present:
+        warnings.append(
+            f"{n_present} champ(s) deja present(s) dans le CR retire(s) des suggestions."
+        )
+    # Les alertes du LLM sont des RECOMMANDATIONS (probabilistes) : elles ne sont
+    # pas "obligatoires". Seuls les marqueurs [A COMPLETER] deterministes le sont.
+    alertes = [
+        DonneeManquante(
+            champ=a.champ, description=a.description, section=a.section,
+            obligatoire=False,
+        )
+        for a in alertes
+    ]
 
     warnings += _check_conclusion_no_todo(cr)
     warnings += _check_negation_flags(cr, source_text)

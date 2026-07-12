@@ -588,12 +588,22 @@ def extraire_marqueurs_a_completer(rapport: str) -> list[DonneeManquante]:
         # Deviner la section depuis le contexte
         section: str = _deviner_section_depuis_contexte(rapport, match.start())
 
+        # Champ CONDITIONNEL ("si realise", "si applicable"...) -> recommande, pas
+        # obligatoire : evite de sur-solliciter le pathologiste sur de l'optionnel.
+        est_conditionnel: bool = any(
+            phrase in cle
+            for phrase in (
+                "si realise", "si applicable", "si disponible", "le cas echeant",
+                "si connu", "eventuel", "si present", "si effectue", "si indique",
+            )
+        )
+
         resultats.append(
             DonneeManquante(
                 champ=description_brute,
                 description=f"Champ manquant identifie par le systeme : {description_brute}",
                 section=section,
-                obligatoire=True,
+                obligatoire=not est_conditionnel,
             )
         )
 

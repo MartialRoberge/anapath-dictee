@@ -56,7 +56,7 @@ from auth import get_current_user
 from db_models import User
 from llm.base import LLMError, LLMTimeoutError
 from reports import GeneratedReport, ReportEngine, get_report_engine, reset_report_engine
-from reports.guardrails import GenerationParseError
+from reports.guardrails import GenerationParseError, filter_present_alertes
 from routes_auth import router as auth_router
 from routes_reports import router as reports_router
 from routes_admin import router as admin_router
@@ -248,12 +248,45 @@ async def format_text(
     return _to_format_response(result)
 
 
+def _merge_donnees_manquantes(
+    deterministes: list[DonneeManquante], recommandees: list[DonneeManquante]
+) -> list[DonneeManquante]:
+    """Fusionne les champs manquants deterministes (marqueurs [A COMPLETER],
+    obligatoires) et les recommandations LLM (probabilistes), en dedupliquant :
+    un champ deja couvert par un marqueur deterministe n'est pas re-liste."""
+
+    def _norm(s: str) -> str:
+        import unicodedata
+
+        s = unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
+        return "".join(c for c in s.lower() if c.isalnum())
+
+    resultat: list[DonneeManquante] = list(deterministes)
+    vus: list[str] = [_norm(d.champ) for d in deterministes]
+    for reco in recommandees:
+        cle = _norm(reco.champ)
+        if not cle:
+            continue
+        # Dédoublonnage par inclusion : "ptnm" et "ptnmtnm8esein" sont le même champ.
+        if any(cle in v or v in cle for v in vus):
+            continue
+        resultat.append(reco)
+        vus.append(cle)
+    return resultat
+
+
 def _to_format_response(result: GeneratedReport) -> FormatResponse:
-    """Assemble la reponse API : alertes moteur + validation multi-specimens."""
-    alertes_multispec: list[DonneeManquante] = detecter_donnees_manquantes(
+    """Assemble la reponse API : marqueurs deterministes + recommandations filtrees."""
+    deterministes: list[DonneeManquante] = detecter_donnees_manquantes(
         result.cr, result.organe
     )
-    donnees_manquantes: list[DonneeManquante] = result.alertes + alertes_multispec
+    donnees_manquantes: list[DonneeManquante] = _merge_donnees_manquantes(
+        deterministes, result.alertes
+    )
+    # Passe finale anti-faux-positif : retirer du PANNEAU tout champ dont le contenu
+    # est deja present dans le CR (le blanc reste visible inline). Priorite absolue :
+    # ne jamais reclamer un element deja dicte.
+    donnees_manquantes, _ = filter_present_alertes(donnees_manquantes, result.cr)
     return FormatResponse(
         formatted_report=result.cr,
         organe_detecte=result.organe,
@@ -290,10 +323,13 @@ async def iterate_report(
     except Exception as exc:  # noqa: BLE001 - traduit en HTTPException typee
         raise _map_generation_error(exc)
 
-    alertes_multispec: list[DonneeManquante] = detecter_donnees_manquantes(
+    deterministes: list[DonneeManquante] = detecter_donnees_manquantes(
         result.cr, result.organe
     )
-    donnees_manquantes: list[DonneeManquante] = result.alertes + alertes_multispec
+    donnees_manquantes: list[DonneeManquante] = _merge_donnees_manquantes(
+        deterministes, result.alertes
+    )
+    donnees_manquantes, _ = filter_present_alertes(donnees_manquantes, result.cr)
 
     return IterationResponse(
         formatted_report=result.cr,
