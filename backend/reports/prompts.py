@@ -121,6 +121,8 @@ sous sa forme canonique. Exemples par specialite :
 - SNC : "un pé dix-neuf q"->codeletion 1p/19q ; "em ji em té"->MGMT.
 - Sarcome : "féne clcc"->FNCLCC ; "stat six"->STAT6.
 - Hemato : "algorithme de hans"->algorithme de Hans ; ébère->EBER.
+Transplantation : "c quatre d"->C4d (complement, PAS "CD4") ; "cd quatre"->CD4 ;
+"i s h l t"->ISHLT ; "banff"->Banff ; "r a i"->RAI ; "d s a"->DSA.
 Transversal : mucose/equeuse->muqueuse ; fibro-yalin->fibro-hyalin ; yaline->
 hyaline ; parenchymate->parenchymateuse ; metaganglionnaire->metastase ganglionnaire.
 En cas de doute sur un score/grade mal transcrit, ne l'invente pas : [VERIFIER].

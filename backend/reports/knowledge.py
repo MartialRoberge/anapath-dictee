@@ -47,6 +47,9 @@ _WEAK_KEYWORDS: frozenset[str] = frozenset(
         # Ambigus cou/col-uterin : "adenopathie cervicale" = ganglion du cou,
         # ne doit pas declencher col uterin ni ORL a lui seul.
         "cervical", "cervicale",
+        # Le "hile" existe au poumon, foie, rein, rate... : non discriminant seul
+        # (evitait un faux "poumon" sur un cholangiocarcinome "hilaire").
+        "hilaire", "hile", "hilaires",
     }
 )
 

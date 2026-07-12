@@ -397,6 +397,13 @@ def suggerer_adicap(rapport: str, organe_detecte: str) -> dict[str, str]:
     diagnostic = _masquer_negations(normaliser(_extraire_diagnostic(rapport)))
 
     organe_canon = canonical_organ(organe_detecte, rapport)
+    # Contexte OCULAIRE : un melanome uveal/choroidien est un melanome de l'OEIL,
+    # pas de la peau. On reroute l'organe pour ne pas coder "Peau" a tort.
+    if organe_canon in ("melanome", "peau"):
+        low = _strip_accents(rapport)
+        if any(w in low for w in ("uveal", "choroid", "oeil", "oculaire", "iris",
+                                  "ciliaire", "conjonctiv", "retino", "intraoculaire")):
+            organe_canon = "oeil"
     prelevement_code = _detecter_prelevement(texte_norm)
     technique_code = _detecter_technique(texte_norm)
     organe_code = ORGANE_APP_TO_D3.get(organe_canon)

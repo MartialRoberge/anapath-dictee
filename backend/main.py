@@ -356,8 +356,26 @@ def _polish_panel(
         s = unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
         return s.lower()
 
-    has_rectum = "rectum" in _norm(cr) or "rectal" in _norm(cr)
-    return [d for d in panel if not ("mesorect" in _norm(d.champ) and not has_rectum)]
+    low_cr = _norm(cr)
+    has_rectum = "rectum" in low_cr or "rectal" in low_cr
+    # Le grade FNCLCC ne s'applique PAS aux sarcomes a cellules rondes / pediatriques
+    # (rhabdomyosarcome, Ewing, neuroblastome... : haut grade par definition, autres
+    # systemes IRS/COG/SIOP). On retire le champ FNCLCC dans ce contexte.
+    sarcome_non_fnclcc = any(
+        w in low_cr for w in ("rhabdomyosarcome", "ewing", "neuroblastome",
+                              "embryonnaire", "desmoplastique a petites cellules",
+                              "pnet")
+    )
+
+    def _garder(d: DonneeManquante) -> bool:
+        n = _norm(d.champ)
+        if "mesorect" in n and not has_rectum:
+            return False
+        if "fnclcc" in n and sarcome_non_fnclcc:
+            return False
+        return True
+
+    return [d for d in panel if _garder(d)]
 
 
 def _to_format_response(result: GeneratedReport) -> FormatResponse:
