@@ -611,7 +611,7 @@ export default function App() {
           ) : (
           <>
           {/* Left: Recorder rail — hauteur fixe, jamais de scroll (tient en plein ecran) */}
-          <section className="flex w-[340px] shrink-0 flex-col overflow-hidden border-r bg-card/30 p-4 max-md:hidden lg:w-[380px]">
+          <section className="flex w-[340px] shrink-0 flex-col overflow-hidden border-r bg-card/30 p-4 max-lg:hidden lg:w-[380px]">
             <RecorderPanel
               rawTranscription={rawTranscription}
               report={report}
@@ -625,7 +625,7 @@ export default function App() {
           </section>
 
           {/* Center: Report canvas */}
-          <section className="flex-1 overflow-y-auto p-5 scrollbar-thin max-md:hidden">
+          <section className="flex-1 overflow-y-auto p-5 scrollbar-thin max-lg:hidden">
             <ReportPanel
               report={report}
               onReportChange={setReport}
@@ -643,8 +643,8 @@ export default function App() {
             )}
           </section>
 
-          {/* Mobile: show active view only */}
-          <div className="hidden max-md:flex max-md:flex-1 max-md:flex-col max-md:overflow-hidden">
+          {/* Mobile / tablette : une seule vue a la fois */}
+          <div className="hidden max-lg:flex max-lg:flex-1 max-lg:flex-col max-lg:overflow-hidden">
             {activeView === "record" ? (
               <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
                 <RecorderPanel

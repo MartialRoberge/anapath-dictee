@@ -181,7 +181,7 @@
   transition: width 0.2s ease;
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 1023.98px) {
   .iris-sidebar {
     display: none;
   }
@@ -194,7 +194,7 @@
   display: none;
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 1023.98px) {
   .iris-mobile-tabs {
     display: flex;
   }
@@ -394,13 +394,13 @@
 /* ============================================================
    Responsive utilities
    ============================================================ */
-@media (max-width: 767.98px) {
+@media (max-width: 1023.98px) {
   .hide-mobile {
     display: none !important;
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .show-mobile-only {
     display: none !important;
   }

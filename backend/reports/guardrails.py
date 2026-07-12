@@ -500,6 +500,17 @@ def strip_empty_table_rows(cr: str) -> str:
     return "\n".join(out)
 
 
+def cosmetic_cleanup(cr: str) -> str:
+    """Nettoyage cosmetique final du CR : puces/asterisques vides, points parasites,
+    lignes vides multiples — sans toucher au contenu."""
+    # Lignes reduites a une puce/asterisques/point isole -> supprimees.
+    cr = re.sub(r"(?m)^[ \t]*(?:[-*•]|\*{1,2})[ \t]*\.?[ \t]*$\n?", "", cr)
+    cr = re.sub(r"\.{2,}", ".", cr)                 # points parasites en serie
+    cr = re.sub(r"[ \t]+([.\n])", r"\1", cr)        # espace avant point/retour
+    cr = re.sub(r"\n{3,}", "\n\n", cr)              # trop de lignes vides
+    return cr.rstrip() + "\n"
+
+
 def strip_conclusion_markers(cr: str) -> str:
     """Retire les [A COMPLETER: ...] presents dans la CONCLUSION.
 
@@ -688,6 +699,8 @@ def build_validated_report(
     cr = strip_conclusion_markers(cr)
     # Retirer les lignes de tableau fabriquees entierement vides (ex sextant).
     cr = strip_empty_table_rows(cr)
+    # Nettoyage cosmetique final (puces/asterisques vides, points parasites).
+    cr = cosmetic_cleanup(cr)
     alertes, dropped = filter_alertes(alertes, detected_organes, specimen, contexte)
     warnings += dropped
     # ANTI-FAUX-POSITIF : retirer les champs deja presents dans le CR.

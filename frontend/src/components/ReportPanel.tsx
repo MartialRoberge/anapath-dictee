@@ -1004,7 +1004,7 @@ export default function ReportPanel({
             </Badge>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <div className="flex items-center gap-0.5 border-r pr-2 mr-1">
             <Button
               variant="ghost"
