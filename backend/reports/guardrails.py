@@ -202,7 +202,9 @@ _PIECE_ONLY_FIELD_TERMS: tuple[str, ...] = (
     "ptnm", "pt1", "pt2", "pt3", "pt4", "pn0", "pn1", "pn2", "marge", "recoupe",
     "curage", "ganglion", "sentinelle", "statut ganglionnaire",
     "taille tumorale", "engainement", "embole", "crm", "mesorectum",
-    "rupture capsulaire", "effraction",
+    "rupture capsulaire", "effraction", "vesicule seminale", "vesicules seminales",
+    "extension extraprostatique", "invasion myometriale", "extension au col",
+    "infiltration parametre",
 )
 
 

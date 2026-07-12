@@ -47,7 +47,11 @@ from models import (
     CompletudeResponse,
 )
 from export_docx import markdown_to_docx, split_report_sections
-from detection_manquantes import detecter_donnees_manquantes, calculer_score_completude
+from detection_manquantes import (
+    detecter_donnees_manquantes,
+    detecter_champs_obligatoires_manquants,
+    calculer_score_completude,
+)
 from adicap import suggerer_adicap
 from snomed import suggerer_snomed
 from config import get_settings, validate_settings_at_startup
@@ -320,26 +324,32 @@ def _safety_filter_panel(
     return filtres
 
 
-def _to_format_response(result: GeneratedReport) -> FormatResponse:
-    """Assemble la reponse API : marqueurs deterministes + recommandations filtrees."""
-    deterministes: list[DonneeManquante] = detecter_donnees_manquantes(
+def _build_panel(result: GeneratedReport) -> list[DonneeManquante]:
+    """Construit le panneau "a completer" — pipeline complet, partage format/iterate.
+
+    Sources fusionnees : (1) marqueurs [A COMPLETER] du CR (deterministes), (2)
+    RAPPEL DETERMINISTE des champs obligatoires INCa applicables absents (comble
+    les oublis du LLM sur les pieces), (3) recommandations du LLM. Puis double
+    garde : filtre de securite (hors-contexte) + anti-faux-positif (deja present).
+    """
+    marqueurs: list[DonneeManquante] = detecter_donnees_manquantes(
         result.cr, result.organe
     )
-    donnees_manquantes: list[DonneeManquante] = _merge_donnees_manquantes(
-        deterministes, result.alertes
+    obligatoires: list[DonneeManquante] = detecter_champs_obligatoires_manquants(
+        result.cr, result.organes_detectes
     )
-    # Passe finale de SECURITE : retirer du panneau final tout champ hors-contexte
-    # organe / prelevement / nature de lesion, quelle que soit sa source (LLM ou
-    # marqueur [A COMPLETER]) — un champ tumoral ne peut pas apparaitre sur du benin.
-    donnees_manquantes = _safety_filter_panel(donnees_manquantes, result)
-    # Passe finale anti-faux-positif : retirer du PANNEAU tout champ dont le contenu
-    # est deja present dans le CR (le blanc reste visible inline). Priorite absolue :
-    # ne jamais reclamer un element deja dicte.
-    donnees_manquantes, _ = filter_present_alertes(donnees_manquantes, result.cr)
+    panel = _merge_donnees_manquantes(marqueurs + obligatoires, result.alertes)
+    panel = _safety_filter_panel(panel, result)
+    panel, _ = filter_present_alertes(panel, result.cr)
+    return panel
+
+
+def _to_format_response(result: GeneratedReport) -> FormatResponse:
+    """Assemble la reponse API : marqueurs deterministes + recommandations filtrees."""
     return FormatResponse(
         formatted_report=result.cr,
         organe_detecte=result.organe,
-        donnees_manquantes=donnees_manquantes,
+        donnees_manquantes=_build_panel(result),
         warnings=result.warnings,
         organes_detectes=result.organes_detectes,
         type_prelevement=result.type_prelevement,
@@ -373,18 +383,10 @@ async def iterate_report(
     except Exception as exc:  # noqa: BLE001 - traduit en HTTPException typee
         raise _map_generation_error(exc)
 
-    deterministes: list[DonneeManquante] = detecter_donnees_manquantes(
-        result.cr, result.organe
-    )
-    donnees_manquantes: list[DonneeManquante] = _merge_donnees_manquantes(
-        deterministes, result.alertes
-    )
-    donnees_manquantes, _ = filter_present_alertes(donnees_manquantes, result.cr)
-
     return IterationResponse(
         formatted_report=result.cr,
         organe_detecte=result.organe,
-        donnees_manquantes=donnees_manquantes,
+        donnees_manquantes=_build_panel(result),
         warnings=result.warnings,
         organes_detectes=result.organes_detectes,
         type_prelevement=result.type_prelevement,

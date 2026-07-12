@@ -135,6 +135,18 @@ _INFILTRANT_KEYWORDS: list[str] = [
     "mesotheliome",
     "tumeur maligne",
     "tumeur infiltrante",
+    # Invasion d'une structure (le carcinome peut avoir un qualificatif au milieu :
+    # "adenocarcinome endometrioide infiltrant le myometre"). Marqueurs surs.
+    "infiltrant le",
+    "infiltrant la",
+    "infiltrant les",
+    "infiltre le",
+    "infiltre la",
+    "infiltre les",
+    "infiltration du myometre",
+    "infiltration de la musculeuse",
+    "franchit la musculeuse",
+    "depasse la musculeuse",
 ]
 
 _BENIN_KEYWORDS: list[str] = [

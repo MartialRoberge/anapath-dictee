@@ -360,11 +360,19 @@ def _champ_present_dans_rapport(
     """Verifie si un champ obligatoire est present dans le rapport.
 
     Un champ est considere present si AU MOINS UN de ses mots-cles de
-    detection apparait dans le texte normalise du rapport.
+    detection apparait dans le texte normalise. Les mots-cles COURTS (<=3
+    caracteres, ex "RE", "RP", "MSI") sont recherches a limites de mots pour
+    eviter les faux positifs (ex "re" contenu dans "sereuse") qui faisaient
+    croire un champ present a tort et le retiraient du rappel.
     """
     for mot_cle in champ.mots_cles_detection:
-        mot_cle_normalise: str = _normaliser_texte(mot_cle)
-        if mot_cle_normalise in rapport_normalise:
+        mot_cle_normalise: str = _normaliser_texte(mot_cle).strip()
+        if not mot_cle_normalise:
+            continue
+        if len(mot_cle_normalise) <= 3:
+            if re.search(rf"\b{re.escape(mot_cle_normalise)}\b", rapport_normalise):
+                return True
+        elif mot_cle_normalise in rapport_normalise:
             return True
     return False
 
@@ -754,3 +762,44 @@ def calculer_score_completude(
         "champs_presents": presents,
         "pourcentage": round(pourcentage, 1),
     }
+
+
+def detecter_champs_obligatoires_manquants(
+    rapport: str, organes: list[str]
+) -> list[DonneeManquante]:
+    """Rappel DETERMINISTE des champs obligatoires INCa absents du CR.
+
+    Complement du LLM (probabiliste) : pour CHAQUE organe detecte, parcourt les
+    champs obligatoires du referentiel, ne garde que ceux APPLICABLES au type de
+    prelevement et a la nature de la lesion (via ``champ_applicable`` — donc pas
+    de pTNM sur biopsie, pas de grade sur benin...), et signale ceux ABSENTS du
+    CR. Garantit le rappel des champs pronostiques reglementaires meme si le LLM
+    les a oublies, sans introduire de faux positif (double filtrage aval).
+    """
+    rapport_normalise: str = _normaliser_texte(rapport)
+    specimen: SpecimenType = detecter_specimen_type(rapport)
+    contexte: DiagnosticContext = detecter_diagnostic_context(rapport)
+
+    manquants: list[DonneeManquante] = []
+    vus: set[str] = set()
+    for organe in organes or []:
+        for champ in get_champs_obligatoires(organe):
+            if not champ.obligatoire:
+                continue
+            if not champ_applicable(champ.nom, specimen, contexte):
+                continue
+            if _champ_present_dans_rapport(champ, rapport_normalise):
+                continue
+            cle = _normaliser_texte(champ.nom)
+            if cle in vus:
+                continue
+            vus.add(cle)
+            manquants.append(
+                DonneeManquante(
+                    champ=champ.nom,
+                    description=champ.exemple_formulation or champ.description,
+                    section=champ.section,
+                    obligatoire=True,
+                )
+            )
+    return manquants
