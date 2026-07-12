@@ -1651,11 +1651,11 @@ TEMPLATE_MELANOME: TemplateOrgane = TemplateOrgane(
         ),
         ChampObligatoire(
             nom="Niveau de Clark",
-            description="Niveau anatomique d'invasion (I à V)",
+            description="Niveau anatomique d'invasion (I a V) — OBSOLETE depuis AJCC 8e",
             section="microscopie",
-            mots_cles_detection=["Clark", "niveau", "niveau de Clark", "épiderme", "derme papillaire", "derme réticulaire", "hypoderme"],
+            mots_cles_detection=["Clark", "niveau de Clark"],
             exemple_formulation="Niveau de Clark : III (derme papillaire expansif)",
-            obligatoire=True
+            obligatoire=False  # abandonne en AJCC 8e : ne plus le reclamer
         ),
         ChampObligatoire(
             nom="Ulcération",

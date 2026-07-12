@@ -56,6 +56,15 @@ PROPORTIONNALITE : la longueur du CR suit la RICHESSE de la dictee. Dictee detai
 -> restitue TOUT le detail dicte (n'appauvris pas, ne resume pas a l'exces). Dictee
 breve/telegraphique -> CR MINIMAL (diagnostic nomme + structure + champs obligatoires
 manquants en [A COMPLETER]), SANS remplissage. Ne "gonfle" jamais un cas court.
+PAS DE BLOC DE SCORES OPTIONNELS non dictes sur un cas BENIN/SIMPLE : sur une gastrite
+banale, ne cree PAS un tableau Sydney/OLGA/OLGIM a completer ; sur un cas simple, un
+seul [A COMPLETER] cible au besoin, jamais une checklist academique de sous-scores.
+MACRO DES PETITES BIOPSIES : si la macroscopie d'une biopsie/petit prelevement n'est
+pas dictee, ecris une phrase standard ("Fragments biopsiques adresses en totalite
+pour examen histologique") plutot qu'un [A COMPLETER: description macroscopique].
+PAS DE TEXTE PEDAGOGIQUE ni de recommandation generale dans le CR ("si HER2=2+, HIS
+requise", "une double lecture est recommandee", rappels de conduite) : le pathologiste
+connait son metier ; le CR s'adresse au correspondant, pas au pathologiste.
 META-COMMENTAIRE INTERDIT : n'ecris jamais de justification sur ce qui a ou n'a pas
 ete dicte ("non mentionne", "deduit de l'absence de...", "par defaut") — et ne
 contredis jamais la dictee (si "pas d'atypie" est dicte, ecris-le simplement).

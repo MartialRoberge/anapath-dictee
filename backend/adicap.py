@@ -314,7 +314,28 @@ def _detecter_prelevement(texte: str) -> str:
     return "B"
 
 
+_PROSPECTIF_MARKERS: tuple[str, ...] = (
+    "non realis", "non faite", "non fait", "non effectu", "non contributif",
+    "recommand", "a realiser", "a faire", "propose", "en cours", "a demander",
+    "a envisager", "souhaitable", "sera realis", "prevu", "complementaire prevu",
+)
+
+
+def _mask_technique_prospective(texte: str) -> str:
+    """Blanchit les clauses ou une technique est NEGATIVE ou PROSPECTIVE (ex
+    'immunohistochimie non realisee', 'PCR recommandee') pour ne pas coder une
+    technique non effectivement realisee."""
+    out: list[str] = []
+    for clause in re.split(r"([.\n;])", texte):
+        if any(m in clause for m in _PROSPECTIF_MARKERS):
+            out.append(" " * len(clause))
+        else:
+            out.append(clause)
+    return "".join(out)
+
+
 def _detecter_technique(texte: str) -> str:
+    texte = _mask_technique_prospective(texte)
     for code, kws in _TECHNIQUE_KEYWORDS.items():
         if any(k in texte for k in kws):
             return code
@@ -358,6 +379,32 @@ def _tokens(texte: str) -> set[str]:
     return {t for t in _TOKEN_RE.findall(_strip_accents(texte)) if len(t) > 2 and t not in _STOP}
 
 
+# Qualificatifs generiques : ne suffisent PAS a fonder un code lesionnel (il faut
+# aussi un terme d'ENTITE). Evite "esthesioneuroblastome bas grade" -> "NIE bas grade".
+_QUALIFIER_TOKENS: frozenset[str] = frozenset({
+    "bas", "haut", "grade", "moyennement", "bien", "peu", "differencie",
+    "differenciee", "atypique", "atypies", "moderee", "severe", "focal", "focale",
+    "diffus", "diffuse", "aigue", "aigu", "chronique", "benin", "benigne", "malin",
+    "maligne", "invasif", "invasive", "infiltrant", "infiltrante", "situ",
+})
+
+_GRADE_RE: re.Pattern[str] = re.compile(
+    r"\b(\d\s?r|bas grade|haut grade|grade\s?[i1v2-4]+|nie|pt[0-4]|stade|"
+    r"gleason|isup|figo)\b"
+)
+
+
+def _lesion_grade_non_dicte(lesion_label: str, rapport: str) -> bool:
+    """Le libelle lesionnel porte-t-il un grade/stade ABSENT du CR ? (=> differer)."""
+    label = _strip_accents(lesion_label)
+    rap = _strip_accents(rapport)
+    for m in _GRADE_RE.finditer(label):
+        token = m.group(0)
+        if token not in rap:
+            return True
+    return False
+
+
 def _match_lesion(
     diagnostic: str, organ_code: str | None, catalog: list[LesionEntry]
 ) -> tuple[LesionEntry | None, float]:
@@ -378,8 +425,13 @@ def _match_lesion(
         ekw = set(entry.kw)
         if not ekw:
             continue
-        overlap = len(ekw & diag_tokens)
+        commun = ekw & diag_tokens
+        overlap = len(commun)
         if overlap == 0:
+            continue
+        # Un match doit reposer sur au moins un terme d'ENTITE (substantif), pas
+        # seulement sur des qualificatifs ("bas grade", "atypique"...).
+        if commun and commun <= _QUALIFIER_TOKENS:
             continue
         # score = fraction des mots-cles de l'entree retrouves
         score = overlap / len(ekw)
@@ -447,6 +499,13 @@ def suggerer_adicap(rapport: str, organe_detecte: str) -> dict[str, str]:
     organe_code = ORGANE_APP_TO_D3.get(organe_canon)
 
     entry, _ = _match_lesion(diagnostic, organe_code, catalog)
+
+    # SECURITE — l'ADICAP ne peut JAMAIS etre plus affirmatif que le CR :
+    # si le libelle de l'entree porte un GRADE/STADE (1R, bas/haut grade, grade N,
+    # NIE, pT...) qui n'est PAS present dans le diagnostic, on DIFFERE (le codeur
+    # ne doit pas inventer un grade que le pathologiste n'a pas donne).
+    if entry is not None and _lesion_grade_non_dicte(entry.lesion, rapport):
+        entry = None
 
     if organe_code is None:
         organe_code_out = "XX"

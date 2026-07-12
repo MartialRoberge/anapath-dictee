@@ -500,6 +500,28 @@ def strip_empty_table_rows(cr: str) -> str:
     return "\n".join(out)
 
 
+_META_PAREN_RE: re.Pattern[str] = re.compile(r"\s*\(([^)]*)\)")
+_META_MARKERS: tuple[str, ...] = (
+    "dicte", "dictee", "mentionn", "deduit", "par defaut", "explicitement",
+    "non observe", "non evoque", "non precise", "non renseigne dans la dictee",
+    "d'apres la dictee", "selon la dictee", "non rapporte dans la dictee",
+)
+
+
+def strip_meta_comments(cr: str) -> str:
+    """Retire les META-COMMENTAIRES parenthetiques adresses au systeme, pas au
+    correspondant ("(explicitement dictee)", "(non observe)", "(par defaut)"...).
+    Ne touche PAS aux parentheses cliniques ("(3+4)", "(AIN3)", "(score 2)")."""
+
+    def _repl(m: re.Match[str]) -> str:
+        contenu = _strip_accents_lower(m.group(1))
+        if any(mk in contenu for mk in _META_MARKERS):
+            return ""
+        return m.group(0)
+
+    return _META_PAREN_RE.sub(_repl, cr)
+
+
 def cosmetic_cleanup(cr: str) -> str:
     """Nettoyage cosmetique final du CR : puces/asterisques vides, points parasites,
     lignes vides multiples — sans toucher au contenu."""
@@ -699,6 +721,8 @@ def build_validated_report(
     cr = strip_conclusion_markers(cr)
     # Retirer les lignes de tableau fabriquees entierement vides (ex sextant).
     cr = strip_empty_table_rows(cr)
+    # Retirer les meta-commentaires parenthetiques (friction praticien n°1).
+    cr = strip_meta_comments(cr)
     # Nettoyage cosmetique final (puces/asterisques vides, points parasites).
     cr = cosmetic_cleanup(cr)
     alertes, dropped = filter_alertes(alertes, detected_organes, specimen, contexte)
