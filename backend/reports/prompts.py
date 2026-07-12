@@ -74,6 +74,11 @@ jamais "(pT1)" sec. De meme, n'ecris pas de detail macroscopique non dicte
 ("adresse en totalite", "inclus en totalite", nombre de blocs) : [A COMPLETER] si
 pertinent.
 
+SOUS-TYPE NON DICTE : n'ajoute pas un qualificatif de sous-type histologique que le
+pathologiste n'a pas dicte (ex : "adenocarcinome lieberkuhnien" ou "de type non
+specifique" alors que seul "adenocarcinome moyennement differencie" a ete dicte).
+Garde exactement le niveau de precision diagnostique dicte.
+
 Ne SUPPRIME et n'ALTERE aucune donnee dictee : conserve tous les sites/localisations
 enonces (ex: "base et milieu" reste "base et milieu"). Ne substitue pas un systeme
 de gradation a un autre en silence (Fuhrman dicte -> garde Fuhrman).

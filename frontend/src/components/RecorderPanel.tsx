@@ -147,18 +147,25 @@ export default function RecorderPanel({
     stopRecording();
   }, [state, stopRecording]);
 
+  const isTypingTarget = (target: EventTarget | null): boolean => {
+    const el = target as HTMLElement | null;
+    if (!el) return false;
+    const tag = el.tagName;
+    // Ne jamais declencher la dictee quand on ecrit : champ texte OU
+    // zone editable au curseur (contentEditable du compte-rendu).
+    return tag === "TEXTAREA" || tag === "INPUT" || el.isContentEditable;
+  };
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.code !== "Space" || e.repeat) return;
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "TEXTAREA" || tag === "INPUT") return;
+      if (isTypingTarget(e.target)) return;
       e.preventDefault();
       handleStart();
     };
     const onKeyUp = (e: KeyboardEvent) => {
       if (e.code !== "Space") return;
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "TEXTAREA" || tag === "INPUT") return;
+      if (isTypingTarget(e.target)) return;
       e.preventDefault();
       handleStop();
     };

@@ -39,6 +39,7 @@ _MARQUEURS_GENERIQUES: frozenset[str] = frozenset({
     "type", "preciser", "precisez", "a", "completer", "le", "la", "les", "de",
     "du", "des", "un", "une", "si", "realise", "realisee", "en", "et", "ou",
     "detail", "details", "information", "donnee", "donnees",
+    "pourcentage", "pourcentages", "intensite", "positivite", "proportion",
 })
 
 # Sections connues et leur correspondance dans le rapport
