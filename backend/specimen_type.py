@@ -149,6 +149,24 @@ _INFILTRANT_KEYWORDS: list[str] = [
     "depasse la musculeuse",
 ]
 
+# Racines de MALIGNITE (invasive par defaut hors "in situ", traite en amont).
+_MALIGNANCY_ROOTS: list[str] = [
+    "carcinome",
+    "adenocarcinome",
+    "melanome",
+    "sarcome",
+    "lymphome",
+    "seminome",
+    "mesotheliome",
+    "glioblastome",
+    "carcinose",
+    "chondrosarcome",
+    "osteosarcome",
+    "leiomyosarcome",
+    "carcinome epidermoide",
+    "carcinome urothelial",
+]
+
 _BENIN_KEYWORDS: list[str] = [
     "absence de malignite",
     "absence de dysplasie",
@@ -289,10 +307,18 @@ def detecter_diagnostic_context(rapport: str) -> DiagnosticContext:
     if _contient_hors_negation(texte, _INFILTRANT_KEYWORDS):
         return DiagnosticContext.INFILTRANT
 
-    # Pre-cancereux
+    # Pre-cancereux (in situ / dysplasie) — AVANT la malignite generique, pour
+    # que "carcinome in situ" ne soit pas classe infiltrant.
     for kw in _PRE_CANCEREUX_KEYWORDS:
         if _normaliser(kw) in texte:
             return DiagnosticContext.PRE_CANCEREUX
+
+    # Malignite GENERIQUE : un carcinome/adenocarcinome/melanome/sarcome/lymphome
+    # est infiltrant meme si le mot "infiltrant" n'est pas dicte (ex "adenocarcinome
+    # prostatique Gleason 7"). L'in situ etant deja traite au-dessus, tout carcinome
+    # restant est invasif. Recherche HORS negation.
+    if _contient_hors_negation(texte, _MALIGNANCY_ROOTS):
+        return DiagnosticContext.INFILTRANT
 
     # Benin
     for kw in _BENIN_KEYWORDS:

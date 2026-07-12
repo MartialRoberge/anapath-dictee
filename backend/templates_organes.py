@@ -557,11 +557,11 @@ TEMPLATE_PROSTATE: TemplateOrgane = TemplateOrgane(
             obligatoire=True
         ),
         ChampObligatoire(
-            nom="Pourcentage de chaque pattern de Gleason",
-            description="Proportion de chaque grade de Gleason (patterns 3, 4, 5)",
+            nom="Pourcentage de pattern 4/5 et architecture cribriforme",
+            description="Proportion de chaque grade (patterns 3, 4, 5) et présence d'une architecture cribriforme (ISUP 2019)",
             section="microscopie",
-            mots_cles_detection=["pourcentage", "pattern", "proportion", "% pattern 4", "% pattern 5", "tertiaire"],
-            exemple_formulation="Pattern 3 : 60%, pattern 4 : 35%, pattern 5 : 5%",
+            mots_cles_detection=["pourcentage", "pattern", "proportion", "% pattern 4", "% pattern 5", "tertiaire", "cribriforme"],
+            exemple_formulation="Pattern 3 : 60%, pattern 4 : 35% (dont cribriforme), pattern 5 : 5%",
             obligatoire=True
         ),
         ChampObligatoire(
