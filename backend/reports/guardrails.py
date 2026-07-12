@@ -222,6 +222,10 @@ _INVASIVE_FIELD_TERMS: tuple[str, ...] = (
     "engainement", "metasta", "extension extra", "marge de resection",
     "marges de resection", "atteinte ganglionnaire", "statut ganglionnaire",
     "ganglion", "sentinelle", "invasion",
+    # Grades du carcinome INFILTRANT : non applicables a une lesion in situ
+    # (le grade NUCLEAIRE de l'in situ, lui, reste autorise).
+    "grade sbr", "grade histopronostique", "sbr", "elston", "nottingham",
+    "scarff", "fnclcc",
 )
 
 

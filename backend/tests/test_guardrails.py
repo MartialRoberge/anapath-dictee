@@ -251,3 +251,15 @@ def test_report_fields_populated():
     assert r.type_prelevement == "biopsie"
     assert r.provider == "mistral"
     assert r.organes_detectes == ["canal_anal"]
+
+
+def test_filter_grade_sbr_dropped_on_precancer_but_keeps_nuclear_grade():
+    # CCIS (in situ) : le grade SBR/Elston du carcinome INFILTRANT ne s'applique
+    # pas, mais le grade NUCLEAIRE de l'in situ reste legitime.
+    alertes = [_alerte("Grade SBR/Elston"), _alerte("Grade nucleaire du CCIS"),
+               _alerte("Statut RE")]
+    kept, _ = filter_alertes(alertes, ["sein"], SpecimenType.PIECE_OPERATOIRE, "pre_cancereux")
+    champs = [a.champ for a in kept]
+    assert "Grade SBR/Elston" not in champs
+    assert "Grade nucleaire du CCIS" in champs
+    assert "Statut RE" in champs

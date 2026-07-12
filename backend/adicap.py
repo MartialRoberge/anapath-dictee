@@ -121,6 +121,29 @@ ORGANE_APP_TO_D3: dict[str, str | None] = {
     "oeil": "OE",
 }
 
+# Libelle d'organe AFFICHE (anatomique, correct) — decouple des etiquettes de la
+# bible qui sont parfois specifiques a une lesion (ex GS n'a que "Gynecomastie"
+# alors que GS = glande mammaire). Evite d'afficher un organe absurde au medecin.
+ORGANE_DISPLAY: dict[str, str] = {
+    "poumon": "Poumon", "bronche": "Bronche", "plevre": "Plevre",
+    "colon_rectum": "Colon-rectum", "rectum": "Rectum", "estomac": "Estomac",
+    "oesophage": "Oesophage", "duodenum": "Duodenum", "appendice": "Appendice",
+    "canal_anal": "Canal anal / anus", "anus": "Canal anal / anus", "foie": "Foie",
+    "vesicule_biliaire": "Vesicule biliaire", "pancreas": "Pancreas",
+    "prostate": "Prostate", "testicule": "Testicule", "vessie": "Vessie",
+    "rein": "Rein", "ovaire": "Ovaire", "endometre": "Endometre / uterus",
+    "col_uterin": "Col uterin", "vulve": "Vulve", "vagin": "Vagin",
+    "thyroide": "Thyroide", "surrenale": "Surrenale", "parathyroide": "Parathyroide",
+    "ganglion": "Ganglion lymphatique", "lymphome": "Ganglion lymphatique",
+    "moelle_osseuse": "Moelle osseuse", "rate": "Rate",
+    "melanome": "Peau", "peau": "Peau",
+    "orl_tete_cou": "Tete et cou (ORL)", "larynx": "Larynx", "pharynx": "Pharynx",
+    "amygdale": "Amygdale", "glande_salivaire": "Glande salivaire",
+    "sein": "Sein", "sarcome": "Tissus mous", "os": "Os / articulation",
+    "systeme_nerveux_central": "Systeme nerveux central", "meninge": "Meninge",
+    "oeil": "Oeil",
+}
+
 # Code lesionnel differe (non code par securite).
 LESION_DIFFEREE: str = "____"
 
@@ -369,7 +392,7 @@ def suggerer_adicap(rapport: str, organe_detecte: str) -> dict[str, str]:
     """
     from organ_utils import canonical_organ
 
-    organ_codes, catalog = _load_reference()
+    _organ_codes, catalog = _load_reference()
     texte_norm = normaliser(rapport)
     diagnostic = _masquer_negations(normaliser(_extraire_diagnostic(rapport)))
 
@@ -385,8 +408,8 @@ def suggerer_adicap(rapport: str, organe_detecte: str) -> dict[str, str]:
         organe_label = "Organe a preciser (code D3 non disponible)"
     else:
         organe_code_out = organe_code
-        labels = organ_codes.get(organe_code, {}).get("labels", [])
-        organe_label = labels[0] if labels else organe_detecte
+        # Libelle anatomique correct en priorite ; la bible n'est qu'un fallback.
+        organe_label = ORGANE_DISPLAY.get(organe_canon) or organe_detecte
 
     if entry is not None:
         lesion_code = entry.lesion_code

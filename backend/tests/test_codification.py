@@ -117,3 +117,18 @@ def test_a_completer_marker_detected():
     cr = "**Macroscopie :**\nTaille [A COMPLETER: dimensions].\n**__CONCLUSION :__**\n**x**"
     alertes = detecter_donnees_manquantes(cr, "poumon")
     assert any("completer" in a.champ.lower() or a.champ for a in alertes) or alertes == []
+
+
+# -- Libelle d'organe ADICAP correct (bug "Gynecomastie"/"Bourgeon charnu") --
+
+
+def test_adicap_organe_label_sein_pas_gynecomastie():
+    r = suggerer_adicap("carcinome canalaire infiltrant du sein droit", "sein")
+    assert r["organe"] == "Sein"
+    assert "gyneco" not in r["organe"].lower()
+
+
+def test_adicap_organe_label_melanome_pas_bourgeon_charnu():
+    r = suggerer_adicap("melanome cutane du dos, Breslow 1.2 mm", "melanome")
+    assert r["organe"] == "Peau"
+    assert "bourgeon" not in r["organe"].lower()
