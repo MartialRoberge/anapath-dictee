@@ -4,6 +4,8 @@ import httpx
 
 from config import get_settings
 from vocabulaire_acp import get_context_bias
+from reports.retry import with_retry
+from llm.base import LLMTransientError
 
 VOXTRAL_API_URL: str = "https://api.mistral.ai/v1/audio/transcriptions"
 
@@ -16,6 +18,14 @@ def _get_httpx_client() -> httpx.AsyncClient:
     if _httpx_client is None:
         _httpx_client = httpx.AsyncClient(timeout=180.0)
     return _httpx_client
+
+
+async def close_httpx_client() -> None:
+    """Ferme le client httpx STT au shutdown (evite une fuite de ressource)."""
+    global _httpx_client
+    if _httpx_client is not None:
+        await _httpx_client.aclose()
+        _httpx_client = None
 
 MIME_TYPES: dict[str, str] = {
     ".webm": "audio/webm",
@@ -85,13 +95,26 @@ async def transcribe_audio(audio_bytes: bytes, filename: str) -> str:
         form_data["context_bias"] = context_csv
 
     client = _get_httpx_client()
-    response: httpx.Response = await client.post(
-        VOXTRAL_API_URL,
-        headers={"Authorization": f"Bearer {settings.voxtral_api_key}"},
-        files={"file": (filename, audio_bytes, mime_type)},
-        data=form_data,
-    )
-    response.raise_for_status()
-    data: dict[str, str] = response.json()
 
-    return data.get("text", "")
+    async def _call() -> str:
+        try:
+            response: httpx.Response = await client.post(
+                VOXTRAL_API_URL,
+                headers={"Authorization": f"Bearer {settings.voxtral_api_key}"},
+                files={"file": (filename, audio_bytes, mime_type)},
+                data=form_data,
+            )
+            response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            # 5xx et 429 = transitoires (retry) ; 4xx = definitif (remonte tel quel)
+            if exc.response.status_code >= 500 or exc.response.status_code == 429:
+                raise LLMTransientError(f"Voxtral {exc.response.status_code}") from exc
+            raise
+        except (httpx.TimeoutException, httpx.TransportError) as exc:
+            raise LLMTransientError(f"Voxtral connexion : {exc}") from exc
+        data: dict[str, str] = response.json()
+        return data.get("text", "")
+
+    return await with_retry(
+        _call, max_retries=2, base_delay=1.0, label="transcription Voxtral"
+    )

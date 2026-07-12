@@ -54,7 +54,7 @@ from config import get_settings, validate_settings_at_startup
 from database import close_engine, create_tables
 from auth import get_current_user
 from db_models import User
-from llm.base import LLMError, LLMTimeoutError
+from llm.base import LLMError, LLMTimeoutError, LLMTransientError
 from reports import GeneratedReport, ReportEngine, get_report_engine, reset_report_engine
 from reports.guardrails import GenerationParseError, filter_present_alertes
 from routes_auth import router as auth_router
@@ -63,7 +63,7 @@ from routes_admin import router as admin_router
 
 logger = logging.getLogger("anapath.api")
 
-limiter = Limiter(key_func=get_remote_address)
+from rate_limit import limiter  # limiteur partage (evite l'import circulaire)
 
 
 # ---------------------------------------------------------------------------
@@ -71,15 +71,33 @@ limiter = Limiter(key_func=get_remote_address)
 # ---------------------------------------------------------------------------
 
 
+def _configure_logging() -> None:
+    """Logging structure au demarrage (sinon les logger.info restent muets)."""
+    import logging
+    import os
+
+    level = os.environ.get("LOG_LEVEL", "INFO").upper()
+    logging.basicConfig(
+        level=getattr(logging, level, logging.INFO),
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+        force=True,
+    )
+
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     """Gestion du cycle de vie de l'application."""
+    _configure_logging()
     validate_settings_at_startup()
     await create_tables()
     yield
     engine = reset_report_engine()
     if engine is not None:
         await engine.aclose()
+    # Fermeture du client STT (evite une fuite de ressource au shutdown).
+    from transcription import close_httpx_client
+
+    await close_httpx_client()
     await close_engine()
 
 
@@ -189,6 +207,12 @@ async def transcribe(
 
     try:
         transcript = await engine.transcribe(audio_bytes, filename)
+    except LLMTransientError as exc:
+        # Voxtral indisponible apres retries -> 503 (reessayer plus tard)
+        raise HTTPException(
+            status_code=503,
+            detail=f"Service de transcription momentanement indisponible : {exc}",
+        )
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=502, detail=f"Erreur transcription : {exc}"

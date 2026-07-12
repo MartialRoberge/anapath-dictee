@@ -7,7 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.requests import Request
 
+from rate_limit import limiter
 from auth import (
     hash_password,
     verify_password,
@@ -71,7 +73,9 @@ class UserResponse(BaseModel):
 
 
 @router.post("/register", response_model=TokenResponse)
+@limiter.limit("5/minute")
 async def register(
+    request: Request,
     req: RegisterRequest,
     db: Annotated[AsyncSession | None, Depends(get_db_session)],
 ) -> TokenResponse:
@@ -106,7 +110,9 @@ async def register(
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit("10/minute")
 async def login(
+    request: Request,
     req: LoginRequest,
     db: Annotated[AsyncSession | None, Depends(get_db_session)],
 ) -> TokenResponse:
@@ -134,7 +140,9 @@ async def login(
 
 
 @router.post("/refresh", response_model=TokenResponse)
+@limiter.limit("20/minute")
 async def refresh(
+    request: Request,
     req: RefreshRequest,
     db: Annotated[AsyncSession | None, Depends(get_db_session)],
 ) -> TokenResponse:

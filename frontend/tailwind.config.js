@@ -123,9 +123,9 @@ export default {
           "0%, 100%": { transform: "scale(1)" },
           "50%": { transform: "scale(1.04)" },
         },
-        "leaf-sway": {
-          "0%, 100%": { transform: "rotate(-2deg)" },
-          "50%": { transform: "rotate(2deg)" },
+        "pulse-brain": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.55", transform: "scale(0.9)" },
         },
       },
       animation: {
@@ -136,7 +136,7 @@ export default {
         "slide-right": "slide-right 0.25s ease-out forwards",
         "toast-in": "toast-in 0.3s ease-out forwards",
         "breathe": "breathe 4s ease-in-out infinite",
-        "leaf-sway": "leaf-sway 8s ease-in-out infinite",
+        "pulse-brain": "pulse-brain 1.4s ease-in-out infinite",
       },
     },
   },

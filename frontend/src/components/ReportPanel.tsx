@@ -15,6 +15,8 @@ import {
   FileType,
   Undo2,
   Redo2,
+  Mic,
+  Upload,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
@@ -200,7 +202,7 @@ function AcpMissingField({
 
   if (editing) {
     return (
-      <span className="inline-flex items-center gap-1 rounded border border-amber-500 bg-amber-500/10 px-1.5 py-0.5">
+      <span className="inline-flex items-center gap-1 rounded border border-warning bg-warning/10 px-1.5 py-0.5">
         <input
           type="text"
           value={value}
@@ -209,13 +211,13 @@ function AcpMissingField({
             if (e.key === "Enter") handleSubmit();
             if (e.key === "Escape") { setEditing(false); setValue(""); }
           }}
-          className="w-40 bg-transparent text-sm text-foreground outline-none placeholder:text-amber-400/50"
+          className="w-40 bg-transparent text-sm text-foreground outline-none placeholder:text-warning/50"
           placeholder={fieldName}
           autoFocus
         />
         <button
           onClick={handleSubmit}
-          className="text-xs font-bold text-emerald-400 hover:text-emerald-300"
+          className="text-xs font-bold text-success hover:text-success/80"
         >
           OK
         </button>
@@ -230,10 +232,10 @@ function AcpMissingField({
   }
 
   return (
-    <span className="group/field inline-flex items-center gap-1 rounded border border-dashed border-amber-500 bg-amber-500/10 px-2 py-0.5 text-amber-300 dark:text-amber-400">
+    <span className="group/field inline-flex items-center gap-1 rounded border border-dashed border-warning bg-warning/10 px-2 py-0.5 text-warning">
       <button
         onClick={() => setEditing(true)}
-        className="cursor-pointer hover:text-amber-200"
+        className="cursor-pointer hover:text-warning/80"
         title="Cliquer pour remplir"
       >
         {fieldName}
@@ -241,7 +243,7 @@ function AcpMissingField({
       {onDismiss && (
         <button
           onClick={() => onDismiss(fieldName)}
-          className="ml-0.5 text-xs opacity-0 transition-opacity group-hover/field:opacity-100 hover:text-red-400"
+          className="ml-0.5 text-xs opacity-0 transition-opacity group-hover/field:opacity-100 hover:text-destructive"
           title="Supprimer ce champ"
         >
           &times;
@@ -1037,15 +1039,35 @@ export default function ReportPanel({
     return buildOrderedSections(sections);
   }, [sections]);
 
-  // Empty state
+  // Empty state — accueil invitant à dicter
   if (!report) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <FileText className="h-10 w-10 text-muted-foreground/30" />
-          <p className="max-w-[280px] text-sm text-muted-foreground">
-            Le compte-rendu formate apparaitra ici apres transcription.
-          </p>
+      <div className="flex h-full items-center justify-center p-6">
+        <div className="flex max-w-[360px] flex-col items-center gap-5 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <FileText className="h-8 w-8" />
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="font-heading text-lg font-bold tracking-tight text-foreground">
+              Votre compte-rendu apparaitra ici
+            </h2>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Dictez votre observation ou importez un fichier audio depuis le
+              panneau de gauche&nbsp;: MARC structure le compte-rendu
+              automatiquement.
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <Mic className="h-3.5 w-3.5 text-primary" />
+              Maintenir Espace
+            </span>
+            <span className="h-3 w-px bg-border" />
+            <span className="inline-flex items-center gap-1.5">
+              <Upload className="h-3.5 w-3.5 text-primary" />
+              Importer un audio
+            </span>
+          </div>
         </div>
       </div>
     );

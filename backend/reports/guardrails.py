@@ -199,8 +199,8 @@ def _strip_accents_lower(s: str) -> str:
 
 # Champs reserves aux pieces operatoires (jamais attendus sur biopsie/cytologie).
 _PIECE_ONLY_FIELD_TERMS: tuple[str, ...] = (
-    "ptnm", "pt1", "pt2", "pt3", "pt4", "marge", "recoupe", "curage",
-    "ganglions examines", "ganglions preleves", "statut ganglionnaire",
+    "ptnm", "pt1", "pt2", "pt3", "pt4", "pn0", "pn1", "pn2", "marge", "recoupe",
+    "curage", "ganglion", "sentinelle", "statut ganglionnaire",
     "taille tumorale", "engainement", "embole", "crm", "mesorectum",
     "rupture capsulaire", "effraction",
 )
@@ -215,11 +215,13 @@ _TUMORAL_FIELD_TERMS: tuple[str, ...] = (
     "figo", "embole", "engainement", "metasta", "extension extra",
     "atteinte ganglionnaire", "statut ganglionnaire", "ulceration",
 )
-# Sous-ensemble reserve a la MALIGNITE INVASIVE (a exclure aussi sur pre-cancer).
+# Sous-ensemble reserve a la MALIGNITE INVASIVE (a exclure aussi sur pre-cancer /
+# in situ, qui ne metastase pas et n'a pas de statut ganglionnaire ni de pTNM).
 _INVASIVE_FIELD_TERMS: tuple[str, ...] = (
-    "ptnm", "pt1", "pt2", "pt3", "pt4", "embole", "engainement", "metasta",
-    "extension extra", "marge de resection", "marges de resection",
-    "atteinte ganglionnaire", "statut ganglionnaire",
+    "ptnm", "pt1", "pt2", "pt3", "pt4", "pn0", "pn1", "pn2", "embole",
+    "engainement", "metasta", "extension extra", "marge de resection",
+    "marges de resection", "atteinte ganglionnaire", "statut ganglionnaire",
+    "ganglion", "sentinelle", "invasion",
 )
 
 

@@ -26,11 +26,16 @@ import re
 import sys
 import unicodedata
 
-from main import _merge_donnees_manquantes
+from main import _merge_donnees_manquantes, _safety_filter_panel
 from detection_manquantes import detecter_donnees_manquantes
-from reports.guardrails import _field_present, _asserted_content, filter_present_alertes
+from reports.guardrails import filter_present_alertes
 from reports.local_engine import LocalReportEngine
 from adicap import suggerer_adicap
+
+# Mots trop generiques pour discriminer un champ (evite les faux matches).
+_GENERIC = {"score", "statut", "grade", "type", "index", "panel", "classification",
+            "niveau", "presence", "absence", "resultat", "evaluation", "standard",
+            "complementaire", "lymphatiques", "tumorale", "tumoral", "histologique"}
 
 
 def _norm(s: str) -> str:
@@ -39,10 +44,13 @@ def _norm(s: str) -> str:
 
 
 def _field_in_panel(needle: str, panel_champs: list[str]) -> bool:
-    """Un champ-cible est-il présent dans le panneau (matching souple par tokens)."""
-    toks = {t for t in re.findall(r"[a-z0-9]+", _norm(needle)) if len(t) >= 4}
+    """Un champ-cible est-il présent dans le panneau ? Matching sur les tokens
+    DISCRIMINANTS uniquement (on ignore 'score', 'statut', 'grade'... qui
+    provoquent de faux appariements type 'score de Gleason' ~ 'score de TRG')."""
+    toks = {t for t in re.findall(r"[a-z0-9]+", _norm(needle))
+            if len(t) >= 4 and t not in _GENERIC}
     if not toks:
-        toks = {_norm(needle)}
+        toks = {t for t in re.findall(r"[a-z0-9]+", _norm(needle)) if len(t) >= 3}
     for champ in panel_champs:
         cn = _norm(champ)
         if any(t in cn for t in toks):
@@ -61,6 +69,9 @@ async def run(cases_path: str, out_path: str) -> int:
             report = await engine.generate(dictee)
             deterministes = detecter_donnees_manquantes(report.cr, report.organe)
             panel = _merge_donnees_manquantes(deterministes, report.alertes)
+            # Chemin de production EXACT : filtre de sécurité (organe/prélèvement/
+            # nature de lésion) PUIS anti-faux-positif.
+            panel = _safety_filter_panel(panel, report)
             panel, _ = filter_present_alertes(panel, report.cr)
             panel_champs = [a.champ for a in panel]
             adicap = suggerer_adicap(report.cr, report.organe)

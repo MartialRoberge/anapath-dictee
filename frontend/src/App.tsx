@@ -10,6 +10,7 @@ import {
   ChevronRight,
   ListChecks,
   Plus,
+  LayoutPanelLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -57,7 +58,6 @@ function useTheme() {
 function Sidebar({
   page,
   setPage,
-  activeView,
   setActiveView,
   hasReport,
   isAdmin,
@@ -67,7 +67,6 @@ function Sidebar({
 }: {
   page: Page;
   setPage: (p: Page) => void;
-  activeView: AppView;
   setActiveView: (v: AppView) => void;
   hasReport: boolean;
   isAdmin: boolean;
@@ -75,23 +74,18 @@ function Sidebar({
   completionCount: number;
   onOpenDrawer: () => void;
 }) {
+  // Espace de travail unifié : un seul point d'entrée « Atelier »
+  // (le recorder et le compte-rendu cohabitent dans la même vue).
   const items = [
     {
-      icon: Mic,
-      label: "Dicter",
-      active: page === "app" && activeView === "record",
+      icon: LayoutPanelLeft,
+      label: "Atelier",
+      active: page === "app",
       onClick: () => { setPage("app"); setActiveView("record"); },
     },
     {
-      icon: FileText,
-      label: "Rapport",
-      active: page === "app" && activeView === "report",
-      onClick: () => { setPage("app"); setActiveView("report"); },
-      disabled: !hasReport,
-    },
-    {
       icon: ListChecks,
-      label: "Champs",
+      label: "Champs obligatoires",
       active: false,
       onClick: onOpenDrawer,
       disabled: !hasReport,
@@ -194,11 +188,30 @@ function MobileNav({
   page: Page;
   setPage: (p: Page) => void;
 }) {
-  const tabs = [
-    { icon: Mic, label: "Dicter", view: "record" as AppView, onClick: () => { setPage("app"); setActiveView("record"); } },
-    { icon: FileText, label: "Rapport", view: "report" as AppView, onClick: () => { setPage("app"); setActiveView("report"); }, disabled: !hasReport },
-    { icon: ListChecks, label: "Champs", view: null, onClick: onOpenDrawer, disabled: !hasReport, badge: completionCount },
-    { icon: History, label: "Historique", view: null, onClick: () => setPage("history") },
+  // Espace de travail unifié : un seul bouton contextuel qui bascule
+  // entre la dictée et le compte-rendu (ou ramène à l'atelier).
+  let contextual: { icon: typeof Mic; label: string; active: boolean; onClick: () => void };
+  if (page !== "app") {
+    contextual = { icon: LayoutPanelLeft, label: "Atelier", active: false, onClick: () => setPage("app") };
+  } else if (activeView === "report") {
+    contextual = { icon: Mic, label: "Dicter", active: false, onClick: () => setActiveView("record") };
+  } else if (hasReport) {
+    contextual = { icon: FileText, label: "Voir le CR", active: false, onClick: () => setActiveView("report") };
+  } else {
+    contextual = { icon: Mic, label: "Dicter", active: true, onClick: () => setActiveView("record") };
+  }
+
+  const tabs: Array<{
+    icon: typeof Mic;
+    label: string;
+    active: boolean;
+    onClick: () => void;
+    disabled?: boolean;
+    badge?: number;
+  }> = [
+    contextual,
+    { icon: ListChecks, label: "Champs", active: false, onClick: onOpenDrawer, disabled: !hasReport, badge: completionCount },
+    { icon: History, label: "Historique", active: page === "history", onClick: () => setPage("history") },
   ];
 
   return (
@@ -211,10 +224,7 @@ function MobileNav({
             disabled={tab.disabled}
             className={`
               relative flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[10px] font-medium transition-all
-              ${(page === "app" && tab.view === activeView)
-                ? "text-primary"
-                : "text-muted-foreground"
-              }
+              ${tab.active ? "text-primary" : "text-muted-foreground"}
               ${tab.disabled ? "opacity-30 pointer-events-none" : ""}
             `}
           >
@@ -524,7 +534,6 @@ export default function App() {
       <Sidebar
         page={page}
         setPage={setPage}
-        activeView={activeView}
         setActiveView={setActiveView}
         hasReport={report !== null}
         isAdmin={user.role === "admin"}
@@ -609,8 +618,8 @@ export default function App() {
             </section>
           ) : (
           <>
-          {/* Left: Recorder */}
-          <section className="iris-leaves-bg w-[380px] shrink-0 overflow-y-auto border-r p-4 scrollbar-thin max-md:hidden">
+          {/* Left: Recorder rail — toujours accessible */}
+          <section className="w-[380px] shrink-0 overflow-y-auto border-r bg-card/30 p-4 scrollbar-thin max-md:hidden">
             <RecorderPanel
               rawTranscription={rawTranscription}
               report={report}
@@ -623,8 +632,8 @@ export default function App() {
             />
           </section>
 
-          {/* Center: Report */}
-          <section className="iris-leaves-bg iris-leaves-bg-subtle flex-1 overflow-y-auto p-5 scrollbar-thin">
+          {/* Center: Report canvas */}
+          <section className="flex-1 overflow-y-auto p-5 scrollbar-thin max-md:hidden">
             <ReportPanel
               report={report}
               onReportChange={setReport}

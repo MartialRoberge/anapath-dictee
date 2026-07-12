@@ -42,10 +42,6 @@ function truncateFilename(name: string, max: number = 28): string {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Floating botanical leaves (CSS animated SVG)                       */
-/* ------------------------------------------------------------------ */
-
-/* ------------------------------------------------------------------ */
 /*  Main component                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -250,7 +246,7 @@ export default function RecorderPanel({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Push-to-talk zone — full width, with floating botanical elements */}
+      {/* Push-to-talk zone — full width, halo de marque au survol */}
       <div
         className={cn(
           "marc-aurora relative flex h-[100px] cursor-pointer select-none items-center justify-center overflow-hidden rounded-2xl border-2 transition-all",
