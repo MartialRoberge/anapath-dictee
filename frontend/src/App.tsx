@@ -101,17 +101,9 @@ function Sidebar({
 
   return (
     <aside className="iris-sidebar flex flex-col items-center border-r bg-card/50 py-4 hide-mobile">
-      {/* Logo */}
-      <button
-        onClick={() => { setPage("app"); setActiveView("record"); }}
-        className="mb-6 transition-transform hover:scale-110"
-        title="MARC"
-      >
-        <MarcLogo size={28} />
-      </button>
-
+      {/* Logo unique dans le header : pas de doublon ici. */}
       {/* Nav items */}
-      <nav className="flex flex-1 flex-col items-center gap-1">
+      <nav className="mt-1 flex flex-1 flex-col items-center gap-1">
         {items.map((item) => (
           <button
             key={item.label}
@@ -618,8 +610,8 @@ export default function App() {
             </section>
           ) : (
           <>
-          {/* Left: Recorder rail — toujours accessible */}
-          <section className="w-[380px] shrink-0 overflow-y-auto border-r bg-card/30 p-4 scrollbar-thin max-md:hidden">
+          {/* Left: Recorder rail — hauteur fixe, jamais de scroll (tient en plein ecran) */}
+          <section className="flex w-[340px] shrink-0 flex-col overflow-hidden border-r bg-card/30 p-4 max-md:hidden lg:w-[380px]">
             <RecorderPanel
               rawTranscription={rawTranscription}
               report={report}

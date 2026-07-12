@@ -490,7 +490,10 @@ def strip_empty_table_rows(cr: str) -> str:
             def _empty(c: str) -> bool:
                 cc = _MARKER_RE.sub("", c)  # retire [A COMPLETER]
                 cc = _strip_accents_lower(cc).strip().strip("*").strip()
-                return cc in _PLACEHOLDER_CELLS
+                if cc in _PLACEHOLDER_CELLS:
+                    return True
+                # fractions garbled a denominateur vide : "3/", "0/+", "3/+", "/..."
+                return bool(re.fullmatch(r"\d*\s*/\s*[+.\-]*", cc))
             if data and all(_empty(c) for c in data):
                 continue  # ligne fabriquee vide -> supprimee
         out.append(line)

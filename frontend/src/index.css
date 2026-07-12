@@ -343,6 +343,41 @@
   font-style: normal;
 }
 
+/* ------------------------------------------------------------
+   Edition au curseur (contentEditable) — jamais de markdown brut
+   ------------------------------------------------------------ */
+.acp-editable {
+  cursor: text;
+  caret-color: hsl(var(--primary));
+}
+
+/* Placeholder quand une section est vide */
+.acp-editable:empty::before,
+.acp-editable > p:only-child:empty::before {
+  content: attr(data-placeholder);
+  color: hsl(var(--muted-foreground) / 0.5);
+  pointer-events: none;
+}
+
+/* Pastilles [A COMPLETER] — cliquables, jamais editables en place */
+.report-typography .acp-missing {
+  display: inline;
+  cursor: pointer;
+  border: 1px dashed hsl(var(--warning));
+  background: hsl(var(--warning) / 0.1);
+  color: hsl(var(--warning));
+  border-radius: 4px;
+  padding: 0 6px;
+  font-weight: 600;
+  text-transform: none;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.report-typography .acp-missing:hover {
+  background: hsl(var(--warning) / 0.2);
+}
+
 /* ============================================================
    Animations
    ============================================================ */

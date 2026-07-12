@@ -1,7 +1,19 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 
+const MUTE_KEY = "marc_sound_muted";
+
+/**
+ * Retour sonore MARC — volontairement discret.
+ * - Deux evenements seulement : debut de dictee + compte-rendu pret.
+ * - Volume tres bas ; plus aucun bip d'etape intermediaire.
+ * - Reglage muet persistant (localStorage), coupe par defaut si l'utilisateur
+ *   l'a choisi une fois.
+ */
 export function useSoundFeedback() {
   const ctxRef = useRef<AudioContext | null>(null);
+  const [muted, setMuted] = useState<boolean>(
+    () => localStorage.getItem(MUTE_KEY) === "1"
+  );
 
   const getCtx = useCallback(() => {
     if (!ctxRef.current) ctxRef.current = new AudioContext();
@@ -9,7 +21,8 @@ export function useSoundFeedback() {
   }, []);
 
   const playTone = useCallback(
-    (freq: number, durationMs: number, type: OscillatorType = "sine", vol = 0.12) => {
+    (freq: number, durationMs: number, type: OscillatorType = "sine", vol = 0.04) => {
+      if (localStorage.getItem(MUTE_KEY) === "1") return;
       const ctx = getCtx();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -25,24 +38,24 @@ export function useSoundFeedback() {
     [getCtx],
   );
 
+  // Debut de dictee — une note breve et douce.
   const playStart = useCallback(() => {
-    playTone(880, 120, "sine");
-    setTimeout(() => playTone(1320, 100, "sine"), 80);
+    playTone(880, 90, "sine", 0.05);
   }, [playTone]);
 
-  const playStop = useCallback(() => {
-    playTone(660, 150, "sine");
-  }, [playTone]);
-
-  const playStepDone = useCallback(() => {
-    playTone(1046, 80, "sine", 0.06);
-  }, [playTone]);
-
+  // Compte-rendu pret — accord discret a deux notes.
   const playAllDone = useCallback(() => {
-    playTone(784, 100, "sine", 0.08);
-    setTimeout(() => playTone(1046, 100, "sine", 0.08), 100);
-    setTimeout(() => playTone(1318, 120, "sine", 0.08), 200);
+    playTone(784, 90, "sine", 0.045);
+    setTimeout(() => playTone(1046, 110, "sine", 0.045), 110);
   }, [playTone]);
 
-  return { playStart, playStop, playStepDone, playAllDone };
+  const toggleMuted = useCallback(() => {
+    setMuted((prev) => {
+      const next = !prev;
+      localStorage.setItem(MUTE_KEY, next ? "1" : "0");
+      return next;
+    });
+  }, []);
+
+  return { playStart, playAllDone, muted, toggleMuted };
 }

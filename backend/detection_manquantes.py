@@ -610,6 +610,11 @@ def extraire_marqueurs_a_completer(rapport: str) -> list[DonneeManquante]:
         tokens_utiles = [t for t in coeur.split() if t not in _MARQUEURS_GENERIQUES]
         if not tokens_utiles:
             continue
+        # Fragment d'INSTRUCTION ("preciser le pourcentage", "precisez 0/1+...") :
+        # ce n'est pas un nom de champ -> on l'ecarte (le rappel deterministe
+        # fournit le champ nomme : RE, HER2, Ki67...).
+        if coeur.startswith(("preciser", "precisez", "precise ")):
+            continue
 
         # Deviner la section depuis le contexte
         section: str = _deviner_section_depuis_contexte(rapport, match.start())

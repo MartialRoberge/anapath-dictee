@@ -6,7 +6,6 @@ import {
   useRef,
 } from "react";
 import {
-  Pencil,
   Copy,
   Check,
   Trash2,
@@ -64,14 +63,14 @@ const SECTION_ORDER: string[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Markdown preprocessing                                             */
+/*  Markdown conventions ACP                                           */
 /* ------------------------------------------------------------------ */
 
 const A_COMPLETER_REGEX = /\[(?:[AÀ]\s*COMPL[EÉ]TER)\s*:\s*([^\]]+)\]/gi;
 
 /**
  * Pre-process ACP markdown conventions into standard HTML
- * that react-markdown + rehype-raw can render.
+ * (utilise uniquement pour le rendu lecture seule de secours).
  */
 function preprocessMarkdown(md: string): string {
   let result = md;
@@ -142,6 +141,11 @@ function useUndoStack(initial: Record<string, string> | null) {
     }));
   }, []);
 
+  // Remplace l'etat courant SANS empiler (coalescence de la frappe continue).
+  const replace = useCallback((next: Record<string, string>) => {
+    setState((prev) => ({ ...prev, present: next, future: [] }));
+  }, []);
+
   const undo = useCallback(() => {
     setState((prev) => {
       if (prev.past.length === 0) return prev;
@@ -169,6 +173,7 @@ function useUndoStack(initial: Record<string, string> | null) {
   return {
     sections: state.present,
     push,
+    replace,
     undo,
     redo,
     canUndo: state.past.length > 0,
@@ -177,84 +182,7 @@ function useUndoStack(initial: Record<string, string> | null) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  AcpMissingField — inline interactive [A COMPLETER] marker          */
-/* ------------------------------------------------------------------ */
-
-function AcpMissingField({
-  fieldName,
-  onDismiss,
-  onReplace,
-}: {
-  fieldName: string;
-  onDismiss?: (fieldName: string) => void;
-  onReplace?: (fieldName: string, value: string) => void;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState("");
-
-  const handleSubmit = () => {
-    if (value.trim() && onReplace) {
-      onReplace(fieldName, value.trim());
-    }
-    setEditing(false);
-    setValue("");
-  };
-
-  if (editing) {
-    return (
-      <span className="inline-flex items-center gap-1 rounded border border-warning bg-warning/10 px-1.5 py-0.5">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleSubmit();
-            if (e.key === "Escape") { setEditing(false); setValue(""); }
-          }}
-          className="w-40 bg-transparent text-sm text-foreground outline-none placeholder:text-warning/50"
-          placeholder={fieldName}
-          autoFocus
-        />
-        <button
-          onClick={handleSubmit}
-          className="text-xs font-bold text-success hover:text-success/80"
-        >
-          OK
-        </button>
-        <button
-          onClick={() => { setEditing(false); setValue(""); }}
-          className="text-xs text-muted-foreground hover:text-foreground"
-        >
-          &times;
-        </button>
-      </span>
-    );
-  }
-
-  return (
-    <span className="group/field inline-flex items-center gap-1 rounded border border-dashed border-warning bg-warning/10 px-2 py-0.5 text-warning">
-      <button
-        onClick={() => setEditing(true)}
-        className="cursor-pointer hover:text-warning/80"
-        title="Cliquer pour remplir"
-      >
-        {fieldName}
-      </button>
-      {onDismiss && (
-        <button
-          onClick={() => onDismiss(fieldName)}
-          className="ml-0.5 text-xs opacity-0 transition-opacity group-hover/field:opacity-100 hover:text-destructive"
-          title="Supprimer ce champ"
-        >
-          &times;
-        </button>
-      )}
-    </span>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  MarkdownReport component                                           */
+/*  Read-only markdown (rendu de secours si /sections indisponible)    */
 /* ------------------------------------------------------------------ */
 
 const SANITIZE_SCHEMA = {
@@ -270,15 +198,7 @@ const SANITIZE_SCHEMA = {
   },
 };
 
-function MarkdownReport({
-  content,
-  onDismissField,
-  onReplaceField,
-}: {
-  content: string;
-  onDismissField?: (fieldName: string) => void;
-  onReplaceField?: (fieldName: string, value: string) => void;
-}) {
+function MarkdownReport({ content }: { content: string }) {
   const processed = useMemo(() => preprocessMarkdown(content), [content]);
 
   return (
@@ -287,7 +207,6 @@ function MarkdownReport({
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, [rehypeSanitize, SANITIZE_SCHEMA]]}
         components={{
-          // Style tables properly
           table: ({ children }) => (
             <table className="w-full border-collapse my-3">{children}</table>
           ),
@@ -299,20 +218,6 @@ function MarkdownReport({
           td: ({ children }) => (
             <td className="border border-border px-3 py-2">{children}</td>
           ),
-          // Render [A COMPLETER] fields as interactive inline elements
-          span: ({ className, children, node, ...props }) => {
-            void node;
-            if (className === "acp-missing") {
-              return (
-                <AcpMissingField
-                  fieldName={String(children ?? "")}
-                  onDismiss={onDismissField}
-                  onReplace={onReplaceField}
-                />
-              );
-            }
-            return <span className={className} {...props}>{children}</span>;
-          },
         }}
       >
         {processed}
@@ -322,55 +227,370 @@ function MarkdownReport({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Conversion Markdown <-> HTML editable (contentEditable propre)      */
+/* ------------------------------------------------------------------ */
+
+interface TableData {
+  headers: string[];
+  rows: string[][];
+}
+
+function parseMarkdownTable(tableBlock: string): TableData | null {
+  const lines = tableBlock.trim().split("\n").filter((l) => l.trim());
+  if (lines.length < 2) return null;
+
+  const parseLine = (line: string): string[] =>
+    line
+      .trim()
+      .replace(/^\||\|$/g, "")
+      .split("|")
+      .map((c) => c.trim());
+
+  const headers = parseLine(lines[0]);
+  const separator = parseLine(lines[1]);
+  if (!separator.every((s) => /^:?-+:?$/.test(s))) return null;
+
+  const rows = lines.slice(2).map(parseLine);
+  return { headers, rows };
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/** Markdown inline -> HTML propre (jamais de **, __, | visibles). */
+function inlineMdToHtml(text: string): string {
+  let h = escapeHtml(text);
+
+  // Pastilles [A COMPLETER: xxx] — non editables, cliquables
+  h = h.replace(A_COMPLETER_REGEX, (_m, field: string) => {
+    const clean = field.trim();
+    return `<span class="acp-missing" contenteditable="false" data-field="${escapeHtml(
+      clean
+    )}">${escapeHtml(clean)}</span>`;
+  });
+
+  // Gras + souligne (titres)
+  h = h.replace(/\*\*__(.+?)__\*\*/g, "<strong><u>$1</u></strong>");
+  h = h.replace(/__(.+?)__/g, "<strong><u>$1</u></strong>");
+  // Gras
+  h = h.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  // Italique
+  h = h.replace(/\*([^*\n]+?)\*/g, "<em>$1</em>");
+
+  return h;
+}
+
+function tableMdToHtml(tableLines: string[]): string {
+  const table = parseMarkdownTable(tableLines.join("\n"));
+  if (!table) {
+    return `<p>${tableLines.map(inlineMdToHtml).join("<br>")}</p>`;
+  }
+  const head =
+    "<thead><tr>" +
+    table.headers.map((h) => `<th>${inlineMdToHtml(h)}</th>`).join("") +
+    "</tr></thead>";
+  const body =
+    "<tbody>" +
+    table.rows
+      .map(
+        (row) =>
+          "<tr>" +
+          row.map((c) => `<td>${inlineMdToHtml(c)}</td>`).join("") +
+          "</tr>"
+      )
+      .join("") +
+    "</tbody>";
+  return `<table>${head}${body}</table>`;
+}
+
+/** Markdown d'une section -> HTML editable joliment rendu. */
+function markdownToEditableHtml(md: string): string {
+  const lines = md.split("\n");
+  const blocks: string[] = [];
+  let para: string[] = [];
+  let table: string[] = [];
+
+  const flushPara = () => {
+    if (para.length) {
+      blocks.push(`<p>${para.map(inlineMdToHtml).join("<br>")}</p>`);
+      para = [];
+    }
+  };
+  const flushTable = () => {
+    if (table.length) {
+      blocks.push(tableMdToHtml(table));
+      table = [];
+    }
+  };
+
+  for (const line of lines) {
+    const t = line.trim();
+    const isTableLine = t.startsWith("|") && t.endsWith("|");
+    if (isTableLine) {
+      flushPara();
+      table.push(line);
+      continue;
+    }
+    flushTable();
+    if (t === "") {
+      flushPara();
+      continue;
+    }
+    para.push(line);
+  }
+  flushPara();
+  flushTable();
+
+  return blocks.join("") || "<p><br></p>";
+}
+
+/** Serialise une cellule de tableau (inline, sans pipe ni saut de ligne). */
+function cellToMarkdown(cell: Element): string {
+  return htmlNodeToMarkdown(cell)
+    .replace(/\n+/g, " ")
+    .replace(/\|/g, "\\|")
+    .trim();
+}
+
+function serializeTable(tableEl: Element): string {
+  const rowEls = Array.from(tableEl.querySelectorAll("tr"));
+  if (rowEls.length === 0) return "";
+  const rows = rowEls.map((tr) =>
+    Array.from(tr.querySelectorAll("th,td")).map(cellToMarkdown)
+  );
+  const header = rows[0];
+  const sep = header.map(() => "---");
+  const bodyRows = rows.slice(1);
+  const line = (cells: string[]) => `| ${cells.join(" | ")} |`;
+  return [line(header), line(sep), ...bodyRows.map(line)].join("\n");
+}
+
+function htmlNodeToMarkdown(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? "";
+  if (node.nodeType !== Node.ELEMENT_NODE) return "";
+
+  const el = node as HTMLElement;
+  const tag = el.tagName.toLowerCase();
+
+  if (tag === "table") return serializeTable(el);
+  if (el.classList.contains("acp-missing")) {
+    const field = el.getAttribute("data-field") ?? el.textContent ?? "";
+    return `[A COMPLETER: ${field.trim()}]`;
+  }
+
+  const inner = Array.from(el.childNodes).map(htmlNodeToMarkdown).join("");
+
+  switch (tag) {
+    case "strong":
+    case "b":
+      return `**${inner}**`;
+    case "u":
+      return `__${inner}__`;
+    case "em":
+    case "i":
+      return `*${inner}*`;
+    case "br":
+      return "\n";
+    case "p":
+      return inner + "\n\n";
+    case "div":
+      return inner + "\n";
+    default:
+      return inner;
+  }
+}
+
+/** HTML editable -> Markdown propre. */
+function editableHtmlToMarkdown(html: string): string {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
+  const root = doc.body.firstElementChild;
+  if (!root) return "";
+  return htmlNodeToMarkdown(root)
+    // recoller **__ ... __** colles ensemble
+    .replace(/\*\*__/g, "**__")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/* ------------------------------------------------------------------ */
+/*  InlineSectionEditor — edition au curseur, sans bouton, sans markdown*/
+/* ------------------------------------------------------------------ */
+
+function InlineSectionEditor({
+  value,
+  onChange,
+  onReplaceField,
+  onDismissField,
+}: {
+  value: string;
+  onChange: (md: string) => void;
+  onReplaceField?: (fieldName: string, value: string) => void;
+  onDismissField?: (fieldName: string) => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const lastEmitted = useRef<string | null>(null);
+  const [pill, setPill] = useState<{ field: string; x: number; y: number } | null>(
+    null
+  );
+  const [pillValue, setPillValue] = useState("");
+
+  // (Re)synchronise le HTML uniquement sur changement externe (pas notre echo).
+  useEffect(() => {
+    if (!ref.current) return;
+    if (value === lastEmitted.current) return;
+    ref.current.innerHTML = markdownToEditableHtml(value);
+  }, [value]);
+
+  const handleInput = useCallback(() => {
+    if (!ref.current) return;
+    const md = editableHtmlToMarkdown(ref.current.innerHTML);
+    lastEmitted.current = md;
+    onChange(md);
+  }, [onChange]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    const pillEl = target.closest?.(".acp-missing") as HTMLElement | null;
+    if (pillEl) {
+      e.preventDefault();
+      const rect = pillEl.getBoundingClientRect();
+      setPill({
+        field: pillEl.getAttribute("data-field") ?? "",
+        x: rect.left,
+        y: rect.bottom + 4,
+      });
+      setPillValue("");
+    }
+  }, []);
+
+  const submitPill = () => {
+    if (pill && pillValue.trim() && onReplaceField) {
+      onReplaceField(pill.field, pillValue.trim());
+    }
+    setPill(null);
+    setPillValue("");
+  };
+
+  const dismissPill = () => {
+    if (pill && onDismissField) onDismissField(pill.field);
+    setPill(null);
+    setPillValue("");
+  };
+
+  return (
+    <>
+      <div
+        ref={ref}
+        contentEditable
+        suppressContentEditableWarning
+        spellCheck={false}
+        onInput={handleInput}
+        onMouseDown={handleMouseDown}
+        data-placeholder="Cliquez pour ecrire..."
+        className="report-typography acp-editable min-h-[28px] rounded-md px-1 py-0.5 outline-none transition-colors focus:bg-primary/[0.03]"
+      />
+      {pill && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setPill(null);
+            }}
+          />
+          <div
+            className="fixed z-50 flex items-center gap-1 rounded-lg border border-warning/40 bg-card p-1 shadow-lg"
+            style={{ left: pill.x, top: pill.y }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <input
+              type="text"
+              autoFocus
+              value={pillValue}
+              placeholder={pill.field}
+              onChange={(e) => setPillValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") submitPill();
+                if (e.key === "Escape") setPill(null);
+              }}
+              className="w-48 bg-transparent px-2 py-1 text-sm text-foreground outline-none placeholder:text-muted-foreground/60"
+            />
+            <button
+              onClick={submitPill}
+              className="rounded px-2 py-1 text-xs font-bold text-success hover:bg-success/10"
+              title="Valider"
+            >
+              OK
+            </button>
+            <button
+              onClick={dismissPill}
+              className="rounded px-1.5 py-1 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+              title="Retirer ce champ"
+            >
+              &times;
+            </button>
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Section utilities                                                  */
 /* ------------------------------------------------------------------ */
 
-/**
- * Retire la premiere ligne du contenu si c'est un titre de section
- * (ex: **__CONCLUSION :__**) pour eviter le doublon avec le label du SectionCard.
- */
-function stripSectionTitle(content: string, sectionKey: string): string {
-  const lines = content.split("\n");
-  if (lines.length === 0) return content;
+const SECTION_TITLE_NAMES: Record<string, string[]> = {
+  titre: [],
+  renseignements_cliniques: [
+    "renseignements cliniques",
+    "renseignement clinique",
+  ],
+  macroscopie: ["macroscopie", "examen macroscopique"],
+  microscopie: [
+    "microscopie",
+    "etude histologique",
+    "l'etude histologique",
+    "letude histologique",
+  ],
+  ihc: ["immunomarquage", "immunohistochimie"],
+  biologie_moleculaire: ["biologie moleculaire"],
+  conclusion: ["conclusion"],
+};
 
-  const firstLine = lines[0].trim().toLowerCase()
+/**
+ * Separe la ligne de titre de section de son corps.
+ * Le titre reste stocke dans le markdown (export/copie), mais n'est pas
+ * dupplique a l'affichage : la carte montre un label discret + le corps editable.
+ */
+function splitSectionTitle(
+  content: string,
+  sectionKey: string
+): { title: string; body: string } {
+  const lines = content.split("\n");
+  if (lines.length <= 1) return { title: "", body: content };
+
+  const firstNorm = lines[0]
+    .trim()
+    .toLowerCase()
     .replace(/[*_#:]/g, "")
     .trim();
 
-  // Verifier si la premiere ligne est le titre de cette section
-  const sectionNames: Record<string, string[]> = {
-    titre: [],  // ne pas toucher au titre principal
-    renseignements_cliniques: ["renseignements cliniques", "renseignement clinique"],
-    macroscopie: ["macroscopie", "examen macroscopique"],
-    microscopie: ["microscopie", "etude histologique", "l'etude histologique", "letude histologique"],
-    ihc: ["immunomarquage", "immunohistochimie"],
-    biologie_moleculaire: ["biologie moleculaire"],
-    conclusion: ["conclusion"],
-  };
+  const names = SECTION_TITLE_NAMES[sectionKey];
+  if (!names || names.length === 0) return { title: "", body: content };
 
-  const names = sectionNames[sectionKey];
-  if (!names || names.length === 0) return content;
-
-  for (const name of names) {
-    if (firstLine.includes(name)) {
-      // Pour renseignements_cliniques, le contenu est apres le ":"
-      // sur la meme ligne (ex: "*Renseignements cliniques : texte*")
-      if (sectionKey === "renseignements_cliniques") {
-        const colonIdx = lines[0].indexOf(":");
-        if (colonIdx >= 0) {
-          const afterColon = lines[0].slice(colonIdx + 1).replace(/[*_]/g, "").trim();
-          const rest = lines.slice(1).join("\n").trimStart();
-          const combined = afterColon + (rest ? "\n" + rest : "");
-          return combined || content;
-        }
-      }
-      // Pour les autres sections : retirer la premiere ligne sauf si c'est la seule
-      if (lines.length <= 1) return content;
-      return lines.slice(1).join("\n").trimStart();
-    }
+  if (names.some((n) => firstNorm.includes(n))) {
+    return {
+      title: lines[0],
+      body: lines.slice(1).join("\n").replace(/^\n+/, ""),
+    };
   }
 
-  return content;
+  return { title: "", body: content };
 }
 
 function buildOrderedSections(
@@ -378,24 +598,20 @@ function buildOrderedSections(
 ): Array<{ key: string; content: string }> {
   const result: Array<{ key: string; content: string }> = [];
 
-  // D'abord les sections standard dans l'ordre defini
   for (const key of SECTION_ORDER) {
     if (sections[key]?.trim()) {
       result.push({ key, content: sections[key] });
     }
   }
 
-  // Ensuite les sections dynamiques (prelevements) triees par numero
   const dynamicKeys = Object.keys(sections)
     .filter((k) => !SECTION_ORDER.includes(k) && sections[k]?.trim())
     .sort((a, b) => {
-      // prelevement_1 avant prelevement_2
       const na = parseInt(a.replace(/\D/g, "") || "999", 10);
       const nb = parseInt(b.replace(/\D/g, "") || "999", 10);
       return na - nb;
     });
 
-  // Inserer les prelevements AVANT la conclusion, dans l'ordre
   const conclusionIdx = result.findIndex((s) => s.key === "conclusion");
   let insertAt = conclusionIdx >= 0 ? conclusionIdx : result.length;
 
@@ -418,282 +634,7 @@ function rebuildReport(sections: Record<string, string>): string {
 }
 
 /* ------------------------------------------------------------------ */
-/*  SectionEditor — textarea + editeur visuel pour les tableaux        */
-/* ------------------------------------------------------------------ */
-
-interface TableData {
-  headers: string[];
-  separator: string[];
-  rows: string[][];
-}
-
-function parseMarkdownTable(tableBlock: string): TableData | null {
-  const lines = tableBlock.trim().split("\n").filter((l) => l.trim());
-  if (lines.length < 2) return null;
-
-  const parseLine = (line: string): string[] =>
-    line
-      .split("|")
-      .map((c) => c.trim())
-      .filter((c) => c !== "");
-
-  const headers = parseLine(lines[0]);
-  const separator = parseLine(lines[1]);
-  if (!separator.every((s) => /^-+$/.test(s))) return null;
-
-  const rows = lines.slice(2).map(parseLine);
-  return { headers, separator, rows };
-}
-
-function rebuildMarkdownTable(table: TableData): string {
-  const line = (cells: string[]) => `| ${cells.join(" | ")} |`;
-  const sep = table.headers.map(() => "---");
-  return [line(table.headers), line(sep), ...table.rows.map(line)].join("\n");
-}
-
-/** Split du contenu en segments texte/table pour edition mixte. */
-function splitContentParts(content: string): Array<{ type: "text" | "table"; value: string }> {
-  const lines = content.split("\n");
-  const parts: Array<{ type: "text" | "table"; value: string }> = [];
-  let current: string[] = [];
-  let inTable = false;
-
-  for (const line of lines) {
-    const isTableLine = line.trim().startsWith("|") && line.trim().endsWith("|");
-
-    if (isTableLine && !inTable) {
-      if (current.length > 0) {
-        parts.push({ type: "text", value: current.join("\n") });
-        current = [];
-      }
-      inTable = true;
-    } else if (!isTableLine && inTable) {
-      parts.push({ type: "table", value: current.join("\n") });
-      current = [];
-      inTable = false;
-    }
-
-    current.push(line);
-  }
-
-  if (current.length > 0) {
-    parts.push({ type: inTable ? "table" : "text", value: current.join("\n") });
-  }
-
-  return parts;
-}
-
-/** Convertit du markdown simple en HTML pour contentEditable. */
-function simpleMarkdownToHtml(md: string): string {
-  let html = md
-    .replace(/\*\*__(.+?)__\*\*/g, "<strong><u>$1</u></strong>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/\[A COMPLETER:\s*([^\]]+)\]/gi, '<span style="color:#d97706;border:1px dashed #d97706;padding:0 4px;border-radius:3px">[A COMPLETER: $1]</span>');
-
-  // Paragraphes
-  html = html
-    .split("\n\n")
-    .map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`)
-    .join("");
-
-  return html;
-}
-
-/** Convertit le HTML d'un contentEditable en markdown (texte seulement, pas de tableau). */
-function htmlToSimpleMarkdown(html: string): string {
-  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
-
-  function walk(node: Node): string {
-    if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? "";
-    if (node.nodeType !== Node.ELEMENT_NODE) return "";
-
-    const el = node as HTMLElement;
-    const tag = el.tagName.toLowerCase();
-    const inner = Array.from(el.childNodes).map(walk).join("");
-
-    switch (tag) {
-      case "strong":
-      case "b":
-        if (el.querySelector("u")) return inner;
-        return `**${inner}**`;
-      case "em":
-      case "i":
-        return `*${inner}*`;
-      case "u":
-        if (el.parentElement?.tagName.toLowerCase() === "strong" ||
-            el.parentElement?.tagName.toLowerCase() === "b") {
-          return `**__${inner}__**`;
-        }
-        return `__${inner}__`;
-      case "br":
-        return "\n";
-      case "p":
-        return inner + "\n\n";
-      case "div":
-        return inner + "\n";
-      case "span":
-        return inner;
-      default:
-        return inner;
-    }
-  }
-
-  const root = doc.body.firstElementChild;
-  if (!root) return html;
-  return walk(root).replace(/\n{3,}/g, "\n\n").trim();
-}
-
-function TextBlockEditor({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (md: string) => void;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const internalRef = useRef(false);
-
-  // Synchroniser le HTML initial
-  useEffect(() => {
-    if (ref.current && !internalRef.current) {
-      ref.current.innerHTML = simpleMarkdownToHtml(value);
-    }
-    internalRef.current = false;
-  }, [value]);
-
-  const handleInput = useCallback(() => {
-    if (!ref.current) return;
-    internalRef.current = true;
-    onChange(htmlToSimpleMarkdown(ref.current.innerHTML));
-  }, [onChange]);
-
-  return (
-    <div
-      ref={ref}
-      contentEditable
-      suppressContentEditableWarning
-      onInput={handleInput}
-      className="report-typography min-h-[40px] rounded border border-border/50 bg-background px-3 py-2 outline-none focus:border-primary"
-    />
-  );
-}
-
-function SectionEditor({
-  content,
-  onChange,
-  onCancel,
-  onSave,
-}: {
-  content: string;
-  onChange: (newContent: string) => void;
-  onCancel: () => void;
-  onSave: () => void;
-}) {
-  const partsRef = useRef(splitContentParts(content));
-
-  // Mettre à jour les parts quand le contenu change de l'extérieur
-  useEffect(() => {
-    partsRef.current = splitContentParts(content);
-  }, [content]);
-
-  const handlePartChange = useCallback((index: number, newValue: string) => {
-    partsRef.current = partsRef.current.map((p, i) =>
-      i === index ? { ...p, value: newValue } : p
-    );
-    onChange(partsRef.current.map((p) => p.value).join("\n"));
-  }, [onChange]);
-
-  const handleCellChange = useCallback((partIndex: number, rowIndex: number, colIndex: number, value: string) => {
-    const table = parseMarkdownTable(partsRef.current[partIndex].value);
-    if (!table) return;
-
-    if (rowIndex === -1) {
-      table.headers[colIndex] = value;
-    } else {
-      if (!table.rows[rowIndex]) return;
-      table.rows[rowIndex][colIndex] = value;
-    }
-
-    handlePartChange(partIndex, rebuildMarkdownTable(table));
-  }, [handlePartChange]);
-
-  const parts = splitContentParts(content);
-
-  return (
-    <div
-      className="space-y-2 rounded-md border-2 border-primary/30 p-3"
-      onKeyDown={(e) => {
-        if (e.key === "Escape") onCancel();
-        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-          e.preventDefault();
-          onSave();
-        }
-      }}
-    >
-      {parts.map((part, idx) => {
-        if (part.type === "table") {
-          const table = parseMarkdownTable(part.value);
-          if (!table) {
-            return (
-              <TextBlockEditor
-                key={idx}
-                value={part.value}
-                onChange={(v) => handlePartChange(idx, v)}
-              />
-            );
-          }
-
-          return (
-            <table key={idx} className="w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  {table.headers.map((h, ci) => (
-                    <th key={ci} className="border border-border bg-muted px-2 py-1.5">
-                      <input
-                        type="text"
-                        value={h}
-                        onChange={(e) => handleCellChange(idx, -1, ci, e.target.value)}
-                        className="w-full bg-transparent text-center text-xs font-bold outline-none"
-                      />
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {table.rows.map((row, ri) => (
-                  <tr key={ri}>
-                    {row.map((cell, ci) => (
-                      <td key={ci} className="border border-border px-2 py-1.5">
-                        <input
-                          type="text"
-                          value={cell}
-                          onChange={(e) => handleCellChange(idx, ri, ci, e.target.value)}
-                          className="w-full bg-transparent text-sm outline-none"
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          );
-        }
-
-        return (
-          <TextBlockEditor
-            key={idx}
-            value={part.value}
-            onChange={(v) => handlePartChange(idx, v)}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  SectionCard                                                        */
+/*  SectionCard — label discret + edition au curseur (pas de crayon)   */
 /* ------------------------------------------------------------------ */
 
 interface SectionCardProps {
@@ -713,86 +654,56 @@ function SectionCard({
   onDismissField,
   onReplaceField,
 }: SectionCardProps) {
-  const [editing, setEditing] = useState(false);
-  const [editText, setEditText] = useState("");
   const [copied, setCopied] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const label = getSectionLabel(sectionKey);
-  const displayContent = stripSectionTitle(content, sectionKey);
+  const { title, body } = splitSectionTitle(content, sectionKey);
 
-  const handleStartEdit = () => {
-    setEditText(displayContent);
-    setEditing(true);
-  };
-
-  const handleSave = () => {
-    onContentChange(sectionKey, editText);
-    setEditing(false);
-  };
-
-  const handleCancel = () => {
-    setEditing(false);
-  };
+  const handleBodyChange = useCallback(
+    (newBody: string) => {
+      const full = title ? `${title}\n${newBody}` : newBody;
+      onContentChange(sectionKey, full);
+    },
+    [title, sectionKey, onContentChange]
+  );
 
   const handleCopy = async () => {
-    await copyReportRich(displayContent);
+    await copyReportRich(body);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="group relative border-b border-border/50 transition-colors last:border-b-0 hover:bg-accent/30">
-      {/* Section header */}
+    <div className="group relative border-b border-border/50 transition-colors last:border-b-0 hover:bg-accent/20">
+      {/* Section header : label + actions discretes (aucun crayon) */}
       <div className="flex items-center justify-between px-0 pb-1 pt-3">
         <span className="text-[0.68rem] font-bold uppercase tracking-widest text-muted-foreground">
           {label}
         </span>
-        <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-          {!editing ? (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={handleStartEdit}
-                title={`Modifier ${label}`}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn("h-7 w-7", copied && "text-success")}
-                onClick={handleCopy}
-                title={`Copier ${label}`}
-              >
-                {copied ? (
-                  <Check className="h-3.5 w-3.5" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5" />
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 hover:text-destructive"
-                onClick={() => setConfirmDelete(true)}
-                title={`Supprimer ${label}`}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" size="sm" onClick={handleCancel}>
-                Annuler
-              </Button>
-              <Button size="sm" onClick={handleSave}>
-                Enregistrer
-              </Button>
-            </>
-          )}
+        <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn("h-7 w-7", copied && "text-success")}
+            onClick={handleCopy}
+            title={`Copier ${label}`}
+          >
+            {copied ? (
+              <Check className="h-3.5 w-3.5" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 hover:text-destructive"
+            onClick={() => setConfirmDelete(true)}
+            title={`Supprimer ${label}`}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </div>
 
@@ -822,22 +733,14 @@ function SectionCard({
         </div>
       )}
 
-      {/* Content */}
+      {/* Contenu : editable directement au clic */}
       <div className="pb-4">
-        {editing ? (
-          <SectionEditor
-            content={editText}
-            onChange={setEditText}
-            onCancel={handleCancel}
-            onSave={handleSave}
-          />
-        ) : (
-          <MarkdownReport
-            content={displayContent}
-            onDismissField={onDismissField}
-            onReplaceField={onReplaceField}
-          />
-        )}
+        <InlineSectionEditor
+          value={body}
+          onChange={handleBodyChange}
+          onReplaceField={onReplaceField}
+          onDismissField={onDismissField}
+        />
       </div>
     </div>
   );
@@ -866,7 +769,8 @@ export default function ReportPanel({
   const [loadingSections, setLoadingSections] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const { sections, push: pushUndo, undo, redo, canUndo, canRedo } = useUndoStack(rawSections);
+  const { sections, push: pushUndo, replace: replaceUndo, undo, redo, canUndo, canRedo } =
+    useUndoStack(rawSections);
 
   const aCompleterCount = useMemo(() => {
     if (!report) return 0;
@@ -874,6 +778,7 @@ export default function ReportPanel({
   }, [report]);
 
   const isUserEditRef = useRef(false);
+  const lastEditRef = useRef<{ key: string; t: number }>({ key: "", t: 0 });
 
   const fetchSections = useCallback(async () => {
     if (!report) return;
@@ -898,7 +803,7 @@ export default function ReportPanel({
   // Raccourcis clavier undo/redo
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") {
         e.preventDefault();
         if (e.shiftKey) {
           redo();
@@ -922,11 +827,21 @@ export default function ReportPanel({
     (key: string, newContent: string) => {
       if (!sections) return;
       const updated = { ...sections, [key]: newContent };
-      pushUndo(updated);
+      // Coalescence : la frappe continue dans une meme section ne cree
+      // qu'un seul point d'annulation (undo par mot/pause, pas par lettre).
+      const now = Date.now();
+      const coalesce =
+        lastEditRef.current.key === key && now - lastEditRef.current.t < 700;
+      lastEditRef.current = { key, t: now };
       isUserEditRef.current = true;
+      if (coalesce) {
+        replaceUndo(updated);
+      } else {
+        pushUndo(updated);
+      }
       onReportChange(rebuildReport(updated));
     },
-    [sections, onReportChange, pushUndo]
+    [sections, onReportChange, pushUndo, replaceUndo]
   );
 
   const handleSectionDelete = useCallback(
@@ -934,6 +849,7 @@ export default function ReportPanel({
       if (!sections) return;
       const updated = { ...sections };
       delete updated[key];
+      lastEditRef.current = { key: "", t: 0 };
       pushUndo(updated);
       isUserEditRef.current = true;
       onReportChange(rebuildReport(updated));
@@ -960,19 +876,15 @@ export default function ReportPanel({
             cleaned.push(line);
             continue;
           }
-          // Reset regex lastIndex after test()
           markerRegex.lastIndex = 0;
           const isTableRow = line.trimStart().startsWith("|");
           if (isTableRow) {
-            // Dans un tableau : vider juste le marqueur dans la cellule
             cleaned.push(line.replace(markerRegex, "").trim());
-          } else {
-            // Dans du texte : supprimer toute la ligne (titre + marqueur)
-            // => on ne push pas la ligne
           }
         }
         updated[key] = cleaned.join("\n").replace(/\n{3,}/g, "\n\n").trim();
       }
+      lastEditRef.current = { key: "", t: 0 };
       pushUndo(updated);
       isUserEditRef.current = true;
       onReportChange(rebuildReport(updated));
@@ -988,6 +900,7 @@ export default function ReportPanel({
       for (const key of Object.keys(updated)) {
         updated[key] = updated[key].replace(regex, value);
       }
+      lastEditRef.current = { key: "", t: 0 };
       pushUndo(updated);
       isUserEditRef.current = true;
       onReportChange(rebuildReport(updated));
@@ -1147,8 +1060,8 @@ export default function ReportPanel({
       )}
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-10">
-        <div className="mx-auto max-w-[860px] rounded-md border bg-card p-12 shadow-sm">
+      <div className="flex-1 overflow-y-auto pb-10 scrollbar-thin">
+        <div className="mx-auto max-w-[860px] rounded-md border bg-card p-6 shadow-sm sm:p-10 lg:p-12">
           {loadingSections ? (
             <div className="flex flex-col items-center gap-3 py-16 text-muted-foreground">
               <div className="h-6 w-6 animate-spin-slow rounded-full border-[2.5px] border-muted border-t-primary" />

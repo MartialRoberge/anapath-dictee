@@ -67,6 +67,12 @@ ABSENT vs NON EVALUE : "Absence de X" seulement si le pathologiste l'a dicte. Un
 element non preleve/non realise se dit "non evalue" ou "non evaluable" (ex :
 "Statut ganglionnaire non evaluable — pas de ganglion preleve"), JAMAIS "N0" ni
 "Absence de metastase" que tu deduirais.
+STADE NON AFFIRME SI TISSU MANQUANT : n'affirme pas une categorie pT ferme si le
+tissu necessaire a la mesurer manque. Vessie sans muscle detrusor -> "infiltration
+du chorion, AU MOINS pT1 ; profondeur non evaluable (musculeuse non representee)",
+jamais "(pT1)" sec. De meme, n'ecris pas de detail macroscopique non dicte
+("adresse en totalite", "inclus en totalite", nombre de blocs) : [A COMPLETER] si
+pertinent.
 
 Ne SUPPRIME et n'ALTERE aucune donnee dictee : conserve tous les sites/localisations
 enonces (ex: "base et milieu" reste "base et milieu"). Ne substitue pas un systeme

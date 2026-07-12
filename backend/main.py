@@ -341,7 +341,23 @@ def _build_panel(result: GeneratedReport) -> list[DonneeManquante]:
     panel = _merge_donnees_manquantes(marqueurs + obligatoires, result.alertes)
     panel = _safety_filter_panel(panel, result)
     panel, _ = filter_present_alertes(panel, result.cr)
+    panel = _polish_panel(panel, result.cr)
     return panel
+
+
+def _polish_panel(
+    panel: list[DonneeManquante], cr: str
+) -> list[DonneeManquante]:
+    """Finition du panneau : retire les champs inadaptes au sous-site — le
+    'mesorectum' (concept RECTAL) n'a pas de sens sur un colon/sigmoide."""
+    import unicodedata
+
+    def _norm(s: str) -> str:
+        s = unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
+        return s.lower()
+
+    has_rectum = "rectum" in _norm(cr) or "rectal" in _norm(cr)
+    return [d for d in panel if not ("mesorect" in _norm(d.champ) and not has_rectum)]
 
 
 def _to_format_response(result: GeneratedReport) -> FormatResponse:

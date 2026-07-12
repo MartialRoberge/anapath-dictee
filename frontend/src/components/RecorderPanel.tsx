@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Mic, Upload, RotateCcw, RefreshCw } from "lucide-react";
+import { Mic, Upload, RotateCcw, RefreshCw, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -57,8 +57,7 @@ export default function RecorderPanel({
 }: RecorderPanelProps) {
   const { state, audioBlob, duration, startRecording, stopRecording, reset } =
     useAudioRecorder();
-  const { playStart, playStop, playStepDone, playAllDone } =
-    useSoundFeedback();
+  const { playStart, playAllDone, muted, toggleMuted } = useSoundFeedback();
   const { toast } = useToast();
   const [step, setStep] = useState<PipelineStep>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -99,13 +98,11 @@ export default function RecorderPanel({
       setDroppedFileName(truncateFilename(filename));
       try {
         setStep("uploading");
-        playStepDone();
 
         setStep("transcribing");
         const raw = await transcribeAudio(blob, filename);
         if (cancelledRef.current) return;
         onTranscription(raw);
-        playStepDone();
 
         setStep("formatting");
         const currentReport = reportRef.current;
@@ -119,7 +116,6 @@ export default function RecorderPanel({
           if (cancelledRef.current) return;
           onFormatted(result);
         }
-        playStepDone();
         setStep("done");
         playAllDone();
       } catch (err: unknown) {
@@ -132,7 +128,7 @@ export default function RecorderPanel({
         if (!cancelledRef.current) setProcessing(false);
       }
     },
-    [onTranscription, onFormatted, playStepDone, playAllDone, toast]
+    [onTranscription, onFormatted, playAllDone, toast]
   );
 
   const handleStart = useCallback(async () => {
@@ -148,9 +144,8 @@ export default function RecorderPanel({
   const handleStop = useCallback(() => {
     if (!holdingRef.current || state !== "recording") return;
     holdingRef.current = false;
-    playStop();
     stopRecording();
-  }, [state, stopRecording, playStop]);
+  }, [state, stopRecording]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -245,11 +240,11 @@ export default function RecorderPanel({
             : "Maintenir espace pour dicter";
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex h-full flex-col gap-2.5 overflow-hidden">
       {/* Push-to-talk zone — full width, halo de marque au survol */}
       <div
         className={cn(
-          "marc-aurora relative flex h-[100px] cursor-pointer select-none items-center justify-center overflow-hidden rounded-2xl border-2 transition-all",
+          "marc-aurora relative flex h-[88px] shrink-0 cursor-pointer select-none items-center justify-center overflow-hidden rounded-2xl border-2 transition-all",
           isRecording
             ? "border-iris-500 bg-iris-50 dark:bg-iris-950/30"
             : "border-dashed border-border hover:border-iris-400/60 hover:bg-iris-50/40 dark:hover:bg-iris-950/10"
@@ -289,7 +284,7 @@ export default function RecorderPanel({
       {/* Drop zone — compact */}
       <div
         className={cn(
-          "flex h-[50px] cursor-pointer select-none items-center justify-center gap-2.5 rounded-lg border border-dashed transition-all",
+          "flex h-[46px] shrink-0 cursor-pointer select-none items-center justify-center gap-2.5 rounded-lg border border-dashed transition-all",
           dragOver
             ? "border-iris-500 bg-iris-50 dark:bg-iris-950/20"
             : "border-border hover:border-muted-foreground hover:bg-accent/50",
@@ -323,23 +318,34 @@ export default function RecorderPanel({
         </div>
       </div>
 
-      {/* Pipeline — always visible once started */}
-      <div className="space-y-2">
-        <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
-          Workflow
-        </span>
-        <Pipeline currentStep={step} isIteration={isIteration} />
+      {/* Pipeline — compacte, toujours visible, jamais de scroll */}
+      <div className="shrink-0 space-y-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
+            Workflow
+          </span>
+          <button
+            type="button"
+            onClick={toggleMuted}
+            title={muted ? "Activer les sons" : "Couper les sons"}
+            aria-label={muted ? "Activer les sons" : "Couper les sons"}
+            className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground/60 transition-colors hover:bg-accent hover:text-foreground"
+          >
+            {muted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+        <Pipeline currentStep={step} isIteration={isIteration} compact />
       </div>
 
       {error && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
+        <div className="shrink-0 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
           {error}
         </div>
       )}
 
-      {/* Raw transcription — always visible */}
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
+      {/* Raw transcription — occupe l'espace restant, seul scroll interne */}
+      <div className="flex min-h-0 flex-1 flex-col gap-1.5">
+        <div className="flex shrink-0 items-center justify-between">
           <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
             Transcription brute
           </span>
@@ -356,12 +362,12 @@ export default function RecorderPanel({
             </Button>
           )}
         </div>
-        <div className="rounded-lg border bg-card">
+        <div className="min-h-0 flex-1 overflow-hidden rounded-lg border bg-card">
           {rawTranscription ? (
             <Textarea
               value={rawTranscription}
               onChange={(e) => onRawChange(e.target.value)}
-              className="min-h-[80px] resize-y border-0 bg-transparent text-[0.82rem] leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="h-full min-h-[64px] resize-none overflow-y-auto border-0 bg-transparent text-[0.82rem] leading-relaxed scrollbar-thin focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           ) : (
             <p className="px-3 py-3 text-sm italic text-muted-foreground/50">
@@ -372,7 +378,7 @@ export default function RecorderPanel({
       </div>
 
       {step === "done" && (
-        <Button variant="secondary" className="w-full" onClick={handleReset}>
+        <Button variant="secondary" className="w-full shrink-0" onClick={handleReset}>
           <RotateCcw className="h-4 w-4" />
           Nouveau compte-rendu
         </Button>

@@ -14,13 +14,14 @@ export type PipelineStep =
 interface StepDef {
   key: PipelineStep;
   label: string;
+  short: string;
 }
 
 const STEPS: StepDef[] = [
-  { key: "uploading", label: "Envoi de l'audio" },
-  { key: "transcribing", label: "Transcription" },
-  { key: "formatting", label: "Analyse MARC" },
-  { key: "done", label: "Termine" },
+  { key: "uploading", label: "Envoi de l'audio", short: "Audio" },
+  { key: "transcribing", label: "Transcription", short: "Transcription" },
+  { key: "formatting", label: "Analyse MARC", short: "Analyse" },
+  { key: "done", label: "Termine", short: "Termine" },
 ];
 
 const IRIS_MESSAGES_INITIAL: string[] = [
@@ -65,14 +66,65 @@ function computeStatus(
 interface PipelineProps {
   currentStep: PipelineStep;
   isIteration?: boolean;
+  compact?: boolean;
 }
 
 export default function Pipeline({
   currentStep,
   isIteration = false,
+  compact = false,
 }: PipelineProps) {
   const activeIdx = getStepIndex(currentStep);
   const isVisible = currentStep !== "idle" && currentStep !== "recording";
+
+  // Variante compacte : rangee horizontale qui tient dans le rail gauche
+  // sans jamais provoquer de scroll.
+  if (compact) {
+    return (
+      <div className="rounded-lg border border-border/70 bg-card px-2.5 py-2">
+        <div className="flex items-center">
+          {STEPS.map((step, idx) => {
+            const status: StepStatus = isVisible
+              ? computeStatus(idx, activeIdx, currentStep)
+              : "pending";
+            return (
+              <div key={step.key} className="flex flex-1 items-center">
+                <div className="flex min-w-0 flex-col items-center gap-1">
+                  <StepIcon status={status} isIris={step.key === "formatting"} />
+                  <span
+                    className={cn(
+                      "max-w-full truncate text-[0.58rem] font-medium leading-none",
+                      status === "pending" && "text-muted-foreground/70",
+                      status === "active" && "font-semibold text-primary",
+                      status === "done" && "text-success",
+                      status === "error" && "text-destructive"
+                    )}
+                  >
+                    {step.short}
+                  </span>
+                </div>
+                {idx < STEPS.length - 1 && (
+                  <div
+                    className={cn(
+                      "mx-0.5 mb-4 h-px flex-1 transition-colors",
+                      idx < activeIdx || currentStep === "done"
+                        ? "bg-success/50"
+                        : "bg-border"
+                    )}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {isVisible && currentStep === "formatting" && (
+          <div className="mt-1.5 flex justify-center border-t border-border/50 pt-1.5">
+            <IrisAnimation isIteration={isIteration} />
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center gap-0">
