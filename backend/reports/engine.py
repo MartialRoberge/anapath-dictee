@@ -48,6 +48,9 @@ class GeneratedReport:
     warnings: list[str] = field(default_factory=list)
     #: Organes detectes automatiquement dans la dictee (0, 1 ou plusieurs).
     organes_detectes: list[str] = field(default_factory=list)
+    #: Verdict de coherence medicale (structure/coherence interne), calcule a
+    #: CHAQUE generation. Voir reports/coherence.py.
+    coherence: dict[str, object] = field(default_factory=dict)
     provider: str = ""
     model: str = ""
 

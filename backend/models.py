@@ -38,6 +38,8 @@ class FormatResponse(BaseModel):
     warnings: list[str] = []
     organes_detectes: list[str] = []
     type_prelevement: str = "autre"
+    # Verdict de coherence medicale calcule a chaque generation.
+    coherence: dict = {}
 
 
 class IterationRequest(BaseModel):

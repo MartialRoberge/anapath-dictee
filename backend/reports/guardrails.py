@@ -580,6 +580,11 @@ def build_validated_report(
         warnings += num_warnings
         alertes += num_alertes
 
+    # Validation de coherence medicale — a CHAQUE generation (deterministe).
+    from reports.coherence import assess_coherence
+
+    coherence = assess_coherence(cr, detected_organes, specimen.value).to_dict()
+
     return GeneratedReport(
         cr=cr,
         organe=organe,
@@ -587,6 +592,7 @@ def build_validated_report(
         alertes=alertes,
         warnings=warnings,
         organes_detectes=detected_organes,
+        coherence=coherence,
         provider=provider,
         model=model,
     )

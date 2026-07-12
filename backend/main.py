@@ -294,6 +294,7 @@ def _to_format_response(result: GeneratedReport) -> FormatResponse:
         warnings=result.warnings,
         organes_detectes=result.organes_detectes,
         type_prelevement=result.type_prelevement,
+        coherence=result.coherence,
     )
 
 
@@ -338,6 +339,7 @@ async def iterate_report(
         warnings=result.warnings,
         organes_detectes=result.organes_detectes,
         type_prelevement=result.type_prelevement,
+        coherence=result.coherence,
     )
 
 
