@@ -617,6 +617,52 @@ def _check_numbers(cr: str, source_text: str) -> tuple[list[str], list[DonneeMan
     return warnings, alertes
 
 
+_SIZE_MEASURE_RE: re.Pattern[str] = re.compile(
+    r"(\d+(?:[.,]\d+)?)\s*(mm|cm|centimetre|millimetre)s?\b", re.IGNORECASE
+)
+
+
+def _check_dropped_measurements(
+    cr: str, source_text: str
+) -> tuple[list[str], list[DonneeManquante]]:
+    """Fidelite INVERSE : une mesure de TAILLE dictee (ex "11 cm") ne doit jamais
+    disparaitre du CR. Si le chiffre d'une mesure de la dictee est absent du CR,
+    on le signale et on l'inscrit au panneau (donnee perdue, jamais inventee)."""
+    warnings: list[str] = []
+    alertes: list[DonneeManquante] = []
+    cr_numbers: set[str] = source_number_set(cr)
+    seen: set[str] = set()
+    for match in _SIZE_MEASURE_RE.finditer(source_text):
+        raw_num: str = match.group(1)
+        norm: str = raw_num.replace(",", ".")
+        integer_part: str = norm.split(".")[0]
+        if _YEAR_RE.search(match.group(0)):
+            continue
+        # Ignore les 0/1 (trop communs, faux positifs) : une taille perdue est > 1.
+        if integer_part in {"0", "1"}:
+            continue
+        if integer_part in cr_numbers or norm in cr_numbers:
+            continue
+        context: str = match.group(0).strip()
+        if context in seen:
+            continue
+        seen.add(context)
+        warnings.append(
+            f"Mesure dictee '{context}' absente du CR : donnee possiblement perdue "
+            f"(a reintegrer par le pathologiste)."
+        )
+        alertes.append(
+            DonneeManquante(
+                champ=f"taille dictee '{context}' a reintegrer",
+                description="Mesure enoncee dans la dictee mais absente du CR — "
+                "a verifier/reintegrer (jamais inventee automatiquement).",
+                section="macroscopie",
+                obligatoire=True,
+            )
+        )
+    return warnings, alertes
+
+
 def _check_conclusion_no_todo(cr: str) -> list[str]:
     """La conclusion ne doit pas contenir de [A COMPLETER]."""
     idx: int = -1
@@ -756,6 +802,9 @@ def build_validated_report(
         num_warnings, num_alertes = _check_numbers(cr, source_text)
         warnings += num_warnings
         alertes += num_alertes
+        drop_warnings, drop_alertes = _check_dropped_measurements(cr, source_text)
+        warnings += drop_warnings
+        alertes += drop_alertes
 
     # Validation de coherence medicale — a CHAQUE generation (deterministe).
     from reports.coherence import assess_coherence

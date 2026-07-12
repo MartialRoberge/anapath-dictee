@@ -276,3 +276,33 @@ def test_forbidden_marker_stripped_from_cr_body():
     r = _build(_payload(cr, organe="sein", tp="piece_operatoire"), organes=["sein"])
     assert "embole" not in r.cr.lower()       # champ invasif retire
     assert "taille" in r.cr.lower()           # champ legitime conserve
+
+
+# --- Fidelite inverse : mesures dictees perdues (B5) ---------------------
+
+def test_taille_dictee_perdue_remonte_au_panel():
+    from reports.guardrails import _check_dropped_measurements
+
+    w, a = _check_dropped_measurements(
+        "Masse renale. [A COMPLETER: taille tumorale].",
+        "Masse renale de 11 cm au pole superieur.",
+    )
+    assert w and any("11 cm" in x for x in w)
+    assert a and any("11 cm" in x.champ for x in a)
+
+
+def test_taille_conservee_pas_de_bruit():
+    from reports.guardrails import _check_dropped_measurements
+
+    w, a = _check_dropped_measurements(
+        "Masse renale de 11 cm.", "Masse renale de 11 cm."
+    )
+    assert w == [] and a == []
+
+
+def test_taille_en_lettres_reconnue():
+    from reports.guardrails import _check_dropped_measurements
+
+    # "trois centimetres" (dictee) -> "3 cm" (CR) ne doit pas alerter.
+    w, _ = _check_dropped_measurements("Nodule de 3 cm.", "Nodule de trois centimetres.")
+    assert w == []
