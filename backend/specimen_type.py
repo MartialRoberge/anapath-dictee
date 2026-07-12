@@ -103,10 +103,13 @@ _CURAGE_KEYWORDS: list[str] = [
 # ---------------------------------------------------------------------------
 
 _PRE_CANCEREUX_KEYWORDS: list[str] = [
-    "ain1", "ain2", "ain3",
-    "cin1", "cin2", "cin3",
+    "ain1", "ain2", "ain3", "ain 1", "ain 2", "ain 3",
+    "cin1", "cin2", "cin3", "cin 1", "cin 2", "cin 3",
+    "vin", "vain", "pin ", "pin de", "pin haut",
     "hsil", "lsil",
+    "intraepitheliale", "intra-epitheliale", "intraepithelial",
     "neoplasie intraepitheliale",
+    "neoplasie cervicale intraepitheliale",
     "neoplasie malpighienne intraepitheliale",
     "dysplasie de haut grade",
     "dysplasie de bas grade",

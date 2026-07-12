@@ -465,6 +465,38 @@ def strip_forbidden_markers(
     return "\n".join(out_lines), removed
 
 
+_PLACEHOLDER_CELLS: frozenset[str] = frozenset({
+    "", "-", "--", "...", ".../...", "/", ".../", "0/...", "na", "n/a", "nd",
+    "non evalue", "non evaluee", "non evaluable", "non observe", "non observee",
+    "non renseigne", "a preciser",
+})
+
+
+def strip_empty_table_rows(cr: str) -> str:
+    """Retire les LIGNES de tableau markdown entierement non-informatives.
+
+    Une ligne dont TOUTES les cellules de donnees (hors 1re cellule = libelle) sont
+    des placeholders ([A COMPLETER], "-", ".../...", "non evalue"...) est une ligne
+    de gabarit FABRIQUEE (ex sous-lignes sextant Base/Milieu/Apex non dictees) : on
+    la supprime. Les lignes contenant une vraie valeur sont conservees. On ne touche
+    ni l'entete ni la ligne de separation.
+    """
+    out: list[str] = []
+    for line in cr.split("\n"):
+        s = line.strip()
+        if s.startswith("|") and s.count("|") >= 3 and "---" not in s:
+            cells = [c.strip() for c in s.strip("|").split("|")]
+            data = cells[1:] if len(cells) > 1 else cells
+            def _empty(c: str) -> bool:
+                cc = _MARKER_RE.sub("", c)  # retire [A COMPLETER]
+                cc = _strip_accents_lower(cc).strip().strip("*").strip()
+                return cc in _PLACEHOLDER_CELLS
+            if data and all(_empty(c) for c in data):
+                continue  # ligne fabriquee vide -> supprimee
+        out.append(line)
+    return "\n".join(out)
+
+
 def strip_conclusion_markers(cr: str) -> str:
     """Retire les [A COMPLETER: ...] presents dans la CONCLUSION.
 
@@ -651,6 +683,8 @@ def build_validated_report(
         )
     # La conclusion ne doit pas contenir de [A COMPLETER] (finition).
     cr = strip_conclusion_markers(cr)
+    # Retirer les lignes de tableau fabriquees entierement vides (ex sextant).
+    cr = strip_empty_table_rows(cr)
     alertes, dropped = filter_alertes(alertes, detected_organes, specimen, contexte)
     warnings += dropped
     # ANTI-FAUX-POSITIF : retirer les champs deja presents dans le CR.
