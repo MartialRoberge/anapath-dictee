@@ -407,6 +407,85 @@ def filter_present_alertes(
     return kept, removed
 
 
+_MARKER_RE: re.Pattern[str] = re.compile(r"\[a\s*completer[^\]]*\]", re.IGNORECASE)
+
+
+def _marker_is_forbidden(
+    inner: str, organes: list[str], specimen: SpecimenType, contexte: str
+) -> bool:
+    """Un marqueur [A COMPLETER: ...] est-il hors-contexte (donc a retirer du CR) ?
+    Meme logique de decision que ``filter_alertes``."""
+    text = _strip_accents_lower(inner)
+    detected = set(organes)
+    for pattern, valid_organs, _label in _CLASSIFICATION_SCOPE:
+        if pattern.search(text) and detected and detected.isdisjoint(valid_organs):
+            return True
+    if specimen in (SpecimenType.BIOPSIE, SpecimenType.CYTOLOGIE) and any(
+        t in text for t in _PIECE_ONLY_FIELD_TERMS
+    ):
+        return True
+    if contexte == "benin" and any(t in text for t in _TUMORAL_FIELD_TERMS):
+        return True
+    if contexte == "pre_cancereux" and any(t in text for t in _INVASIVE_FIELD_TERMS):
+        return True
+    return False
+
+
+def strip_forbidden_markers(
+    cr: str, organes: list[str], specimen: SpecimenType, contexte: str
+) -> tuple[str, int]:
+    """Retire du TEXTE du CR les marqueurs [A COMPLETER: ...] hors-contexte.
+
+    Le filtre du panneau ne suffit pas : un marqueur tumoral/pTNM/embole peut
+    subsister dans le CORPS du CR (ex "emboles vasculaires" sur un CCIS in situ).
+    On retire ici la ligne entiere si elle se reduit a ce marqueur, sinon juste
+    le marqueur. Garantit qu'aucun champ interdit n'apparait, meme dans le texte.
+    """
+    removed = 0
+    out_lines: list[str] = []
+    for line in cr.split("\n"):
+        markers = _MARKER_RE.findall(line)
+        forbidden = [
+            m for m in markers
+            if _marker_is_forbidden(m, organes, specimen, contexte)
+        ]
+        if not forbidden:
+            out_lines.append(line)
+            continue
+        removed += len(forbidden)
+        new_line = line
+        for m in forbidden:
+            new_line = new_line.replace(m, "")
+        content = new_line.strip().lstrip("-*•").strip()
+        after_colon = new_line.rsplit(":", 1)[-1].strip() if ":" in new_line else content
+        # Ligne vide, ou label "Xxx :" sans valeur restante -> on supprime la ligne.
+        if not content or (":" in new_line and not after_colon):
+            continue
+        out_lines.append(new_line)
+    return "\n".join(out_lines), removed
+
+
+def strip_conclusion_markers(cr: str) -> str:
+    """Retire les [A COMPLETER: ...] presents dans la CONCLUSION.
+
+    Regle metier : la conclusion ne doit pas contenir de champ a completer. Le
+    champ reste signale au panneau par le rappel deterministe. On nettoie aussi la
+    ponctuation orpheline laissee (", ", " - ").
+    """
+    low = cr.lower()
+    idx = low.rfind("conclusion")
+    if idx == -1:
+        return cr
+    head, tail = cr[:idx], cr[idx:]
+    tail = _MARKER_RE.sub("", tail)
+    # Nettoyage des residus (", ." / " ,"/ doubles espaces / puce vide)
+    tail = re.sub(r"[ \t]*,[ \t]*(?=[.\n)])", "", tail)
+    tail = re.sub(r"\(\s*\)", "", tail)
+    tail = re.sub(r"[ \t]{2,}", " ", tail)
+    tail = re.sub(r"[ \t]+([.\n])", r"\1", tail)  # espace avant point/retour
+    return head + tail
+
+
 def _check_classification_scope(cr: str, organes: list[str]) -> list[str]:
     """Signale une classification citee hors de son organe (recommandation erronee)."""
     detected: set[str] = set(organes)
@@ -559,6 +638,15 @@ def build_validated_report(
     from specimen_type import detecter_diagnostic_context
 
     contexte = detecter_diagnostic_context(cr).value
+    # Retirer du CORPS du CR les marqueurs [A COMPLETER] hors-contexte (ex emboles
+    # sur un CCIS in situ) : le filtre du panneau ne touche pas le texte.
+    cr, n_markers = strip_forbidden_markers(cr, detected_organes, specimen, contexte)
+    if n_markers:
+        warnings.append(
+            f"{n_markers} marqueur(s) hors-contexte retire(s) du texte du CR."
+        )
+    # La conclusion ne doit pas contenir de [A COMPLETER] (finition).
+    cr = strip_conclusion_markers(cr)
     alertes, dropped = filter_alertes(alertes, detected_organes, specimen, contexte)
     warnings += dropped
     # ANTI-FAUX-POSITIF : retirer les champs deja presents dans le CR.

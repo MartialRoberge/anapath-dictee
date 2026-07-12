@@ -109,10 +109,12 @@ def test_piece_operatoire_allows_ptnm():
 # -- conclusion ------------------------------------------------------------
 
 
-def test_conclusion_todo_flagged():
+def test_conclusion_todo_removed():
+    # La conclusion ne doit PAS contenir de [A COMPLETER] : il est retire du texte.
     cr = "**Microscopie :**\nADK.\n**__CONCLUSION :__**\n**ADK [A COMPLETER: grade].**"
     r = _build(_payload(cr))
-    assert any("conclusion" in w.lower() for w in r.warnings)
+    conclusion = r.cr[r.cr.lower().rfind("conclusion"):]
+    assert "a completer" not in conclusion.lower()
 
 
 # -- garde recommandation hors contexte (anti-erreur medicale) -------------
@@ -263,3 +265,14 @@ def test_filter_grade_sbr_dropped_on_precancer_but_keeps_nuclear_grade():
     assert "Grade SBR/Elston" not in champs
     assert "Grade nucleaire du CCIS" in champs
     assert "Statut RE" in champs
+
+
+def test_forbidden_marker_stripped_from_cr_body():
+    # Marqueur "emboles" (invasif) dans le corps d'un CR in situ -> retire du texte.
+    cr = ("**Microscopie :**\nCarcinome canalaire in situ de haut grade.\n"
+          "- Emboles vasculaires : [A COMPLETER: etude des emboles]\n"
+          "- Taille du CCIS : [A COMPLETER: taille en mm]\n"
+          "**__CONCLUSION :__**\n**CCIS haut grade.**")
+    r = _build(_payload(cr, organe="sein", tp="piece_operatoire"), organes=["sein"])
+    assert "embole" not in r.cr.lower()       # champ invasif retire
+    assert "taille" in r.cr.lower()           # champ legitime conserve

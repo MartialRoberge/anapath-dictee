@@ -31,6 +31,14 @@ sur toutes les autres. Concretement, INTERDIT si non dicte :
 - toute CONSTATATION specifique de ce cas non dictee : presence/absence d'emboles,
   d'engainements, sous-type histologique precis, marge saine/envahie, negatifs
   ("sans composante sarcomatoide"), score de gradation chiffre (Sydney, mitoses).
+- NEGATION NON DICTEE INTERDITE : n'ecris "Absence de X" / "X non observe" QUE si le
+  praticien l'a explicitement dicte. Si un element n'a PAS ete evoque, ne l'affirme
+  pas absent (surtout pas "Absence de X (non mentionne)") : mets [A COMPLETER: X] ou
+  n'en parle pas. "Non evalue" est autorise, "Absence de X" ne l'est pas.
+- SEUIL / NORME INTERDIT comme resultat : n'ecris jamais une valeur de seuil ou de
+  norme (ex "p16 >= 70%", "au moins 12 ganglions", "Ki67 > 20%") comme si elle etait
+  observee. Si seul un qualitatif est dicte ("p16 positif diffus"), garde le qualitatif ;
+  le seuil eventuel va dans un [A COMPLETER: preciser le pourcentage], jamais dans le resultat.
 
 CE QUI EST AUTORISE : reformuler en prose ACP standard ce qui a ete dicte, et
 developper un diagnostic nomme par sa description CANONIQUE (definitionnelle) —
