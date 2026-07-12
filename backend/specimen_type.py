@@ -187,6 +187,19 @@ _BENIN_KEYWORDS: list[str] = [
     "sans atypie",
     "pas de proliferation tumorale",
     "absence de proliferation tumorale",
+    # Entites MEDICALES / NON TUMORALES : contexte non tumoral -> pas de champ
+    # pronostique tumoral (grade/pTNM/MMR...). Le tumoral prime (INFILTRANT teste
+    # avant), donc ces mots ne s'appliquent que sur du purement medical.
+    "rejet", "greffon", "greffe", "transplant",
+    "crohn", "rch", "rcuh", "colite", "ileite", "mici",
+    "glomerul", "nephropathie", "nephrite", "tubulo-interstiti",
+    "thyroidite", "hashimoto", "basedow",
+    "granulome", "granulomateuse", "sarcoidose", "tuberculose", "caseeuse",
+    "chorioamniotite", "villite", "arterite", "horton", "vascularite",
+    "osteonecrose", "osteomyelite", "hepatite", "steatohepatite", "steatose",
+    "cirrhose", "cholangite", "pemphigoide", "pemphigus", "lichen", "psoriasis",
+    "meningite", "cystite", "gastrite", "duodenite", "oesophagite",
+    "thrombus", "atherome", "atherosclerose", "amylose",
 ]
 
 _NEGATION_PREFIXES: list[str] = [

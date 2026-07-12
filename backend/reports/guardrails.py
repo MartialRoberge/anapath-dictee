@@ -216,6 +216,9 @@ _TUMORAL_FIELD_TERMS: tuple[str, ...] = (
     "mitotique", "mitose", "ptnm", "pt1", "pt2", "pt3", "pt4", "stade tnm",
     "figo", "embole", "engainement", "metasta", "extension extra",
     "atteinte ganglionnaire", "statut ganglionnaire", "ulceration",
+    # Marqueurs moleculaires TUMORAUX (n'ont pas de sens sur une lesion medicale /
+    # inflammatoire : evite "statut MMR" sur une maladie de Crohn).
+    "mmr", "msi", "microsatellite", "kras", "nras", "braf",
 )
 # Sous-ensemble reserve a la MALIGNITE INVASIVE (a exclure aussi sur pre-cancer /
 # in situ, qui ne metastase pas et n'a pas de statut ganglionnaire ni de pTNM).
