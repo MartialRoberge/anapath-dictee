@@ -204,7 +204,7 @@ _PIECE_ONLY_FIELD_TERMS: tuple[str, ...] = (
     "taille tumorale", "engainement", "embole", "crm", "mesorectum",
     "rupture capsulaire", "effraction", "vesicule seminale", "vesicules seminales",
     "extension extraprostatique", "invasion myometriale", "extension au col",
-    "infiltration parametre",
+    "infiltration parametre", "exerese", "qualite de l'exerese", "limites d'exerese",
 )
 
 
