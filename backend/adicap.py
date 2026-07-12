@@ -119,7 +119,34 @@ ORGANE_APP_TO_D3: dict[str, str | None] = {
     "meninge": "NM",
     # Sens
     "oeil": "OE",
+    # Gyneco (compl.) — bible : GT = Trompe
+    "trompe": "GT",
+    # Cardio-vasculaire — bible : CM = Myocarde, VA = artere/BAT/endartere
+    "myocarde": "CM",
+    "coeur": "CM",
+    "artere": "VA",
+    "aorte": "VA",
+    "vaisseau": "VA",
+    # Obstetrical / foeto — bible : PP = Placenta
+    "placenta": "PP",
 }
+
+# Detection d'organe de REPLI pour l'ADICAP, independante des templates (organes
+# sans template mais avec un code D3 VALIDE dans la bible). Mots-cles -> nom organe.
+_ORGAN_FALLBACK_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("placenta", ("placenta", "chorioamniotite", "villosites choriales",
+                  "membranes foetales", "cordon ombilical", "chorioamnio")),
+    ("myocarde", ("myocarde", "myocardique", "endomyocardique",
+                  "biopsie cardiaque", "greffon cardiaque")),
+    ("artere", ("artere temporale", "arterite", "biopsie d'artere", "endartere",
+                "horton")),
+    ("trompe", ("trompe de fallope", "salpingectomie", "salpinx", "tubaire")),
+    ("rate", ("splenectomie", "pulpe splenique")),
+    ("moelle_osseuse", ("biopsie osteomedullaire", "moelle osseuse", "myelogramme",
+                        "osteomedullaire")),
+    ("os", ("osteonecrose", "tete femorale", "biopsie osseuse", "trabecules osseuses",
+            "corticale osseuse", "os spongieux", "coxarthrose", "col femoral")),
+)
 
 # Libelle d'organe AFFICHE (anatomique, correct) — decouple des etiquettes de la
 # bible qui sont parfois specifiques a une lesion (ex GS n'a que "Gynecomastie"
@@ -141,7 +168,9 @@ ORGANE_DISPLAY: dict[str, str] = {
     "amygdale": "Amygdale", "glande_salivaire": "Glande salivaire",
     "sein": "Sein", "sarcome": "Tissus mous", "os": "Os / articulation",
     "systeme_nerveux_central": "Systeme nerveux central", "meninge": "Meninge",
-    "oeil": "Oeil",
+    "oeil": "Oeil", "trompe": "Trompe uterine", "myocarde": "Myocarde",
+    "coeur": "Coeur", "artere": "Artere", "aorte": "Aorte", "vaisseau": "Vaisseau",
+    "placenta": "Placenta",
 }
 
 # Code lesionnel differe (non code par securite).
@@ -397,6 +426,15 @@ def suggerer_adicap(rapport: str, organe_detecte: str) -> dict[str, str]:
     diagnostic = _masquer_negations(normaliser(_extraire_diagnostic(rapport)))
 
     organe_canon = canonical_organ(organe_detecte, rapport)
+    # Repli : si le moteur n'a pas resolu l'organe, tenter un detecteur texte large
+    # (organes sans template mais avec un code D3 valide : placenta, myocarde,
+    # artere, trompe, moelle...). Sinon on defere honnetement.
+    if ORGANE_APP_TO_D3.get(organe_canon) is None:
+        low_fallback = _strip_accents(rapport)
+        for organe_name, kws in _ORGAN_FALLBACK_KEYWORDS:
+            if any(k in low_fallback for k in kws):
+                organe_canon = organe_name
+                break
     # Contexte OCULAIRE : un melanome uveal/choroidien est un melanome de l'OEIL,
     # pas de la peau. On reroute l'organe pour ne pas coder "Peau" a tort.
     if organe_canon in ("melanome", "peau"):
