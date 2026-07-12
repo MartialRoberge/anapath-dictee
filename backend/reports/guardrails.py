@@ -233,6 +233,32 @@ _INVASIVE_FIELD_TERMS: tuple[str, ...] = (
     "scarff", "fnclcc",
 )
 
+# Marqueurs moleculaires TUMORAUX : n'ont de sens que sur un carcinome INFILTRANT
+# (depistage Lynch, theranostique). Recherche a limites de mots (voir _has_word)
+# pour eviter les collisions ("msi" dans "transmission", "braf" partiel...).
+_MOLECULAR_TUMORAL_TERMS: frozenset[str] = frozenset({
+    "mmr", "dmmr", "pmmr", "msi", "msi", "microsatellite", "instabilite",
+    "kras", "nras", "braf", "egfr", "idh", "her2", "oncotype",
+})
+
+# Sigles ambigus : n'attestent le marqueur moleculaire que suivis du bon contexte
+# (ex "her2" est tumoral, mais on ne coupe que hors infiltrant de toute facon).
+_MOLECULAR_WORD_RE: dict[str, re.Pattern[str]] = {}
+
+
+def _has_word(text: str, terms: frozenset[str]) -> bool:
+    """True si l'un des termes apparait comme MOT ENTIER dans text (deja sans
+    accents, minuscule). Evite que 'msi' matche 'transmission' ou 'idh' un
+    fragment. 'her2'/'microsatellite' comptent aussi (bornes alphanumeriques)."""
+    for term in terms:
+        pat = _MOLECULAR_WORD_RE.get(term)
+        if pat is None:
+            pat = re.compile(rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])")
+            _MOLECULAR_WORD_RE[term] = pat
+        if pat.search(text):
+            return True
+    return False
+
 
 def filter_alertes(
     alertes: list[DonneeManquante],
@@ -296,6 +322,17 @@ def filter_alertes(
             dropped.append(
                 f"Champ '{alerte.champ}' retire : champ de malignite invasive non "
                 f"applicable sur une lesion pre-cancereuse (in situ)."
+            )
+            continue
+
+        # 5. marqueur moleculaire TUMORAL (MMR/MSI/KRAS...) hors carcinome infiltrant.
+        # Ces marqueurs exigent une malignite INVASIVE (ex depistage Lynch sur
+        # adenocarcinome colorectal). Reclamer 'statut MMR' sur un adenome en
+        # dysplasie de bas grade (pre-cancereux) ou une lesion benigne est faux.
+        if ctx != "infiltrant" and _has_word(text, _MOLECULAR_TUMORAL_TERMS):
+            dropped.append(
+                f"Champ '{alerte.champ}' retire : marqueur moleculaire tumoral "
+                f"(reserve au carcinome infiltrant), non applicable ici."
             )
             continue
 

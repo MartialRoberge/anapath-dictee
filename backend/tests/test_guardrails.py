@@ -306,3 +306,41 @@ def test_taille_en_lettres_reconnue():
     # "trois centimetres" (dictee) -> "3 cm" (CR) ne doit pas alerter.
     w, _ = _check_dropped_measurements("Nodule de 3 cm.", "Nodule de trois centimetres.")
     assert w == []
+
+
+# --- Marqueurs moleculaires tumoraux hors carcinome infiltrant -----------
+
+def _dm(champ):
+    from models import DonneeManquante
+    return DonneeManquante(champ=champ, description="", section="x")
+
+
+def test_mmr_retire_sur_adenome_pre_cancereux():
+    from reports.guardrails import filter_alertes
+    from specimen_type import SpecimenType
+
+    kept, _ = filter_alertes(
+        [_dm("statut MMR"), _dm("Type histologique")],
+        ["colon_rectum"], SpecimenType.BIOPSIE, "pre_cancereux",
+    )
+    champs = [k.champ for k in kept]
+    assert "statut MMR" not in champs
+    assert "Type histologique" in champs
+
+
+def test_mmr_conserve_sur_carcinome_infiltrant():
+    from reports.guardrails import filter_alertes
+    from specimen_type import SpecimenType
+
+    kept, _ = filter_alertes(
+        [_dm("statut MMR/MSI")], ["colon_rectum"],
+        SpecimenType.PIECE_OPERATOIRE, "infiltrant",
+    )
+    assert [k.champ for k in kept] == ["statut MMR/MSI"]
+
+
+def test_pas_de_collision_de_mot_msi():
+    from reports.guardrails import _has_word, _MOLECULAR_TUMORAL_TERMS
+
+    assert not _has_word("transmission synaptique", _MOLECULAR_TUMORAL_TERMS)
+    assert _has_word("instabilite des microsatellites", _MOLECULAR_TUMORAL_TERMS)
