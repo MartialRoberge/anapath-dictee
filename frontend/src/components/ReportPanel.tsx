@@ -410,8 +410,6 @@ function editableHtmlToMarkdown(html: string): string {
   const root = doc.body.firstElementChild;
   if (!root) return "";
   return htmlNodeToMarkdown(root)
-    // recoller **__ ... __** colles ensemble
-    .replace(/\*\*__/g, "**__")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
