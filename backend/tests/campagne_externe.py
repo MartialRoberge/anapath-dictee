@@ -33,9 +33,11 @@ from reports.local_engine import LocalReportEngine
 from adicap import suggerer_adicap
 
 # Mots trop generiques pour discriminer un champ (evite les faux matches).
+# "tumoral"/"tumorale" NE sont PAS generiques : ils discriminent "grade tumoral"
+# (interdit sur benin) du "grade" de Sydney (inflammation, legitime sur gastrite).
 _GENERIC = {"score", "statut", "grade", "type", "index", "panel", "classification",
             "niveau", "presence", "absence", "resultat", "evaluation", "standard",
-            "complementaire", "lymphatiques", "tumorale", "tumoral", "histologique"}
+            "complementaire", "lymphatiques", "histologique"}
 
 
 def _norm(s: str) -> str:
