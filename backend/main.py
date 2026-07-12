@@ -338,7 +338,21 @@ def _build_panel(result: GeneratedReport) -> list[DonneeManquante]:
     obligatoires: list[DonneeManquante] = detecter_champs_obligatoires_manquants(
         result.cr, result.organes_detectes
     )
-    panel = _merge_donnees_manquantes(marqueurs + obligatoires, result.alertes)
+    # Systemes de reporting standardises (cytologie + pathologie medicale) : propose
+    # la categorie/score attendu (Bethesda, Paris, Milan, Banff, MEST-C, SAF, ISHLT,
+    # Amsterdam...) EN [A COMPLETER] s'il n'est pas dicte. Ne cote jamais a la place.
+    from reports.reporting_systems import suggest_reporting_fields
+
+    reporting: list[DonneeManquante] = [
+        DonneeManquante(
+            champ=champ,
+            description="Systeme de reporting standardise applicable — a renseigner "
+            "par le pathologiste (jamais cote automatiquement).",
+            section="reporting",
+        )
+        for champ in suggest_reporting_fields(result.cr)
+    ]
+    panel = _merge_donnees_manquantes(marqueurs + obligatoires + reporting, result.alertes)
     panel = _safety_filter_panel(panel, result)
     panel, _ = filter_present_alertes(panel, result.cr)
     panel = _polish_panel(panel, result.cr)
