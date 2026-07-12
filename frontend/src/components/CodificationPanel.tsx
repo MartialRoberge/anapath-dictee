@@ -200,6 +200,13 @@ export default function CodificationPanel({
               code={codes.adicap.lesion_code}
               display={codes.adicap.lesion}
             />
+            {codes.adicap.confidence &&
+              codes.adicap.confidence !== "haute" && (
+                <p className="mt-1 rounded bg-warning/10 px-2 py-1 text-[0.65rem] leading-snug text-warning">
+                  Code lésionnel non certain — à préciser par le pathologiste (le
+                  système ne devine pas pour éviter toute erreur).
+                </p>
+              )}
           </div>
 
           <div>

@@ -26,6 +26,11 @@ _BODY_STRUCTURES: dict[str, dict[str, str]] = {
     "estomac": {"code": "69695003", "display": "Stomach structure"},
     "foie": {"code": "10200004", "display": "Liver structure"},
     "melanome": {"code": "39937001", "display": "Skin structure"},
+    "peau": {"code": "39937001", "display": "Skin structure"},
+    "systeme_nerveux_central": {"code": "12738006", "display": "Brain structure"},
+    "ganglion": {"code": "59441001", "display": "Lymph node structure"},
+    "lymphome": {"code": "59441001", "display": "Lymph node structure"},
+    "larynx": {"code": "4596009", "display": "Laryngeal structure"},
     "oesophage": {"code": "32849002", "display": "Esophageal structure"},
     "ovaire": {"code": "15497006", "display": "Ovarian structure"},
     "pancreas": {"code": "15776009", "display": "Pancreatic structure"},
@@ -58,6 +63,8 @@ _MORPHOLOGIES: list[tuple[str, str, list[str]]] = [
     # Carcinomes
     ("402815007", "Carcinome epidermoide",
      ["carcinome epidermoide", "carcinome malpighien"]),
+    ("27090000", "Carcinome urothelial (transitionnel)",
+     ["carcinome urothelial", "carcinome transitionnel"]),
     ("35917007", "Adenocarcinome",
      ["adenocarcinome"]),
     ("82711006", "Carcinome canalaire infiltrant du sein",
@@ -135,10 +142,13 @@ def suggerer_snomed(rapport: str, organe_detecte: str) -> dict[str, str | dict[s
         - topography : {code, display, system}
         - morphology : {code, display, system}
     """
+    from organ_utils import canonical_organ
+
     rapport_normalise: str = normaliser(rapport)
 
-    # Topographie
-    body = _BODY_STRUCTURES.get(organe_detecte)
+    # Topographie (normalisation de l'organe libre -> cle canonique)
+    organe_canon = canonical_organ(organe_detecte, rapport)
+    body = _BODY_STRUCTURES.get(organe_canon)
     topography: dict[str, str] = {
         "code": body["code"] if body else "",
         "display": body["display"] if body else "Non determine",

@@ -32,9 +32,13 @@ _PATTERN_A_COMPLETER: re.Pattern[str] = re.compile(
     r"(\[A COMPLETER\s*:\s*[^\]]+\])", re.IGNORECASE
 )
 
+# Titre gras+souligne : accepte les deux ordres de marqueurs produits par le LLM
+# (**__X__** et __**X**__) ainsi que __X__ simple.
 _PATTERN_BOLD_UNDERLINE: re.Pattern[str] = re.compile(
-    r"\*\*__(.+?)__\*\*|__(.+?)__"
+    r"\*\*__(.+?)__\*\*|__\*\*(.+?)\*\*__|__(.+?)__"
 )
+
+_STRAY_MARKERS: re.Pattern[str] = re.compile(r"^[\*_]+|[\*_]+$")
 
 _PATTERN_INLINE_MARKUP: re.Pattern[str] = re.compile(
     r"(\*\*\*.+?\*\*\*|\*\*.+?\*\*|\*.+?\*)"
@@ -250,7 +254,8 @@ def markdown_to_docx(markdown_text: str, title: str) -> bytes:
         # Titre **__TEXT__** ou __TEXT__
         bu_match: re.Match[str] | None = _is_bold_underline_line(stripped)
         if bu_match:
-            text: str = bu_match.group(1) or bu_match.group(2) or ""
+            text: str = bu_match.group(1) or bu_match.group(2) or bu_match.group(3) or ""
+            text = _STRAY_MARKERS.sub("", text).strip()
             is_conclusion: bool = "CONCLUSION" in text.upper()
             _add_title_paragraph(doc, text, is_conclusion)
 

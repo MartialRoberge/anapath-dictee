@@ -90,6 +90,10 @@ class AdicapResponse(BaseModel):
     organe_code: str
     lesion: str
     lesion_code: str
+    # Traçabilité de confiance : "haute" (code lésionnel validé),
+    # "organe_seul" (lésion différée), "aucune".
+    confidence: str = "haute"
+    note: str = ""
 
 
 class SnomedCode(BaseModel):

@@ -181,6 +181,8 @@ export interface AdicapResult {
   organe_code: string;
   lesion: string;
   lesion_code: string;
+  confidence?: "haute" | "organe_seul" | "aucune";
+  note?: string;
 }
 
 export interface SnomedCode {
