@@ -45,17 +45,22 @@ def _norm(s: str) -> str:
     return s.lower()
 
 
-def _field_in_panel(needle: str, panel_champs: list[str]) -> bool:
-    """Un champ-cible est-il présent dans le panneau ? Matching sur les tokens
-    DISCRIMINANTS uniquement (on ignore 'score', 'statut', 'grade'... qui
-    provoquent de faux appariements type 'score de Gleason' ~ 'score de TRG')."""
+def _field_in_panel(needle: str, panel_champs: list[str], strict: bool = False) -> bool:
+    """Un champ-cible est-il présent dans le panneau ?
+
+    Tokens DISCRIMINANTS uniquement (on ignore 'score', 'statut', 'grade'...).
+    strict=True (pour les champs INTERDITS) exige que TOUS les tokens spécifiques
+    soient dans une même cellule — évite qu'un mot partagé comme 'tumoral' fasse
+    matcher 'index mitotique tumoral' (interdit) avec 'taille tumorale' (légitime).
+    strict=False (recall) : un seul token suffit.
+    """
     toks = {t for t in re.findall(r"[a-z0-9]+", _norm(needle))
             if len(t) >= 4 and t not in _GENERIC}
     if not toks:
         toks = {t for t in re.findall(r"[a-z0-9]+", _norm(needle)) if len(t) >= 3}
     for champ in panel_champs:
         cn = _norm(champ)
-        if any(t in cn for t in toks):
+        if (all(t in cn for t in toks) if strict else any(t in cn for t in toks)):
             return True
     return False
 
@@ -89,7 +94,8 @@ async def run(cases_path: str, out_path: str) -> int:
             doivent_manques = [f for f in doivent if not _field_in_panel(f, panel_champs)]
 
             interdits = c.get("champs_qui_NE_DOIVENT_PAS_apparaitre", [])
-            interdits_presents = [f for f in interdits if _field_in_panel(f, panel_champs)]
+            interdits_presents = [f for f in interdits
+                                  if _field_in_panel(f, panel_champs, strict=True)]
             if interdits_presents:
                 safety_violations += 1
 
