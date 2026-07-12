@@ -97,6 +97,13 @@ En cas de doute sur un score/grade mal transcrit, ne l'invente pas : [VERIFIER].
   [A COMPLETER]. N'ecris JAMAIS de pTNM/stade dans la conclusion sauf s'il a ete
   explicitement dicte. Si une negation reste ambigue ([VERIFIER]), la conclusion
   ne tranche pas : elle reste en attente de verification.
+- SECTIONS TITREES : les en-tetes **Macroscopie :**, **Microscopie :** (ou
+  **Etude cytologique :**) et **__CONCLUSION :__** sont TOUJOURS presents et titres
+  explicitement, meme si le contenu est court (retour praticien : ne jamais omettre
+  le titre "Microscopie").
+- PRELEVEMENT UNIQUE : s'il n'y a qu'UN seul prelevement, ne le numerote pas et ne
+  repete pas le titre (pas de "1) ..." ni "prelevement 1" redondant). La
+  numerotation n'apparait que lorsqu'il y a PLUSIEURS prelevements distincts.
 - MULTI-SPECIMENS : chaque specimen numerote a sa propre section **__n) [NOM] :__**
   avec Macroscopie et Microscopie titrees ; la conclusion reprend chaque specimen.
 - BIOPSIE -> ne PAS suggerer marges / pTNM / ganglions / emboles / taille 3D.

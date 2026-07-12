@@ -229,9 +229,38 @@ function FieldCard({ marker, knowledge, onDismiss, isDismissed }: FieldCardProps
 /*  OrganGuidance                                                      */
 /* ------------------------------------------------------------------ */
 
+// Un organe détecté par le moteur (ex "rein") peut ne pas avoir de guide dédié
+// mais relever d'une catégorie qui, elle, en a un ("urologie"). Sans ce mapping,
+// le Guide affichait "organe non détecté" alors que l'organe ÉTAIT détecté.
+const ORGAN_GUIDANCE_ALIAS: Record<string, string> = {
+  rein: "urologie",
+  vessie: "urologie",
+  testicule: "urologie",
+  col_uterin: "gynecologie",
+  endometre: "gynecologie",
+  ovaire: "gynecologie",
+  estomac: "digestif",
+  oesophage: "digestif",
+  foie: "digestif",
+  pancreas: "digestif",
+  appendice: "digestif",
+  vesicule_biliaire: "digestif",
+  duodenum: "digestif",
+  lymphome: "hematologie",
+  ganglion: "hematologie",
+  sarcome: "tissus_mous",
+  systeme_nerveux_central: "neurologie",
+  orl_tete_cou: "orl",
+  peau: "dermatologie",
+};
+
 function OrganGuidance({ organe }: { organe: string }) {
   const [open, setOpen] = useState(true);
-  const guidance = ORGAN_GUIDANCE[organe] ?? ORGAN_GUIDANCE["non_determine"];
+  const guidance =
+    ORGAN_GUIDANCE[organe] ??
+    ORGAN_GUIDANCE[ORGAN_GUIDANCE_ALIAS[organe] ?? ""] ??
+    ORGAN_GUIDANCE["generic"] ??
+    ORGAN_GUIDANCE["non_determine"];
 
   if (!guidance) return null;
 
