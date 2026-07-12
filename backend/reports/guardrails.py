@@ -205,6 +205,11 @@ _PIECE_ONLY_FIELD_TERMS: tuple[str, ...] = (
     "rupture capsulaire", "effraction", "vesicule seminale", "vesicules seminales",
     "extension extraprostatique", "invasion myometriale", "extension au col",
     "infiltration parametre", "exerese", "qualite de l'exerese", "limites d'exerese",
+    # Descripteurs MACROSCOPIQUES de PIECE de resection : non evaluables sur une
+    # cytologie / biopsie (evite d'injecter des champs de nephrectomie/hepatectomie
+    # tumorale sur un brossage biliaire ou une biopsie de greffon).
+    "capsule tumorale", "necrose tumorale", "systeme collecteur", "surrenale",
+    "invasion du systeme", "nombre de nodules", "limite de resection",
 )
 
 
@@ -216,6 +221,10 @@ _TUMORAL_FIELD_TERMS: tuple[str, ...] = (
     "mitotique", "mitose", "ptnm", "pt1", "pt2", "pt3", "pt4", "stade tnm",
     "figo", "embole", "engainement", "metasta", "extension extra",
     "atteinte ganglionnaire", "statut ganglionnaire", "ulceration",
+    "stade pt", "pt is", "ptis",
+    # Tout champ nomme d'apres la TUMEUR n'a aucun sens sur une lesion benigne /
+    # inflammatoire / medicale (necrose tumorale, capsule tumorale, taille tumorale...)
+    "tumoral", "tumorale", "tumeur", "carcinom",
     # Marqueurs moleculaires TUMORAUX (n'ont pas de sens sur une lesion medicale /
     # inflammatoire : evite "statut MMR" sur une maladie de Crohn).
     "mmr", "msi", "microsatellite", "kras", "nras", "braf",

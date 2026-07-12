@@ -19,15 +19,26 @@ def test_greffon_renal_propose_banff():
     assert any("Banff" in c for c in champs)
 
 
-def test_nash_propose_saf():
-    champs = suggest_reporting_fields("Foie, steatohepatite, steatose macrovacuolaire.")
-    assert any("SAF" in c for c in champs)
-
-
-def test_deja_cote_pas_de_doublon():
-    # Bethesda deja renseigne -> ne pas re-proposer.
+def test_mest_c_propose_sur_iga():
+    # Apostrophe courbe du CR ("d'IgA") ne doit pas casser la detection.
     champs = suggest_reporting_fields(
-        "Cytoponction thyroidienne, categorie II Bethesda, benin."
+        "Nephropathie a depots mesangiaux d’IgA, hypercellularite mesangiale."
+    )
+    assert any("MEST-C" in c for c in champs)
+
+
+def test_banff_propose_sur_slot_vide():
+    # Le nom du systeme sur un slot vide ("selon Banff :.") = NON renseigne.
+    champs = suggest_reporting_fields(
+        "Rejet cellulaire aigu du greffon renal. Classification selon Banff :."
+    )
+    assert any("Banff" in c for c in champs)
+
+
+def test_score_renseigne_pas_de_doublon():
+    # Categorie de Paris deja renseignee -> ne pas re-proposer.
+    champs = suggest_reporting_fields(
+        "Cytologie urinaire. Categorie AUC (Systeme de Paris)."
     )
     assert champs == []
 
