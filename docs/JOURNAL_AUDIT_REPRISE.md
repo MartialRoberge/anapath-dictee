@@ -22,7 +22,8 @@ restantes** (non bloquantes). Pour l'architecture et le lancement, voir
 | Abstraction (M5) | logique de panneau extraite de `main.py` → `reports/panel.py` ; endpoint mort `/completude` retiré | `main.py` 595→436 l |
 | Lisibilité | `build_validated_report` (103 l) découpé en phases nommées ; scories (sets à doublons, regex `[A COMPLETER]` dupliquée, branche morte de cohérence) | — |
 
-Tests backend : **119 passent** après chaque étape (`cd backend && python -m pytest -q`).
+Tests backend : **128 passent** au moment de la remise (`cd backend && python -m pytest -q`
+pour le compte exact — la suite évolue avec les ajouts de tests).
 
 Validation métier (non-régression) : campagne held-out de 16 cas neufs (cytologie,
 médical/greffon, tumoral, pièges) via le **vrai chemin de production** (`build_panel`) :
