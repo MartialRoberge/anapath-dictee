@@ -75,7 +75,46 @@ def parse_llm_json(raw: str) -> dict[str, object]:
                     raise GenerationParseError(
                         f"JSON du modele invalide : {exc.msg}"
                     ) from exc
+
+    # Sortie TRONQUEE (jamais refermee) : on tente de recuperer le CR partiel
+    # plutot que d'echouer durement — mieux vaut un CR a finir qu'un ecran rouge.
+    repaired = _repair_truncated_json(cleaned[start:])
+    if repaired is not None:
+        return repaired
     raise GenerationParseError("Objet JSON non termine dans la sortie du modele.")
+
+
+def _repair_truncated_json(fragment: str) -> dict[str, object] | None:
+    """Referme un objet JSON tronque (chaine/accolades non fermees) pour sauver
+    le contenu deja produit. Retourne le dict repare, ou None si irrecuperable."""
+    depth: int = 0
+    in_str: bool = False
+    escape: bool = False
+    for ch in fragment:
+        if escape:
+            escape = False
+            continue
+        if ch == "\\":
+            escape = True
+            continue
+        if ch == '"':
+            in_str = not in_str
+        elif not in_str:
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+    patched: str = fragment
+    if escape:  # se termine sur un backslash pendant -> le retirer
+        patched = patched[:-1]
+    if in_str:
+        patched += '"'
+    patched += "}" * max(depth, 0)
+    try:
+        result = json.loads(patched, strict=False)
+        return result if isinstance(result, dict) else None
+    except json.JSONDecodeError:
+        return None
 
 
 # ---------------------------------------------------------------------------

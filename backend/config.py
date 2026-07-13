@@ -40,7 +40,9 @@ class Settings(BaseSettings):
 
     # Parametres de generation communs a tous les fournisseurs.
     llm_temperature: float = 0.0
-    llm_max_tokens: int = 8192
+    # 16384 : marge large pour les grosses pieces (lobectomie + curage etendu,
+    # multi-prelevements) afin d'eviter la troncature du JSON de sortie.
+    llm_max_tokens: int = 16384
     llm_timeout_seconds: float = 120.0
     llm_max_retries: int = 2
 
