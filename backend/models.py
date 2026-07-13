@@ -28,6 +28,23 @@ class DonneeManquante(BaseModel):
     obligatoire: bool = True
 
 
+class CoherenceIssue(BaseModel):
+    """Un probleme de coherence medicale detecte dans le compte-rendu."""
+
+    code: str
+    message: str
+    severity: str  # "bloquant" | "attention"
+
+
+class CoherenceVerdict(BaseModel):
+    """Verdict de coherence medicale (structure + coherence interne)."""
+
+    ok: bool = True
+    structure_complete: bool = True
+    sections_presentes: list[str] = []
+    issues: list[CoherenceIssue] = []
+
+
 class FormatResponse(BaseModel):
     """Réponse de mise en forme avec détection des données manquantes."""
 
@@ -39,7 +56,7 @@ class FormatResponse(BaseModel):
     organes_detectes: list[str] = []
     type_prelevement: str = "autre"
     # Verdict de coherence medicale calcule a chaque generation.
-    coherence: dict = {}
+    coherence: CoherenceVerdict = CoherenceVerdict()
 
 
 class IterationRequest(BaseModel):
@@ -49,15 +66,12 @@ class IterationRequest(BaseModel):
     nouveau_transcript: str
 
 
-class IterationResponse(BaseModel):
-    """Réponse d'itération avec mise à jour du compte-rendu."""
+class IterationResponse(FormatResponse):
+    """Réponse d'itération : contrat identique à la mise en forme initiale.
 
-    formatted_report: str
-    organe_detecte: str
-    donnees_manquantes: list[DonneeManquante]
-    warnings: list[str] = []
-    template_id: str = "generic"
-    type_prelevement: str = "autre"
+    L'itération produit le meme objet qu'une generation (CR + panneau + garde-fous
+    + coherence) ; elle herite donc de FormatResponse pour garantir un seul contrat.
+    """
 
 
 class ExportRequest(BaseModel):
