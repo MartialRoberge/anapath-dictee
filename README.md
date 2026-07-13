@@ -49,7 +49,9 @@ par simple variable d'environnement, sans toucher au code métier. Détails dans
 Gilbert : [docs/INTEGRATION_GILBERT.md](docs/INTEGRATION_GILBERT.md) (checklist
 technique) et [docs/GILBERT_API_PRODUCT.md](docs/GILBERT_API_PRODUCT.md)
 (roadmap produit). Pour la trajectoire souveraineté/HDS :
-[docs/NOTE_TECHNO_SOUVERAINETE.md](docs/NOTE_TECHNO_SOUVERAINETE.md).
+[docs/NOTE_TECHNO_SOUVERAINETE.md](docs/NOTE_TECHNO_SOUVERAINETE.md). Pour les
+notes de reprise (nettoyage effectué, invariants de sécurité à préserver,
+améliorations restantes) : [docs/JOURNAL_AUDIT_REPRISE.md](docs/JOURNAL_AUDIT_REPRISE.md).
 
 ---
 
@@ -177,15 +179,15 @@ cd frontend && npm run dev
 
 Ouvrir **http://localhost:5173**. En dev, Vite proxifie les routes API
 (`/transcribe`, `/format`, `/iterate`, `/sections`, `/adicap`, `/snomed`,
-`/completude`, `/export`, `/health`, `/auth`, `/reports`, `/admin`) vers le
-backend `:8000` (voir `frontend/vite.config.ts`) — inutile de définir
-`VITE_API_URL` en local.
+`/export`, `/health`, `/auth`, `/reports`, `/admin`) vers le backend `:8000`
+(voir `frontend/vite.config.ts`) — inutile de définir `VITE_API_URL` en local.
 
 ### Endpoints backend
 
 - **Pipeline** (`main.py`) : `POST /transcribe`, `POST /format`, `POST /iterate`,
-  `POST /sections`, `POST /adicap`, `POST /snomed`, `POST /completude`,
-  `POST /export`, `GET /health`.
+  `POST /sections`, `POST /adicap`, `POST /snomed`, `POST /export`, `GET /health`.
+  *(Les champs à compléter — ex-`/completude` — sont désormais renvoyés directement
+  dans la réponse de `/format` et `/iterate`, via `reports/panel.py`.)*
 - **Auth** (`routes_auth.py`, préfixe `/auth`) : `POST /register`, `POST /login`,
   `POST /refresh`, `GET /me`.
 - **Comptes-rendus** (`routes_reports.py`, préfixe `/reports`) : CRUD + feedback.
@@ -292,6 +294,7 @@ Demo_anapath/
 │   │   ├── knowledge.py        #   detect_organs / build_context_block (injection connaissances métier)
 │   │   ├── prompts.py          #   Prompts système/utilisateur (format + iterate)
 │   │   ├── guardrails.py       #   build_validated_report (garde-chiffres, négations, périmètre biopsie)
+│   │   ├── panel.py            #   build_panel : panneau « à compléter » (fusion marqueurs + INCa + LLM)
 │   │   ├── coherence.py        #   Validation de cohérence médicale (à chaque génération)
 │   │   ├── reporting_systems.py#   Systèmes de reporting standardisés (Bethesda, Paris, Milan, Banff…)
 │   │   ├── numbers.py          #   Nombres parlés → chiffres
@@ -313,7 +316,7 @@ Demo_anapath/
 │       ├── services/api.ts     # Client API (API_BASE = VITE_API_URL ?? "")
 │       ├── lib/ , data/
 ├── alembic/                    # Migrations (versions/001_initial_schema.py)
-├── docs/                       # ARCHITECTURE, INTEGRATION_GILBERT, GILBERT_API_PRODUCT, NOTE_TECHNO_SOUVERAINETE
+├── docs/                       # ARCHITECTURE, INTEGRATION_GILBERT, GILBERT_API_PRODUCT, NOTE_TECHNO_SOUVERAINETE, JOURNAL_AUDIT_REPRISE
 ├── scripts/reset_password.py
 ├── Dockerfile, docker-compose.yml, render.yaml, start.sh, .env.example
 ├── recherche_standards_anatomopathologie_france.md   # Recherche métier (standards ACP France)

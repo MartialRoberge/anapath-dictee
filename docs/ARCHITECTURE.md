@@ -85,8 +85,9 @@ Appliqués à **toute** sortie (locale ou distante) par `build_validated_report`
 
 Les risques deviennent des `warnings` (revue humaine) ; le pathologiste valide.
 Une **validation de cohérence médicale** (`reports/coherence.py`) est calculée à
-chaque génération. Le panneau « à compléter » fusionne marqueurs déterministes,
-champs obligatoires INCa manquants, recommandations LLM et systèmes de reporting
+chaque génération. Le panneau « à compléter » (`reports/panel.py` → `build_panel`,
+appelé par `/format` et `/iterate`) fusionne marqueurs déterministes, champs
+obligatoires INCa manquants, recommandations LLM et systèmes de reporting
 standardisés (`reports/reporting_systems.py` : Bethesda, Paris, Milan, Banff,
 MEST-C, SAF, ISHLT…), avec double garde (hors-contexte + anti-faux-positif).
 
@@ -97,8 +98,11 @@ MEST-C, SAF, ISHLT…), avec double garde (hors-contexte + anti-faux-positif).
 - `snomed.py` — suggestion de codes **SNOMED CT** (topographie + morphologie),
   endpoint `/snomed`. 100 % local (l'URI `snomed.info/sct` n'est qu'un namespace,
   pas un appel réseau).
-- `detection_manquantes.py` — champs obligatoires **INCa** manquants et score de
-  complétude, endpoint `/completude`.
+- `detection_manquantes.py` — champs obligatoires **INCa** manquants (surfacés dans
+  le panneau « à compléter », cf. `reports/panel.py`). La fonction
+  `calculer_score_completude` existe encore mais **n'est plus exposée** en endpoint
+  HTTP (l'ancien `/completude` a été retiré ; les manques reviennent dans la réponse
+  de `/format` et `/iterate`).
 - `specimen_type.py` — détection du type de prélèvement (`SpecimenType`) et du
   contexte diagnostique, utilisée pour filtrer les champs applicables.
 
