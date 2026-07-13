@@ -130,21 +130,40 @@ def _deviner_section_depuis_contexte(
     return derniere_section
 
 
+# Formulations rendant un champ RECOMMANDE (optionnel) plutot qu'obligatoire.
+_PHRASES_CONDITIONNELLES: tuple[str, ...] = (
+    "si realise", "si applicable", "si disponible", "le cas echeant",
+    "si connu", "eventuel", "si present", "si effectue", "si indique",
+)
+
+
+def _marqueur_nom_exploitable(description_brute: str) -> bool:
+    """Un marqueur [A COMPLETER: ...] designe-t-il un vrai champ nomme ?
+
+    Ecarte (le rappel deterministe fournit le champ nomme a la place) :
+    - les marqueurs GENERIQUES NUS ("grade", "resultat", "valeur"...) ;
+    - les fragments d'INSTRUCTION ("preciser le pourcentage", "precisez 0/1+...").
+    """
+    coeur = _normaliser_texte(description_brute.split("(")[0])
+    tokens_utiles = [t for t in coeur.split() if t not in _MARQUEURS_GENERIQUES]
+    if not tokens_utiles:
+        return False
+    if coeur.startswith(("preciser", "precisez", "precise ")):
+        return False
+    return True
+
+
+def _est_champ_conditionnel(cle_normalisee: str) -> bool:
+    """Le champ est-il optionnel ('si realise', 'si applicable'...) ?"""
+    return any(phrase in cle_normalisee for phrase in _PHRASES_CONDITIONNELLES)
+
+
 def extraire_marqueurs_a_completer(rapport: str) -> list[DonneeManquante]:
-    """Extrait les marqueurs [A COMPLETER: xxx] du rapport.
+    """Extrait les marqueurs [A COMPLETER: xxx] du rapport en DonneeManquante.
 
-    Parcourt le rapport a la recherche de tous les patterns
-    [A COMPLETER: description] et les convertit en objets DonneeManquante.
-
-    C'est la source PRIMAIRE de detection : le LLM connait le contexte
-    clinique et n'insere ces marqueurs que pour les champs veritablement
-    pertinents.
-
-    Args:
-        rapport: Le compte-rendu formate en Markdown.
-
-    Returns:
-        Liste de DonneeManquante extraites des marqueurs.
+    Source PRIMAIRE de detection : le LLM connait le contexte clinique et n'insere
+    ces marqueurs que pour les champs pertinents. On deduplique, on ecarte les
+    marqueurs non exploitables, on devine la section et le caractere obligatoire.
     """
     resultats: list[DonneeManquante] = []
     noms_vus: set[str] = set()
@@ -152,38 +171,16 @@ def extraire_marqueurs_a_completer(rapport: str) -> list[DonneeManquante]:
     for match in _PATTERN_A_COMPLETER.finditer(rapport):
         description_brute: str = match.group(1).strip()
 
-        # Eviter les doublons si le meme marqueur apparait plusieurs fois
         cle: str = _normaliser_texte(description_brute)
-        if cle in noms_vus:
+        if cle in noms_vus:  # meme marqueur repete
             continue
         noms_vus.add(cle)
 
-        # Marqueur GENERIQUE NU inexploitable ("grade", "resultat", "valeur"...) :
-        # on ne l'affiche pas au panneau (le rappel deterministe fournit le vrai
-        # champ nomme). Le "coeur" avant une parenthese doit contenir un terme non
-        # generique.
-        coeur = _normaliser_texte(description_brute.split("(")[0])
-        tokens_utiles = [t for t in coeur.split() if t not in _MARQUEURS_GENERIQUES]
-        if not tokens_utiles:
-            continue
-        # Fragment d'INSTRUCTION ("preciser le pourcentage", "precisez 0/1+...") :
-        # ce n'est pas un nom de champ -> on l'ecarte (le rappel deterministe
-        # fournit le champ nomme : RE, HER2, Ki67...).
-        if coeur.startswith(("preciser", "precisez", "precise ")):
+        if not _marqueur_nom_exploitable(description_brute):
             continue
 
-        # Deviner la section depuis le contexte
         section: str = _deviner_section_depuis_contexte(rapport, match.start())
-
-        # Champ CONDITIONNEL ("si realise", "si applicable"...) -> recommande, pas
-        # obligatoire : evite de sur-solliciter le pathologiste sur de l'optionnel.
-        est_conditionnel: bool = any(
-            phrase in cle
-            for phrase in (
-                "si realise", "si applicable", "si disponible", "le cas echeant",
-                "si connu", "eventuel", "si present", "si effectue", "si indique",
-            )
-        )
+        est_conditionnel: bool = _est_champ_conditionnel(cle)
 
         resultats.append(
             DonneeManquante(
