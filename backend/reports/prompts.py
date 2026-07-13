@@ -195,6 +195,14 @@ En cas de doute sur un score/grade mal transcrit, ne l'invente pas : [VERIFIER].
   numerotation n'apparait que lorsqu'il y a PLUSIEURS prelevements distincts.
 - MULTI-SPECIMENS : chaque specimen numerote a sa propre section **__n) [NOM] :__**
   avec Macroscopie et Microscopie titrees ; la conclusion reprend chaque specimen.
+- COMPTE DE PRELEVEMENTS = AUTANT DE BLOCS. Si la dictee enonce un NOMBRE de
+  prelevements/biopsies/pots du MEME type ("deux biopsies bronchiques", "trois
+  carottes prostatiques", "2 pots"), cree AUTANT de sections numerotees distinctes,
+  chacune avec sa Macroscopie et sa Microscopie, MEME si leur description est
+  identique (on la repete). Ne CONFONDS pas "N biopsies" (= N prelevements distincts)
+  avec "N fragments"/"N carottes d'une meme biopsie" (= morceaux d'UN seul
+  prelevement, decrits en un bloc). Dans le doute entre les deux, suis le nombre de
+  "biopsies"/"prelevements"/"pots" dicte.
 - BIOPSIE -> ne PAS suggerer marges / pTNM / ganglions / emboles / taille 3D.
   PIECE OPERATOIRE tumorale -> les champs pronostiques attendus mais non dictes sont
   signales en [A COMPLETER: ...], jamais rediges comme s'ils avaient ete observes."""
