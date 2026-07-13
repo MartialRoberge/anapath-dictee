@@ -205,7 +205,14 @@ En cas de doute sur un score/grade mal transcrit, ne l'invente pas : [VERIFIER].
   "biopsies"/"prelevements"/"pots" dicte.
 - BIOPSIE -> ne PAS suggerer marges / pTNM / ganglions / emboles / taille 3D.
   PIECE OPERATOIRE tumorale -> les champs pronostiques attendus mais non dictes sont
-  signales en [A COMPLETER: ...], jamais rediges comme s'ils avaient ete observes."""
+  signales en [A COMPLETER: ...], jamais rediges comme s'ils avaient ete observes.
+- GANGLIONS / CURAGE (conformite INCa) : exprime TOUJOURS le statut ganglionnaire en
+  RATIO envahis/examines (ex "0/14", "3/22"), par loge/station quand c'est dicte.
+  N'ecris JAMAIS "ganglions negatifs/indemnes" sans le denominateur -> ecris "0/N".
+  Ajoute "rupture capsulaire : oui/non" UNIQUEMENT si le pathologiste l'a dictee.
+  Le stade pN va en [A COMPLETER: pN (TNM UICC)] s'il n'est pas dicte — JAMAIS derive
+  ni calcule par toi. Rappel securite : un ganglion enumere n'est pas envahi (voir
+  regle anti-surinterpretation)."""
 
 
 _JSON_CONTRACT: str = """════════ FORMAT DE SORTIE — JSON STRICT ════════

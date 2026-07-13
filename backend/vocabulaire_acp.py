@@ -19,7 +19,7 @@ CONTEXT_BIAS_TERMS: list[str] = [
     "TTF1", "ALK", "PD-L1", "Ki67",
     "HER2", "CK7", "CK20", "CK5/6", "CDX2", "p16", "p40", "p63", "p53",
     "GATA3", "PAX8", "SOX10", "Melan-A", "HMB45",
-    "AMACR", "P504S", "PSA", "NKX3.1", "ERG",
+    "AMACR", "PSA", "ERG",
     "Chromogranine", "Synaptophysine",
     "RE", "RP", "MLH1", "MSH2", "MSH6", "PMS2",
     "BRAF", "KRAS", "NRAS", "EGFR", "ROS1",
@@ -27,7 +27,7 @@ CONTEXT_BIAS_TERMS: list[str] = [
     # Éponymes/Scores (critiques pour le sens clinique)
     "Gleason", "ISUP", "Scarff-Bloom-Richardson", "SBR",
     "Breslow", "Clark", "Fuhrman", "Nottingham",
-    "pTNM", "FIGO", "METAVIR",
+    "pTNM", "FIGO",
     # Termes techniques fréquemment mal transcrits (mots simples uniquement)
     "adénocarcinome", "carcinome", "épidermoïde", "urothélial",
     "mélanome", "mésothéliome", "lymphome",
@@ -38,6 +38,10 @@ CONTEXT_BIAS_TERMS: list[str] = [
     # Anatomie critique
     "bronchique", "hilaire", "parenchymateuse", "périnerveux",
     "lymphovasculaire", "ganglionnaire",
+    # Loges / stations ganglionnaires (proprement mal reconnues -> ex "Barety"
+    # transcrit "barretis", "sous-carinaire" perdu). Coeur du curage thoracique/abdo.
+    "Barety", "sous-carinaire", "paratrachéal", "para-œsophagien",
+    "interlobaire", "péribronchique", "lombo-aortique",
     # Prélèvements
     "lobectomie", "mastectomie", "prostatectomie",
     "néphrectomie", "colectomie", "gastrectomie",
@@ -47,8 +51,7 @@ CONTEXT_BIAS_TERMS: list[str] = [
     # Néoplasies intraépithéliales
     "AIN3", "CIN3",
     # Biologie moléculaire
-    "FISH", "NGS",
-    "IDH1", "ATRX", "H3K27M",
+    "FISH", "NGS", "IDH1",
 ]
 
 
