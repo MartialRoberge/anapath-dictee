@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import asyncio
 
-from main import _merge_donnees_manquantes
+from reports.panel import merge_donnees_manquantes as _merge_donnees_manquantes
 from detection_manquantes import detecter_donnees_manquantes
 from reports.guardrails import _asserted_content, _field_present, filter_present_alertes
 from reports.local_engine import LocalReportEngine

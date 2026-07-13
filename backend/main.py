@@ -36,7 +36,6 @@ from models import (
     IterationResponse,
     ExportRequest,
     SectionsResponse,
-    DonneeManquante,
     CoherenceVerdict,
     AdicapRequest,
     AdicapResponse,
@@ -44,20 +43,16 @@ from models import (
     SnomedResponse,
 )
 from export_docx import markdown_to_docx, split_report_sections
-from detection_manquantes import (
-    detecter_donnees_manquantes,
-    detecter_champs_obligatoires_manquants,
-)
 from adicap import suggerer_adicap
 from snomed import suggerer_snomed
-from text_utils import cle_alphanum, normaliser
 from config import get_settings, validate_settings_at_startup
 from database import close_engine, create_tables
 from auth import get_current_user
 from db_models import User
 from llm.base import LLMError, LLMTimeoutError, LLMTransientError
 from reports import GeneratedReport, ReportEngine, get_report_engine, reset_report_engine
-from reports.guardrails import GenerationParseError, filter_present_alertes
+from reports.guardrails import GenerationParseError
+from reports.panel import build_panel
 from routes_auth import router as auth_router
 from routes_reports import router as reports_router
 from routes_admin import router as admin_router
@@ -273,119 +268,12 @@ async def format_text(
     return _to_format_response(result)
 
 
-def _merge_donnees_manquantes(
-    deterministes: list[DonneeManquante], recommandees: list[DonneeManquante]
-) -> list[DonneeManquante]:
-    """Fusionne les champs manquants deterministes (marqueurs [A COMPLETER],
-    obligatoires) et les recommandations LLM (probabilistes), en dedupliquant :
-    un champ deja couvert par un marqueur deterministe n'est pas re-liste."""
-    resultat: list[DonneeManquante] = list(deterministes)
-    vus: list[str] = [cle_alphanum(d.champ) for d in deterministes]
-    for reco in recommandees:
-        cle = cle_alphanum(reco.champ)
-        if not cle:
-            continue
-        # Dédoublonnage par inclusion : "ptnm" et "ptnmtnm8esein" sont le même champ.
-        if any(cle in v or v in cle for v in vus):
-            continue
-        resultat.append(reco)
-        vus.append(cle)
-    return resultat
-
-
-def _safety_filter_panel(
-    donnees: list[DonneeManquante], result: GeneratedReport
-) -> list[DonneeManquante]:
-    """Filtre de securite du panneau FINAL (marqueurs deterministes inclus).
-
-    Garantit qu'aucun champ hors-contexte organe / prelevement / nature de lesion
-    ne peut apparaitre, quelle que soit sa source (LLM ou marqueur [A COMPLETER]) :
-    un champ tumoral ne peut pas apparaitre sur une lesion benigne.
-    """
-    from reports.guardrails import filter_alertes
-    from specimen_type import SpecimenType, detecter_diagnostic_context
-
-    try:
-        specimen = SpecimenType(result.type_prelevement)
-    except ValueError:
-        specimen = SpecimenType.INDETERMINE
-    contexte = detecter_diagnostic_context(result.cr).value
-    filtres, _ = filter_alertes(donnees, result.organes_detectes, specimen, contexte)
-    return filtres
-
-
-def _build_panel(result: GeneratedReport) -> list[DonneeManquante]:
-    """Construit le panneau "a completer" — pipeline complet, partage format/iterate.
-
-    Sources fusionnees : (1) marqueurs [A COMPLETER] du CR (deterministes), (2)
-    RAPPEL DETERMINISTE des champs obligatoires INCa applicables absents (comble
-    les oublis du LLM sur les pieces), (3) recommandations du LLM. Puis double
-    garde : filtre de securite (hors-contexte) + anti-faux-positif (deja present).
-    """
-    marqueurs: list[DonneeManquante] = detecter_donnees_manquantes(
-        result.cr, result.organe
-    )
-    obligatoires: list[DonneeManquante] = detecter_champs_obligatoires_manquants(
-        result.cr, result.organes_detectes
-    )
-    panel = _merge_donnees_manquantes(marqueurs + obligatoires, result.alertes)
-    panel = _safety_filter_panel(panel, result)
-    panel, _ = filter_present_alertes(panel, result.cr)
-    panel = _polish_panel(panel, result.cr)
-    # Systemes de reporting standardises (cytologie + pathologie medicale) : propose
-    # la categorie/score attendu (Bethesda, Paris, Milan, Banff, MEST-C, SAF, ISHLT,
-    # Amsterdam...) EN [A COMPLETER] s'il n'est pas dicte. Ne cote jamais a la place.
-    # Ajoute APRES l'anti-faux-positif : le module a deja son propre controle de
-    # presence precis (categorie/score reellement rempli), sinon ses mots-cles
-    # declencheurs presents dans le CR le feraient supprimer a tort.
-    from reports.reporting_systems import suggest_reporting_fields
-
-    reporting: list[DonneeManquante] = [
-        DonneeManquante(
-            champ=champ,
-            description="Systeme de reporting standardise applicable — a renseigner "
-            "par le pathologiste (jamais cote automatiquement).",
-            section="reporting",
-        )
-        for champ in suggest_reporting_fields(result.cr)
-    ]
-    panel = _merge_donnees_manquantes(panel, reporting)
-    return panel
-
-
-def _polish_panel(
-    panel: list[DonneeManquante], cr: str
-) -> list[DonneeManquante]:
-    """Finition du panneau : retire les champs inadaptes au sous-site — le
-    'mesorectum' (concept RECTAL) n'a pas de sens sur un colon/sigmoide."""
-    low_cr = normaliser(cr)
-    has_rectum = "rectum" in low_cr or "rectal" in low_cr
-    # Le grade FNCLCC ne s'applique PAS aux sarcomes a cellules rondes / pediatriques
-    # (rhabdomyosarcome, Ewing, neuroblastome... : haut grade par definition, autres
-    # systemes IRS/COG/SIOP). On retire le champ FNCLCC dans ce contexte.
-    sarcome_non_fnclcc = any(
-        w in low_cr for w in ("rhabdomyosarcome", "ewing", "neuroblastome",
-                              "embryonnaire", "desmoplastique a petites cellules",
-                              "pnet")
-    )
-
-    def _garder(d: DonneeManquante) -> bool:
-        n = normaliser(d.champ)
-        if "mesorect" in n and not has_rectum:
-            return False
-        if "fnclcc" in n and sarcome_non_fnclcc:
-            return False
-        return True
-
-    return [d for d in panel if _garder(d)]
-
-
 def _to_format_response(result: GeneratedReport) -> FormatResponse:
     """Assemble la reponse API : marqueurs deterministes + recommandations filtrees."""
     return FormatResponse(
         formatted_report=result.cr,
         organe_detecte=result.organe,
-        donnees_manquantes=_build_panel(result),
+        donnees_manquantes=build_panel(result),
         warnings=result.warnings,
         organes_detectes=result.organes_detectes,
         type_prelevement=result.type_prelevement,

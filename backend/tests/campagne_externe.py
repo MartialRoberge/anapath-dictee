@@ -26,7 +26,7 @@ import re
 import sys
 import unicodedata
 
-from main import _build_panel
+from reports.panel import build_panel as _build_panel
 from detection_manquantes import detecter_donnees_manquantes
 from reports.guardrails import filter_present_alertes
 from reports.local_engine import LocalReportEngine

@@ -6,7 +6,7 @@ lésion (pas de champ pièce sur biopsie, pas de champ tumoral sur bénin).
 """
 
 from reports.engine import GeneratedReport
-from main import _build_panel
+from reports.panel import build_panel as _build_panel
 
 
 def _panel(cr, organe, tp, organes):
