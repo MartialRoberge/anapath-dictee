@@ -2933,46 +2933,6 @@ _INDEX_PAR_ORGANE: dict[str, TemplateOrgane] = {t.organe: t for t in TOUS_LES_TE
 # ===========================================================================
 
 
-import re as _re
-
-from text_utils import normaliser as _normaliser_accents
-
-
-def _mot_cle_present(mot_cle_norm: str, texte_norm: str) -> bool:
-    """Vérifie la présence d'un mot-clé avec respect des limites de mots."""
-    pattern: str = r"\b" + _re.escape(mot_cle_norm) + r"\b"
-    return _re.search(pattern, texte_norm) is not None
-
-
-def detecter_organe(transcript: str) -> str | None:
-    """Détecte l'organe principal à partir du transcript.
-
-    Parcourt les mots-clés de détection de chaque template et retourne
-    l'organe dont le score de correspondance est le plus élevé.
-    Utilise le matching par mots entiers pour éviter les faux positifs.
-    Retourne None si aucun organe n'est détecté avec un score suffisant.
-    """
-    texte_norm: str = _normaliser_accents(transcript.lower())
-    meilleur_organe: str | None = None
-    meilleur_score: int = 0
-
-    for template in TOUS_LES_TEMPLATES:
-        score: int = 0
-        for mot_cle in template.mots_cles_detection:
-            mot_cle_norm: str = _normaliser_accents(mot_cle.lower())
-            if _mot_cle_present(mot_cle_norm, texte_norm):
-                score += 1
-        if score > meilleur_score:
-            meilleur_score = score
-            meilleur_organe = template.organe
-
-    # Seuil minimum : au moins 1 mot-clé spécifique détecté
-    if meilleur_score < 1:
-        return None
-
-    return meilleur_organe
-
-
 def get_template(organe: str) -> TemplateOrgane | None:
     """Retourne le template pour un organe donné.
 
@@ -2998,11 +2958,6 @@ def get_template(organe: str) -> TemplateOrgane | None:
     return None
 
 
-def get_all_organes() -> list[str]:
-    """Retourne la liste de tous les organes couverts (noms internes)."""
-    return [t.organe for t in TOUS_LES_TEMPLATES]
-
-
 def get_champs_obligatoires(organe: str) -> list[ChampObligatoire]:
     """Retourne les champs obligatoires pour un organe.
 
@@ -3012,90 +2967,3 @@ def get_champs_obligatoires(organe: str) -> list[ChampObligatoire]:
     if template is None:
         return []
     return [c for c in template.champs_obligatoires if c.obligatoire]
-
-
-def detecter_champs_manquants(organe: str, texte_rapport: str) -> list[ChampObligatoire]:
-    """Détecte les champs obligatoires manquants dans un texte de rapport.
-
-    Pour chaque champ obligatoire, vérifie si au moins un des mots-clés
-    de détection est présent dans le texte. Retourne la liste des champs
-    non détectés.
-    """
-    champs: list[ChampObligatoire] = get_champs_obligatoires(organe)
-    texte_lower: str = texte_rapport.lower()
-    manquants: list[ChampObligatoire] = []
-
-    for champ in champs:
-        trouve: bool = False
-        for mot_cle in champ.mots_cles_detection:
-            if mot_cle.lower() in texte_lower:
-                trouve = True
-                break
-        if not trouve:
-            manquants.append(champ)
-
-    return manquants
-
-
-def generer_prompt_template(organe: str) -> str:
-    """Génère le texte de template à injecter dans le prompt LLM pour un organe donné.
-
-    Retourne une chaîne vide si l'organe n'est pas trouvé.
-    """
-    template: TemplateOrgane | None = get_template(organe)
-    if template is None:
-        return ""
-
-    lignes: list[str] = []
-    lignes.append(f"=== TEMPLATE COMPTE RENDU : {template.nom_affichage.upper()} ===")
-    lignes.append("")
-    lignes.append(f"Système de staging : {template.systeme_staging}")
-    lignes.append("")
-
-    # Notes spécifiques
-    lignes.append("--- NOTES SPÉCIFIQUES ---")
-    lignes.append(template.notes_specifiques)
-    lignes.append("")
-
-    # Champs obligatoires par section
-    sections_ordre: list[str] = ["macroscopie", "microscopie", "ihc", "biologie_moleculaire", "conclusion"]
-    noms_sections: dict[str, str] = {
-        "macroscopie": "MACROSCOPIE",
-        "microscopie": "MICROSCOPIE",
-        "ihc": "IMMUNOHISTOCHIMIE",
-        "biologie_moleculaire": "BIOLOGIE MOLÉCULAIRE",
-        "conclusion": "CONCLUSION",
-    }
-
-    for section in sections_ordre:
-        champs_section: list[ChampObligatoire] = [
-            c for c in template.champs_obligatoires if c.section == section
-        ]
-        if not champs_section:
-            continue
-
-        nom_section: str = noms_sections.get(section, section.upper())
-        lignes.append(f"--- {nom_section} ---")
-        lignes.append("Données OBLIGATOIRES à inclure :")
-        for champ in champs_section:
-            statut: str = "OBLIGATOIRE" if champ.obligatoire else "recommandé"
-            lignes.append(f"  - {champ.nom} [{statut}] : {champ.description}")
-            lignes.append(f"    Exemple : {champ.exemple_formulation}")
-        lignes.append("")
-
-    # Marqueurs IHC attendus
-    lignes.append("--- MARQUEURS IHC ATTENDUS ---")
-    lignes.append(", ".join(template.marqueurs_ihc))
-    lignes.append("")
-
-    # Template macroscopie
-    lignes.append("--- MODÈLE DE MACROSCOPIE ---")
-    lignes.append(template.template_macroscopie)
-    lignes.append("")
-
-    # Template conclusion
-    lignes.append("--- MODÈLE DE CONCLUSION ---")
-    lignes.append(template.template_conclusion)
-    lignes.append("")
-
-    return "\n".join(lignes)
