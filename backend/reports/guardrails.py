@@ -778,6 +778,89 @@ def _check_negation_flags(cr: str, source_text: str) -> list[str]:
     return warnings
 
 
+# Atteinte ganglionnaire AFFIRMEE dans le CR (formes positives uniquement).
+_NODAL_POSITIVE_RE: re.Pattern[str] = re.compile(
+    r"ganglion[a-z]*\s+(?:\w+\s+){0,3}?(?:envahi|metastatiq|atteint|positif|suspect)"
+    r"|metastas[a-z]*\s+ganglionnaire"
+    r"|envahissement\s+ganglionnaire"
+    r"|adenopathie[a-z]*\s+(?:metastatiq|suspect)"
+    r"|effraction\s+capsulaire"
+    r"|\bp?n[123]\b",
+    re.IGNORECASE,
+)
+# Contexte NEGATIF -> l'affirmation d'atteinte est en fait une negation (sans danger).
+_NODAL_NEGATION_MARKERS: tuple[str, ...] = (
+    "sans", "pas de", "pas d", "absence", "aucun", "indemne", "non ", "ni ",
+    "0/", "0 /", "libre", "respecte", "epargne",
+)
+# Vocabulaire d'atteinte ganglionnaire dans la DICTEE (source) : s'il est present,
+# l'affirmation du CR est supportee (pas d'alerte).
+_NODAL_SOURCE_SUPPORT: tuple[str, ...] = (
+    "envahi", "metasta", "atteint", "positif", "suspect", "adenopathie",
+    "effraction", "rupture capsulaire", "pn1", "pn2", "pn3", "n1", "n2", "n3",
+    "macrometasta", "micrometasta", "itc",
+)
+
+
+def _is_negated(norm_text: str, pos: int, window: int = 22) -> bool:
+    """La position `pos` est-elle precedee d'un marqueur de negation (fenetre courte) ?"""
+    before: str = norm_text[max(0, pos - window) : pos]
+    return any(neg in before for neg in _NODAL_NEGATION_MARKERS)
+
+
+def _source_asserts_nodal_involvement(src_norm: str) -> bool:
+    """La DICTEE affirme-t-elle une atteinte ganglionnaire en contexte POSITIF ?
+
+    'indemne de lesion metastatique' contient 'metasta' mais en contexte NEGATIF :
+    on ne le compte pas comme une atteinte dictee."""
+    for term in _NODAL_SOURCE_SUPPORT:
+        start: int = 0
+        while True:
+            idx: int = src_norm.find(term, start)
+            if idx == -1:
+                break
+            if not _is_negated(src_norm, idx):
+                return True
+            start = idx + len(term)
+    return False
+
+
+def _check_nodal_overinterpretation(
+    cr: str, source_text: str
+) -> tuple[list[str], list[DonneeManquante]]:
+    """Securite : le CR affirme-t-il une ATTEINTE ganglionnaire absente de la dictee ?
+
+    Surstadification (N0 -> N+) = danger clinique direct. Si le CR affirme un
+    envahissement/metastase ganglionnaire (forme positive, hors contexte negatif)
+    alors que la dictee n'affirme AUCUNE atteinte (en contexte positif), on le
+    signale fortement (warning + champ a verifier) sans reecrire le texte a l'aveugle.
+    """
+    cr_norm: str = _strip_accents_lower(cr)
+    src_norm: str = _strip_accents_lower(source_text)
+
+    if _source_asserts_nodal_involvement(src_norm):
+        return [], []  # atteinte reellement dictee -> le CR a le droit de l'affirmer
+
+    for match in _NODAL_POSITIVE_RE.finditer(cr_norm):
+        if _is_negated(cr_norm, match.start(), window=30):
+            continue  # "sans metastase ganglionnaire" -> negation, sans danger
+        fragment: str = cr[match.start() : match.start() + 60].split("\n")[0].strip()
+        warnings: list[str] = [
+            f"Atteinte ganglionnaire affirmee ('{fragment}') mais AUCUNE atteinte "
+            f"n'est retrouvee dans la dictee : risque de surstadification — a verifier."
+        ]
+        return warnings, [
+            DonneeManquante(
+                champ="Statut ganglionnaire a confirmer (atteinte non dictee)",
+                description="Le CR affirme une atteinte ganglionnaire absente de la "
+                "dictee. Verifier : sur-interpretation possible (surstadification).",
+                section="conclusion",
+                obligatoire=True,
+            )
+        ]
+    return [], []
+
+
 def _check_biopsy_scope(cr: str, specimen: SpecimenType) -> list[str]:
     """Sur biopsie, aucun champ de piece operatoire ne doit apparaitre."""
     if specimen is not SpecimenType.BIOPSIE:
@@ -833,6 +916,10 @@ def _collect_guardrail_warnings(
     warnings += _check_biopsy_scope(cr, specimen)
     warnings += _check_classification_scope(cr, organes)
     warnings += _check_tnm_derivation(cr, source_text)
+    if source_text.strip():
+        nodal_warnings, nodal_alertes = _check_nodal_overinterpretation(cr, source_text)
+        warnings += nodal_warnings
+        alertes += nodal_alertes
     if run_number_guard and source_text.strip():
         num_warnings, num_alertes = _check_numbers(cr, source_text)
         warnings += num_warnings
