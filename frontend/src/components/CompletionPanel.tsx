@@ -375,7 +375,7 @@ export default function CompletionPanel({
       {relevantMarkers.length > 0 && (
         <div className="space-y-1">
           <div className="flex items-center justify-between text-[0.65rem] text-muted-foreground">
-            <span>{dismissedCount + (relevantMarkers.length - activeMarkers.length)} / {relevantMarkers.length} verifie{dismissedCount > 1 ? "s" : ""}</span>
+            <span>{dismissedCount} / {relevantMarkers.length} verifie{dismissedCount > 1 ? "s" : ""}</span>
             <span>{Math.round(((relevantMarkers.length - activeMarkers.length) / relevantMarkers.length) * 100)}%</span>
           </div>
           <div className="h-1.5 w-full rounded-full bg-muted">
