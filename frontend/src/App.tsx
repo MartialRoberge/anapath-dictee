@@ -606,7 +606,7 @@ export default function App() {
         <main className="flex flex-1 overflow-hidden">
           {page === "history" ? (
             <section className="flex-1 overflow-y-auto p-6 scrollbar-thin">
-              <HistoryPage token={getToken()} onBack={() => setPage("app")} onOpenReport={handleOpenReport} />
+              <HistoryPage token={getToken()} onOpenReport={handleOpenReport} />
             </section>
           ) : (
           <>
@@ -629,7 +629,6 @@ export default function App() {
             <ReportPanel
               report={report}
               onReportChange={setReport}
-              markers={markers}
               organeDetecte={organeDetecte}
             />
 
@@ -663,7 +662,6 @@ export default function App() {
                 <ReportPanel
                   report={report}
                   onReportChange={setReport}
-                  markers={markers}
                   organeDetecte={organeDetecte}
                 />
               </div>

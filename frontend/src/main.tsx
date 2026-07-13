@@ -1,6 +1,5 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ToastProvider } from "./components/Toast";
 import App from "./App";
@@ -15,9 +14,7 @@ createRoot(rootElement).render(
   <StrictMode>
     <ErrorBoundary>
       <ToastProvider>
-        <TooltipProvider>
-          <App />
-        </TooltipProvider>
+        <App />
       </ToastProvider>
     </ErrorBoundary>
   </StrictMode>

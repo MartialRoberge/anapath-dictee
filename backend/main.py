@@ -42,14 +42,11 @@ from models import (
     AdicapResponse,
     SnomedCode,
     SnomedResponse,
-    CompletudeRequest,
-    CompletudeResponse,
 )
 from export_docx import markdown_to_docx, split_report_sections
 from detection_manquantes import (
     detecter_donnees_manquantes,
     detecter_champs_obligatoires_manquants,
-    calculer_score_completude,
 )
 from adicap import suggerer_adicap
 from snomed import suggerer_snomed
@@ -493,31 +490,6 @@ async def get_snomed(
     return SnomedResponse(
         topography=SnomedCode(**topo),  # type: ignore[arg-type]
         morphology=SnomedCode(**morpho),  # type: ignore[arg-type]
-    )
-
-
-# ---------------------------------------------------------------------------
-# Completude INCa
-# ---------------------------------------------------------------------------
-
-
-@app.post("/completude", response_model=CompletudeResponse)
-async def get_completude(
-    _user: Annotated[User, Depends(get_current_user)],
-    req: CompletudeRequest,
-) -> CompletudeResponse:
-    """Calcule le score de completude INCa du rapport."""
-    if not req.formatted_report.strip():
-        raise HTTPException(status_code=400, detail="Rapport vide.")
-
-    result: dict[str, int | float] = calculer_score_completude(
-        req.formatted_report, req.organe_detecte
-    )
-    return CompletudeResponse(
-        score=int(result["score"]),
-        total_champs=int(result["total_champs"]),
-        champs_presents=int(result["champs_presents"]),
-        pourcentage=float(result["pourcentage"]),
     )
 
 

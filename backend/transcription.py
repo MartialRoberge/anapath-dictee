@@ -13,10 +13,11 @@ _httpx_client: httpx.AsyncClient | None = None
 
 
 def _get_httpx_client() -> httpx.AsyncClient:
-    """Retourne le client httpx singleton."""
+    """Retourne le client httpx singleton (timeout STT depuis la configuration)."""
     global _httpx_client
     if _httpx_client is None:
-        _httpx_client = httpx.AsyncClient(timeout=180.0)
+        timeout = get_settings().stt_timeout_seconds
+        _httpx_client = httpx.AsyncClient(timeout=timeout)
     return _httpx_client
 
 
@@ -87,7 +88,7 @@ async def transcribe_audio(audio_bytes: bytes, filename: str) -> str:
     context_csv: str = _build_context_bias_csv()
 
     form_data: dict[str, str] = {
-        "model": "voxtral-mini-latest",
+        "model": settings.voxtral_model,
         "language": "fr",
     }
 
@@ -116,5 +117,6 @@ async def transcribe_audio(audio_bytes: bytes, filename: str) -> str:
         return data.get("text", "")
 
     return await with_retry(
-        _call, max_retries=2, base_delay=1.0, label="transcription Voxtral"
+        _call, max_retries=settings.llm_max_retries, base_delay=1.0,
+        label="transcription Voxtral"
     )

@@ -25,7 +25,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { exportDocx, getSections } from "../services/api";
-import type { Marker } from "../services/api";
 import CodificationPanel from "./CodificationPanel";
 import { copyReportRich, markdownToPlainText } from "../lib/reportText";
 
@@ -751,18 +750,14 @@ function SectionCard({
 interface ReportPanelProps {
   report: string | null;
   onReportChange: (report: string) => void;
-  markers: Marker[];
   organeDetecte: string;
 }
 
 export default function ReportPanel({
   report,
   onReportChange,
-  markers: _markers,
   organeDetecte,
 }: ReportPanelProps) {
-  void _markers;
-
   const [rawSections, setRawSections] = useState<Record<string, string> | null>(null);
   const [loadingSections, setLoadingSections] = useState(false);
   const [copied, setCopied] = useState(false);

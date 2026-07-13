@@ -19,7 +19,6 @@ interface ReportSummary {
 
 interface HistoryPageProps {
   token: string | null;
-  onBack: () => void;
   onOpenReport: (reportId: string) => void;
 }
 
@@ -93,7 +92,6 @@ function groupByDate(reports: ReportSummary[]): Map<string, ReportSummary[]> {
 
 export default function HistoryPage({
   token,
-  onBack,
   onOpenReport,
 }: HistoryPageProps) {
   const [reports, setReports] = useState<ReportSummary[]>([]);
@@ -122,8 +120,6 @@ export default function HistoryPage({
   useEffect(() => {
     fetchReports();
   }, [fetchReports]);
-
-  void onBack;
 
   const grouped = groupByDate(reports);
 

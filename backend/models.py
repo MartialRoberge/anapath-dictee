@@ -127,17 +127,3 @@ class SnomedResponse(BaseModel):
     morphology: SnomedCode
 
 
-class CompletudeRequest(BaseModel):
-    """Requête de calcul du score de complétude INCa."""
-
-    formatted_report: str
-    organe_detecte: str
-
-
-class CompletudeResponse(BaseModel):
-    """Réponse avec le score de complétude INCa."""
-
-    score: int
-    total_champs: int
-    champs_presents: int
-    pourcentage: float
