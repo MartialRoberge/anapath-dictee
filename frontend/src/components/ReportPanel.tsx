@@ -306,12 +306,17 @@ function tableMdToHtml(tableLines: string[]): string {
   return `<table>${head}${body}</table>`;
 }
 
-/** Markdown d'une section -> HTML editable joliment rendu. */
+const BULLET_RE = /^[-*+•]\s+(.*)$/;
+const HEADING_RE = /^#{1,6}\s+(.*)$/;
+
+/** Markdown d'une section -> HTML editable joliment rendu (jamais de #, -, *, |
+ * visibles : titres, listes a puces et tableaux sont convertis en vrai HTML). */
 function markdownToEditableHtml(md: string): string {
   const lines = md.split("\n");
   const blocks: string[] = [];
   let para: string[] = [];
   let table: string[] = [];
+  let list: string[] = [];
 
   const flushPara = () => {
     if (para.length) {
@@ -325,24 +330,48 @@ function markdownToEditableHtml(md: string): string {
       table = [];
     }
   };
+  const flushList = () => {
+    if (list.length) {
+      blocks.push(
+        `<ul>${list.map((it) => `<li>${inlineMdToHtml(it)}</li>`).join("")}</ul>`
+      );
+      list = [];
+    }
+  };
 
   for (const line of lines) {
     const t = line.trim();
     const isTableLine = t.startsWith("|") && t.endsWith("|");
     if (isTableLine) {
       flushPara();
+      flushList();
       table.push(line);
       continue;
     }
     flushTable();
+    const bullet = t.match(BULLET_RE);
+    if (bullet) {
+      flushPara();
+      list.push(bullet[1]);
+      continue;
+    }
+    flushList();
     if (t === "") {
       flushPara();
+      continue;
+    }
+    // Titre markdown egare (#, ##) -> rendu en gras (jamais de # visible).
+    const heading = t.match(HEADING_RE);
+    if (heading) {
+      flushPara();
+      blocks.push(`<p><strong>${inlineMdToHtml(heading[1])}</strong></p>`);
       continue;
     }
     para.push(line);
   }
   flushPara();
   flushTable();
+  flushList();
 
   return blocks.join("") || "<p><br></p>";
 }
@@ -394,6 +423,11 @@ function htmlNodeToMarkdown(node: Node): string {
       return `*${inner}*`;
     case "br":
       return "\n";
+    case "li":
+      return `- ${inner.trim()}\n`;
+    case "ul":
+    case "ol":
+      return inner + "\n";
     case "p":
       return inner + "\n\n";
     case "div":
@@ -673,11 +707,17 @@ function SectionCard({
 
   return (
     <div className="group relative border-b border-border/50 transition-colors last:border-b-0 hover:bg-accent/20">
-      {/* Section header : label + actions discretes (aucun crayon) */}
-      <div className="flex items-center justify-between px-0 pb-1 pt-3">
-        <span className="text-[0.68rem] font-bold uppercase tracking-widest text-muted-foreground">
-          {label}
-        </span>
+      {/* Section header : titre de section lisible + actions discretes (aucun crayon).
+          Pas de label pour le titre principal (redondant avec le grand titre). */}
+      <div className="flex items-center justify-between px-0 pb-1.5 pt-4">
+        {sectionKey === "titre" ? (
+          <span />
+        ) : (
+          <span className="flex items-center gap-2 text-[0.8rem] font-bold uppercase tracking-wide text-primary">
+            <span className="h-3.5 w-1 rounded-full bg-primary/70" />
+            {label}
+          </span>
+        )}
         <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
           <Button
             variant="ghost"
