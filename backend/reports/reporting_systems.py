@@ -34,8 +34,11 @@ def _norm(s: str) -> str:
 # renseignee (regex) n'est trouvee.
 _SYSTEMS: tuple[tuple[tuple[str, ...], str, str], ...] = (
     # -- Cytologie --
+    # NB : PAS de declencheur "sereuse" nu — "sous-sereuse" (couche anatomique de
+    # la paroi digestive) le ferait matcher a tort sur une piece tumorale digestive.
     (("epanchement", "liquide pleural", "liquide peritoneal", "ascite",
-      "liquide d ascite", "liquide pericardique", "cavite sereuse", "sereuse"),
+      "liquide d ascite", "liquide pericardique", "cavite sereuse",
+      "liquide sereux", "cytologie du liquide"),
      "Categorie diagnostique (Systeme international de cytopathologie des "
      "epanchements sereux) et adequation du prelevement",
      r"categorie\s+(nd|am|nfm|sfm|mal)\b|systeme international"),
