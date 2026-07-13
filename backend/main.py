@@ -54,6 +54,7 @@ from detection_manquantes import (
 )
 from adicap import suggerer_adicap
 from snomed import suggerer_snomed
+from text_utils import cle_alphanum, normaliser
 from config import get_settings, validate_settings_at_startup
 from database import close_engine, create_tables
 from auth import get_current_user
@@ -282,17 +283,10 @@ def _merge_donnees_manquantes(
     """Fusionne les champs manquants deterministes (marqueurs [A COMPLETER],
     obligatoires) et les recommandations LLM (probabilistes), en dedupliquant :
     un champ deja couvert par un marqueur deterministe n'est pas re-liste."""
-
-    def _norm(s: str) -> str:
-        import unicodedata
-
-        s = unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
-        return "".join(c for c in s.lower() if c.isalnum())
-
     resultat: list[DonneeManquante] = list(deterministes)
-    vus: list[str] = [_norm(d.champ) for d in deterministes]
+    vus: list[str] = [cle_alphanum(d.champ) for d in deterministes]
     for reco in recommandees:
-        cle = _norm(reco.champ)
+        cle = cle_alphanum(reco.champ)
         if not cle:
             continue
         # Dédoublonnage par inclusion : "ptnm" et "ptnmtnm8esein" sont le même champ.
@@ -368,13 +362,7 @@ def _polish_panel(
 ) -> list[DonneeManquante]:
     """Finition du panneau : retire les champs inadaptes au sous-site — le
     'mesorectum' (concept RECTAL) n'a pas de sens sur un colon/sigmoide."""
-    import unicodedata
-
-    def _norm(s: str) -> str:
-        s = unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
-        return s.lower()
-
-    low_cr = _norm(cr)
+    low_cr = normaliser(cr)
     has_rectum = "rectum" in low_cr or "rectal" in low_cr
     # Le grade FNCLCC ne s'applique PAS aux sarcomes a cellules rondes / pediatriques
     # (rhabdomyosarcome, Ewing, neuroblastome... : haut grade par definition, autres
@@ -386,7 +374,7 @@ def _polish_panel(
     )
 
     def _garder(d: DonneeManquante) -> bool:
-        n = _norm(d.champ)
+        n = normaliser(d.champ)
         if "mesorect" in n and not has_rectum:
             return False
         if "fnclcc" in n and sarcome_non_fnclcc:

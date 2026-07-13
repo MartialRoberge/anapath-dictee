@@ -8,7 +8,7 @@ sur la detection multi-organes du rapport (meme moteur que la generation).
 
 from __future__ import annotations
 
-import unicodedata
+from text_utils import normaliser
 
 # Alias texte libre -> identifiant canonique (templates_organes / codification).
 _ALIASES: dict[str, str] = {
@@ -44,8 +44,7 @@ _ALIASES: dict[str, str] = {
 
 
 def _strip(s: str) -> str:
-    s = unicodedata.normalize("NFD", s or "").encode("ascii", "ignore").decode()
-    return s.strip().lower()
+    return normaliser(s or "").strip()
 
 
 def canonical_organ(organe_detecte: str, rapport: str = "") -> str:

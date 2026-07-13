@@ -18,15 +18,15 @@ score SAF du foie) ne sont PAS repris ici, pour eviter les doublons de panneau.
 from __future__ import annotations
 
 import re
-import unicodedata
+
+from text_utils import normaliser
 
 
 def _norm(s: str) -> str:
-    # Neutralise accents ET apostrophes (le CR peut contenir des apostrophes
-    # courbes U+2019 qui, apres encodage ascii, disparaissent : "d'IgA" -> "diga").
-    s = s.replace("’", " ").replace("'", " ")
-    s = unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
-    return re.sub(r"\s+", " ", s.lower())
+    # Normalisation partagee + neutralisation des apostrophes (le CR peut contenir
+    # des apostrophes courbes U+2019 : "d'IgA" doit matcher le declencheur "d iga")
+    # et collapse des espaces.
+    return re.sub(r"\s+", " ", normaliser(s.replace("’", " ").replace("'", " ")))
 
 
 # (mots-cles declencheurs, libelle du champ a completer, regex de RESULTAT rempli).

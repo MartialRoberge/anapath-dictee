@@ -18,6 +18,7 @@ from models import DonneeManquante
 from reports.engine import GeneratedReport
 from reports.numbers import source_number_set
 from specimen_type import SpecimenType
+from text_utils import normaliser
 
 # ---------------------------------------------------------------------------
 # 1. Parsing JSON robuste
@@ -189,12 +190,9 @@ def _check_tnm_derivation(cr: str, source_text: str) -> list[str]:
     ]
 
 
-def _strip_accents_lower(s: str) -> str:
-    import unicodedata
-
-    return (
-        unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode("ascii").lower()
-    )
+# Normalisation partagee (source unique : text_utils). Alias local pour garder
+# les nombreux appels existants de ce module.
+_strip_accents_lower = normaliser
 
 
 # Champs reserves aux pieces operatoires (jamais attendus sur biopsie/cytologie).

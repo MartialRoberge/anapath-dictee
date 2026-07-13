@@ -15,6 +15,7 @@ import re
 
 from models import DonneeManquante
 from templates_organes import get_champs_obligatoires, ChampObligatoire
+from text_utils import normaliser as _normaliser_texte
 from specimen_type import (
     SpecimenType,
     DiagnosticContext,
@@ -337,32 +338,6 @@ _CHAMPS_EXCLUS_PRE_CANCEREUX: list[str] = [
 # ---------------------------------------------------------------------------
 # Fonctions utilitaires
 # ---------------------------------------------------------------------------
-
-def _normaliser_texte(texte: str) -> str:
-    """Normalise le texte pour la recherche de mots-cles (minuscules, sans accents basiques)."""
-    resultat: str = texte.lower()
-    # Remplacement basique des accents les plus courants
-    remplacements: dict[str, str] = {
-        "é": "e",
-        "è": "e",
-        "ê": "e",
-        "ë": "e",
-        "à": "a",
-        "â": "a",
-        "ä": "a",
-        "ù": "u",
-        "û": "u",
-        "ü": "u",
-        "ô": "o",
-        "ö": "o",
-        "î": "i",
-        "ï": "i",
-        "ç": "c",
-    }
-    for accent, remplacement in remplacements.items():
-        resultat = resultat.replace(accent, remplacement)
-    return resultat
-
 
 def _champ_present_dans_rapport(
     champ: ChampObligatoire, rapport_normalise: str

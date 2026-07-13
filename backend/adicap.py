@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import json
 import re
-import unicodedata
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -270,13 +269,9 @@ def _load_reference() -> tuple[dict[str, dict[str, list[str]]], list[LesionEntry
     return raw["organ_codes"], catalog
 
 
-def _strip_accents(s: str) -> str:
-    return (
-        unicodedata.normalize("NFD", s)
-        .encode("ascii", "ignore")
-        .decode("ascii")
-        .lower()
-    )
+# Normalisation partagee (source unique : text_utils). Alias local pour garder
+# les appels existants de ce module.
+_strip_accents = normaliser
 
 
 # ---------------------------------------------------------------------------
