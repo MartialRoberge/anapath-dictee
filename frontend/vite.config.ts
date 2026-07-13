@@ -22,7 +22,6 @@ export default defineConfig({
       "/admin": "http://localhost:8000",
       "/adicap": "http://localhost:8000",
       "/snomed": "http://localhost:8000",
-      "/completude": "http://localhost:8000",
     },
   },
 });
