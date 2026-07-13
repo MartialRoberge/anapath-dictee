@@ -25,9 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 from starlette.requests import Request
 
 from models import (
@@ -39,6 +37,7 @@ from models import (
     ExportRequest,
     SectionsResponse,
     DonneeManquante,
+    CoherenceVerdict,
     AdicapRequest,
     AdicapResponse,
     SnomedCode,
@@ -393,7 +392,7 @@ def _to_format_response(result: GeneratedReport) -> FormatResponse:
         warnings=result.warnings,
         organes_detectes=result.organes_detectes,
         type_prelevement=result.type_prelevement,
-        coherence=result.coherence,
+        coherence=CoherenceVerdict.model_validate(result.coherence),
     )
 
 
@@ -423,15 +422,9 @@ async def iterate_report(
     except Exception as exc:  # noqa: BLE001 - traduit en HTTPException typee
         raise _map_generation_error(exc)
 
-    return IterationResponse(
-        formatted_report=result.cr,
-        organe_detecte=result.organe,
-        donnees_manquantes=_build_panel(result),
-        warnings=result.warnings,
-        organes_detectes=result.organes_detectes,
-        type_prelevement=result.type_prelevement,
-        coherence=result.coherence,
-    )
+    # Iteration et generation partagent le meme contrat (IterationResponse herite
+    # de FormatResponse) : on reutilise le meme assembleur.
+    return IterationResponse.model_validate(_to_format_response(result).model_dump())
 
 
 # ---------------------------------------------------------------------------
