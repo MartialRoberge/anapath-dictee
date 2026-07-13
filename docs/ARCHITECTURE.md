@@ -144,9 +144,10 @@ utilise `API_BASE = import.meta.env.VITE_API_URL ?? ""` et stocke le token en
 ## Tests
 
 - Suite déterministe (sans réseau) : `backend/tests/test_*.py` — `pytest`
-  (**119 tests**). Couvre nombres, guardrails, connaissances métier, LLM /
-  factory / retry, moteur, API, codification, cohérence, recall des champs
-  obligatoires, reporting systems.
+  (**~128 tests** ; lancer `pytest -q` pour le compte exact, la suite évolue).
+  Couvre nombres, guardrails, connaissances métier, LLM / factory / retry,
+  moteur, API, codification, cohérence, recall des champs obligatoires,
+  reporting systems.
 - Harnais **live** (hors suite pytest, non collectés — `pytest.ini` :
   `python_files = test_*.py`) : `backend/tests/*_campaign.py` et
   `campagne_externe.py`, qui appellent réellement Voxtral/Mistral. Certains

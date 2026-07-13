@@ -225,7 +225,7 @@ automatiquement).
 ```bash
 cd backend
 source ../venv/bin/activate
-python -m pytest -q          # suite déterministe : 119 tests, aucun appel réseau
+python -m pytest -q          # suite déterministe : ~128 tests, aucun appel réseau
 ```
 
 La suite (`backend/tests/test_*.py`) couvre nombres, guardrails, connaissances
@@ -304,7 +304,7 @@ Demo_anapath/
 │   │   ├── factory.py          #   Sélecteur mistral|anthropic (LLM_PROVIDER)
 │   │   ├── mistral.py          #   Provider Mistral (httpx direct)
 │   │   └── anthropic_provider.py# Provider Anthropic (SDK)
-│   ├── tests/                  # pytest : test_*.py (119) + harnais live *_campaign.py (non collectés)
+│   ├── tests/                  # pytest : test_*.py (~128) + harnais live *_campaign.py (non collectés)
 │   ├── requirements.txt / requirements-dev.txt / pytest.ini
 │   └── data/
 ├── frontend/                   # React 19 + Vite + TS + Tailwind
