@@ -3,7 +3,7 @@ import { Star, FileText, Clock, RefreshCw, Calendar, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MarcLogo } from "../components/MarcLogo";
-import { useToast } from "../components/Toast";
+import { useToast } from "../components/toast-context";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 

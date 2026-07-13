@@ -253,10 +253,15 @@ function IrisAnimation({ isIteration }: { isIteration: boolean }) {
   const [visible, setVisible] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
-  useEffect(() => {
+  // Reinitialise le defilement quand on bascule initial <-> iteration.
+  // Ajuste l'etat pendant le rendu (pas dans un effet) pour eviter un
+  // rendu en cascade — cf. https://react.dev/learn/you-might-not-need-an-effect
+  const [prevIteration, setPrevIteration] = useState(isIteration);
+  if (prevIteration !== isIteration) {
+    setPrevIteration(isIteration);
     setMsgIdx(0);
     setVisible(true);
-  }, [isIteration]);
+  }
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {

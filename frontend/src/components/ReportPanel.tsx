@@ -123,14 +123,14 @@ function useUndoStack(initial: Record<string, string> | null) {
     future: [],
   });
 
-  // Synchroniser quand le rapport change de l'exterieur (nouveau formatage)
-  const lastExternalRef = useRef(initial);
-  useEffect(() => {
-    if (initial !== lastExternalRef.current) {
-      lastExternalRef.current = initial;
-      setState({ past: [], present: initial, future: [] });
-    }
-  }, [initial]);
+  // Synchroniser quand le rapport change de l'exterieur (nouveau formatage).
+  // Ajuste l'etat pendant le rendu (pas dans un effet) pour eviter un rendu
+  // en cascade — cf. https://react.dev/learn/you-might-not-need-an-effect
+  const [lastExternal, setLastExternal] = useState(initial);
+  if (initial !== lastExternal) {
+    setLastExternal(initial);
+    setState({ past: [], present: initial, future: [] });
+  }
 
   const push = useCallback((next: Record<string, string>) => {
     setState((prev) => ({

@@ -138,6 +138,11 @@ Un modèle est fourni dans [`.env.example`](.env.example).
 - **Dev (défaut)** : SQLite via `aiosqlite` — fichier local `lexia.db`. Aucune
   installation externe. Les tables sont créées automatiquement au démarrage
   (`create_tables()` dans le `lifespan` de `main.py`).
+  > Attention : `.env.example` fournit un `DATABASE_URL` **PostgreSQL**
+  > (`postgresql+asyncpg://anapath:anapath_dev@localhost:5432/anapath`). Pour
+  > profiter du défaut SQLite en dev, **commenter/supprimer la ligne `DATABASE_URL`**
+  > de votre `.env` (sinon il faut un Postgres joignable, par ex. via
+  > `docker compose up db`).
 - **Prod** : **PostgreSQL** (`postgresql+asyncpg://…`). Renseigner `DATABASE_URL`
   puis appliquer les migrations Alembic :
 

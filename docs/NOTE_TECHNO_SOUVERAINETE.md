@@ -213,7 +213,7 @@ point d'accroche déjà préparé dans `backend/reports/gilbert_engine.py` :
 ### 4.3 Bascule le jour J (une fois l'API Gilbert prête)
 
 Estimée à **1-2 journées** (cf. `INTEGRATION_GILBERT.md` §4), sans toucher au frontend ni aux guardrails :
-1. Renseigner les `gilbert_template_id` du catalogue ; 2. implémenter `generate()` + `_map_summary_to_report()` ; 3. dé-commenter l'injection `template_id` à l'upload ; 4. `GILBERT_API_KEY` + `REPORT_ENGINE=gilbert` ; 5. gestion async (polling/webhook) côté front si dictées longues ; 6. rejouer la campagne fonctionnelle.
+1. Créer puis renseigner la correspondance organe → `template_id` Gilbert (inexistante à ce jour, cf. §4.1) ; 2. implémenter `generate()` + `_map_summary_to_report()` ; 3. dé-commenter l'injection `template_id` à l'upload ; 4. `GILBERT_API_KEY` + `REPORT_ENGINE=gilbert` ; 5. gestion async (polling/webhook) côté front si dictées longues ; 6. rejouer un harnais fonctionnel live.
 
 > **Note souveraineté :** Gilbert (Lexia, hébergé OVHcloud) est réputé souverain — **à confirmer HDS/SecNumCloud sur le périmètre du service**. La bascule local→Gilbert ne dégrade pas le positionnement souverain, à condition d'avoir validé §3.5.
 
@@ -242,7 +242,7 @@ Ordre recommandé : **souveraineté logique d'abord (peu risquée) → hébergem
 ### Phase C — Bascule moteur Gilbert (dépend de l'API Gilbert)
 **Objectif :** déléguer STT + génération au moteur Gilbert souverain.
 - **Prérequis (côté Lexia) :** `template_id` à l'upload **et** sortie structurée (cf. §4.2 et `GILBERT_API_PRODUCT.md` Sprints 0-1). Bloquant tant qu'absent.
-- **Prérequis (côté MARC) :** Phases A-B ; catalogue `gilbert_template_id` renseigné.
+- **Prérequis (côté MARC) :** Phases A-B ; correspondance organe → `template_id` Gilbert créée et renseignée.
 - Implémenter `generate()`/mapping, activer `REPORT_ENGINE=gilbert`, gérer l'async côté front, rejouer la campagne fonctionnelle.
 - **Risques :** dépendance au calendrier Lexia ; pas d'endpoint d'itération Gilbert (garder `/iterate` sur moteur local → **architecture hybride** possible : Gilbert pour la 1re passe, local pour les retouches, cf. `INTEGRATION_GILBERT.md` §3).
 

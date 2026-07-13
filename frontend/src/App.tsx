@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MarcLogo, MarcWordmark } from "./components/MarcLogo";
-import { useToast } from "./components/Toast";
+import { useToast } from "./components/toast-context";
 import { useAuth } from "./hooks/useAuth";
 import LoginPage from "./pages/LoginPage";
 import HistoryPage from "./pages/HistoryPage";

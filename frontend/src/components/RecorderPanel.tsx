@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
 import { useSoundFeedback } from "../hooks/useSoundFeedback";
-import { useToast } from "./Toast";
+import { useToast } from "./toast-context";
 import {
   transcribeAudio,
   formatTranscription,

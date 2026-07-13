@@ -763,6 +763,47 @@ def _sanitize_cr(cr: str) -> str:
 # ---------------------------------------------------------------------------
 
 
+def _clean_cr_text(
+    cr: str, organes: list[str], specimen: SpecimenType, contexte: str
+) -> tuple[str, list[str]]:
+    """Nettoie le TEXTE du CR (marqueurs hors-contexte, meta-commentaires, lignes
+    vides, cosmetique) et retourne (cr_nettoye, warnings)."""
+    warnings: list[str] = []
+    # Retirer du CORPS les marqueurs [A COMPLETER] hors-contexte (ex emboles sur un
+    # CCIS in situ) : le filtre du panneau ne touche pas le texte.
+    cr, n_markers = strip_forbidden_markers(cr, organes, specimen, contexte)
+    if n_markers:
+        warnings.append(f"{n_markers} marqueur(s) hors-contexte retire(s) du texte du CR.")
+    cr = strip_conclusion_markers(cr)   # pas de [A COMPLETER] en conclusion
+    cr = strip_empty_table_rows(cr)     # lignes de tableau fabriquees vides
+    cr = strip_meta_comments(cr)        # meta-commentaires parenthetiques
+    cr = cosmetic_cleanup(cr)           # puces/asterisques vides, points parasites
+    return cr, warnings
+
+
+def _collect_guardrail_warnings(
+    cr: str, source_text: str, organes: list[str], specimen: SpecimenType,
+    run_number_guard: bool,
+) -> tuple[list[str], list[DonneeManquante]]:
+    """Fait tourner les gardes non bloquantes (negations, hors-perimetre, derivation
+    de stade, fidelite des chiffres) et retourne (warnings, alertes additionnelles)."""
+    warnings: list[str] = []
+    alertes: list[DonneeManquante] = []
+    warnings += _check_conclusion_no_todo(cr)
+    warnings += _check_negation_flags(cr, source_text)
+    warnings += _check_biopsy_scope(cr, specimen)
+    warnings += _check_classification_scope(cr, organes)
+    warnings += _check_tnm_derivation(cr, source_text)
+    if run_number_guard and source_text.strip():
+        num_warnings, num_alertes = _check_numbers(cr, source_text)
+        warnings += num_warnings
+        alertes += num_alertes
+        drop_warnings, drop_alertes = _check_dropped_measurements(cr, source_text)
+        warnings += drop_warnings
+        alertes += drop_alertes
+    return warnings, alertes
+
+
 def build_validated_report(
     raw_llm_text: str,
     *,
@@ -803,31 +844,21 @@ def build_validated_report(
     from specimen_type import detecter_diagnostic_context
 
     contexte = detecter_diagnostic_context(cr).value
-    # Retirer du CORPS du CR les marqueurs [A COMPLETER] hors-contexte (ex emboles
-    # sur un CCIS in situ) : le filtre du panneau ne touche pas le texte.
-    cr, n_markers = strip_forbidden_markers(cr, detected_organes, specimen, contexte)
-    if n_markers:
-        warnings.append(
-            f"{n_markers} marqueur(s) hors-contexte retire(s) du texte du CR."
-        )
-    # La conclusion ne doit pas contenir de [A COMPLETER] (finition).
-    cr = strip_conclusion_markers(cr)
-    # Retirer les lignes de tableau fabriquees entierement vides (ex sextant).
-    cr = strip_empty_table_rows(cr)
-    # Retirer les meta-commentaires parenthetiques (friction praticien n°1).
-    cr = strip_meta_comments(cr)
-    # Nettoyage cosmetique final (puces/asterisques vides, points parasites).
-    cr = cosmetic_cleanup(cr)
+
+    # 1. Nettoyage du TEXTE du CR.
+    cr, clean_warnings = _clean_cr_text(cr, detected_organes, specimen, contexte)
+    warnings += clean_warnings
+
+    # 2. Filtrage des alertes : securite hors-contexte + anti-faux-positif.
     alertes, dropped = filter_alertes(alertes, detected_organes, specimen, contexte)
     warnings += dropped
-    # ANTI-FAUX-POSITIF : retirer les champs deja presents dans le CR.
     alertes, n_present = filter_present_alertes(alertes, cr)
     if n_present:
         warnings.append(
             f"{n_present} champ(s) deja present(s) dans le CR retire(s) des suggestions."
         )
-    # Les alertes du LLM sont des RECOMMANDATIONS (probabilistes) : elles ne sont
-    # pas "obligatoires". Seuls les marqueurs [A COMPLETER] deterministes le sont.
+    # Les alertes du LLM sont des RECOMMANDATIONS (probabilistes), pas des champs
+    # "obligatoires" : seuls les marqueurs [A COMPLETER] deterministes le sont.
     alertes = [
         DonneeManquante(
             champ=a.champ, description=a.description, section=a.section,
@@ -836,21 +867,14 @@ def build_validated_report(
         for a in alertes
     ]
 
-    warnings += _check_conclusion_no_todo(cr)
-    warnings += _check_negation_flags(cr, source_text)
-    warnings += _check_biopsy_scope(cr, specimen)
-    warnings += _check_classification_scope(cr, detected_organes)
-    warnings += _check_tnm_derivation(cr, source_text)
+    # 3. Gardes non bloquantes (negations, hors-perimetre, fidelite des chiffres).
+    check_warnings, check_alertes = _collect_guardrail_warnings(
+        cr, source_text, detected_organes, specimen, run_number_guard
+    )
+    warnings += check_warnings
+    alertes += check_alertes
 
-    if run_number_guard and source_text.strip():
-        num_warnings, num_alertes = _check_numbers(cr, source_text)
-        warnings += num_warnings
-        alertes += num_alertes
-        drop_warnings, drop_alertes = _check_dropped_measurements(cr, source_text)
-        warnings += drop_warnings
-        alertes += drop_alertes
-
-    # Validation de coherence medicale — a CHAQUE generation (deterministe).
+    # 4. Validation de coherence medicale — a CHAQUE generation (deterministe).
     from reports.coherence import assess_coherence
 
     coherence = assess_coherence(cr).to_dict()
