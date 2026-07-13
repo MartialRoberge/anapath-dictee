@@ -1,3786 +1,3576 @@
 {
- "organ_codes": {
-  "DQ": {
-   "labels": [
-    "Anus"
-   ],
-   "kw": [
-    "anus"
-   ]
-  },
-  "DA": {
-   "labels": [
-    "Appendice"
-   ],
-   "kw": [
-    "appendice"
-   ]
-  },
-  "DP": {
-   "labels": [
-    "Chir Colo-rectal",
-    "Péritoine"
-   ],
-   "kw": [
-    "chir",
-    "colo",
-    "peritoine",
-    "rectal"
-   ]
-  },
-  "DC": {
-   "labels": [
-    "Colo-rectal"
-   ],
-   "kw": [
-    "colo",
-    "rectal"
-   ]
-  },
-  "DD": {
-   "labels": [
-    "Duodenum"
-   ],
-   "kw": [
-    "duodenum"
-   ]
-  },
-  "DE": {
-   "labels": [
-    "Estomac"
-   ],
-   "kw": [
-    "estomac"
-   ]
-  },
-  "FF": {
-   "labels": [
-    "Foie"
-   ],
-   "kw": [
-    "foie"
-   ]
-  },
-  "DO": {
-   "labels": [
-    "Œsophage"
-   ],
-   "kw": [
-    "sophage"
-   ]
-  },
-  "FV": {
-   "labels": [
-    "Vésicule"
-   ],
-   "kw": [
-    "vesicule"
-   ]
-  },
-  "HD": {
-   "labels": [
-    "Deferent"
-   ],
-   "kw": [
-    "deferent"
-   ]
-  },
-  "HE": {
-   "labels": [
-    "Epididyme"
-   ],
-   "kw": [
-    "epididyme"
-   ]
-  },
-  "HT": {
-   "labels": [
-    "HYDATIDE",
-    "Testicule"
-   ],
-   "kw": [
-    "hydatide",
-    "testicule"
-   ]
-  },
-  "HV": {
-   "labels": [
-    "Prépuce"
-   ],
-   "kw": [
-    "prepuce"
-   ]
-  },
-  "OT": {
-   "labels": [
-    "Bourgeon charnu",
-    "Kyste sacro-coccygien",
-    "Kyste sacro-coccygien probable",
-    "Kyste sacro-coccygien sans abc",
-    "Kyste trichilemmal",
-    "Kyste trichilemmal remanié",
-    "Kyste épidermique",
-    "Kyste épidermique marsupialisé",
-    "Kyste épidermique remanié",
-    "Kératose lichenoïde bénigne",
-    "Prépuce"
-   ],
-   "kw": [
-    "abces",
-    "benigne",
-    "bourgeon",
-    "charnu",
-    "coccygien",
-    "epidermique",
-    "keratose",
-    "kyste",
-    "lichenoide",
-    "marsupialise",
-    "prepuce",
-    "probable",
-    "remanie",
-    "sacro",
-    "trichilemmal"
-   ]
-  },
-  "HP": {
-   "labels": [
-    "Prostate"
-   ],
-   "kw": [
-    "prostate"
-   ]
-  },
-  "UT": {
-   "labels": [
-    "Uretère"
-   ],
-   "kw": [
-    "uretere"
-   ]
-  },
-  "HG": {
-   "labels": [
-    "Vaginale"
-   ],
-   "kw": [
-    "vaginale"
-   ]
-  },
-  "UV": {
-   "labels": [
-    "Vessie"
-   ],
-   "kw": [
-    "vessie"
-   ]
-  },
-  "GC": {
-   "labels": [
-    "COL"
-   ],
-   "kw": [
-    "col"
-   ]
-  },
-  "PO": {
-   "labels": [
-    "Endomètre"
-   ],
-   "kw": [
-    "endometre"
-   ]
-  },
-  "GU": {
-   "labels": [
-    "Endomètre"
-   ],
-   "kw": [
-    "endometre"
-   ]
-  },
-  "GO": {
-   "labels": [
-    "Ovaire"
-   ],
-   "kw": [
-    "ovaire"
-   ]
-  },
-  "TC": {
-   "labels": [
-    "TC"
-   ],
-   "kw": []
-  },
-  "GT": {
-   "labels": [
-    "Trompe"
-   ],
-   "kw": [
-    "trompe"
-   ]
-  },
-  "GG": {
-   "labels": [
-    "vagin"
-   ],
-   "kw": [
-    "vagin"
-   ]
-  },
-  "GV": {
-   "labels": [
-    "VULVE"
-   ],
-   "kw": [
-    "vulve"
-   ]
-  },
-  "GB": {
-   "labels": [
-    "VULVE"
-   ],
-   "kw": [
-    "vulve"
-   ]
-  },
-  "TA": {
-   "labels": [
-    "Adiponécrose",
-    "Coque abcès"
-   ],
-   "kw": [
-    "abces",
-    "adiponecrose",
-    "coque"
-   ]
-  },
-  "RS": {
-   "labels": [
-    "Plèvre"
-   ],
-   "kw": [
-    "plevre"
-   ]
-  },
-  "GS": {
-   "labels": [
-    "Gynécomastie"
-   ],
-   "kw": [
-    "gynecomastie"
-   ]
-  },
-  "PP": {
-   "labels": [
-    "Placenta"
-   ],
-   "kw": [
-    "placenta"
-   ]
-  },
-  "AA": {
-   "labels": [
-    "Amygdale",
-    "Cou"
-   ],
-   "kw": [
-    "amygdale",
-    "cou"
-   ]
-  },
-  "AC": {
-   "labels": [
-    "Amygdale"
-   ],
-   "kw": [
-    "amygdale"
-   ]
-  },
-  "BX": {
-   "labels": [
-    "Bouche"
-   ],
-   "kw": [
-    "bouche"
-   ]
-  },
-  "BD": {
-   "labels": [
-    "Bouche"
-   ],
-   "kw": [
-    "bouche"
-   ]
-  },
-  "XC": {
-   "labels": [
-    "Cou"
-   ],
-   "kw": [
-    "cou"
-   ]
-  },
-  "AL": {
-   "labels": [
-    "CV",
-    "Larynx"
-   ],
-   "kw": [
-    "larynx"
-   ]
-  },
-  "BA": {
-   "labels": [
-    "Glande salivaire"
-   ],
-   "kw": [
-    "glande",
-    "salivaire"
-   ]
-  },
-  "AS": {
-   "labels": [
-    "Naso-sinusien"
-   ],
-   "kw": [
-    "naso",
-    "sinusien"
-   ]
-  },
-  "AF": {
-   "labels": [
-    "Naso-sinusien"
-   ],
-   "kw": [
-    "naso",
-    "sinusien"
-   ]
-  },
-  "OR": {
-   "labels": [
-    "Oreille"
-   ],
-   "kw": [
-    "oreille"
-   ]
-  },
-  "RP": {
-   "labels": [
-    "Poumon"
-   ],
-   "kw": [
-    "poumon"
-   ]
-  },
-  "ET": {
-   "labels": [
-    "Thyroïde"
-   ],
-   "kw": [
-    "thyroide"
-   ]
-  },
-  "LO": {
-   "labels": [
-    "Coxarthrose"
-   ],
-   "kw": [
-    "coxarthrose"
-   ]
-  },
-  "LC": {
-   "labels": [
-    "HERNIE DISCALE"
-   ],
-   "kw": [
-    "discale",
-    "hernie"
-   ]
-  },
-  "LB": {
-   "labels": [
-    "Hygroma"
-   ],
-   "kw": [
-    "hygroma"
-   ]
-  },
-  "LS": {
-   "labels": [
-    "Kyste synovial",
-    "Synoviale amylose",
-    "Ténosynovite des fléchisseurs "
-   ],
-   "kw": [
-    "amylose",
-    "flechisseurs",
-    "kyste",
-    "main",
-    "synovial",
-    "synoviale",
-    "tenosynovite"
-   ]
-  },
-  "OG": {
-   "labels": [
-    "Ongle"
-   ],
-   "kw": [
-    "ongle"
-   ]
-  },
-  "LT": {
-   "labels": [
-    "Ténosynovite"
-   ],
-   "kw": [
-    "tenosynovite"
-   ]
-  },
-  "SM": {
-   "labels": [
-    "BOM"
-   ],
-   "kw": [
-    "bom"
-   ]
-  },
-  "SG": {
-   "labels": [
-    "GG"
-   ],
-   "kw": []
-  },
-  "SR": {
-   "labels": [
-    "Rate"
-   ],
-   "kw": [
-    "rate"
-   ]
-  },
-  "VA": {
-   "labels": [
-    "BAT",
-    "Endartere"
-   ],
-   "kw": [
-    "bat",
-    "endartere"
-   ]
-  },
-  "CE": {
-   "labels": [
-    "Valve"
-   ],
-   "kw": [
-    "valve"
-   ]
-  },
-  "CM": {
-   "labels": [
-    "Myocarde"
-   ],
-   "kw": [
-    "myocarde"
-   ]
-  },
-  "OL": {
-   "labels": [
-    "DCR"
-   ],
-   "kw": [
-    "dcr"
-   ]
-  },
-  "OE": {
-   "labels": [
-    "Œil"
-   ],
-   "kw": []
-  }
- },
- "lesion_catalog": [
-  {
-   "cat": "DIG",
-   "organ_code": "DQ",
-   "lesion": "Hémorroïdes non compliquées",
-   "lesion_code": "4550",
-   "kw": [
-    "hemorroides",
-    "compliquees"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DQ",
-   "lesion": "Hémorroïdes partiellement thrombosées, sans surinfection.",
-   "lesion_code": "4554",
-   "kw": [
-    "hemorroides",
-    "partiellement",
-    "thrombosees",
-    "surinfection"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Marisque hémorroïdaire",
-   "lesion_code": "4558",
-   "kw": [
-    "marisque",
-    "hemorroidaire"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Fissure anale",
-   "lesion_code": "7600",
-   "kw": [
-    "fissure",
-    "anale"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Fistule anale",
-   "lesion_code": "3340",
-   "kw": [
-    "fistule",
-    "anale"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DA",
-   "lesion": "Appendicite aigue simple",
-   "lesion_code": "7000",
-   "kw": [
-    "appendicite",
-    "aigue",
-    "simple"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DA",
-   "lesion": "Appendicite aigue suppurée non compliquée",
-   "lesion_code": "7130",
-   "kw": [
-    "appendicite",
-    "aigue",
-    "suppuree",
-    "compliquee"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DA",
-   "lesion": "Appendicite aigue suppurée avec réaction péritonéale",
-   "lesion_code": "7130",
-   "kw": [
-    "appendicite",
-    "aigue",
-    "suppuree",
-    "reaction",
-    "peritoneale"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DA",
-   "lesion": "Appendicite aigue suppurée perforée avec réaction péritonéale",
-   "lesion_code": "7250",
-   "kw": [
-    "appendicite",
-    "aigue",
-    "suppuree",
-    "perforee",
-    "reaction",
-    "peritoneale"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DA",
-   "lesion": "Appendicite aiguë phlegmoneuse avec réaction péritonéale",
-   "lesion_code": "7170",
-   "kw": [
-    "appendicite",
-    "aigue",
-    "phlegmoneuse",
-    "reaction",
-    "peritoneale"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DA",
-   "lesion": "Appendicite aigue gangréneuse avec péritonite",
-   "lesion_code": "7180",
-   "kw": [
-    "appendicite",
-    "aigue",
-    "gangreneuse",
-    "peritonite"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DA",
-   "lesion": "Appendicite chronique avec oxyurose",
-   "lesion_code": "8623",
-   "kw": [
-    "appendicite",
-    "chronique",
-    "oxyurose"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DA",
-   "lesion": "Appendicite chronique oblitérante",
-   "lesion_code": "7602",
-   "kw": [
-    "appendicite",
-    "chronique",
-    "obliterante"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DA",
-   "lesion": "Appendicite folliculaire",
-   "lesion_code": "7515",
-   "kw": [
-    "appendicite",
-    "folliculaire"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Colite aiguë avec péritonite sur diverticulose colique",
-   "lesion_code": "3426",
-   "kw": [
-    "colite",
-    "aigue",
-    "peritonite",
-    "diverticulose",
-    "colique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Colite ischémique aiguë",
-   "lesion_code": "4700",
-   "kw": [
-    "colite",
-    "ischemique",
-    "aigue"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Sigmoïdite perforée avec péritonite",
-   "lesion_code": "3427",
-   "kw": [
-    "sigmoidite",
-    "perforee",
-    "peritonite"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DP",
-   "lesion": "Ulcere solitaire",
-   "lesion_code": "5230",
-   "kw": [
-    "ulcere",
-    "solitaire"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Colite inflammatoire aiguë non spécifique",
-   "lesion_code": "7000",
-   "kw": [
-    "colite",
-    "inflammatoire",
-    "aigue",
-    "specifique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Légère colite chronique non spécifique",
-   "lesion_code": "7511",
-   "kw": [
-    "legere",
-    "colite",
-    "chronique",
-    "specifique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Eosinophiles",
-   "lesion_code": "7550",
-   "kw": [
-    "eosinophiles"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DC",
-   "lesion": "Repli de muqueuse colique oedémateuse",
-   "lesion_code": "4110",
-   "kw": [
-    "repli",
-    "muqueuse",
-    "colique",
-    "oedemateuse"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DC",
-   "lesion": "Repli de muqueuse colique normale",
-   "lesion_code": "0000",
-   "kw": [
-    "repli",
-    "muqueuse",
-    "colique",
-    "normale"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DC",
-   "lesion": "Repli de muqueuse colique inflammatoire",
-   "lesion_code": "7510",
-   "kw": [
-    "repli",
-    "muqueuse",
-    "colique",
-    "inflammatoire"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Pseudomélanose colique",
-   "lesion_code": "5516",
-   "kw": [
-    "pseudomelanose",
-    "colique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Colite ischémique aigue",
-   "lesion_code": "4700",
-   "kw": [
-    "colite",
-    "ischemique",
-    "aigue"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DC",
-   "lesion": "Colite ischémique chronique",
-   "lesion_code": "4790",
-   "kw": [
-    "colite",
-    "ischemique",
-    "chronique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DC",
-   "lesion": "Colite radique",
-   "lesion_code": "3600",
-   "kw": [
-    "colite",
-    "radique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "RCH quiescente",
-   "lesion_code": "7912",
-   "kw": [
-    "rch",
-    "quiescente"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "RCH quiescente",
-   "lesion_code": "7912",
-   "kw": [
-    "rch",
-    "quiescente"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DC",
-   "lesion": "Colite microscopique",
-   "lesion_code": "7610",
-   "kw": [
-    "colite",
-    "microscopique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DC",
-   "lesion": "Colite collagène",
-   "lesion_code": "7739",
-   "kw": [
-    "colite",
-    "collagene"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DC",
-   "lesion": "Colite pseudo-membraneuse",
-   "lesion_code": "7080",
-   "kw": [
-    "colite",
-    "pseudo",
-    "membraneuse"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Hirschsprung",
-   "lesion_code": "2170",
-   "kw": [
-    "hirschsprung"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Hirschsprung",
-   "lesion_code": "2170",
-   "kw": [
-    "hirschsprung"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Hyperplasie des glandes de Brünner",
-   "lesion_code": "6715",
-   "kw": [
-    "hyperplasie",
-    "glandes",
-    "brunner"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DD",
-   "lesion": "Duodénite chronique",
-   "lesion_code": "7600",
-   "kw": [
-    "duodenite",
-    "chronique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Légère duodénite aigue",
-   "lesion_code": "7000",
-   "kw": [
-    "legere",
-    "duodenite",
-    "aigue"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Duodénite aigue",
-   "lesion_code": "7000",
-   "kw": [
-    "duodenite",
-    "aigue"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Giardia duodénalis",
-   "lesion_code": "0I50",
-   "kw": [
-    "giardia",
-    "duodenalis"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DD",
-   "lesion": "Maladie coeliaque",
-   "lesion_code": "6017",
-   "kw": [
-    "maladie",
-    "coeliaque"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DE",
-   "lesion": "Gastropathie réactive",
-   "lesion_code": "6500",
-   "kw": [
-    "gastropathie",
-    "reactive"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DE",
-   "lesion": "Dystrophie fundique IPP",
-   "lesion_code": "3960",
-   "kw": [
-    "dystrophie",
-    "fundique",
-    "ipp"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DE",
-   "lesion": "Gastrite minime/discrète et non spécifique",
-   "lesion_code": "0300",
-   "kw": [
-    "gastrite",
-    "minime",
-    "discrete",
-    "specifique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Biermer débutant",
-   "lesion_code": "5815",
-   "kw": [
-    "biermer",
-    "debutant"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Indéterminé pour la NIE",
-   "lesion_code": "0G00",
-   "kw": [
-    "indetermine",
-    "nie"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "NIE bas grade",
-   "lesion_code": "0D10",
-   "kw": [
-    "nie",
-    "bas",
-    "grade"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DE",
-   "lesion": "Sleeve congestion",
-   "lesion_code": "4000",
-   "kw": [
-    "sleeve",
-    "congestion"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DE",
-   "lesion": "Sleeve hémorragique",
-   "lesion_code": "4200",
-   "kw": [
-    "sleeve",
-    "hemorragique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DE",
-   "lesion": "Sleeve inflammatoire",
-   "lesion_code": "0300",
-   "kw": [
-    "sleeve",
-    "inflammatoire"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DE",
-   "lesion": "Sleeve normale",
-   "lesion_code": "0000",
-   "kw": [
-    "sleeve",
-    "normale"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "FF",
-   "lesion": "Steato-hépatite",
-   "lesion_code": "5220",
-   "kw": [
-    "steato",
-    "hepatite"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "FF",
-   "lesion": "Stéatose",
-   "lesion_code": "5220",
-   "kw": [
-    "steatose"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Iléite aigue",
-   "lesion_code": "7000",
-   "kw": [
-    "ileite",
-    "aigue"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Ischémie aiguë",
-   "lesion_code": "4700",
-   "kw": [
-    "ischemie",
-    "aigue"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "pochite",
-   "lesion_code": "7000",
-   "kw": [
-    "pochite"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "cul de sac réservoir RCH",
-   "lesion_code": "7600",
-   "kw": [
-    "cul",
-    "sac",
-    "reservoir",
-    "rch"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "PAS",
-   "lesion_code": "8400",
-   "kw": [
-    "pas"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DO",
-   "lesion": "Métaplasie gastrique",
-   "lesion_code": "2330",
-   "kw": [
-    "metaplasie",
-    "gastrique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DO",
-   "lesion": "EBO sans MI",
-   "lesion_code": "6536",
-   "kw": [
-    "ebo"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DO",
-   "lesion": "EBO avec MI",
-   "lesion_code": "6538",
-   "kw": [
-    "ebo"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DO",
-   "lesion": "Candidose œsophagienne",
-   "lesion_code": "8400",
-   "kw": [
-    "candidose",
-    "sophagienne"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DO",
-   "lesion": "ŒSOPHAGITE AIGUË ULCEREE",
-   "lesion_code": "7200",
-   "kw": [
-    "sophagite",
-    "aigue",
-    "ulceree"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DO",
-   "lesion": "Œsophagite à polynucléaires éosinophiles",
-   "lesion_code": "7550",
-   "kw": [
-    "sophagite",
-    "polynucleaires",
-    "eosinophiles"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "DP",
-   "lesion": "Hernie ombilicale étranglée",
-   "lesion_code": "6756",
-   "kw": [
-    "hernie",
-    "ombilicale",
-    "etranglee"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Sac herniaire",
-   "lesion_code": "4000",
-   "kw": [
-    "sac",
-    "herniaire"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "FV",
-   "lesion": "cholécystite chronique avec cholestérolose",
-   "lesion_code": "5242",
-   "kw": [
-    "cholecystite",
-    "chronique",
-    "cholesterolose"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "FV",
-   "lesion": "Cholécystite chronique non spécifique",
-   "lesion_code": "7510",
-   "kw": [
-    "cholecystite",
-    "chronique",
-    "specifique"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "CHOLECYSTITE RICHE EN EOSINOPHILES",
-   "lesion_code": "7550",
-   "kw": [
-    "cholecystite",
-    "riche",
-    "eosinophiles"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "FV",
-   "lesion": "Cholécystite gangreneuse",
-   "lesion_code": "7180",
-   "kw": [
-    "cholecystite",
-    "gangreneuse"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "FV",
-   "lesion": "Cholécystite granulomateuse",
-   "lesion_code": "7450",
-   "kw": [
-    "cholecystite",
-    "granulomateuse"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Cholécystite xantogranulomateuse",
-   "lesion_code": "7450",
-   "kw": [
-    "cholecystite",
-    "xantogranulomateuse"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "FV",
-   "lesion": "cholécystite suppurée aiguë.",
-   "lesion_code": "7100",
-   "kw": [
-    "cholecystite",
-    "suppuree",
-    "aigue"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": "FV",
-   "lesion": "Cholécystite aiguë phlegmoneuse",
-   "lesion_code": "7100",
-   "kw": [
-    "cholecystite",
-    "aigue",
-    "phlegmoneuse"
-   ]
-  },
-  {
-   "cat": "DIG",
-   "organ_code": null,
-   "lesion": "Cholécystite et adénomyose",
-   "lesion_code": "6568",
-   "kw": [
-    "cholecystite",
-    "adenomyose"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HD",
-   "lesion": "vasectomie",
-   "lesion_code": "0000",
-   "kw": [
-    "vasectomie"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HE",
-   "lesion": "kyste",
-   "lesion_code": "6300",
-   "kw": [
-    "kyste"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HE",
-   "lesion": "poche herniaire mésothélial",
-   "lesion_code": "3434",
-   "kw": [
-    "poche",
-    "herniaire",
-    "mesothelial"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HT",
-   "lesion": "HYDATIDE",
-   "lesion_code": "2791",
-   "kw": [
-    "hydatide"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HV",
-   "lesion": "Balano-posthite",
-   "lesion_code": "7510",
-   "kw": [
-    "balano",
-    "posthite"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "OT",
-   "lesion": "Lichen évolué",
-   "lesion_code": "0462",
-   "kw": [
-    "lichen",
-    "evolue"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "OT",
-   "lesion": "Lichen scléro-atrophique",
-   "lesion_code": "0462",
-   "kw": [
-    "lichen",
-    "sclero",
-    "atrophique"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": null,
-   "lesion": "Lichen plan des muqueuses",
-   "lesion_code": "6502",
-   "kw": [
-    "lichen",
-    "plan",
-    "muqueuses"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HP",
-   "lesion": "HBP",
-   "lesion_code": "6775",
-   "kw": [
-    "hbp"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": null,
-   "lesion": "Carcinome papillaire de type 1",
-   "lesion_code": "0X54",
-   "kw": [
-    "carcinome",
-    "papillaire",
-    "type"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": null,
-   "lesion": "Carcinome papillaire de type 2",
-   "lesion_code": "0X54",
-   "kw": [
-    "carcinome",
-    "papillaire",
-    "type"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HT",
-   "lesion": "Azoospermie",
-   "lesion_code": "6010",
-   "kw": [
-    "azoospermie"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HT",
-   "lesion": "Azoospermie",
-   "lesion_code": "6010",
-   "kw": [
-    "azoospermie"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HT",
-   "lesion": "Infarctus",
-   "lesion_code": "4710",
-   "kw": [
-    "infarctus"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HT",
-   "lesion": "Infarctus",
-   "lesion_code": "4710",
-   "kw": [
-    "infarctus"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": null,
-   "lesion": "TVT",
-   "lesion_code": "7440",
-   "kw": [
-    "tvt"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "UT",
-   "lesion": "jonction pyélo-urétérale",
-   "lesion_code": "2300",
-   "kw": [
-    "jonction",
-    "pyelo",
-    "ureterale"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HG",
-   "lesion": "Pachyvaginalite",
-   "lesion_code": "7718",
-   "kw": [
-    "pachyvaginalite"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "HG",
-   "lesion": "Remaniements fibro-inflammatoires",
-   "lesion_code": "6391",
-   "kw": [
-    "remaniements",
-    "fibro",
-    "inflammatoires"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": null,
-   "lesion": "Bourgeon charnu",
-   "lesion_code": "7410",
-   "kw": [
-    "bourgeon",
-    "charnu"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "UV",
-   "lesion": "Inflammatoire",
-   "lesion_code": "6418",
-   "kw": [
-    "inflammatoire"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": null,
-   "lesion": "Cystite interstitielle",
-   "lesion_code": "7330",
-   "kw": [
-    "cystite",
-    "interstitielle"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "UV",
-   "lesion": "Inflammatoire",
-   "lesion_code": "7600",
-   "kw": [
-    "inflammatoire"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "UV",
-   "lesion": "Inflammatoire",
-   "lesion_code": "7600",
-   "kw": [
-    "inflammatoire"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "UV",
-   "lesion": "Cicatrice post-th/macrophages",
-   "lesion_code": "7540",
-   "kw": [
-    "cicatrice",
-    "post",
-    "macrophages"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "UV",
-   "lesion": "BCGite",
-   "lesion_code": "8284",
-   "kw": [
-    "bcgite"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": null,
-   "lesion": "Cystite glandulo-kystique",
-   "lesion_code": "7695",
-   "kw": [
-    "cystite",
-    "glandulo",
-    "kystique"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": null,
-   "lesion": "Cystite radique",
-   "lesion_code": "7230",
-   "kw": [
-    "cystite",
-    "radique"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": null,
-   "lesion": "Adénome/métaplasie néphrogénique",
-   "lesion_code": "6425",
-   "kw": [
-    "adenome",
-    "metaplasie",
-    "nephrogenique"
-   ]
-  },
-  {
-   "cat": "URO",
-   "organ_code": "UV",
-   "lesion": "UPUMP",
-   "lesion_code": "0165",
-   "kw": [
-    "upump"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Métaplasie malpighienne",
-   "lesion_code": "6418",
-   "kw": [
-    "metaplasie",
-    "malpighienne"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GC",
-   "lesion": "cervicite",
-   "lesion_code": "7600",
-   "kw": [
-    "cervicite"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Déciduose ectopique",
-   "lesion_code": "6696",
-   "kw": [
-    "deciduose",
-    "ectopique"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "PO",
-   "lesion": "Révision",
-   "lesion_code": "0628",
-   "kw": [
-    "revision"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Polype endocevial",
-   "lesion_code": "2901",
-   "kw": [
-    "polype",
-    "endocevial"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Polype endomètre",
-   "lesion_code": "2901",
-   "kw": [
-    "polype",
-    "endometre"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Polype endomètre",
-   "lesion_code": "0360",
-   "kw": [
-    "polype",
-    "endometre"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Polype atrophique",
-   "lesion_code": "6010",
-   "kw": [
-    "polype",
-    "atrophique"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Polype glandulo-kystique",
-   "lesion_code": "6716",
-   "kw": [
-    "polype",
-    "glandulo",
-    "kystique"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Polype  hyperplasique",
-   "lesion_code": "0360",
-   "kw": [
-    "polype",
-    "hyperplasique"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Polype adénomyomateux",
-   "lesion_code": "6775",
-   "kw": [
-    "polype",
-    "adenomyomateux"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Endomètre quiescent",
-   "lesion_code": "0450",
-   "kw": [
-    "endometre",
-    "quiescent"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Endomètre atrophique",
-   "lesion_code": "6010",
-   "kw": [
-    "endometre",
-    "atrophique"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Endomètre glandulo-kystique",
-   "lesion_code": "0453",
-   "kw": [
-    "endometre",
-    "glandulo",
-    "kystique"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Prolifératif",
-   "lesion_code": "0740",
-   "kw": [
-    "proliferatif"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Faible imprégnation oestrogé",
-   "lesion_code": "0331",
-   "kw": [
-    "faible",
-    "impregnation",
-    "oestroge"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Sécrétoire",
-   "lesion_code": "0750",
-   "kw": [
-    "secretoire"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Progestatif",
-   "lesion_code": "0535",
-   "kw": [
-    "progestatif"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Insuffisance lutéale",
-   "lesion_code": "0200",
-   "kw": [
-    "insuffisance",
-    "luteale"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Progestatif asynchrone",
-   "lesion_code": "0200",
-   "kw": [
-    "progestatif",
-    "asynchrone"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Dyshormonal",
-   "lesion_code": "0200",
-   "kw": [
-    "dyshormonal"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Endomètre prolifératif persistant",
-   "lesion_code": "0200",
-   "kw": [
-    "endometre",
-    "proliferatif",
-    "persistant"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Endomètre desquamatif",
-   "lesion_code": "0753",
-   "kw": [
-    "endometre",
-    "desquamatif"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Hyperplasie simple",
-   "lesion_code": "6700",
-   "kw": [
-    "hyperplasie",
-    "simple"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GU",
-   "lesion": "Hyperplasie complexe",
-   "lesion_code": "6700",
-   "kw": [
-    "hyperplasie",
-    "complexe"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Adénomyose",
-   "lesion_code": "6568",
-   "kw": [
-    "adenomyose"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Kyste fonctionnel",
-   "lesion_code": "6351",
-   "kw": [
-    "kyste",
-    "fonctionnel"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Kyste séreux",
-   "lesion_code": "6341",
-   "kw": [
-    "kyste",
-    "sereux"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Kyste épithélial bénin",
-   "lesion_code": "6341",
-   "kw": [
-    "kyste",
-    "epithelial",
-    "benin"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GO",
-   "lesion": "Corps jaune",
-   "lesion_code": "6352",
-   "kw": [
-    "corps",
-    "jaune"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GO",
-   "lesion": "Endométriome",
-   "lesion_code": "6560",
-   "kw": [
-    "endometriome"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "TC",
-   "lesion": "Endométriose",
-   "lesion_code": "6560",
-   "kw": [
-    "endometriose"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Normal 1 trompe",
-   "lesion_code": "6341",
-   "kw": [
-    "normal",
-    "trompe"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Fibreux",
-   "lesion_code": "6610",
-   "kw": [
-    "fibreux"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Fibreux 1 trompe",
-   "lesion_code": "6610",
-   "kw": [
-    "fibreux",
-    "trompe"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GT",
-   "lesion": "Kyste para tubaire",
-   "lesion_code": "2700",
-   "kw": [
-    "kyste",
-    "para",
-    "tubaire"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "GEU",
-   "lesion_code": "9711",
-   "kw": [
-    "geu"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "GEU tubaire",
-   "lesion_code": "9711",
-   "kw": [
-    "geu",
-    "tubaire"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Pyosalpinx/hematosalpinx",
-   "lesion_code": "6391",
-   "kw": [
-    "pyosalpinx",
-    "hematosalpinx"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Prolapsus",
-   "lesion_code": "3230",
-   "kw": [
-    "prolapsus"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Bourgeon charnu",
-   "lesion_code": "7410",
-   "kw": [
-    "bourgeon",
-    "charnu"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GG",
-   "lesion": "Polype",
-   "lesion_code": "6914",
-   "kw": [
-    "polype"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Prolapsus",
-   "lesion_code": "3230",
-   "kw": [
-    "prolapsus"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GV",
-   "lesion": "Nymphoplastie",
-   "lesion_code": "0000",
-   "kw": [
-    "nymphoplastie"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": "GB",
-   "lesion": "Kyste de la glande de Bartholin",
-   "lesion_code": "6300",
-   "kw": [
-    "kyste",
-    "glande",
-    "bartholin"
-   ]
-  },
-  {
-   "cat": "GYN",
-   "organ_code": null,
-   "lesion": "Kyste de la glande de Skène",
-   "lesion_code": "2730",
-   "kw": [
-    "kyste",
-    "glande",
-    "skene"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "TA",
-   "lesion": "TA 5230",
-   "lesion_code": "5230",
-   "kw": [
-    "5230"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "OT",
-   "lesion": "OT 7410",
-   "lesion_code": "7410",
-   "kw": [
-    "7410"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "7810",
-   "lesion_code": "7810",
-   "kw": [
-    "7810"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "TA",
-   "lesion": "TA 7440",
-   "lesion_code": "7440",
-   "kw": [
-    "7440"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "6176",
-   "lesion_code": "6176",
-   "kw": [
-    "6176"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "6914",
-   "lesion_code": "6914",
-   "kw": [
-    "6914"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "7440",
-   "lesion_code": "7440",
-   "kw": [
-    "7440"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "OT",
-   "lesion": "OT0507",
-   "lesion_code": "0507",
-   "kw": [
-    "ot0507"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "2739",
-   "lesion_code": "2739",
-   "kw": [
-    "2739"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "OT",
-   "lesion": "OT 6310",
-   "lesion_code": "6310",
-   "kw": [
-    "6310"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "OT",
-   "lesion": "OT6312",
-   "lesion_code": "6312",
-   "kw": [
-    "ot6312"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "OT",
-   "lesion": "OT 6310",
-   "lesion_code": "6310",
-   "kw": [
-    "6310"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "OT",
-   "lesion": "OT2743",
-   "lesion_code": "2743",
-   "kw": [
-    "ot2743"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "OT",
-   "lesion": "OT2743",
-   "lesion_code": "2743",
-   "kw": [
-    "ot2743"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "OT",
-   "lesion": "OT2743",
-   "lesion_code": "2743",
-   "kw": [
-    "ot2743"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "OT",
-   "lesion": "OT6310",
-   "lesion_code": "6310",
-   "kw": [
-    "ot6310"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": "OT",
-   "lesion": "OT6312",
-   "lesion_code": "6312",
-   "kw": [
-    "ot6312"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "5552",
-   "lesion_code": "5552",
-   "kw": [
-    "5552"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "5555",
-   "lesion_code": "5555",
-   "kw": [
-    "5555"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "5555",
-   "lesion_code": "5555",
-   "kw": [
-    "5555"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "9369",
-   "lesion_code": "9369",
-   "kw": [
-    "9369"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "0C84",
-   "lesion_code": "0C84",
-   "kw": [
-    "0c84"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "7800",
-   "lesion_code": "7800",
-   "kw": [
-    "7800"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "1585",
-   "lesion_code": "1585",
-   "kw": [
-    "1585"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "9312",
-   "lesion_code": "9312",
-   "kw": [
-    "9312"
-   ]
-  },
-  {
-   "cat": "DERMATO",
-   "organ_code": null,
-   "lesion": "9312",
-   "lesion_code": "9312",
-   "kw": [
-    "9312"
-   ]
-  },
-  {
-   "cat": "CYTO",
-   "organ_code": "RS",
-   "lesion": "Hyperplasie mésothéliale",
-   "lesion_code": "7660",
-   "kw": [
-    "hyperplasie",
-    "mesotheliale"
-   ]
-  },
-  {
-   "cat": "CYTO",
-   "organ_code": null,
-   "lesion": "Atypique",
-   "lesion_code": "0S15",
-   "kw": [
-    "atypique"
-   ]
-  },
-  {
-   "cat": "CYTO",
-   "organ_code": null,
-   "lesion": "Suspecte de HG",
-   "lesion_code": "0S90",
-   "kw": [
-    "suspecte"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "Actinomycose",
-   "lesion_code": "8351",
-   "kw": [
-    "actinomycose"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "ASCUS",
-   "lesion_code": "0G11",
-   "kw": [
-    "ascus"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "Atrophique ménopausique",
-   "lesion_code": "0H44",
-   "kw": [
-    "atrophique",
-    "menopausique"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "Dystrophies",
-   "lesion_code": "0P62",
-   "kw": [
-    "dystrophies"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "Lésions intra-épithéliales de bas grade",
-   "lesion_code": "0D10",
-   "kw": [
-    "lesions",
-    "intra",
-    "epitheliales",
-    "bas",
-    "grade"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "Lutéal",
-   "lesion_code": "0H02",
-   "kw": [
-    "luteal"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "Ménopause de type intermédiaire",
-   "lesion_code": "0H42",
-   "kw": [
-    "menopause",
-    "type",
-    "intermediaire"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "Subatrophique ménopausique",
-   "lesion_code": "0H43",
-   "kw": [
-    "subatrophique",
-    "menopausique"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "Subatrophique sous contraception orale",
-   "lesion_code": "0H43",
-   "kw": [
-    "subatrophique",
-    "sous",
-    "contraception",
-    "orale"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "Superficiel",
-   "lesion_code": "0H01",
-   "kw": [
-    "superficiel"
-   ]
-  },
-  {
-   "cat": "Cyto FCU",
-   "organ_code": null,
-   "lesion": "Ménopausique et troubles de maturation",
-   "lesion_code": "0H44",
-   "kw": [
-    "menopausique",
-    "troubles",
-    "maturation"
-   ]
-  },
-  {
-   "cat": "SEIN",
-   "organ_code": null,
-   "lesion": "6711",
-   "lesion_code": "6711",
-   "kw": [
-    "6711"
-   ]
-  },
-  {
-   "cat": "SEIN",
-   "organ_code": null,
-   "lesion": "6773",
-   "lesion_code": "6773",
-   "kw": [
-    "6773"
-   ]
-  },
-  {
-   "cat": "SEIN",
-   "organ_code": null,
-   "lesion": "6610",
-   "lesion_code": "6610",
-   "kw": [
-    "6610"
-   ]
-  },
-  {
-   "cat": "SEIN",
-   "organ_code": null,
-   "lesion": "6546",
-   "lesion_code": "6546",
-   "kw": [
-    "6546"
-   ]
-  },
-  {
-   "cat": "SEIN",
-   "organ_code": "GS",
-   "lesion": "GS 6551",
-   "lesion_code": "6551",
-   "kw": [
-    "6551"
-   ]
-  },
-  {
-   "cat": "SEIN",
-   "organ_code": "GS",
-   "lesion": "GS 6551",
-   "lesion_code": "6551",
-   "kw": [
-    "6551"
-   ]
-  },
-  {
-   "cat": "FOETO-P",
-   "organ_code": "PP",
-   "lesion": "JPQX019",
-   "lesion_code": "1810",
-   "kw": [
-    "jpqx019"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Amygdalite chronique",
-   "lesion_code": "6743",
-   "kw": [
-    "amygdalite",
-    "chronique"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AA",
-   "lesion": "Hyperplasie sur biopsie",
-   "lesion_code": "7600",
-   "kw": [
-    "hyperplasie",
-    "biopsie"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AC",
-   "lesion": "Végétations adénoïdes",
-   "lesion_code": "6743",
-   "kw": [
-    "vegetations",
-    "adenoides"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Bourgeon charnu",
-   "lesion_code": "7410",
-   "kw": [
-    "bourgeon",
-    "charnu"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Dysplasie légère",
-   "lesion_code": "6312",
-   "kw": [
-    "dysplasie",
-    "legere"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Dysplasie modérée",
-   "lesion_code": "6313",
-   "kw": [
-    "dysplasie",
-    "moderee"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Diapneusie",
-   "lesion_code": "6914",
-   "kw": [
-    "diapneusie"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Hyperplasie pseudo-épithéliomateuse",
-   "lesion_code": "8400",
-   "kw": [
-    "hyperplasie",
-    "pseudo",
-    "epitheliomateuse"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Kératokyste odontogène",
-   "lesion_code": "2762",
-   "kw": [
-    "keratokyste",
-    "odontogene"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Kyste gingival",
-   "lesion_code": "2765",
-   "kw": [
-    "kyste",
-    "gingival"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Kyste odontogène inflammatoire",
-   "lesion_code": "6316",
-   "kw": [
-    "kyste",
-    "odontogene",
-    "inflammatoire"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Kyste radiculaire ou un kyste dentigère",
-   "lesion_code": "2760",
-   "kw": [
-    "kyste",
-    "radiculaire",
-    "kyste",
-    "dentigere"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BX",
-   "lesion": "Kyste lympho-épithélial",
-   "lesion_code": "6339",
-   "kw": [
-    "kyste",
-    "lympho",
-    "epithelial"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Kyste mucoide",
-   "lesion_code": "6332",
-   "kw": [
-    "kyste",
-    "mucoide"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BX",
-   "lesion": "Kyste radiculo-dentaire p.184 apico dentaire",
-   "lesion_code": "6316",
-   "kw": [
-    "kyste",
-    "radiculo",
-    "dentaire",
-    "184",
-    "apico",
-    "dentaire"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BX",
-   "lesion": "Kyste dentigère/pericoronaire/folliculaire",
-   "lesion_code": "2763",
-   "kw": [
-    "kyste",
-    "dentigere",
-    "pericoronaire",
-    "folliculaire"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BX",
-   "lesion": "Kyste odontogène p.321",
-   "lesion_code": "2760",
-   "kw": [
-    "kyste",
-    "odontogene",
-    "321"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BX",
-   "lesion": "Kératokyste odontogène - kyste épidermoïde",
-   "lesion_code": "2762",
-   "kw": [
-    "keratokyste",
-    "odontogene",
-    "kyste",
-    "epidermoide"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Inflammation + régénératif",
-   "lesion_code": "7600",
-   "kw": [
-    "inflammation",
-    "regeneratif"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "indéterminé pour la dysplasie",
-   "lesion_code": "7600",
-   "kw": [
-    "indetermine",
-    "dysplasie"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BD",
-   "lesion": "Epulis",
-   "lesion_code": "6911",
-   "kw": [
-    "epulis"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BX",
-   "lesion": "Epulis polype fibro-épithélial",
-   "lesion_code": "6914",
-   "kw": [
-    "epulis",
-    "polype",
-    "fibro",
-    "epithelial"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BX",
-   "lesion": "Lichen",
-   "lesion_code": "6502",
-   "kw": [
-    "lichen"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "MUCOCELE",
-   "lesion_code": "6392",
-   "kw": [
-    "mucocele"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BX",
-   "lesion": "Mycose",
-   "lesion_code": "8433",
-   "kw": [
-    "mycose"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BX",
-   "lesion": "Dysplasie sévère",
-   "lesion_code": "6814",
-   "kw": [
-    "dysplasie",
-    "severe"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BX",
-   "lesion": "Luette",
-   "lesion_code": "4000",
-   "kw": [
-    "luette"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "XC",
-   "lesion": "Kyste",
-   "lesion_code": "2730",
-   "kw": [
-    "kyste"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AA",
-   "lesion": "KYSTE AMYGDALOïDE  2éme arc branchial",
-   "lesion_code": "6339",
-   "kw": [
-    "kyste",
-    "amygdaloide",
-    "2eme",
-    "arc",
-    "branchial"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "XC",
-   "lesion": "Kyste du tractus thyréoglosse",
-   "lesion_code": "2780",
-   "kw": [
-    "kyste",
-    "tractus",
-    "thyreoglosse"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Kyste dysembryoplasique",
-   "lesion_code": "2730",
-   "kw": [
-    "kyste",
-    "dysembryoplasique"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Remaniements inflammatoires chroniques",
-   "lesion_code": "7600",
-   "kw": [
-    "remaniements",
-    "inflammatoires",
-    "chroniques"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Hyperplasie épithéliale",
-   "lesion_code": "6700",
-   "kw": [
-    "hyperplasie",
-    "epitheliale"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Hyperplasie verruqueuse",
-   "lesion_code": "6700",
-   "kw": [
-    "hyperplasie",
-    "verruqueuse"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Inflammation + régénératif",
-   "lesion_code": "7600",
-   "kw": [
-    "inflammation",
-    "regeneratif"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Dysplasie légère",
-   "lesion_code": "6812",
-   "kw": [
-    "dysplasie",
-    "legere"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Dysplasie modérée",
-   "lesion_code": "6813",
-   "kw": [
-    "dysplasie",
-    "moderee"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Polype des chanteurs",
-   "lesion_code": "6911",
-   "kw": [
-    "polype",
-    "chanteurs"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "nodule de la corde vocale",
-   "lesion_code": "6500",
-   "kw": [
-    "nodule",
-    "corde",
-    "vocale"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Kyste",
-   "lesion_code": "6360",
-   "kw": [
-    "kyste"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Kyste épidermique",
-   "lesion_code": "6310",
-   "kw": [
-    "kyste",
-    "epidermique"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "kyste de la corde vocale",
-   "lesion_code": "6304",
-   "kw": [
-    "kyste",
-    "corde",
-    "vocale"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "BGSA Chisholm 0",
-   "lesion_code": "0000",
-   "kw": [
-    "bgsa",
-    "chisholm"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "BGSA négatives",
-   "lesion_code": "0000",
-   "kw": [
-    "bgsa",
-    "negatives"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BA",
-   "lesion": "BGSA Chisholm 1",
-   "lesion_code": "7510",
-   "kw": [
-    "bgsa",
-    "chisholm"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "BGSA Chisholm 2",
-   "lesion_code": "7510",
-   "kw": [
-    "bgsa",
-    "chisholm"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BA",
-   "lesion": "BGSA Chisholm 3",
-   "lesion_code": "9422",
-   "kw": [
-    "bgsa",
-    "chisholm"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "BGSA Chisholm 4",
-   "lesion_code": "9422",
-   "kw": [
-    "bgsa",
-    "chisholm"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "BA",
-   "lesion": "Amylose",
-   "lesion_code": "5310",
-   "kw": [
-    "amylose"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "DIVERTICULE DE ZENKER",
-   "lesion_code": "3420",
-   "kw": [
-    "diverticule",
-    "zenker"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Biopsie malpighienne dysplasie légère",
-   "lesion_code": "6810",
-   "kw": [
-    "biopsie",
-    "malpighienne",
-    "dysplasie",
-    "legere"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Biopsie malpighienne dysplasie modérée",
-   "lesion_code": "6813",
-   "kw": [
-    "biopsie",
-    "malpighienne",
-    "dysplasie",
-    "moderee"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Inflammation + régénératif",
-   "lesion_code": "7600",
-   "kw": [
-    "inflammation",
-    "regeneratif"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Biopsie malpighienne leucokératosique, hyperplasique, inflammation",
-   "lesion_code": "6700",
-   "kw": [
-    "biopsie",
-    "malpighienne",
-    "leucokeratosique",
-    "hyperplasique",
-    "inflammation"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Polype des chanteurs",
-   "lesion_code": "6910",
-   "kw": [
-    "polype",
-    "chanteurs"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AL",
-   "lesion": "Polype oedémateux",
-   "lesion_code": "6910",
-   "kw": [
-    "polype",
-    "oedemateux"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Polype oedémateux de la corde vocale",
-   "lesion_code": "6913",
-   "kw": [
-    "polype",
-    "oedemateux",
-    "corde",
-    "vocale"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AS",
-   "lesion": "Aspergillome",
-   "lesion_code": "8442",
-   "kw": [
-    "aspergillome"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AF",
-   "lesion": "Mucocèle",
-   "lesion_code": "6392",
-   "kw": [
-    "mucocele"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AF",
-   "lesion": "Mucocèle",
-   "lesion_code": "6392",
-   "kw": [
-    "mucocele"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Mucine allergique sans filament",
-   "lesion_code": "9100",
-   "kw": [
-    "mucine",
-    "allergique",
-    "filament"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AF",
-   "lesion": "POLYPE DE KILLIAN",
-   "lesion_code": "6911",
-   "kw": [
-    "polype",
-    "killian"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AF",
-   "lesion": "Polypose nasale",
-   "lesion_code": "6911",
-   "kw": [
-    "polypose",
-    "nasale"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AF",
-   "lesion": "Polypose nasale LP",
-   "lesion_code": "6911",
-   "kw": [
-    "polypose",
-    "nasale"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Sinusite chronique",
-   "lesion_code": "7600",
-   "kw": [
-    "sinusite",
-    "chronique"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AF",
-   "lesion": "Condylome + dysplasie sévère + IHC",
-   "lesion_code": "6814",
-   "kw": [
-    "condylome",
-    "dysplasie",
-    "severe",
-    "ihc"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AF",
-   "lesion": "Churg et Strauss",
-   "lesion_code": "9331",
-   "kw": [
-    "churg",
-    "strauss"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "AF",
-   "lesion": "WEGENER",
-   "lesion_code": "9332",
-   "kw": [
-    "wegener"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Cholestéatome",
-   "lesion_code": "6311",
-   "kw": [
-    "cholesteatome"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "OR",
-   "lesion": "Nodule douloureux",
-   "lesion_code": "6925",
-   "kw": [
-    "nodule",
-    "douloureux"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Otite moyenne chronique",
-   "lesion_code": "7600",
-   "kw": [
-    "otite",
-    "moyenne",
-    "chronique"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "OR",
-   "lesion": "Nodule élastosique",
-   "lesion_code": "6690",
-   "kw": [
-    "nodule",
-    "elastosique"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "OR",
-   "lesion": "Tympanosclérose",
-   "lesion_code": "6453",
-   "kw": [
-    "tympanosclerose"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Tophus goutteux",
-   "lesion_code": "5342",
-   "kw": [
-    "tophus",
-    "goutteux"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": "OR",
-   "lesion": "TUBERCULE PRE-TRAGIEN tragus accessoire",
-   "lesion_code": "1585",
-   "kw": [
-    "tubercule",
-    "pre",
-    "tragien",
-    "tragus",
-    "accessoire"
-   ]
-  },
-  {
-   "cat": "ORL",
-   "organ_code": null,
-   "lesion": "Ostéonécrose",
-   "lesion_code": "3624",
-   "kw": [
-    "osteonecrose"
-   ]
-  },
-  {
-   "cat": "THO",
-   "organ_code": null,
-   "lesion": "Biop infllammatoire",
-   "lesion_code": "7510",
-   "kw": [
-    "biop",
-    "infllammatoire"
-   ]
-  },
-  {
-   "cat": "THO",
-   "organ_code": null,
-   "lesion": "Métaplasie malpighienne",
-   "lesion_code": "6418",
-   "kw": [
-    "metaplasie",
-    "malpighienne"
-   ]
-  },
-  {
-   "cat": "THO",
-   "organ_code": null,
-   "lesion": "Dystrophie bulleuse",
-   "lesion_code": "2431",
-   "kw": [
-    "dystrophie",
-    "bulleuse"
-   ]
-  },
-  {
-   "cat": "THO",
-   "organ_code": null,
-   "lesion": "Emphysème bulleux",
-   "lesion_code": "3488",
-   "kw": [
-    "emphyseme",
-    "bulleux"
-   ]
-  },
-  {
-   "cat": "THO",
-   "organ_code": "RP",
-   "lesion": "MAKP (malformation adénoïde kystique)",
-   "lesion_code": "2630",
-   "kw": [
-    "makp",
-    "malformation",
-    "adenoide",
-    "kystique"
-   ]
-  },
-  {
-   "cat": "ENDOC",
-   "organ_code": null,
-   "lesion": "Basedow",
-   "lesion_code": "0240",
-   "kw": [
-    "basedow"
-   ]
-  },
-  {
-   "cat": "ENDOC",
-   "organ_code": null,
-   "lesion": "Basedow ttt",
-   "lesion_code": "0241",
-   "kw": [
-    "basedow",
-    "ttt"
-   ]
-  },
-  {
-   "cat": "ENDOC",
-   "organ_code": "ET",
-   "lesion": "DYSTROPHIE HETERONODULAIRE BENIGNE NON REMANIEE",
-   "lesion_code": "0220",
-   "kw": [
-    "dystrophie",
-    "heteronodulaire",
-    "benigne",
-    "remaniee"
-   ]
-  },
-  {
-   "cat": "ENDOC",
-   "organ_code": "ET",
-   "lesion": "DYSTROPHIE HETERONODULAIRE BENIGNE REMANIEE",
-   "lesion_code": "0225",
-   "kw": [
-    "dystrophie",
-    "heteronodulaire",
-    "benigne",
-    "remaniee"
-   ]
-  },
-  {
-   "cat": "ENDOC",
-   "organ_code": null,
-   "lesion": "Cordarone",
-   "lesion_code": "3700",
-   "kw": [
-    "cordarone"
-   ]
-  },
-  {
-   "cat": "ENDOC",
-   "organ_code": "ET",
-   "lesion": "Kyste scléro-inflammatoire",
-   "lesion_code": "6300",
-   "kw": [
-    "kyste",
-    "sclero",
-    "inflammatoire"
-   ]
-  },
-  {
-   "cat": "ENDOC",
-   "organ_code": "ET",
-   "lesion": "Thyroïdite chronique lymphocytaire",
-   "lesion_code": "7513",
-   "kw": [
-    "thyroidite",
-    "chronique",
-    "lymphocytaire"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": null,
-   "lesion": "7781",
-   "lesion_code": "7781",
-   "kw": [
-    "7781"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": "LO",
-   "lesion": "LO 6621",
-   "lesion_code": "6621",
-   "kw": [
-    "6621"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": null,
-   "lesion": "3050",
-   "lesion_code": "3050",
-   "kw": [
-    "3050"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": "LC",
-   "lesion": "LC 6633",
-   "lesion_code": "6633",
-   "kw": [
-    "6633"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": "LB",
-   "lesion": "LB7600",
-   "lesion_code": "7600",
-   "kw": [
-    "lb7600"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": "LB",
-   "lesion": "LB7600",
-   "lesion_code": "7600",
-   "kw": [
-    "lb7600"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": null,
-   "lesion": "6345",
-   "lesion_code": "6345",
-   "kw": [
-    "6345"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": "LS",
-   "lesion": "LS 6344",
-   "lesion_code": "6344",
-   "kw": [
-    "6344"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": "LS",
-   "lesion": "LS 6344",
-   "lesion_code": "6344",
-   "kw": [
-    "6344"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": "OG",
-   "lesion": "OG 0000",
-   "lesion_code": "0000",
-   "kw": [
-    "0000"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": null,
-   "lesion": "4770",
-   "lesion_code": "4770",
-   "kw": [
-    "4770"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": "LS",
-   "lesion": "LS7600",
-   "lesion_code": "7600",
-   "kw": [
-    "ls7600"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": "LT",
-   "lesion": "LT 6600",
-   "lesion_code": "6600",
-   "kw": [
-    "6600"
-   ]
-  },
-  {
-   "cat": "OS-ARTI",
-   "organ_code": "LS",
-   "lesion": "LS 6100",
-   "lesion_code": "6100",
-   "kw": [
-    "6100"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": "SM",
-   "lesion": "BOM",
-   "lesion_code": "0140",
-   "kw": [
-    "bom"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": "SM",
-   "lesion": "BOM",
-   "lesion_code": "6745",
-   "kw": [
-    "bom"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": "SM",
-   "lesion": "BOM",
-   "lesion_code": "0440",
-   "kw": [
-    "bom"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": "SM",
-   "lesion": "BOM",
-   "lesion_code": "0000",
-   "kw": [
-    "bom"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": "SM",
-   "lesion": "BOM",
-   "lesion_code": "0440",
-   "kw": [
-    "bom"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": "SG",
-   "lesion": "Maladie de Castelman",
-   "lesion_code": "6779",
-   "kw": [
-    "maladie",
-    "castelman"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": null,
-   "lesion": "INF",
-   "lesion_code": "6768",
-   "kw": [
-    "inf"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": null,
-   "lesion": "INF",
-   "lesion_code": "6768",
-   "kw": [
-    "inf"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": null,
-   "lesion": "INF",
-   "lesion_code": "8560",
-   "kw": [
-    "inf"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": null,
-   "lesion": "INF",
-   "lesion_code": "8380",
-   "kw": [
-    "inf"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": null,
-   "lesion": "INF",
-   "lesion_code": "8200",
-   "kw": [
-    "inf"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": null,
-   "lesion": "INF",
-   "lesion_code": "8311",
-   "kw": [
-    "inf"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": null,
-   "lesion": "INF",
-   "lesion_code": "7500",
-   "kw": [
-    "inf"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": null,
-   "lesion": "INF",
-   "lesion_code": "7500",
-   "kw": [
-    "inf"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": null,
-   "lesion": "INF",
-   "lesion_code": "8361",
-   "kw": [
-    "inf"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": "SR",
-   "lesion": "Trauma",
-   "lesion_code": "3000",
-   "kw": [
-    "trauma"
-   ]
-  },
-  {
-   "cat": "HEMATO",
-   "organ_code": "SR",
-   "lesion": "Trauma",
-   "lesion_code": "3000",
-   "kw": [
-    "trauma"
-   ]
-  },
-  {
-   "cat": "T mous",
-   "organ_code": null,
-   "lesion": "8350",
-   "lesion_code": "8350",
-   "kw": [
-    "8350"
-   ]
-  },
-  {
-   "cat": "CV",
-   "organ_code": "VA",
-   "lesion": "Discrète artériosclérose",
-   "lesion_code": "4460",
-   "kw": [
-    "discrete",
-    "arteriosclerose"
-   ]
-  },
-  {
-   "cat": "CV",
-   "organ_code": null,
-   "lesion": "Horton",
-   "lesion_code": "9334",
-   "kw": [
-    "horton"
-   ]
-  },
-  {
-   "cat": "CV",
-   "organ_code": "VA",
-   "lesion": "Endartere",
-   "lesion_code": "4460",
-   "kw": [
-    "endartere"
-   ]
-  },
-  {
-   "cat": "CV",
-   "organ_code": "VA",
-   "lesion": "Endartere",
-   "lesion_code": "4460",
-   "kw": [
-    "endartere"
-   ]
-  },
-  {
-   "cat": "CV",
-   "organ_code": null,
-   "lesion": "Médiacalcose",
-   "lesion_code": "5645",
-   "kw": [
-    "mediacalcose"
-   ]
-  },
-  {
-   "cat": "CV",
-   "organ_code": "CE",
-   "lesion": "Valve dégénérative",
-   "lesion_code": "7783",
-   "kw": [
-    "valve",
-    "degenerative"
-   ]
-  },
-  {
-   "cat": "CV",
-   "organ_code": "CM",
-   "lesion": "Rejet 1R",
-   "lesion_code": "9635",
-   "kw": [
-    "rejet"
-   ]
-  },
-  {
-   "cat": "OPH",
-   "organ_code": "OL",
-   "lesion": "DCR",
-   "lesion_code": "7600",
-   "kw": [
-    "dcr"
-   ]
-  },
-  {
-   "cat": "OPH",
-   "organ_code": null,
-   "lesion": "Cornée",
-   "lesion_code": "6210",
-   "kw": [
-    "cornee"
-   ]
-  },
-  {
-   "cat": "OPH",
-   "organ_code": "OE",
-   "lesion": "Pinguécula",
-   "lesion_code": "1593",
-   "kw": [
-    "pinguecula"
-   ]
-  },
-  {
-   "cat": "OPH",
-   "organ_code": "OE",
-   "lesion": "Ptérygion",
-   "lesion_code": "1593",
-   "kw": [
-    "pterygion"
-   ]
-  }
- ]
+  "organ_codes": {
+    "DQ": {
+      "labels": [
+        "Anus"
+      ],
+      "kw": [
+        "anus"
+      ]
+    },
+    "DA": {
+      "labels": [
+        "Appendice"
+      ],
+      "kw": [
+        "appendice"
+      ]
+    },
+    "DP": {
+      "labels": [
+        "Chir Colo-rectal",
+        "Péritoine"
+      ],
+      "kw": [
+        "chir",
+        "colo",
+        "peritoine",
+        "rectal"
+      ]
+    },
+    "DC": {
+      "labels": [
+        "Colo-rectal"
+      ],
+      "kw": [
+        "colo",
+        "rectal"
+      ]
+    },
+    "DD": {
+      "labels": [
+        "Duodenum"
+      ],
+      "kw": [
+        "duodenum"
+      ]
+    },
+    "DE": {
+      "labels": [
+        "Estomac"
+      ],
+      "kw": [
+        "estomac"
+      ]
+    },
+    "FF": {
+      "labels": [
+        "Foie"
+      ],
+      "kw": [
+        "foie"
+      ]
+    },
+    "DO": {
+      "labels": [
+        "Œsophage"
+      ],
+      "kw": [
+        "sophage"
+      ]
+    },
+    "FV": {
+      "labels": [
+        "Vésicule"
+      ],
+      "kw": [
+        "vesicule"
+      ]
+    },
+    "HD": {
+      "labels": [
+        "Deferent"
+      ],
+      "kw": [
+        "deferent"
+      ]
+    },
+    "HE": {
+      "labels": [
+        "Epididyme"
+      ],
+      "kw": [
+        "epididyme"
+      ]
+    },
+    "HT": {
+      "labels": [
+        "HYDATIDE",
+        "Testicule"
+      ],
+      "kw": [
+        "hydatide",
+        "testicule"
+      ]
+    },
+    "HV": {
+      "labels": [
+        "Prépuce"
+      ],
+      "kw": [
+        "prepuce"
+      ]
+    },
+    "OT": {
+      "labels": [
+        "Bourgeon charnu",
+        "Kyste sacro-coccygien",
+        "Kyste sacro-coccygien probable",
+        "Kyste sacro-coccygien sans abc",
+        "Kyste trichilemmal",
+        "Kyste trichilemmal remanié",
+        "Kyste épidermique",
+        "Kyste épidermique marsupialisé",
+        "Kyste épidermique remanié",
+        "Kératose lichenoïde bénigne",
+        "Prépuce"
+      ],
+      "kw": [
+        "abces",
+        "benigne",
+        "bourgeon",
+        "charnu",
+        "coccygien",
+        "epidermique",
+        "keratose",
+        "kyste",
+        "lichenoide",
+        "marsupialise",
+        "prepuce",
+        "probable",
+        "remanie",
+        "sacro",
+        "trichilemmal"
+      ]
+    },
+    "HP": {
+      "labels": [
+        "Prostate"
+      ],
+      "kw": [
+        "prostate"
+      ]
+    },
+    "UT": {
+      "labels": [
+        "Uretère"
+      ],
+      "kw": [
+        "uretere"
+      ]
+    },
+    "HG": {
+      "labels": [
+        "Vaginale"
+      ],
+      "kw": [
+        "vaginale"
+      ]
+    },
+    "UV": {
+      "labels": [
+        "Vessie"
+      ],
+      "kw": [
+        "vessie"
+      ]
+    },
+    "GC": {
+      "labels": [
+        "COL"
+      ],
+      "kw": [
+        "col"
+      ]
+    },
+    "PO": {
+      "labels": [
+        "Endomètre"
+      ],
+      "kw": [
+        "endometre"
+      ]
+    },
+    "GU": {
+      "labels": [
+        "Endomètre"
+      ],
+      "kw": [
+        "endometre"
+      ]
+    },
+    "GO": {
+      "labels": [
+        "Ovaire"
+      ],
+      "kw": [
+        "ovaire"
+      ]
+    },
+    "TC": {
+      "labels": [
+        "TC"
+      ],
+      "kw": []
+    },
+    "GT": {
+      "labels": [
+        "Trompe"
+      ],
+      "kw": [
+        "trompe"
+      ]
+    },
+    "GG": {
+      "labels": [
+        "vagin"
+      ],
+      "kw": [
+        "vagin"
+      ]
+    },
+    "GV": {
+      "labels": [
+        "VULVE"
+      ],
+      "kw": [
+        "vulve"
+      ]
+    },
+    "GB": {
+      "labels": [
+        "VULVE"
+      ],
+      "kw": [
+        "vulve"
+      ]
+    },
+    "TA": {
+      "labels": [
+        "Adiponécrose",
+        "Coque abcès"
+      ],
+      "kw": [
+        "abces",
+        "adiponecrose",
+        "coque"
+      ]
+    },
+    "RS": {
+      "labels": [
+        "Plèvre"
+      ],
+      "kw": [
+        "plevre"
+      ]
+    },
+    "GS": {
+      "labels": [
+        "Gynécomastie"
+      ],
+      "kw": [
+        "gynecomastie"
+      ]
+    },
+    "PP": {
+      "labels": [
+        "Placenta"
+      ],
+      "kw": [
+        "placenta"
+      ]
+    },
+    "AA": {
+      "labels": [
+        "Amygdale",
+        "Cou"
+      ],
+      "kw": [
+        "amygdale",
+        "cou"
+      ]
+    },
+    "AC": {
+      "labels": [
+        "Amygdale"
+      ],
+      "kw": [
+        "amygdale"
+      ]
+    },
+    "BX": {
+      "labels": [
+        "Bouche"
+      ],
+      "kw": [
+        "bouche"
+      ]
+    },
+    "BD": {
+      "labels": [
+        "Bouche"
+      ],
+      "kw": [
+        "bouche"
+      ]
+    },
+    "XC": {
+      "labels": [
+        "Cou"
+      ],
+      "kw": [
+        "cou"
+      ]
+    },
+    "AL": {
+      "labels": [
+        "CV",
+        "Larynx"
+      ],
+      "kw": [
+        "larynx"
+      ]
+    },
+    "BA": {
+      "labels": [
+        "Glande salivaire"
+      ],
+      "kw": [
+        "glande",
+        "salivaire"
+      ]
+    },
+    "AS": {
+      "labels": [
+        "Naso-sinusien"
+      ],
+      "kw": [
+        "naso",
+        "sinusien"
+      ]
+    },
+    "AF": {
+      "labels": [
+        "Naso-sinusien"
+      ],
+      "kw": [
+        "naso",
+        "sinusien"
+      ]
+    },
+    "OR": {
+      "labels": [
+        "Oreille"
+      ],
+      "kw": [
+        "oreille"
+      ]
+    },
+    "RP": {
+      "labels": [
+        "Poumon"
+      ],
+      "kw": [
+        "poumon"
+      ]
+    },
+    "ET": {
+      "labels": [
+        "Thyroïde"
+      ],
+      "kw": [
+        "thyroide"
+      ]
+    },
+    "LO": {
+      "labels": [
+        "Coxarthrose"
+      ],
+      "kw": [
+        "coxarthrose"
+      ]
+    },
+    "LC": {
+      "labels": [
+        "HERNIE DISCALE"
+      ],
+      "kw": [
+        "discale",
+        "hernie"
+      ]
+    },
+    "LB": {
+      "labels": [
+        "Hygroma"
+      ],
+      "kw": [
+        "hygroma"
+      ]
+    },
+    "LS": {
+      "labels": [
+        "Kyste synovial",
+        "Synoviale amylose",
+        "Ténosynovite des fléchisseurs "
+      ],
+      "kw": [
+        "amylose",
+        "flechisseurs",
+        "kyste",
+        "main",
+        "synovial",
+        "synoviale",
+        "tenosynovite"
+      ]
+    },
+    "OG": {
+      "labels": [
+        "Ongle"
+      ],
+      "kw": [
+        "ongle"
+      ]
+    },
+    "LT": {
+      "labels": [
+        "Ténosynovite"
+      ],
+      "kw": [
+        "tenosynovite"
+      ]
+    },
+    "SM": {
+      "labels": [
+        "BOM"
+      ],
+      "kw": [
+        "bom"
+      ]
+    },
+    "SG": {
+      "labels": [
+        "GG"
+      ],
+      "kw": []
+    },
+    "SR": {
+      "labels": [
+        "Rate"
+      ],
+      "kw": [
+        "rate"
+      ]
+    },
+    "VA": {
+      "labels": [
+        "BAT",
+        "Endartere"
+      ],
+      "kw": [
+        "bat",
+        "endartere"
+      ]
+    },
+    "CE": {
+      "labels": [
+        "Valve"
+      ],
+      "kw": [
+        "valve"
+      ]
+    },
+    "CM": {
+      "labels": [
+        "Myocarde"
+      ],
+      "kw": [
+        "myocarde"
+      ]
+    },
+    "OL": {
+      "labels": [
+        "DCR"
+      ],
+      "kw": [
+        "dcr"
+      ]
+    },
+    "OE": {
+      "labels": [
+        "Œil"
+      ],
+      "kw": []
+    }
+  },
+  "lesion_catalog": [
+    {
+      "cat": "DIG",
+      "organ_code": "DQ",
+      "lesion": "Hémorroïdes non compliquées",
+      "lesion_code": "4550",
+      "kw": [
+        "hemorroides",
+        "compliquees"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DQ",
+      "lesion": "Hémorroïdes partiellement thrombosées, sans surinfection.",
+      "lesion_code": "4554",
+      "kw": [
+        "hemorroides",
+        "partiellement",
+        "thrombosees",
+        "surinfection"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Marisque hémorroïdaire",
+      "lesion_code": "4558",
+      "kw": [
+        "marisque",
+        "hemorroidaire"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Fissure anale",
+      "lesion_code": "7600",
+      "kw": [
+        "fissure",
+        "anale"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Fistule anale",
+      "lesion_code": "3340",
+      "kw": [
+        "fistule",
+        "anale"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DA",
+      "lesion": "Appendicite aigue simple",
+      "lesion_code": "7000",
+      "kw": [
+        "appendicite",
+        "aigue",
+        "simple"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DA",
+      "lesion": "Appendicite aigue suppurée non compliquée",
+      "lesion_code": "7130",
+      "kw": [
+        "appendicite",
+        "aigue",
+        "suppuree",
+        "compliquee"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DA",
+      "lesion": "Appendicite aigue suppurée avec réaction péritonéale",
+      "lesion_code": "7130",
+      "kw": [
+        "appendicite",
+        "aigue",
+        "suppuree",
+        "reaction",
+        "peritoneale"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DA",
+      "lesion": "Appendicite aigue suppurée perforée avec réaction péritonéale",
+      "lesion_code": "7250",
+      "kw": [
+        "appendicite",
+        "aigue",
+        "suppuree",
+        "perforee",
+        "reaction",
+        "peritoneale"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DA",
+      "lesion": "Appendicite aiguë phlegmoneuse avec réaction péritonéale",
+      "lesion_code": "7170",
+      "kw": [
+        "appendicite",
+        "aigue",
+        "phlegmoneuse",
+        "reaction",
+        "peritoneale"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DA",
+      "lesion": "Appendicite aigue gangréneuse avec péritonite",
+      "lesion_code": "7180",
+      "kw": [
+        "appendicite",
+        "aigue",
+        "gangreneuse",
+        "peritonite"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DA",
+      "lesion": "Appendicite chronique avec oxyurose",
+      "lesion_code": "8623",
+      "kw": [
+        "appendicite",
+        "chronique",
+        "oxyurose"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DA",
+      "lesion": "Appendicite chronique oblitérante",
+      "lesion_code": "7602",
+      "kw": [
+        "appendicite",
+        "chronique",
+        "obliterante"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DA",
+      "lesion": "Appendicite folliculaire",
+      "lesion_code": "7515",
+      "kw": [
+        "appendicite",
+        "folliculaire"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Colite aiguë avec péritonite sur diverticulose colique",
+      "lesion_code": "3426",
+      "kw": [
+        "colite",
+        "aigue",
+        "peritonite",
+        "diverticulose",
+        "colique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Colite ischémique aiguë",
+      "lesion_code": "4700",
+      "kw": [
+        "colite",
+        "ischemique",
+        "aigue"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Sigmoïdite perforée avec péritonite",
+      "lesion_code": "3427",
+      "kw": [
+        "sigmoidite",
+        "perforee",
+        "peritonite"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DP",
+      "lesion": "Ulcere solitaire",
+      "lesion_code": "5230",
+      "kw": [
+        "ulcere",
+        "solitaire"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Colite inflammatoire aiguë non spécifique",
+      "lesion_code": "7000",
+      "kw": [
+        "colite",
+        "inflammatoire",
+        "aigue",
+        "specifique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Légère colite chronique non spécifique",
+      "lesion_code": "7511",
+      "kw": [
+        "legere",
+        "colite",
+        "chronique",
+        "specifique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Eosinophiles",
+      "lesion_code": "7550",
+      "kw": [
+        "eosinophiles"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DC",
+      "lesion": "Repli de muqueuse colique oedémateuse",
+      "lesion_code": "4110",
+      "kw": [
+        "repli",
+        "muqueuse",
+        "colique",
+        "oedemateuse"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DC",
+      "lesion": "Repli de muqueuse colique normale",
+      "lesion_code": "0000",
+      "kw": [
+        "repli",
+        "muqueuse",
+        "colique",
+        "normale"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DC",
+      "lesion": "Repli de muqueuse colique inflammatoire",
+      "lesion_code": "7510",
+      "kw": [
+        "repli",
+        "muqueuse",
+        "colique",
+        "inflammatoire"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Pseudomélanose colique",
+      "lesion_code": "5516",
+      "kw": [
+        "pseudomelanose",
+        "colique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Colite ischémique aigue",
+      "lesion_code": "4700",
+      "kw": [
+        "colite",
+        "ischemique",
+        "aigue"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DC",
+      "lesion": "Colite ischémique chronique",
+      "lesion_code": "4790",
+      "kw": [
+        "colite",
+        "ischemique",
+        "chronique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DC",
+      "lesion": "Colite radique",
+      "lesion_code": "3600",
+      "kw": [
+        "colite",
+        "radique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "RCH quiescente",
+      "lesion_code": "7912",
+      "kw": [
+        "rch",
+        "quiescente"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DC",
+      "lesion": "Colite microscopique",
+      "lesion_code": "7610",
+      "kw": [
+        "colite",
+        "microscopique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DC",
+      "lesion": "Colite collagène",
+      "lesion_code": "7739",
+      "kw": [
+        "colite",
+        "collagene"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DC",
+      "lesion": "Colite pseudo-membraneuse",
+      "lesion_code": "7080",
+      "kw": [
+        "colite",
+        "pseudo",
+        "membraneuse"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Hirschsprung",
+      "lesion_code": "2170",
+      "kw": [
+        "hirschsprung"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Hyperplasie des glandes de Brünner",
+      "lesion_code": "6715",
+      "kw": [
+        "hyperplasie",
+        "glandes",
+        "brunner"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DD",
+      "lesion": "Duodénite chronique",
+      "lesion_code": "7600",
+      "kw": [
+        "duodenite",
+        "chronique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Légère duodénite aigue",
+      "lesion_code": "7000",
+      "kw": [
+        "legere",
+        "duodenite",
+        "aigue"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Duodénite aigue",
+      "lesion_code": "7000",
+      "kw": [
+        "duodenite",
+        "aigue"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Giardia duodénalis",
+      "lesion_code": "0I50",
+      "kw": [
+        "giardia",
+        "duodenalis"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DD",
+      "lesion": "Maladie coeliaque",
+      "lesion_code": "6017",
+      "kw": [
+        "maladie",
+        "coeliaque"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DE",
+      "lesion": "Gastropathie réactive",
+      "lesion_code": "6500",
+      "kw": [
+        "gastropathie",
+        "reactive"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DE",
+      "lesion": "Dystrophie fundique IPP",
+      "lesion_code": "3960",
+      "kw": [
+        "dystrophie",
+        "fundique",
+        "ipp"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DE",
+      "lesion": "Gastrite minime/discrète et non spécifique",
+      "lesion_code": "0300",
+      "kw": [
+        "gastrite",
+        "minime",
+        "discrete",
+        "specifique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Biermer débutant",
+      "lesion_code": "5815",
+      "kw": [
+        "biermer",
+        "debutant"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Indéterminé pour la NIE",
+      "lesion_code": "0G00",
+      "kw": [
+        "indetermine",
+        "nie"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "NIE bas grade",
+      "lesion_code": "0D10",
+      "kw": [
+        "nie",
+        "bas",
+        "grade"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DE",
+      "lesion": "Sleeve congestion",
+      "lesion_code": "4000",
+      "kw": [
+        "sleeve",
+        "congestion"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DE",
+      "lesion": "Sleeve hémorragique",
+      "lesion_code": "4200",
+      "kw": [
+        "sleeve",
+        "hemorragique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DE",
+      "lesion": "Sleeve inflammatoire",
+      "lesion_code": "0300",
+      "kw": [
+        "sleeve",
+        "inflammatoire"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DE",
+      "lesion": "Sleeve normale",
+      "lesion_code": "0000",
+      "kw": [
+        "sleeve",
+        "normale"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "FF",
+      "lesion": "Steato-hépatite",
+      "lesion_code": "5220",
+      "kw": [
+        "steato",
+        "hepatite"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "FF",
+      "lesion": "Stéatose",
+      "lesion_code": "5220",
+      "kw": [
+        "steatose"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Iléite aigue",
+      "lesion_code": "7000",
+      "kw": [
+        "ileite",
+        "aigue"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Ischémie aiguë",
+      "lesion_code": "4700",
+      "kw": [
+        "ischemie",
+        "aigue"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "pochite",
+      "lesion_code": "7000",
+      "kw": [
+        "pochite"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "cul de sac réservoir RCH",
+      "lesion_code": "7600",
+      "kw": [
+        "cul",
+        "sac",
+        "reservoir",
+        "rch"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "PAS",
+      "lesion_code": "8400",
+      "kw": [
+        "pas"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DO",
+      "lesion": "Métaplasie gastrique",
+      "lesion_code": "2330",
+      "kw": [
+        "metaplasie",
+        "gastrique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DO",
+      "lesion": "EBO sans MI",
+      "lesion_code": "6536",
+      "kw": [
+        "ebo"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DO",
+      "lesion": "EBO avec MI",
+      "lesion_code": "6538",
+      "kw": [
+        "ebo"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DO",
+      "lesion": "Candidose œsophagienne",
+      "lesion_code": "8400",
+      "kw": [
+        "candidose",
+        "sophagienne"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DO",
+      "lesion": "ŒSOPHAGITE AIGUË ULCEREE",
+      "lesion_code": "7200",
+      "kw": [
+        "sophagite",
+        "aigue",
+        "ulceree"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DO",
+      "lesion": "Œsophagite à polynucléaires éosinophiles",
+      "lesion_code": "7550",
+      "kw": [
+        "sophagite",
+        "polynucleaires",
+        "eosinophiles"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "DP",
+      "lesion": "Hernie ombilicale étranglée",
+      "lesion_code": "6756",
+      "kw": [
+        "hernie",
+        "ombilicale",
+        "etranglee"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Sac herniaire",
+      "lesion_code": "4000",
+      "kw": [
+        "sac",
+        "herniaire"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "FV",
+      "lesion": "cholécystite chronique avec cholestérolose",
+      "lesion_code": "5242",
+      "kw": [
+        "cholecystite",
+        "chronique",
+        "cholesterolose"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "FV",
+      "lesion": "Cholécystite chronique non spécifique",
+      "lesion_code": "7510",
+      "kw": [
+        "cholecystite",
+        "chronique",
+        "specifique"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "CHOLECYSTITE RICHE EN EOSINOPHILES",
+      "lesion_code": "7550",
+      "kw": [
+        "cholecystite",
+        "riche",
+        "eosinophiles"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "FV",
+      "lesion": "Cholécystite gangreneuse",
+      "lesion_code": "7180",
+      "kw": [
+        "cholecystite",
+        "gangreneuse"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "FV",
+      "lesion": "Cholécystite granulomateuse",
+      "lesion_code": "7450",
+      "kw": [
+        "cholecystite",
+        "granulomateuse"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Cholécystite xantogranulomateuse",
+      "lesion_code": "7450",
+      "kw": [
+        "cholecystite",
+        "xantogranulomateuse"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "FV",
+      "lesion": "cholécystite suppurée aiguë.",
+      "lesion_code": "7100",
+      "kw": [
+        "cholecystite",
+        "suppuree",
+        "aigue"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": "FV",
+      "lesion": "Cholécystite aiguë phlegmoneuse",
+      "lesion_code": "7100",
+      "kw": [
+        "cholecystite",
+        "aigue",
+        "phlegmoneuse"
+      ]
+    },
+    {
+      "cat": "DIG",
+      "organ_code": null,
+      "lesion": "Cholécystite et adénomyose",
+      "lesion_code": "6568",
+      "kw": [
+        "cholecystite",
+        "adenomyose"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "HD",
+      "lesion": "vasectomie",
+      "lesion_code": "0000",
+      "kw": [
+        "vasectomie"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "HE",
+      "lesion": "kyste",
+      "lesion_code": "6300",
+      "kw": [
+        "kyste"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "HE",
+      "lesion": "poche herniaire mésothélial",
+      "lesion_code": "3434",
+      "kw": [
+        "poche",
+        "herniaire",
+        "mesothelial"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "HT",
+      "lesion": "HYDATIDE",
+      "lesion_code": "2791",
+      "kw": [
+        "hydatide"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "HV",
+      "lesion": "Balano-posthite",
+      "lesion_code": "7510",
+      "kw": [
+        "balano",
+        "posthite"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "OT",
+      "lesion": "Lichen évolué",
+      "lesion_code": "0462",
+      "kw": [
+        "lichen",
+        "evolue"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "OT",
+      "lesion": "Lichen scléro-atrophique",
+      "lesion_code": "0462",
+      "kw": [
+        "lichen",
+        "sclero",
+        "atrophique"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": null,
+      "lesion": "Lichen plan des muqueuses",
+      "lesion_code": "6502",
+      "kw": [
+        "lichen",
+        "plan",
+        "muqueuses"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "HP",
+      "lesion": "HBP",
+      "lesion_code": "6775",
+      "kw": [
+        "hbp"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": null,
+      "lesion": "Carcinome papillaire de type 1",
+      "lesion_code": "0X54",
+      "kw": [
+        "carcinome",
+        "papillaire",
+        "type"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": null,
+      "lesion": "Carcinome papillaire de type 2",
+      "lesion_code": "0X54",
+      "kw": [
+        "carcinome",
+        "papillaire",
+        "type"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "HT",
+      "lesion": "Azoospermie",
+      "lesion_code": "6010",
+      "kw": [
+        "azoospermie"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "HT",
+      "lesion": "Infarctus",
+      "lesion_code": "4710",
+      "kw": [
+        "infarctus"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": null,
+      "lesion": "TVT",
+      "lesion_code": "7440",
+      "kw": [
+        "tvt"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "UT",
+      "lesion": "jonction pyélo-urétérale",
+      "lesion_code": "2300",
+      "kw": [
+        "jonction",
+        "pyelo",
+        "ureterale"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "HG",
+      "lesion": "Pachyvaginalite",
+      "lesion_code": "7718",
+      "kw": [
+        "pachyvaginalite"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "HG",
+      "lesion": "Remaniements fibro-inflammatoires",
+      "lesion_code": "6391",
+      "kw": [
+        "remaniements",
+        "fibro",
+        "inflammatoires"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": null,
+      "lesion": "Bourgeon charnu",
+      "lesion_code": "7410",
+      "kw": [
+        "bourgeon",
+        "charnu"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "UV",
+      "lesion": "Inflammatoire",
+      "lesion_code": "6418",
+      "kw": [
+        "inflammatoire"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": null,
+      "lesion": "Cystite interstitielle",
+      "lesion_code": "7330",
+      "kw": [
+        "cystite",
+        "interstitielle"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "UV",
+      "lesion": "Inflammatoire",
+      "lesion_code": "7600",
+      "kw": [
+        "inflammatoire"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "UV",
+      "lesion": "Cicatrice post-th/macrophages",
+      "lesion_code": "7540",
+      "kw": [
+        "cicatrice",
+        "post",
+        "macrophages"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "UV",
+      "lesion": "BCGite",
+      "lesion_code": "8284",
+      "kw": [
+        "bcgite"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": null,
+      "lesion": "Cystite glandulo-kystique",
+      "lesion_code": "7695",
+      "kw": [
+        "cystite",
+        "glandulo",
+        "kystique"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": null,
+      "lesion": "Cystite radique",
+      "lesion_code": "7230",
+      "kw": [
+        "cystite",
+        "radique"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": null,
+      "lesion": "Adénome/métaplasie néphrogénique",
+      "lesion_code": "6425",
+      "kw": [
+        "adenome",
+        "metaplasie",
+        "nephrogenique"
+      ]
+    },
+    {
+      "cat": "URO",
+      "organ_code": "UV",
+      "lesion": "UPUMP",
+      "lesion_code": "0165",
+      "kw": [
+        "upump"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Métaplasie malpighienne",
+      "lesion_code": "6418",
+      "kw": [
+        "metaplasie",
+        "malpighienne"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GC",
+      "lesion": "cervicite",
+      "lesion_code": "7600",
+      "kw": [
+        "cervicite"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Déciduose ectopique",
+      "lesion_code": "6696",
+      "kw": [
+        "deciduose",
+        "ectopique"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "PO",
+      "lesion": "Révision",
+      "lesion_code": "0628",
+      "kw": [
+        "revision"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Polype endocevial",
+      "lesion_code": "2901",
+      "kw": [
+        "polype",
+        "endocevial"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Polype endomètre",
+      "lesion_code": "2901",
+      "kw": [
+        "polype",
+        "endometre"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Polype endomètre",
+      "lesion_code": "0360",
+      "kw": [
+        "polype",
+        "endometre"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Polype atrophique",
+      "lesion_code": "6010",
+      "kw": [
+        "polype",
+        "atrophique"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Polype glandulo-kystique",
+      "lesion_code": "6716",
+      "kw": [
+        "polype",
+        "glandulo",
+        "kystique"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Polype  hyperplasique",
+      "lesion_code": "0360",
+      "kw": [
+        "polype",
+        "hyperplasique"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Polype adénomyomateux",
+      "lesion_code": "6775",
+      "kw": [
+        "polype",
+        "adenomyomateux"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Endomètre quiescent",
+      "lesion_code": "0450",
+      "kw": [
+        "endometre",
+        "quiescent"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Endomètre atrophique",
+      "lesion_code": "6010",
+      "kw": [
+        "endometre",
+        "atrophique"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Endomètre glandulo-kystique",
+      "lesion_code": "0453",
+      "kw": [
+        "endometre",
+        "glandulo",
+        "kystique"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Prolifératif",
+      "lesion_code": "0740",
+      "kw": [
+        "proliferatif"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Faible imprégnation oestrogé",
+      "lesion_code": "0331",
+      "kw": [
+        "faible",
+        "impregnation",
+        "oestroge"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Sécrétoire",
+      "lesion_code": "0750",
+      "kw": [
+        "secretoire"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Progestatif",
+      "lesion_code": "0535",
+      "kw": [
+        "progestatif"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Insuffisance lutéale",
+      "lesion_code": "0200",
+      "kw": [
+        "insuffisance",
+        "luteale"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Progestatif asynchrone",
+      "lesion_code": "0200",
+      "kw": [
+        "progestatif",
+        "asynchrone"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Dyshormonal",
+      "lesion_code": "0200",
+      "kw": [
+        "dyshormonal"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Endomètre prolifératif persistant",
+      "lesion_code": "0200",
+      "kw": [
+        "endometre",
+        "proliferatif",
+        "persistant"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Endomètre desquamatif",
+      "lesion_code": "0753",
+      "kw": [
+        "endometre",
+        "desquamatif"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Hyperplasie simple",
+      "lesion_code": "6700",
+      "kw": [
+        "hyperplasie",
+        "simple"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GU",
+      "lesion": "Hyperplasie complexe",
+      "lesion_code": "6700",
+      "kw": [
+        "hyperplasie",
+        "complexe"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Adénomyose",
+      "lesion_code": "6568",
+      "kw": [
+        "adenomyose"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Kyste fonctionnel",
+      "lesion_code": "6351",
+      "kw": [
+        "kyste",
+        "fonctionnel"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Kyste séreux",
+      "lesion_code": "6341",
+      "kw": [
+        "kyste",
+        "sereux"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Kyste épithélial bénin",
+      "lesion_code": "6341",
+      "kw": [
+        "kyste",
+        "epithelial",
+        "benin"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GO",
+      "lesion": "Corps jaune",
+      "lesion_code": "6352",
+      "kw": [
+        "corps",
+        "jaune"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GO",
+      "lesion": "Endométriome",
+      "lesion_code": "6560",
+      "kw": [
+        "endometriome"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "TC",
+      "lesion": "Endométriose",
+      "lesion_code": "6560",
+      "kw": [
+        "endometriose"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Normal 1 trompe",
+      "lesion_code": "6341",
+      "kw": [
+        "normal",
+        "trompe"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Fibreux",
+      "lesion_code": "6610",
+      "kw": [
+        "fibreux"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Fibreux 1 trompe",
+      "lesion_code": "6610",
+      "kw": [
+        "fibreux",
+        "trompe"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GT",
+      "lesion": "Kyste para tubaire",
+      "lesion_code": "2700",
+      "kw": [
+        "kyste",
+        "para",
+        "tubaire"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "GEU",
+      "lesion_code": "9711",
+      "kw": [
+        "geu"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "GEU tubaire",
+      "lesion_code": "9711",
+      "kw": [
+        "geu",
+        "tubaire"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Pyosalpinx/hematosalpinx",
+      "lesion_code": "6391",
+      "kw": [
+        "pyosalpinx",
+        "hematosalpinx"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Prolapsus",
+      "lesion_code": "3230",
+      "kw": [
+        "prolapsus"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Bourgeon charnu",
+      "lesion_code": "7410",
+      "kw": [
+        "bourgeon",
+        "charnu"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GG",
+      "lesion": "Polype",
+      "lesion_code": "6914",
+      "kw": [
+        "polype"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GV",
+      "lesion": "Nymphoplastie",
+      "lesion_code": "0000",
+      "kw": [
+        "nymphoplastie"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": "GB",
+      "lesion": "Kyste de la glande de Bartholin",
+      "lesion_code": "6300",
+      "kw": [
+        "kyste",
+        "glande",
+        "bartholin"
+      ]
+    },
+    {
+      "cat": "GYN",
+      "organ_code": null,
+      "lesion": "Kyste de la glande de Skène",
+      "lesion_code": "2730",
+      "kw": [
+        "kyste",
+        "glande",
+        "skene"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": "TA",
+      "lesion": "TA 5230",
+      "lesion_code": "5230",
+      "kw": [
+        "5230"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": "OT",
+      "lesion": "OT 7410",
+      "lesion_code": "7410",
+      "kw": [
+        "7410"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "7810",
+      "lesion_code": "7810",
+      "kw": [
+        "7810"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": "TA",
+      "lesion": "TA 7440",
+      "lesion_code": "7440",
+      "kw": [
+        "7440"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "6176",
+      "lesion_code": "6176",
+      "kw": [
+        "6176"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "6914",
+      "lesion_code": "6914",
+      "kw": [
+        "6914"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "7440",
+      "lesion_code": "7440",
+      "kw": [
+        "7440"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": "OT",
+      "lesion": "OT0507",
+      "lesion_code": "0507",
+      "kw": [
+        "ot0507"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "2739",
+      "lesion_code": "2739",
+      "kw": [
+        "2739"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": "OT",
+      "lesion": "OT 6310",
+      "lesion_code": "6310",
+      "kw": [
+        "6310"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": "OT",
+      "lesion": "OT6312",
+      "lesion_code": "6312",
+      "kw": [
+        "ot6312"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": "OT",
+      "lesion": "OT2743",
+      "lesion_code": "2743",
+      "kw": [
+        "ot2743"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": "OT",
+      "lesion": "OT6310",
+      "lesion_code": "6310",
+      "kw": [
+        "ot6310"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "5552",
+      "lesion_code": "5552",
+      "kw": [
+        "5552"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "5555",
+      "lesion_code": "5555",
+      "kw": [
+        "5555"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "9369",
+      "lesion_code": "9369",
+      "kw": [
+        "9369"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "0C84",
+      "lesion_code": "0C84",
+      "kw": [
+        "0c84"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "7800",
+      "lesion_code": "7800",
+      "kw": [
+        "7800"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "1585",
+      "lesion_code": "1585",
+      "kw": [
+        "1585"
+      ]
+    },
+    {
+      "cat": "DERMATO",
+      "organ_code": null,
+      "lesion": "9312",
+      "lesion_code": "9312",
+      "kw": [
+        "9312"
+      ]
+    },
+    {
+      "cat": "CYTO",
+      "organ_code": "RS",
+      "lesion": "Hyperplasie mésothéliale",
+      "lesion_code": "7660",
+      "kw": [
+        "hyperplasie",
+        "mesotheliale"
+      ]
+    },
+    {
+      "cat": "CYTO",
+      "organ_code": null,
+      "lesion": "Atypique",
+      "lesion_code": "0S15",
+      "kw": [
+        "atypique"
+      ]
+    },
+    {
+      "cat": "CYTO",
+      "organ_code": null,
+      "lesion": "Suspecte de HG",
+      "lesion_code": "0S90",
+      "kw": [
+        "suspecte"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "Actinomycose",
+      "lesion_code": "8351",
+      "kw": [
+        "actinomycose"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "ASCUS",
+      "lesion_code": "0G11",
+      "kw": [
+        "ascus"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "Atrophique ménopausique",
+      "lesion_code": "0H44",
+      "kw": [
+        "atrophique",
+        "menopausique"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "Dystrophies",
+      "lesion_code": "0P62",
+      "kw": [
+        "dystrophies"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "Lésions intra-épithéliales de bas grade",
+      "lesion_code": "0D10",
+      "kw": [
+        "lesions",
+        "intra",
+        "epitheliales",
+        "bas",
+        "grade"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "Lutéal",
+      "lesion_code": "0H02",
+      "kw": [
+        "luteal"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "Ménopause de type intermédiaire",
+      "lesion_code": "0H42",
+      "kw": [
+        "menopause",
+        "type",
+        "intermediaire"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "Subatrophique ménopausique",
+      "lesion_code": "0H43",
+      "kw": [
+        "subatrophique",
+        "menopausique"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "Subatrophique sous contraception orale",
+      "lesion_code": "0H43",
+      "kw": [
+        "subatrophique",
+        "sous",
+        "contraception",
+        "orale"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "Superficiel",
+      "lesion_code": "0H01",
+      "kw": [
+        "superficiel"
+      ]
+    },
+    {
+      "cat": "Cyto FCU",
+      "organ_code": null,
+      "lesion": "Ménopausique et troubles de maturation",
+      "lesion_code": "0H44",
+      "kw": [
+        "menopausique",
+        "troubles",
+        "maturation"
+      ]
+    },
+    {
+      "cat": "SEIN",
+      "organ_code": null,
+      "lesion": "6711",
+      "lesion_code": "6711",
+      "kw": [
+        "6711"
+      ]
+    },
+    {
+      "cat": "SEIN",
+      "organ_code": null,
+      "lesion": "6773",
+      "lesion_code": "6773",
+      "kw": [
+        "6773"
+      ]
+    },
+    {
+      "cat": "SEIN",
+      "organ_code": null,
+      "lesion": "6610",
+      "lesion_code": "6610",
+      "kw": [
+        "6610"
+      ]
+    },
+    {
+      "cat": "SEIN",
+      "organ_code": null,
+      "lesion": "6546",
+      "lesion_code": "6546",
+      "kw": [
+        "6546"
+      ]
+    },
+    {
+      "cat": "SEIN",
+      "organ_code": "GS",
+      "lesion": "GS 6551",
+      "lesion_code": "6551",
+      "kw": [
+        "6551"
+      ]
+    },
+    {
+      "cat": "FOETO-P",
+      "organ_code": "PP",
+      "lesion": "JPQX019",
+      "lesion_code": "1810",
+      "kw": [
+        "jpqx019"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Amygdalite chronique",
+      "lesion_code": "6743",
+      "kw": [
+        "amygdalite",
+        "chronique"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AA",
+      "lesion": "Hyperplasie sur biopsie",
+      "lesion_code": "7600",
+      "kw": [
+        "hyperplasie",
+        "biopsie"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AC",
+      "lesion": "Végétations adénoïdes",
+      "lesion_code": "6743",
+      "kw": [
+        "vegetations",
+        "adenoides"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Bourgeon charnu",
+      "lesion_code": "7410",
+      "kw": [
+        "bourgeon",
+        "charnu"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Dysplasie légère",
+      "lesion_code": "6312",
+      "kw": [
+        "dysplasie",
+        "legere"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Dysplasie modérée",
+      "lesion_code": "6313",
+      "kw": [
+        "dysplasie",
+        "moderee"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Diapneusie",
+      "lesion_code": "6914",
+      "kw": [
+        "diapneusie"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Hyperplasie pseudo-épithéliomateuse",
+      "lesion_code": "8400",
+      "kw": [
+        "hyperplasie",
+        "pseudo",
+        "epitheliomateuse"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Kératokyste odontogène",
+      "lesion_code": "2762",
+      "kw": [
+        "keratokyste",
+        "odontogene"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Kyste gingival",
+      "lesion_code": "2765",
+      "kw": [
+        "kyste",
+        "gingival"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Kyste odontogène inflammatoire",
+      "lesion_code": "6316",
+      "kw": [
+        "kyste",
+        "odontogene",
+        "inflammatoire"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Kyste radiculaire ou un kyste dentigère",
+      "lesion_code": "2760",
+      "kw": [
+        "kyste",
+        "radiculaire",
+        "kyste",
+        "dentigere"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BX",
+      "lesion": "Kyste lympho-épithélial",
+      "lesion_code": "6339",
+      "kw": [
+        "kyste",
+        "lympho",
+        "epithelial"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Kyste mucoide",
+      "lesion_code": "6332",
+      "kw": [
+        "kyste",
+        "mucoide"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BX",
+      "lesion": "Kyste radiculo-dentaire p.184 apico dentaire",
+      "lesion_code": "6316",
+      "kw": [
+        "kyste",
+        "radiculo",
+        "dentaire",
+        "184",
+        "apico",
+        "dentaire"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BX",
+      "lesion": "Kyste dentigère/pericoronaire/folliculaire",
+      "lesion_code": "2763",
+      "kw": [
+        "kyste",
+        "dentigere",
+        "pericoronaire",
+        "folliculaire"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BX",
+      "lesion": "Kyste odontogène p.321",
+      "lesion_code": "2760",
+      "kw": [
+        "kyste",
+        "odontogene",
+        "321"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BX",
+      "lesion": "Kératokyste odontogène - kyste épidermoïde",
+      "lesion_code": "2762",
+      "kw": [
+        "keratokyste",
+        "odontogene",
+        "kyste",
+        "epidermoide"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Inflammation + régénératif",
+      "lesion_code": "7600",
+      "kw": [
+        "inflammation",
+        "regeneratif"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "indéterminé pour la dysplasie",
+      "lesion_code": "7600",
+      "kw": [
+        "indetermine",
+        "dysplasie"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BD",
+      "lesion": "Epulis",
+      "lesion_code": "6911",
+      "kw": [
+        "epulis"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BX",
+      "lesion": "Epulis polype fibro-épithélial",
+      "lesion_code": "6914",
+      "kw": [
+        "epulis",
+        "polype",
+        "fibro",
+        "epithelial"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BX",
+      "lesion": "Lichen",
+      "lesion_code": "6502",
+      "kw": [
+        "lichen"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "MUCOCELE",
+      "lesion_code": "6392",
+      "kw": [
+        "mucocele"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BX",
+      "lesion": "Mycose",
+      "lesion_code": "8433",
+      "kw": [
+        "mycose"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BX",
+      "lesion": "Dysplasie sévère",
+      "lesion_code": "6814",
+      "kw": [
+        "dysplasie",
+        "severe"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BX",
+      "lesion": "Luette",
+      "lesion_code": "4000",
+      "kw": [
+        "luette"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "XC",
+      "lesion": "Kyste",
+      "lesion_code": "2730",
+      "kw": [
+        "kyste"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AA",
+      "lesion": "KYSTE AMYGDALOïDE  2éme arc branchial",
+      "lesion_code": "6339",
+      "kw": [
+        "kyste",
+        "amygdaloide",
+        "2eme",
+        "arc",
+        "branchial"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "XC",
+      "lesion": "Kyste du tractus thyréoglosse",
+      "lesion_code": "2780",
+      "kw": [
+        "kyste",
+        "tractus",
+        "thyreoglosse"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Kyste dysembryoplasique",
+      "lesion_code": "2730",
+      "kw": [
+        "kyste",
+        "dysembryoplasique"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Remaniements inflammatoires chroniques",
+      "lesion_code": "7600",
+      "kw": [
+        "remaniements",
+        "inflammatoires",
+        "chroniques"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Hyperplasie épithéliale",
+      "lesion_code": "6700",
+      "kw": [
+        "hyperplasie",
+        "epitheliale"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Hyperplasie verruqueuse",
+      "lesion_code": "6700",
+      "kw": [
+        "hyperplasie",
+        "verruqueuse"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Dysplasie légère",
+      "lesion_code": "6812",
+      "kw": [
+        "dysplasie",
+        "legere"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Dysplasie modérée",
+      "lesion_code": "6813",
+      "kw": [
+        "dysplasie",
+        "moderee"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Polype des chanteurs",
+      "lesion_code": "6911",
+      "kw": [
+        "polype",
+        "chanteurs"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "nodule de la corde vocale",
+      "lesion_code": "6500",
+      "kw": [
+        "nodule",
+        "corde",
+        "vocale"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Kyste",
+      "lesion_code": "6360",
+      "kw": [
+        "kyste"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Kyste épidermique",
+      "lesion_code": "6310",
+      "kw": [
+        "kyste",
+        "epidermique"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "kyste de la corde vocale",
+      "lesion_code": "6304",
+      "kw": [
+        "kyste",
+        "corde",
+        "vocale"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "BGSA Chisholm 0",
+      "lesion_code": "0000",
+      "kw": [
+        "bgsa",
+        "chisholm"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "BGSA négatives",
+      "lesion_code": "0000",
+      "kw": [
+        "bgsa",
+        "negatives"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BA",
+      "lesion": "BGSA Chisholm 1",
+      "lesion_code": "7510",
+      "kw": [
+        "bgsa",
+        "chisholm"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "BGSA Chisholm 2",
+      "lesion_code": "7510",
+      "kw": [
+        "bgsa",
+        "chisholm"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BA",
+      "lesion": "BGSA Chisholm 3",
+      "lesion_code": "9422",
+      "kw": [
+        "bgsa",
+        "chisholm"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "BGSA Chisholm 4",
+      "lesion_code": "9422",
+      "kw": [
+        "bgsa",
+        "chisholm"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "BA",
+      "lesion": "Amylose",
+      "lesion_code": "5310",
+      "kw": [
+        "amylose"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "DIVERTICULE DE ZENKER",
+      "lesion_code": "3420",
+      "kw": [
+        "diverticule",
+        "zenker"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Biopsie malpighienne dysplasie légère",
+      "lesion_code": "6810",
+      "kw": [
+        "biopsie",
+        "malpighienne",
+        "dysplasie",
+        "legere"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Biopsie malpighienne dysplasie modérée",
+      "lesion_code": "6813",
+      "kw": [
+        "biopsie",
+        "malpighienne",
+        "dysplasie",
+        "moderee"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Biopsie malpighienne leucokératosique, hyperplasique, inflammation",
+      "lesion_code": "6700",
+      "kw": [
+        "biopsie",
+        "malpighienne",
+        "leucokeratosique",
+        "hyperplasique",
+        "inflammation"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Polype des chanteurs",
+      "lesion_code": "6910",
+      "kw": [
+        "polype",
+        "chanteurs"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AL",
+      "lesion": "Polype oedémateux",
+      "lesion_code": "6910",
+      "kw": [
+        "polype",
+        "oedemateux"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Polype oedémateux de la corde vocale",
+      "lesion_code": "6913",
+      "kw": [
+        "polype",
+        "oedemateux",
+        "corde",
+        "vocale"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AS",
+      "lesion": "Aspergillome",
+      "lesion_code": "8442",
+      "kw": [
+        "aspergillome"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AF",
+      "lesion": "Mucocèle",
+      "lesion_code": "6392",
+      "kw": [
+        "mucocele"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Mucine allergique sans filament",
+      "lesion_code": "9100",
+      "kw": [
+        "mucine",
+        "allergique",
+        "filament"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AF",
+      "lesion": "POLYPE DE KILLIAN",
+      "lesion_code": "6911",
+      "kw": [
+        "polype",
+        "killian"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AF",
+      "lesion": "Polypose nasale",
+      "lesion_code": "6911",
+      "kw": [
+        "polypose",
+        "nasale"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AF",
+      "lesion": "Polypose nasale LP",
+      "lesion_code": "6911",
+      "kw": [
+        "polypose",
+        "nasale"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Sinusite chronique",
+      "lesion_code": "7600",
+      "kw": [
+        "sinusite",
+        "chronique"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AF",
+      "lesion": "Condylome + dysplasie sévère + IHC",
+      "lesion_code": "6814",
+      "kw": [
+        "condylome",
+        "dysplasie",
+        "severe",
+        "ihc"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AF",
+      "lesion": "Churg et Strauss",
+      "lesion_code": "9331",
+      "kw": [
+        "churg",
+        "strauss"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "AF",
+      "lesion": "WEGENER",
+      "lesion_code": "9332",
+      "kw": [
+        "wegener"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Cholestéatome",
+      "lesion_code": "6311",
+      "kw": [
+        "cholesteatome"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "OR",
+      "lesion": "Nodule douloureux",
+      "lesion_code": "6925",
+      "kw": [
+        "nodule",
+        "douloureux"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Otite moyenne chronique",
+      "lesion_code": "7600",
+      "kw": [
+        "otite",
+        "moyenne",
+        "chronique"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "OR",
+      "lesion": "Nodule élastosique",
+      "lesion_code": "6690",
+      "kw": [
+        "nodule",
+        "elastosique"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "OR",
+      "lesion": "Tympanosclérose",
+      "lesion_code": "6453",
+      "kw": [
+        "tympanosclerose"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Tophus goutteux",
+      "lesion_code": "5342",
+      "kw": [
+        "tophus",
+        "goutteux"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": "OR",
+      "lesion": "TUBERCULE PRE-TRAGIEN tragus accessoire",
+      "lesion_code": "1585",
+      "kw": [
+        "tubercule",
+        "pre",
+        "tragien",
+        "tragus",
+        "accessoire"
+      ]
+    },
+    {
+      "cat": "ORL",
+      "organ_code": null,
+      "lesion": "Ostéonécrose",
+      "lesion_code": "3624",
+      "kw": [
+        "osteonecrose"
+      ]
+    },
+    {
+      "cat": "THO",
+      "organ_code": null,
+      "lesion": "Biop infllammatoire",
+      "lesion_code": "7510",
+      "kw": [
+        "biop",
+        "infllammatoire"
+      ]
+    },
+    {
+      "cat": "THO",
+      "organ_code": null,
+      "lesion": "Métaplasie malpighienne",
+      "lesion_code": "6418",
+      "kw": [
+        "metaplasie",
+        "malpighienne"
+      ]
+    },
+    {
+      "cat": "THO",
+      "organ_code": null,
+      "lesion": "Dystrophie bulleuse",
+      "lesion_code": "2431",
+      "kw": [
+        "dystrophie",
+        "bulleuse"
+      ]
+    },
+    {
+      "cat": "THO",
+      "organ_code": null,
+      "lesion": "Emphysème bulleux",
+      "lesion_code": "3488",
+      "kw": [
+        "emphyseme",
+        "bulleux"
+      ]
+    },
+    {
+      "cat": "THO",
+      "organ_code": "RP",
+      "lesion": "MAKP (malformation adénoïde kystique)",
+      "lesion_code": "2630",
+      "kw": [
+        "makp",
+        "malformation",
+        "adenoide",
+        "kystique"
+      ]
+    },
+    {
+      "cat": "ENDOC",
+      "organ_code": null,
+      "lesion": "Basedow",
+      "lesion_code": "0240",
+      "kw": [
+        "basedow"
+      ]
+    },
+    {
+      "cat": "ENDOC",
+      "organ_code": null,
+      "lesion": "Basedow ttt",
+      "lesion_code": "0241",
+      "kw": [
+        "basedow",
+        "ttt"
+      ]
+    },
+    {
+      "cat": "ENDOC",
+      "organ_code": "ET",
+      "lesion": "DYSTROPHIE HETERONODULAIRE BENIGNE NON REMANIEE",
+      "lesion_code": "0220",
+      "kw": [
+        "dystrophie",
+        "heteronodulaire",
+        "benigne",
+        "remaniee"
+      ]
+    },
+    {
+      "cat": "ENDOC",
+      "organ_code": "ET",
+      "lesion": "DYSTROPHIE HETERONODULAIRE BENIGNE REMANIEE",
+      "lesion_code": "0225",
+      "kw": [
+        "dystrophie",
+        "heteronodulaire",
+        "benigne",
+        "remaniee"
+      ]
+    },
+    {
+      "cat": "ENDOC",
+      "organ_code": null,
+      "lesion": "Cordarone",
+      "lesion_code": "3700",
+      "kw": [
+        "cordarone"
+      ]
+    },
+    {
+      "cat": "ENDOC",
+      "organ_code": "ET",
+      "lesion": "Kyste scléro-inflammatoire",
+      "lesion_code": "6300",
+      "kw": [
+        "kyste",
+        "sclero",
+        "inflammatoire"
+      ]
+    },
+    {
+      "cat": "ENDOC",
+      "organ_code": "ET",
+      "lesion": "Thyroïdite chronique lymphocytaire",
+      "lesion_code": "7513",
+      "kw": [
+        "thyroidite",
+        "chronique",
+        "lymphocytaire"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": null,
+      "lesion": "7781",
+      "lesion_code": "7781",
+      "kw": [
+        "7781"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": "LO",
+      "lesion": "LO 6621",
+      "lesion_code": "6621",
+      "kw": [
+        "6621"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": null,
+      "lesion": "3050",
+      "lesion_code": "3050",
+      "kw": [
+        "3050"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": "LC",
+      "lesion": "LC 6633",
+      "lesion_code": "6633",
+      "kw": [
+        "6633"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": "LB",
+      "lesion": "LB7600",
+      "lesion_code": "7600",
+      "kw": [
+        "lb7600"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": null,
+      "lesion": "6345",
+      "lesion_code": "6345",
+      "kw": [
+        "6345"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": "LS",
+      "lesion": "LS 6344",
+      "lesion_code": "6344",
+      "kw": [
+        "6344"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": "OG",
+      "lesion": "OG 0000",
+      "lesion_code": "0000",
+      "kw": [
+        "0000"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": null,
+      "lesion": "4770",
+      "lesion_code": "4770",
+      "kw": [
+        "4770"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": "LS",
+      "lesion": "LS7600",
+      "lesion_code": "7600",
+      "kw": [
+        "ls7600"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": "LT",
+      "lesion": "LT 6600",
+      "lesion_code": "6600",
+      "kw": [
+        "6600"
+      ]
+    },
+    {
+      "cat": "OS-ARTI",
+      "organ_code": "LS",
+      "lesion": "LS 6100",
+      "lesion_code": "6100",
+      "kw": [
+        "6100"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": "SM",
+      "lesion": "BOM",
+      "lesion_code": "0140",
+      "kw": [
+        "bom"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": "SM",
+      "lesion": "BOM",
+      "lesion_code": "6745",
+      "kw": [
+        "bom"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": "SM",
+      "lesion": "BOM",
+      "lesion_code": "0440",
+      "kw": [
+        "bom"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": "SM",
+      "lesion": "BOM",
+      "lesion_code": "0000",
+      "kw": [
+        "bom"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": "SG",
+      "lesion": "Maladie de Castelman",
+      "lesion_code": "6779",
+      "kw": [
+        "maladie",
+        "castelman"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": null,
+      "lesion": "INF",
+      "lesion_code": "6768",
+      "kw": [
+        "inf"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": null,
+      "lesion": "INF",
+      "lesion_code": "8560",
+      "kw": [
+        "inf"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": null,
+      "lesion": "INF",
+      "lesion_code": "8380",
+      "kw": [
+        "inf"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": null,
+      "lesion": "INF",
+      "lesion_code": "8200",
+      "kw": [
+        "inf"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": null,
+      "lesion": "INF",
+      "lesion_code": "8311",
+      "kw": [
+        "inf"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": null,
+      "lesion": "INF",
+      "lesion_code": "7500",
+      "kw": [
+        "inf"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": null,
+      "lesion": "INF",
+      "lesion_code": "8361",
+      "kw": [
+        "inf"
+      ]
+    },
+    {
+      "cat": "HEMATO",
+      "organ_code": "SR",
+      "lesion": "Trauma",
+      "lesion_code": "3000",
+      "kw": [
+        "trauma"
+      ]
+    },
+    {
+      "cat": "T mous",
+      "organ_code": null,
+      "lesion": "8350",
+      "lesion_code": "8350",
+      "kw": [
+        "8350"
+      ]
+    },
+    {
+      "cat": "CV",
+      "organ_code": "VA",
+      "lesion": "Discrète artériosclérose",
+      "lesion_code": "4460",
+      "kw": [
+        "discrete",
+        "arteriosclerose"
+      ]
+    },
+    {
+      "cat": "CV",
+      "organ_code": null,
+      "lesion": "Horton",
+      "lesion_code": "9334",
+      "kw": [
+        "horton"
+      ]
+    },
+    {
+      "cat": "CV",
+      "organ_code": "VA",
+      "lesion": "Endartere",
+      "lesion_code": "4460",
+      "kw": [
+        "endartere"
+      ]
+    },
+    {
+      "cat": "CV",
+      "organ_code": null,
+      "lesion": "Médiacalcose",
+      "lesion_code": "5645",
+      "kw": [
+        "mediacalcose"
+      ]
+    },
+    {
+      "cat": "CV",
+      "organ_code": "CE",
+      "lesion": "Valve dégénérative",
+      "lesion_code": "7783",
+      "kw": [
+        "valve",
+        "degenerative"
+      ]
+    },
+    {
+      "cat": "CV",
+      "organ_code": "CM",
+      "lesion": "Rejet 1R",
+      "lesion_code": "9635",
+      "kw": [
+        "rejet"
+      ]
+    },
+    {
+      "cat": "OPH",
+      "organ_code": "OL",
+      "lesion": "DCR",
+      "lesion_code": "7600",
+      "kw": [
+        "dcr"
+      ]
+    },
+    {
+      "cat": "OPH",
+      "organ_code": null,
+      "lesion": "Cornée",
+      "lesion_code": "6210",
+      "kw": [
+        "cornee"
+      ]
+    },
+    {
+      "cat": "OPH",
+      "organ_code": "OE",
+      "lesion": "Pinguécula",
+      "lesion_code": "1593",
+      "kw": [
+        "pinguecula"
+      ]
+    },
+    {
+      "cat": "OPH",
+      "organ_code": "OE",
+      "lesion": "Ptérygion",
+      "lesion_code": "1593",
+      "kw": [
+        "pterygion"
+      ]
+    }
+  ]
 }
