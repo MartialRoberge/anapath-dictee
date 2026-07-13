@@ -12,38 +12,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
-
-interface AdminStats {
-  total_reports: number;
-  total_users: number;
-  average_rating: number | null;
-  reports_with_feedback: number;
-  reports_with_corrections: number;
-  reports_by_organ: Record<string, number>;
-}
-
-interface AdminReport {
-  id: string;
-  user_name: string;
-  user_email: string;
-  organe_detecte: string;
-  status: string;
-  created_at: string;
-  rating: number | null;
-  feedback_comment: string | null;
-  correction_count: number;
-}
-
-interface AdminCorrection {
-  report_id: string;
-  user_name: string;
-  organe: string;
-  timestamp: string;
-  before_excerpt: string;
-  after_excerpt: string;
-}
+import {
+  getAdminStats,
+  getAdminReports,
+  getAdminCorrections,
+} from "../services/api";
+import type { AdminStats, AdminReport, AdminCorrection } from "../services/api";
 
 type Tab = "stats" | "reports" | "corrections";
 
@@ -59,23 +33,18 @@ export default function AdminPage({ token, onBack }: AdminPageProps) {
   const [corrections, setCorrections] = useState<AdminCorrection[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const headers: Record<string, string> = token
-    ? { Authorization: `Bearer ${token}` }
-    : {};
-
   const fetchData = useCallback(async () => {
+    if (!token) return;
     setLoading(true);
     try {
-      const [statsRes, reportsRes, correctionsRes] = await Promise.all([
-        fetch(`${API_BASE}/admin/stats`, { headers }),
-        fetch(`${API_BASE}/admin/reports`, { headers }),
-        fetch(`${API_BASE}/admin/corrections`, { headers }),
+      const [stats, reports, corrections] = await Promise.allSettled([
+        getAdminStats(),
+        getAdminReports(),
+        getAdminCorrections(),
       ]);
-      if (statsRes.ok) setStats(await statsRes.json());
-      if (reportsRes.ok) setReports(await reportsRes.json());
-      if (correctionsRes.ok) setCorrections(await correctionsRes.json());
-    } catch {
-      // silent
+      if (stats.status === "fulfilled") setStats(stats.value);
+      if (reports.status === "fulfilled") setReports(reports.value);
+      if (corrections.status === "fulfilled") setCorrections(corrections.value);
     } finally {
       setLoading(false);
     }

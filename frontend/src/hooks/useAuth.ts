@@ -2,8 +2,8 @@
  * Hook d'authentification avec stockage JWT dans localStorage.
  */
 import { useState, useCallback, useEffect } from "react";
+import { API_BASE } from "@/lib/config";
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
 const TOKEN_KEY = "iris_access_token";
 const REFRESH_KEY = "iris_refresh_token";
 

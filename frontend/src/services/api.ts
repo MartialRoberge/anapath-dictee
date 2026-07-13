@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
+import { API_BASE } from "@/lib/config";
 
 function getAuthHeaders(): Record<string, string> {
   const token = localStorage.getItem("iris_access_token");
@@ -113,7 +113,8 @@ export async function transcribeAudio(
   return data.raw_transcription;
 }
 
-interface V3FormatResponse {
+/** Reponse brute du backend v3 pour /format et /iterate (structure identique). */
+interface V3ReportResponse {
   formatted_report: string;
   organe_detecte: string;
   donnees_manquantes: DonneeManquante[];
@@ -132,18 +133,12 @@ export async function formatTranscription(
     body: JSON.stringify(body),
   });
 
-  const v3 = await handleResponse<V3FormatResponse>(response);
+  const v3 = await handleResponse<V3ReportResponse>(response);
   return {
     formatted_report: v3.formatted_report,
     organe_detecte: v3.organe_detecte,
     markers: v3.donnees_manquantes.map(donneeToMarker),
   };
-}
-
-interface V3IterationResponse {
-  formatted_report: string;
-  organe_detecte: string;
-  donnees_manquantes: DonneeManquante[];
 }
 
 export async function iterateReport(
@@ -159,7 +154,7 @@ export async function iterateReport(
     }),
   });
 
-  const v3 = await handleResponse<V3IterationResponse>(response);
+  const v3 = await handleResponse<V3ReportResponse>(response);
   return {
     formatted_report: v3.formatted_report,
     organe_detecte: v3.organe_detecte,
@@ -276,4 +271,128 @@ export async function exportDocx(
   }
 
   return response.blob();
+}
+
+/* ------------------------------------------------------------------ */
+/*  Comptes-rendus sauvegardes (historique, detail, sauvegarde)        */
+/* ------------------------------------------------------------------ */
+
+export interface ReportSummary {
+  id: string;
+  organe_detecte: string;
+  status: string;
+  created_at: string;
+  excerpt: string;
+  has_feedback: boolean;
+  rating: number | null;
+}
+
+export interface ReportDetail {
+  id: string;
+  raw_transcription: string | null;
+  structured_report: string;
+  organe_detecte: string;
+  feedback_rating: number | null;
+}
+
+export interface SavedReport {
+  id: string;
+}
+
+/** Liste des comptes-rendus de l'utilisateur (historique). */
+export async function getReports(): Promise<ReportSummary[]> {
+  const response = await fetch(`${API_BASE}/reports`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<ReportSummary[]>(response);
+}
+
+/** Detail complet d'un compte-rendu sauvegarde. */
+export async function getReport(reportId: string): Promise<ReportDetail> {
+  const response = await fetch(`${API_BASE}/reports/${reportId}`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<ReportDetail>(response);
+}
+
+/** Sauvegarde (creation) d'un compte-rendu, renvoie son identifiant. */
+export async function saveReport(input: {
+  raw_transcription: string;
+  structured_report: string;
+  organe_detecte: string;
+}): Promise<SavedReport> {
+  const response = await fetch(`${API_BASE}/reports`, {
+    method: "POST",
+    headers: jsonHeaders(),
+    body: JSON.stringify(input),
+  });
+  return handleResponse<SavedReport>(response);
+}
+
+/** Envoi d'un feedback (note + commentaire) sur un compte-rendu. */
+export async function sendFeedback(
+  reportId: string,
+  rating: number,
+  comment: string,
+): Promise<void> {
+  await fetch(`${API_BASE}/reports/${reportId}/feedback`, {
+    method: "POST",
+    headers: jsonHeaders(),
+    body: JSON.stringify({ rating, comment }),
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Administration (tableau de bord)                                   */
+/* ------------------------------------------------------------------ */
+
+export interface AdminStats {
+  total_reports: number;
+  total_users: number;
+  average_rating: number | null;
+  reports_with_feedback: number;
+  reports_with_corrections: number;
+  reports_by_organ: Record<string, number>;
+}
+
+export interface AdminReport {
+  id: string;
+  user_name: string;
+  user_email: string;
+  organe_detecte: string;
+  status: string;
+  created_at: string;
+  rating: number | null;
+  feedback_comment: string | null;
+  correction_count: number;
+}
+
+export interface AdminCorrection {
+  report_id: string;
+  user_name: string;
+  organe: string;
+  timestamp: string;
+  before_excerpt: string;
+  after_excerpt: string;
+}
+
+export async function getAdminStats(): Promise<AdminStats> {
+  const response = await fetch(`${API_BASE}/admin/stats`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<AdminStats>(response);
+}
+
+export async function getAdminReports(): Promise<AdminReport[]> {
+  const response = await fetch(`${API_BASE}/admin/reports`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<AdminReport[]>(response);
+}
+
+export async function getAdminCorrections(): Promise<AdminCorrection[]> {
+  const response = await fetch(`${API_BASE}/admin/corrections`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<AdminCorrection[]>(response);
 }

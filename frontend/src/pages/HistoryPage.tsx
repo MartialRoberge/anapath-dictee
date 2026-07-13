@@ -4,18 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MarcLogo } from "../components/MarcLogo";
 import { useToast } from "../components/toast-context";
-
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
-
-interface ReportSummary {
-  id: string;
-  organe_detecte: string;
-  status: string;
-  created_at: string;
-  excerpt: string;
-  has_feedback: boolean;
-  rating: number | null;
-}
+import { getReports } from "../services/api";
+import type { ReportSummary } from "../services/api";
 
 interface HistoryPageProps {
   token: string | null;
@@ -102,14 +92,7 @@ export default function HistoryPage({
     if (!token) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/reports`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        setReports(await res.json());
-      } else {
-        toast("Erreur lors du chargement de l'historique", "error");
-      }
+      setReports(await getReports());
     } catch {
       toast("Impossible de charger l'historique", "error");
     } finally {

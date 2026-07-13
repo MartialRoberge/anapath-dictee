@@ -23,11 +23,9 @@ import AdminPage from "./pages/AdminPage";
 import RecorderPanel from "./components/RecorderPanel";
 import ReportPanel from "./components/ReportPanel";
 import CompletionPanel from "./components/CompletionPanel";
-import { formatTranscription } from "./services/api";
+import { formatTranscription, getReport, saveReport, sendFeedback } from "./services/api";
 import type { FormatResult, Marker } from "./services/api";
 // v3 backend: FormatResult has formatted_report, organe_detecte, markers (adapted from donnees_manquantes)
-
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
 type Page = "app" | "history" | "admin";
 type AppView = "record" | "report";
@@ -258,11 +256,7 @@ function FeedbackPanel({
     const token = getToken();
     if (!token) return;
     try {
-      await fetch(`${API_BASE}/reports/${savedReportId}/feedback`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ rating, comment }),
-      });
+      await sendFeedback(savedReportId, rating, comment);
       onSent();
       toast("Merci pour votre retour", "success");
     } catch {
@@ -399,11 +393,7 @@ export default function App() {
   const handleOpenReport = useCallback(
     async (reportId: string) => {
       try {
-        const res = await fetch(`${API_BASE}/reports/${reportId}`, {
-          headers: { Authorization: `Bearer ${getToken()}` },
-        });
-        if (!res.ok) throw new Error("Impossible de charger le compte-rendu.");
-        const data = await res.json();
+        const data = await getReport(reportId);
         setReport(data.structured_report ?? "");
         setRawTranscription(data.raw_transcription ?? null);
         setOrganeDetecte(data.organe_detecte ?? "");
@@ -452,22 +442,13 @@ export default function App() {
     if (!token) return;
     setSaving(true);
     try {
-      const res = await fetch(`${API_BASE}/reports`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          raw_transcription: rawTranscription,
-          structured_report: report,
-          organe_detecte: organeDetecte,
-        }),
+      const data = await saveReport({
+        raw_transcription: rawTranscription,
+        structured_report: report,
+        organe_detecte: organeDetecte,
       });
-      if (res.ok) {
-        const data = await res.json();
-        setSavedReportId(data.id);
-        toast("Compte-rendu sauvegarde", "success");
-      } else {
-        toast("Erreur lors de la sauvegarde", "error");
-      }
+      setSavedReportId(data.id);
+      toast("Compte-rendu sauvegarde", "success");
     } catch {
       toast("Erreur lors de la sauvegarde", "error");
     } finally {
