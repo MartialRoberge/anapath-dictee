@@ -1,6 +1,7 @@
 """Configuration Alembic pour migrations async PostgreSQL."""
 
 import asyncio
+import os
 import sys
 from logging.config import fileConfig
 from pathlib import Path
@@ -15,6 +16,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
 from db_models import Base  # noqa: E402
 
 config = context.config
+
+# La cible des migrations vient de DATABASE_URL (prod/CI) et non de l'URL codee en
+# dur dans alembic.ini (qui ne sert que de repli en dev local). L'engine async
+# d'Alembic attend le driver asyncpg : on normalise 'postgresql://' au besoin.
+_database_url = os.environ.get("DATABASE_URL")
+if _database_url:
+    if _database_url.startswith("postgresql://"):
+        _database_url = _database_url.replace(
+            "postgresql://", "postgresql+asyncpg://", 1
+        )
+    config.set_main_option("sqlalchemy.url", _database_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

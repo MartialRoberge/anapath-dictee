@@ -11,20 +11,10 @@ export function useAudioRecorder() {
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
 
   const startRecording = useCallback(async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     streamRef.current = stream;
-
-    const audioCtx = new AudioContext();
-    audioCtxRef.current = audioCtx;
-    const source = audioCtx.createMediaStreamSource(stream);
-    const analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-    source.connect(analyser);
-    analyserRef.current = analyser;
 
     // Detecter le MIME type supporte (Safari ne supporte pas audio/webm)
     const mimeType = MediaRecorder.isTypeSupported("audio/webm")
@@ -48,7 +38,6 @@ export function useAudioRecorder() {
       setAudioBlob(blob);
       stream.getTracks().forEach((t) => t.stop());
       if (timerRef.current) clearInterval(timerRef.current);
-      audioCtx.close();
     };
 
     setDuration(0);
@@ -68,18 +57,14 @@ export function useAudioRecorder() {
     setAudioBlob(null);
     setDuration(0);
     setState("idle");
-    analyserRef.current = null;
   }, []);
-
-  const getAnalyser = useCallback(() => analyserRef.current, []);
 
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       streamRef.current?.getTracks().forEach((t) => t.stop());
-      audioCtxRef.current?.close();
     };
   }, []);
 
-  return { state, audioBlob, duration, startRecording, stopRecording, reset, getAnalyser };
+  return { state, audioBlob, duration, startRecording, stopRecording, reset };
 }
