@@ -19,6 +19,7 @@ Contexte diagnostique :
 
 from enum import Enum
 
+from negation import NEGATION_MARKERS as _NEGATION_PREFIXES
 from text_utils import normaliser as _normaliser
 
 
@@ -201,13 +202,6 @@ _BENIN_KEYWORDS: list[str] = [
     "meningite", "cystite", "gastrite", "duodenite", "oesophagite",
     "thrombus", "atherome", "atherosclerose", "amylose",
 ]
-
-_NEGATION_PREFIXES: list[str] = [
-    "absence de", "pas de", "sans", "il n'est pas",
-    "ne montre pas de", "ne trouve pas de",
-    "indemne de", "ni de",
-]
-
 
 # ---------------------------------------------------------------------------
 # Fonctions utilitaires

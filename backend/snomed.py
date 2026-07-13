@@ -12,6 +12,9 @@ Ce module fournit une suggestion de codes SNOMED CT depuis le CR
 structure et l'organe detecte.
 """
 
+from negation import mask_negations
+from text_utils import normaliser
+
 
 # ---------------------------------------------------------------------------
 # Body Structure (localisation anatomique)
@@ -108,29 +111,6 @@ _MORPHOLOGIES: list[tuple[str, str, list[str]]] = [
 ]
 
 
-from text_utils import normaliser
-
-_NEGATION_MARKERS: list[str] = [
-    "absence de", "pas de", "sans", "il n'est pas",
-    "ne montre pas de", "ne trouve pas de", "indemne de",
-]
-
-
-def _masquer_negations(texte: str) -> str:
-    """Masque les portions de texte en contexte de negation."""
-    resultat: str = texte
-    for marker in _NEGATION_MARKERS:
-        while marker in resultat:
-            pos: int = resultat.find(marker)
-            end: int = len(resultat)
-            for sep in [".", "\n"]:
-                sep_pos: int = resultat.find(sep, pos + len(marker))
-                if sep_pos != -1 and sep_pos < end:
-                    end = sep_pos
-            resultat = resultat[:pos] + " " * (end - pos) + resultat[end:]
-    return resultat
-
-
 def suggerer_snomed(rapport: str, organe_detecte: str) -> dict[str, str | dict[str, str]]:
     """Suggere des codes SNOMED CT depuis le rapport et l'organe detecte.
 
@@ -157,7 +137,7 @@ def suggerer_snomed(rapport: str, organe_detecte: str) -> dict[str, str | dict[s
 
     # Morphologie - chercher du plus specifique au plus generique
     # Masquer les negations pour eviter les faux positifs
-    texte_sans_negations: str = _masquer_negations(rapport_normalise)
+    texte_sans_negations: str = mask_negations(rapport_normalise)
     morphology: dict[str, str] = {
         "code": "",
         "display": "Non determine",

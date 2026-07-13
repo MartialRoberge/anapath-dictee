@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
+from negation import mask_negations
 from text_utils import normaliser
 
 _DATA_PATH: Path = Path(__file__).resolve().parent / "data" / "adicap_bible.json"
@@ -338,30 +339,6 @@ def _detecter_technique(texte: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Masquage des negations (ne pas coder "absence de carcinome")
-# ---------------------------------------------------------------------------
-
-_NEGATION_MARKERS: tuple[str, ...] = (
-    "absence de", "pas de", "sans ", "il n'est pas", "ne montre pas de",
-    "ne trouve pas de", "indemne de", "il n'y a pas",
-)
-
-
-def _masquer_negations(texte: str) -> str:
-    resultat = texte
-    for marker in _NEGATION_MARKERS:
-        while marker in resultat:
-            pos = resultat.find(marker)
-            end = len(resultat)
-            for sep in (".", "\n", ";"):
-                sp = resultat.find(sep, pos + len(marker))
-                if sp != -1 and sp < end:
-                    end = sp
-            resultat = resultat[:pos] + " " * (end - pos) + resultat[end:]
-    return resultat
-
-
-# ---------------------------------------------------------------------------
 # Matching lesionnel sur la bible
 # ---------------------------------------------------------------------------
 
@@ -470,7 +447,7 @@ def suggerer_adicap(rapport: str, organe_detecte: str) -> dict[str, str]:
 
     _organ_codes, catalog = _load_reference()
     texte_norm = normaliser(rapport)
-    diagnostic = _masquer_negations(normaliser(_extraire_diagnostic(rapport)))
+    diagnostic = mask_negations(normaliser(_extraire_diagnostic(rapport)))
 
     organe_canon = canonical_organ(organe_detecte, rapport)
     # Repli : si le moteur n'a pas resolu l'organe, tenter un detecteur texte large
