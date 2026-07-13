@@ -220,15 +220,40 @@ def _is_header_line(stripped: str) -> tuple[bool, int]:
     return False, 0
 
 
+_PATTERN_BULLET: re.Pattern[str] = re.compile(r"^[-*+•]\s+(.*)$")
+
+
+def _bullet_content(stripped: str) -> str | None:
+    """Retourne le contenu d'une puce markdown (- / * / +), ou None.
+
+    Exclut le separateur '---' (pas d'espace apres les tirets)."""
+    match = _PATTERN_BULLET.match(stripped)
+    return match.group(1) if match else None
+
+
+def _add_bullet_paragraph(doc: Any, text: str) -> None:
+    """Ajoute une puce Word (style natif 'List Bullet'), texte enrichi Arial 10."""
+    p = doc.add_paragraph(style="List Bullet")
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    _add_rich_text(p, text)
+
+
 # ---------------------------------------------------------------------------
 # Fonction principale d'export
 # ---------------------------------------------------------------------------
 
 
 def markdown_to_docx(markdown_text: str, title: str) -> bytes:
-    """Convertit un rapport Markdown en document Word au format anapath standard."""
+    """Convertit un rapport Markdown en document Word au format anapath standard.
+
+    ``title`` alimente les proprietes du document Word (metadonnees Titre/Sujet),
+    utiles a l'archivage et a la recherche documentaire.
+    """
     doc: Any = Document()
     _configure_document_style(doc)
+    if title:
+        doc.core_properties.title = title
+        doc.core_properties.subject = "Compte-rendu anatomopathologique"
 
     lines: list[str] = markdown_text.split("\n")
     i: int = 0
@@ -277,6 +302,13 @@ def markdown_to_docx(markdown_text: str, title: str) -> bytes:
 
         # Separateur ---
         if stripped == "---":
+            i += 1
+            continue
+
+        # Liste a puces (- / * / +) -> vraie puce Word
+        bullet: str | None = _bullet_content(stripped)
+        if bullet is not None:
+            _add_bullet_paragraph(doc, bullet)
             i += 1
             continue
 
