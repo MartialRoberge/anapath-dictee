@@ -69,9 +69,7 @@ def _conclusion_text(cr: str) -> str:
     return cr[m.end():] if m else ""
 
 
-def assess_coherence(
-    cr: str, organes: list[str], specimen: str
-) -> CoherenceReport:
+def assess_coherence(cr: str) -> CoherenceReport:
     """Verifie la coherence structurelle et interne du CR (deterministe)."""
     low = cr.lower()
 
@@ -127,14 +125,6 @@ def assess_coherence(
                 f"La mesure '{match.group(0).strip()}' de la conclusion n'apparait "
                 f"pas dans le corps du CR.", "attention"))
             break
-
-    # 6. Coherence organe : l'organe detecte doit transparaitre dans titre/conclusion
-    #    (best-effort, seulement si un seul organe detecte).
-    if len(organes) == 1:
-        organ = organes[0].split("_")[0]
-        if len(organ) >= 4 and organ not in low:
-            # tolerance : certains organes s'expriment par un synonyme -> attention seulement
-            pass
 
     structure_complete = has_title and has_diag and len(concl) >= 5
     ok = not any(i.severity == "bloquant" for i in issues)

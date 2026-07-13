@@ -2,7 +2,13 @@
 
 **Objet.** Ce document explique, en mode produit, comment faire évoluer l'API Gilbert pour qu'une application verticale (MARC pour l'anapath, mais aussi juridique, industrie, etc.) puisse être construite **en ne changeant que le frontend**, tout le moteur restant côté Gilbert. Il répond à trois questions : *(1) qu'est-ce qui manque aujourd'hui ? (2) la génération par template est-elle bonne, et quel contexte faut-il en plus ? (3) quelle roadmap par sprints pour y arriver ?*
 
-MARC (le POC anapath) sert de **implémentation de référence** : tout ce qu'il fait aujourd'hui côté serveur applicatif (templates, slot-filling, guardrails, codification) est ce qu'il faut absorber dans l'API Gilbert pour le rendre réutilisable par toutes les verticales.
+MARC (le POC anapath) sert de **implémentation de référence** : tout ce qu'il fait aujourd'hui côté serveur applicatif (connaissances métier par organe, guardrails, codification) est ce qu'il faut absorber dans l'API Gilbert pour le rendre réutilisable par toutes les verticales.
+
+> **Ce document est la vue produit / roadmap.** Pour la **checklist technique
+> d'intégration** (état réel de `backend/reports/gilbert_engine.py`, étapes de
+> bascule, points d'injection), voir **[`INTEGRATION_GILBERT.md`](INTEGRATION_GILBERT.md)**.
+> Pour la **trajectoire souveraineté/HDS**, voir
+> **[`NOTE_TECHNO_SOUVERAINETE.md`](NOTE_TECHNO_SOUVERAINETE.md)**.
 
 ---
 
@@ -224,4 +230,4 @@ Le même moteur sert les quatre : **seul le template (et le frontend) change**. 
 
 ## 8. Passerelle immédiate (sans attendre les sprints)
 
-En attendant que l'API Gilbert soit « template-native », MARC fonctionne déjà avec l'abstraction `ReportEngine` (voir `docs/INTEGRATION_GILBERT.md`) : le jour où `template_id` à l'upload + sortie structurée existent (Sprints 0–1), on bascule `REPORT_ENGINE=gilbert` sans toucher au frontend ni aux guardrails. MARC est donc **la première verticale de référence** de cette API composable — et son moteur (templates + slot-filling + guardrails + codification) est le patron de ce qu'il faut internaliser dans Gilbert.
+En attendant que l'API Gilbert soit « template-native », MARC fonctionne déjà avec l'abstraction `ReportEngine` (voir `INTEGRATION_GILBERT.md`) : le jour où `template_id` à l'upload + sortie structurée existent (Sprints 0–1), on bascule `REPORT_ENGINE=gilbert` sans toucher au frontend ni aux guardrails. MARC est donc **la première verticale de référence** de cette API composable — et son moteur (détection automatique multi-organes + injection de connaissances métier + guardrails + codification) est le patron de ce qu'il faut internaliser dans Gilbert.

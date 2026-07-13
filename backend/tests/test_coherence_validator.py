@@ -10,7 +10,7 @@ def test_cr_complet_est_coherent():
         "**Microscopie :**\nCarcinome canalaire infiltrant, grade SBR 2.\n"
         "**__CONCLUSION :__**\n**Carcinome canalaire infiltrant, grade SBR 2.**"
     )
-    r = assess_coherence(cr, ["sein"], "biopsie")
+    r = assess_coherence(cr)
     assert r.ok
     assert r.structure_complete
     assert set(r.sections_presentes) >= {"titre", "microscopie", "conclusion"}
@@ -18,14 +18,14 @@ def test_cr_complet_est_coherent():
 
 def test_conclusion_absente_bloquant():
     cr = "**__BIOPSIE__**\n**Microscopie :**\nADK."
-    r = assess_coherence(cr, ["poumon"], "biopsie")
+    r = assess_coherence(cr)
     assert not r.ok
     assert any(i.code == "conclusion_absente" for i in r.issues)
 
 
 def test_microscopie_absente_signalee():
     cr = "**__BIOPSIE__**\n**__CONCLUSION :__**\n**Diagnostic final.**"
-    r = assess_coherence(cr, ["poumon"], "biopsie")
+    r = assess_coherence(cr)
     assert any(i.code == "microscopie_absente" for i in r.issues)
     assert not r.structure_complete
 
@@ -36,7 +36,7 @@ def test_chiffre_conclusion_absent_du_corps_signale():
         "**__PIECE__**\n**Microscopie :**\nAdenocarcinome.\n"
         "**__CONCLUSION :__**\n**Adenocarcinome de 42 mm.**"
     )
-    r = assess_coherence(cr, ["poumon"], "piece_operatoire")
+    r = assess_coherence(cr)
     assert any(i.code == "chiffre_conclusion_absent_corps" for i in r.issues)
 
 
@@ -45,7 +45,7 @@ def test_chiffre_conclusion_present_dans_corps_ok():
         "**__PIECE__**\n**Microscopie :**\nAdenocarcinome mesurant 18 mm.\n"
         "**__CONCLUSION :__**\n**Adenocarcinome de 18 mm.**"
     )
-    r = assess_coherence(cr, ["poumon"], "piece_operatoire")
+    r = assess_coherence(cr)
     assert not any(i.code == "chiffre_conclusion_absent_corps" for i in r.issues)
 
 
@@ -54,11 +54,11 @@ def test_todo_dans_conclusion_signale():
         "**__BIOPSIE__**\n**Microscopie :**\nADK.\n"
         "**__CONCLUSION :__**\n**ADK [A COMPLETER: grade].**"
     )
-    r = assess_coherence(cr, ["poumon"], "biopsie")
+    r = assess_coherence(cr)
     assert any(i.code == "todo_conclusion" for i in r.issues)
 
 
 def test_dictee_non_medicale_est_coherente():
     cr = "**La transcription ne semble pas correspondre a un compte-rendu anatomopathologique.**"
-    r = assess_coherence(cr, [], "autre")
+    r = assess_coherence(cr)
     assert r.ok

@@ -244,7 +244,7 @@ _INVASIVE_FIELD_TERMS: tuple[str, ...] = (
 # (depistage Lynch, theranostique). Recherche a limites de mots (voir _has_word)
 # pour eviter les collisions ("msi" dans "transmission", "braf" partiel...).
 _MOLECULAR_TUMORAL_TERMS: frozenset[str] = frozenset({
-    "mmr", "dmmr", "pmmr", "msi", "msi", "microsatellite", "instabilite",
+    "mmr", "dmmr", "pmmr", "msi", "microsatellite", "instabilite",
     "kras", "nras", "braf", "egfr", "idh", "her2", "oncotype",
 })
 
@@ -454,7 +454,7 @@ def filter_present_alertes(
     return kept, removed
 
 
-_MARKER_RE: re.Pattern[str] = re.compile(r"\[a\s*completer[^\]]*\]", re.IGNORECASE)
+# (regex [A COMPLETER] : source unique _A_COMPLETER_REGION, definie plus haut)
 
 
 def _marker_is_forbidden(
@@ -491,7 +491,7 @@ def strip_forbidden_markers(
     removed = 0
     out_lines: list[str] = []
     for line in cr.split("\n"):
-        markers = _MARKER_RE.findall(line)
+        markers = _A_COMPLETER_REGION.findall(line)
         forbidden = [
             m for m in markers
             if _marker_is_forbidden(m, organes, specimen, contexte)
@@ -535,7 +535,7 @@ def strip_empty_table_rows(cr: str) -> str:
             cells = [c.strip() for c in s.strip("|").split("|")]
             data = cells[1:] if len(cells) > 1 else cells
             def _empty(c: str) -> bool:
-                cc = _MARKER_RE.sub("", c)  # retire [A COMPLETER]
+                cc = _A_COMPLETER_REGION.sub("", c)  # retire [A COMPLETER]
                 cc = _strip_accents_lower(cc).strip().strip("*").strip()
                 if cc in _PLACEHOLDER_CELLS:
                     return True
@@ -592,7 +592,7 @@ def strip_conclusion_markers(cr: str) -> str:
     if idx == -1:
         return cr
     head, tail = cr[:idx], cr[idx:]
-    tail = _MARKER_RE.sub("", tail)
+    tail = _A_COMPLETER_REGION.sub("", tail)
     # Nettoyage des residus (", ." / " ,"/ doubles espaces / puce vide)
     tail = re.sub(r"[ \t]*,[ \t]*(?=[.\n)])", "", tail)
     tail = re.sub(r"\(\s*\)", "", tail)
@@ -853,7 +853,7 @@ def build_validated_report(
     # Validation de coherence medicale — a CHAQUE generation (deterministe).
     from reports.coherence import assess_coherence
 
-    coherence = assess_coherence(cr, detected_organes, specimen.value).to_dict()
+    coherence = assess_coherence(cr).to_dict()
 
     return GeneratedReport(
         cr=cr,

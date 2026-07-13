@@ -344,7 +344,7 @@ def _detecter_technique(texte: str) -> str:
 
 _TOKEN_RE = re.compile(r"[a-z0-9]+")
 _STOP = {"de", "la", "le", "les", "des", "un", "une", "du", "et", "en", "sur",
-         "avec", "sans", "pour", "non", "type", "avec"}
+         "avec", "sans", "pour", "non", "type"}
 
 
 def _tokens(texte: str) -> set[str]:

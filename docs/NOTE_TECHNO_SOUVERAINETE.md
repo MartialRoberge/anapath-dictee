@@ -195,16 +195,20 @@ Le swap vers Gilbert **ne change que la configuration**, grâce à `ReportEngine
 - Squelette Gilbert **déjà écrit et testable** : upload + polling du transcript fonctionnels (`backend/reports/gilbert_engine.py:87-128`).
 - Base URL Gilbert : `https://gilbert-assistant.ovh/api/v1` (`gilbert_engine.py:38`).
 - Les **guardrails** (garde-chiffres, garde-négations, périmètre biopsie) s'appliquent à **toute** sortie, locale **ou** distante, via `build_validated_report` (`backend/reports/guardrails.py`) — la fiabilité anti-hallucination est **indépendante du moteur**.
-- Le catalogue de templates porte déjà un champ `gilbert_template_id` (cf. `docs/ARCHITECTURE.md` §templates) : un seul catalogue logique sert les deux moteurs.
+- Le catalogue métier des organes existe (`backend/templates_organes.py`, 23 organes) ; en revanche la **correspondance organe → `template_id` Gilbert reste à créer** (elle n'existe pas encore dans le code — cf. `INTEGRATION_GILBERT.md` §2.1).
 
 ### 4.2 Ce qui bloque encore côté API Gilbert (état v1.1.0)
 
-D'après `gilbert_engine.py:8-18` et `docs/INTEGRATION_GILBERT.md` §2, il manque **deux capacités bloquantes** côté API Gilbert :
+**L'analyse détaillée des lacunes est dans `INTEGRATION_GILBERT.md` §2** (checklist
+technique) et `GILBERT_API_PRODUCT.md` §1-3 (vision produit) — non reproduite ici. En
+résumé, il manque **deux capacités bloquantes** côté API Gilbert, toutes deux avec un
+point d'accroche déjà préparé dans `backend/reports/gilbert_engine.py` :
 
-1. **Sélection de template à l'upload** — `POST /meetings/upload` n'accepte que `file` + `title`, pas de `template_id`. Point d'injection **déjà préparé** dans le code (`gilbert_engine.py:94-95`, commentaire « ajouter ici `data["template_id"]` »).
-2. **Sortie structurée** — `GET /meetings/{id}/summary` renvoie du **markdown libre**, pas le contrat `{cr, organe, type_prelevement, alertes}`. Tant que ce n'est pas exposé, `GilbertReportEngine.generate()` lève volontairement `GilbertCapabilityMissing` (`gilbert_engine.py:145-150`) plutôt que de produire une sortie non fiable. Le mapping cible est **déjà esquissé** (`_map_summary_to_report`, `gilbert_engine.py:159-179`).
-
-La cible produit (rendre le **Template** « first-class » : schéma + instructions + vocabulaire + guardrails + enrichissements) est décrite dans `docs/GILBERT_API_PRODUCT.md` §2-3.
+1. **Sélection de template à l'upload** — `POST /meetings/upload` n'accepte que
+   `file` + `title` (point d'injection commenté dans `_upload`).
+2. **Sortie structurée** — `GET /meetings/{id}/summary` renvoie du markdown libre,
+   pas le contrat `{cr, organe, type_prelevement, alertes}` ; tant que c'est le cas,
+   `GilbertReportEngine.generate()` lève volontairement `GilbertCapabilityMissing`.
 
 ### 4.3 Bascule le jour J (une fois l'API Gilbert prête)
 
