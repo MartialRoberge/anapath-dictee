@@ -383,7 +383,12 @@
   padding: 0 6px;
   font-weight: 600;
   text-transform: none;
-  white-space: nowrap;
+  /* Passe a la ligne au lieu de deborder du cadre ; le fond/bordure se
+     repetent proprement sur chaque ligne (pastille multi-lignes). */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
   transition: background 0.15s ease;
 }
 
