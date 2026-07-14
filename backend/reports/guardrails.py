@@ -614,6 +614,8 @@ def cosmetic_cleanup(cr: str) -> str:
     # Lignes reduites a une puce/asterisques/point isole -> supprimees.
     cr = re.sub(r"(?m)^[ \t]*(?:[-*•]|\*{1,2})[ \t]*\.?[ \t]*$\n?", "", cr)
     cr = re.sub(r"\.{2,}", ".", cr)                 # points parasites en serie
+    # Lignes reduites a un point isole (ex fin de CR "\n.\n.\n") -> supprimees.
+    cr = re.sub(r"(?m)^[ \t]*\.[ \t]*$\n?", "", cr)
     cr = re.sub(r"[ \t]+([.\n])", r"\1", cr)        # espace avant point/retour
     cr = re.sub(r"\n{3,}", "\n\n", cr)              # trop de lignes vides
     return cr.rstrip() + "\n"
