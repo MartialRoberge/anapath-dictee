@@ -146,6 +146,16 @@ _ORGAN_FALLBACK_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
                         "osteomedullaire")),
     ("os", ("osteonecrose", "tete femorale", "biopsie osseuse", "trabecules osseuses",
             "corticale osseuse", "os spongieux", "coxarthrose", "col femoral")),
+    # Entites BENIGNES qui n'enoncent pas le nom de l'organe : au moins coder
+    # l'organe (mieux qu'un organe inconnu XX ; la lesion peut rester deferee).
+    ("estomac", ("gastrite", "muqueuse gastrique", "gastrique", "metaplasie intestinale")),
+    ("peau", ("naevus", "nevus", "basocellulaire", "keratose seborrheique",
+              "verrue seborrheique", "molluscum", "kyste epidermoide", "histiocytofibrome")),
+    ("colon_rectum", ("maladie de crohn", "rectocolite", "colite", "recto-colite",
+                      "ileite", "maladie coeliaque")),
+    ("thyroide", ("thyroidite", "hashimoto", "goitre", "basedow")),
+    ("foie", ("steatohepatite", "steatose", "cirrhose", "hepatite chronique",
+              "cholangite", "hemochromatose")),
 )
 
 # Libelle d'organe AFFICHE (anatomique, correct) — decouple des etiquettes de la
