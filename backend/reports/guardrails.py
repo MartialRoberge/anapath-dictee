@@ -586,6 +586,38 @@ def strip_empty_table_rows(cr: str) -> str:
     return "\n".join(out)
 
 
+def strip_empty_tables(cr: str) -> str:
+    """Retire les TABLEAUX sans aucune ligne de donnees (coquille vide).
+
+    Complement de ``strip_empty_table_rows`` : une fois les lignes fabriquees
+    retirees, il peut rester un entete + separateur sans donnees (ex un tableau
+    d'immunomarquage alors qu'aucun anticorps n'est dicte). Ce gabarit vide n'a
+    aucune valeur pour le praticien : on le supprime entierement.
+    """
+    lines: list[str] = cr.split("\n")
+    out: list[str] = []
+    i: int = 0
+    while i < len(lines):
+        if not lines[i].strip().startswith("|"):
+            out.append(lines[i])
+            i += 1
+            continue
+        # Bloc de tableau : on collecte les lignes contigues.
+        start: int = i
+        while i < len(lines) and lines[i].strip().startswith("|"):
+            i += 1
+        block: list[str] = lines[start:i]
+        has_data: bool = any(
+            "---" not in ln and idx > 0 and ln.strip().strip("|").strip()
+            for idx, ln in enumerate(block)
+            if idx >= 2  # 0 = entete, 1 = separateur
+        )
+        if has_data:
+            out.extend(block)
+        # sinon : coquille vide -> supprimee
+    return "\n".join(out)
+
+
 _META_PAREN_RE: re.Pattern[str] = re.compile(r"\s*\(([^)]*)\)")
 _META_MARKERS: tuple[str, ...] = (
     "dicte", "dictee", "mentionn", "deduit", "par defaut", "explicitement",
@@ -900,6 +932,7 @@ def _clean_cr_text(
         warnings.append(f"{n_markers} marqueur(s) hors-contexte retire(s) du texte du CR.")
     cr = strip_conclusion_markers(cr)   # pas de [A COMPLETER] en conclusion
     cr = strip_empty_table_rows(cr)     # lignes de tableau fabriquees vides
+    cr = strip_empty_tables(cr)         # coquilles de tableau sans donnees
     cr = strip_meta_comments(cr)        # meta-commentaires parenthetiques
     cr = cosmetic_cleanup(cr)           # puces/asterisques vides, points parasites
     return cr, warnings

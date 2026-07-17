@@ -161,6 +161,16 @@ def build_context_block(transcript: str) -> ContextResult:
         parts.append("")
         parts.append(_organ_block(tpl, specimen, contexte))
 
+    # Formulation de REFERENCE du praticien pour la lesion dictee (sa propre
+    # bible) : donne le vocabulaire, la structure et la densite qu'IL attend.
+    # Verrouille par organe ; vide si la lesion n'est pas dans sa bible.
+    from reports.canonical_texts import build_canonical_block
+
+    canonical = build_canonical_block(transcript, [o.organe for o in organs])
+    if canonical:
+        parts.append("")
+        parts.append(canonical)
+
     return ContextResult(
         block="\n".join(parts),
         organes=[o.organe for o in organs],
