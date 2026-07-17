@@ -379,3 +379,19 @@ def test_biomarqueur_inca_nomme_reste_autorise():
         assert not _marker_is_forbidden(
             marqueur, ["sein"], SpecimenType.PIECE_OPERATOIRE, "infiltrant"
         ), marqueur
+
+
+def test_entete_de_section_vide_retiree():
+    """Quand une passe de nettoyage vide une section (ex panel IHC devine retire),
+    son en-tete ne doit pas rester orphelin a l'ecran."""
+    from reports.guardrails import strip_empty_sections
+
+    cr = (
+        "**Microscopie :**\nDu texte.\n\n"
+        "**Immunohistochimie :**\n\n"
+        "**__CONCLUSION :__**\n**Carcinome.**"
+    )
+    out = strip_empty_sections(cr)
+    assert "**Immunohistochimie :**" not in out
+    assert "**Microscopie :**" in out          # section avec contenu : conservee
+    assert "CONCLUSION" in out                 # titre gras+souligne : intouchable

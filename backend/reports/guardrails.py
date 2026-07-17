@@ -603,6 +603,35 @@ def strip_empty_table_rows(cr: str) -> str:
     return "\n".join(out)
 
 
+_SECTION_HEADER_RE: re.Pattern[str] = re.compile(
+    r"^\s*(?:\*\*|__)+\s*[A-Za-zÀ-ÿ'’ ()-]+\s*:\s*(?:\*\*|__)+\s*$"
+)
+
+
+def strip_empty_sections(cr: str) -> str:
+    """Retire les EN-TETES de section restes sans contenu.
+
+    Ex : le panel IHC devine est retire -> il reste "**Immunohistochimie :**" seul,
+    ce qui donne une section vide a l'ecran. Un titre sans corps n'apporte rien.
+    La conclusion et le titre principal (gras + souligne) ne sont jamais touches.
+    """
+    lines: list[str] = cr.split("\n")
+    keep: list[bool] = [True] * len(lines)
+    for i, line in enumerate(lines):
+        if not _SECTION_HEADER_RE.match(line):
+            continue
+        if "__" in line:  # titre principal / CONCLUSION (gras+souligne) : intouchable
+            continue
+        # Contenu = premiere ligne non vide qui suit ; si c'est un autre en-tete
+        # (ou la fin du CR), la section est vide.
+        j = i + 1
+        while j < len(lines) and not lines[j].strip():
+            j += 1
+        if j >= len(lines) or _SECTION_HEADER_RE.match(lines[j]):
+            keep[i] = False
+    return "\n".join(ln for ln, k in zip(lines, keep) if k)
+
+
 def strip_empty_tables(cr: str) -> str:
     """Retire les TABLEAUX sans aucune ligne de donnees (coquille vide).
 
@@ -951,6 +980,9 @@ def _clean_cr_text(
     cr = strip_empty_table_rows(cr)     # lignes de tableau fabriquees vides
     cr = strip_empty_tables(cr)         # coquilles de tableau sans donnees
     cr = strip_meta_comments(cr)        # meta-commentaires parenthetiques
+    # EN DERNIER : les passes ci-dessus peuvent vider une section (ex panel IHC
+    # devine retire, ou "(si realisee)" nettoye) et laisser son en-tete orphelin.
+    cr = strip_empty_sections(cr)       # en-tetes de section restes sans contenu
     cr = cosmetic_cleanup(cr)           # puces/asterisques vides, points parasites
     return cr, warnings
 
