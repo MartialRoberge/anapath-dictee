@@ -61,7 +61,10 @@ def _keyword_patterns() -> list[tuple[TemplateOrgane, list[tuple[str, re.Pattern
     for tpl in TOUS_LES_TEMPLATES:
         pats: list[tuple[str, re.Pattern[str]]] = []
         for kw in tpl.mots_cles_detection:
-            pat = re.compile(rf"\b{re.escape(kw.lower())}\b")
+            # Pluriel francais tolere (-s / -x) : "biopsies COLIQUES" doit matcher
+            # le mot-cle "colique", "vaisseaux" -> "vaisseau". Les limites de mots
+            # restent strictes (pas de "CIN" dans "adenocarCINome").
+            pat = re.compile(rf"\b{re.escape(kw.lower())}(?:s|x)?\b")
             pats.append((kw.lower(), pat))
         compiled.append((tpl, pats))
     return compiled

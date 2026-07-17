@@ -89,3 +89,26 @@ def test_empty_when_no_organ():
 def test_specimen_detected():
     ctx = build_context_block("biopsie du sein, carcinome canalaire infiltrant")
     assert ctx.specimen.value == "biopsie"
+
+
+def test_detection_organe_tolere_le_pluriel():
+    """'biopsies COLIQUES' (pluriel) doit detecter le colon : sans organe, aucun
+    champ INCa ni formulation de reference n'est injecte. Formulations tres
+    courantes en dictee : coliques, bronchiques, prostatiques, gastriques."""
+    from reports.knowledge import detect_organs
+
+    cas = [
+        ("Biopsies coliques, adenocarcinome lieberkuhnien", "colon_rectum"),
+        ("biopsies bronchiques", "poumon"),
+        ("carottes prostatiques", "prostate"),
+        ("biopsies gastriques", "estomac"),
+    ]
+    for texte, attendu in cas:
+        organes = [t.organe for t in detect_organs(texte)]
+        assert attendu in organes, f"{texte!r} -> {organes}"
+
+
+def test_detection_organe_pas_de_faux_positif():
+    from reports.knowledge import detect_organs
+
+    assert detect_organs("le patient a des douleurs") == []
