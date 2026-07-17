@@ -189,6 +189,15 @@ En cas de doute sur un score/grade mal transcrit, ne l'invente pas : [VERIFIER].
   [A COMPLETER: description microscopique] plutot que d'inventer une observation.
 - IHC : si >= 2 marqueurs, tableau 2 colonnes (Anticorps | Resultats), precede de
   la phrase standard d'immunomarquage. Colonne "Temoin +" seulement si dictee.
+- IHC — NE DEVINE JAMAIS LE PANEL (retour praticien explicite) : c'est le pathologiste
+  qui dicte les anticorps testes ; ce n'est PAS a toi de proposer quelle immunohistochimie
+  serait pertinente dans ce contexte. INTERDIT : inventer un panel diagnostique du type
+  [A COMPLETER: panel IHC (TTF1, Napsin A, p40, CK7...)] ou "IHC recommandee pour typer".
+  Si aucune IHC n'est dictee, n'ecris PAS de section immunohistochimie du tout.
+  SEULE EXCEPTION : les biomarqueurs exiges par les DONNEES MINIMALES de l'organe et
+  listes dans le contexte metier ci-dessous (ex RE/RP/HER2/Ki67 sur un carcinome
+  mammaire infiltrant, MMR sur un adenocarcinome colique) — ceux-la sont reglementaires,
+  pas une suggestion : ils peuvent etre signales en [A COMPLETER: champ precis].
 - CONCLUSION : ultra synthetique (1 a 3 phrases), en **gras**, termes nosologiques
   complets, phenotype IHC en un mot-cle (jamais le detail des %/scores), jamais de
   [A COMPLETER]. N'ecris JAMAIS de pTNM/stade dans la conclusion sauf s'il a ete

@@ -496,12 +496,29 @@ def filter_present_alertes(
 # (regex [A COMPLETER] : source unique _A_COMPLETER_REGION, definie plus haut)
 
 
+#: Panel d'immunohistochimie COMPOSE par le logiciel (ex "panel immunohistochimique
+#: (p40, p63, CK5/6, TTF1)"). Retour praticien explicite : c'est le pathologiste qui
+#: dicte les anticorps testes ; le logiciel n'a pas a deviner quelle IHC serait
+#: pertinente. Les biomarqueurs REGLEMENTAIRES restent signales par leur nom propre
+#: (RE, RP, HER2, Ki67, MMR, PD-L1...) via le rappel deterministe des champs INCa.
+_IHC_PANEL_RE: re.Pattern[str] = re.compile(
+    r"\bpanel\b.*\b(immunohisto|ihc|anticorps|marqueur)"
+    r"|\b(immunohisto\w*|ihc)\b.*\bpanel\b"
+    r"|\bpanel (immunohisto|ihc)\w*",
+)
 def _marker_is_forbidden(
     inner: str, organes: list[str], specimen: SpecimenType, contexte: str
 ) -> bool:
     """Un marqueur [A COMPLETER: ...] est-il hors-contexte (donc a retirer du CR) ?
     Meme logique de decision que ``filter_alertes``."""
     text = _strip_accents_lower(inner)
+    # Panel IHC compose par le logiciel -> toujours retire du texte du CR. Les
+    # biomarqueurs REGLEMENTAIRES ne sont pas perdus pour autant : le rappel
+    # deterministe des donnees minimales INCa les re-signale au panneau sous leur
+    # nom propre ("PD-L1 (TPS)", "Statut HER2"), ce qui est precisement la demande
+    # du praticien : le logiciel ne compose pas de panel, il rappelle les champs exiges.
+    if _IHC_PANEL_RE.search(text):
+        return True
     detected = set(organes)
     for pattern, valid_organs, _label in _CLASSIFICATION_SCOPE:
         if pattern.search(text) and detected and detected.isdisjoint(valid_organs):

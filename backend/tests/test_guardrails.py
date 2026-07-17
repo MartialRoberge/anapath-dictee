@@ -344,3 +344,38 @@ def test_pas_de_collision_de_mot_msi():
 
     assert not _has_word("transmission synaptique", _MOLECULAR_TUMORAL_TERMS)
     assert _has_word("instabilite des microsatellites", _MOLECULAR_TUMORAL_TERMS)
+
+
+# --- IHC : le logiciel ne compose jamais le panel (retour praticien) ---
+
+def test_panel_ihc_devine_retire_du_cr():
+    """Retour praticien : 'ce n'est pas au logiciel de deviner les IHC pertinentes'.
+    Un panel de typage compose par le modele est retire du texte du CR."""
+    from reports.guardrails import _marker_is_forbidden
+    from specimen_type import SpecimenType
+
+    for marqueur in (
+        "panel immunohistochimique (p40, p63, CK5/6, TTF1)",
+        "Panel IHC (TTF1, Napsin A, p40, CK7)",
+        "panel immunohistochimique (p40, TTF1, PD-L1 si realise)",
+    ):
+        assert _marker_is_forbidden(
+            marqueur, ["poumon"], SpecimenType.BIOPSIE, "infiltrant"
+        ), marqueur
+
+
+def test_biomarqueur_inca_nomme_reste_autorise():
+    """Un champ REGLEMENTAIRE nomme (donnees minimales INCa) n'est pas un panel
+    devine : il reste signale."""
+    from reports.guardrails import _marker_is_forbidden
+    from specimen_type import SpecimenType
+
+    for marqueur in (
+        "statut HER2 (0/1+/2+/3+)",
+        "recepteurs RE et RP (%)",
+        "index Ki67 (%)",
+        "statut MMR (MLH1, MSH2, MSH6, PMS2)",
+    ):
+        assert not _marker_is_forbidden(
+            marqueur, ["sein"], SpecimenType.PIECE_OPERATOIRE, "infiltrant"
+        ), marqueur
