@@ -62,3 +62,22 @@ def test_ihc_table_rendered():
     doc = _render(cr)
     assert len(doc.tables) >= 1
     assert doc.tables[0].rows[0].cells[0].text.strip() == "Anticorps"
+
+
+def test_section_extemporane_reconnue():
+    """L'examen extemporane (26% des modeles CR du praticien, section CI-SIS)
+    est decoupe dans sa propre section, avant la macroscopie."""
+    from export_docx import split_report_sections
+
+    cr = (
+        "**__TITRE__**\n\n"
+        "**Examen extemporané :**\n- Ganglion n°1 : sain.\n\n"
+        "**Macroscopie :**\nPièce de lobectomie.\n\n"
+        "**__CONCLUSION :__**\n**Adénocarcinome.**"
+    )
+    sections = split_report_sections(cr)
+    assert "extemporane" in sections
+    assert "Ganglion" in sections["extemporane"]
+    # ordre : l'extemporane precede la macroscopie
+    keys = list(sections)
+    assert keys.index("extemporane") < keys.index("macroscopie")

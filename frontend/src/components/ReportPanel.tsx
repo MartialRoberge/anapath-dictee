@@ -35,6 +35,7 @@ import { copyReportRich, markdownToPlainText } from "../lib/reportText";
 const SECTION_LABELS: Record<string, string> = {
   titre: "Titre",
   renseignements_cliniques: "Renseignements cliniques",
+  extemporane: "Examen extemporane",
   macroscopie: "Macroscopie",
   microscopie: "Etude histologique",
   ihc: "Immunomarquage",
@@ -54,6 +55,7 @@ function getSectionLabel(key: string): string {
 const SECTION_ORDER: string[] = [
   "titre",
   "renseignements_cliniques",
+  "extemporane",
   "macroscopie",
   "microscopie",
   "ihc",

@@ -333,6 +333,14 @@ _SECTION_KEYWORDS: dict[str, list[str]] = {
         "renseignements cliniques",
         "renseignement clinique",
     ],
+    # Section normalisee CI-SIS (et 26% des modeles CR du praticien) : le resultat
+    # de l'extemporane precede la macroscopie.
+    "extemporane": [
+        "extemporane",
+        "extemporané",  # le decoupage ne retire pas les accents : les 2 formes
+        "extemporanes",
+        "extemporanés",
+    ],
     "macroscopie": [
         "macroscopie",
         "examen macroscopique",

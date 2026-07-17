@@ -194,6 +194,9 @@ En cas de doute sur un score/grade mal transcrit, ne l'invente pas : [VERIFIER].
   [A COMPLETER]. N'ecris JAMAIS de pTNM/stade dans la conclusion sauf s'il a ete
   explicitement dicte. Si une negation reste ambigue ([VERIFIER]), la conclusion
   ne tranche pas : elle reste en attente de verification.
+- EXTEMPORANE : si la dictee rapporte un examen extemporane, il a sa PROPRE section
+  **Examen extemporane :** placee AVANT la macroscopie (ordre CI-SIS), reprenant le
+  resultat par prelevement tel que dicte. S'il n'y en a pas, n'invente pas la section.
 - SECTIONS TITREES : les en-tetes **Macroscopie :**, **Microscopie :** (ou
   **Etude cytologique :**) et **__CONCLUSION :__** sont TOUJOURS presents et titres
   explicitement, meme si le contenu est court (retour praticien : ne jamais omettre
