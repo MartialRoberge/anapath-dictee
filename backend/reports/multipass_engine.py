@@ -16,11 +16,12 @@ from reports.engine import EngineCapabilities, GeneratedReport, ReportEngine
 from reports.guardrails import GenerationParseError, build_validated_report, parse_llm_json
 from reports.knowledge import ContextResult, build_context_block
 from reports.local_engine import LocalReportEngine
-from reports.prompts import build_format_system_prompt, build_format_user_prompt
+from reports.prompts import build_format_user_prompt
 from reports.prompts_multipass import (
     build_comprehension_hint,
     build_comprehension_system_prompt,
     build_comprehension_user_prompt,
+    build_redaction_system_prompt,
     build_relecture_system_prompt,
     build_relecture_user_prompt,
 )
@@ -59,8 +60,8 @@ class MultiPassReportEngine(LocalReportEngine):
             context.organes, comprehension.get("organes"),
         )
 
-        # --- Passe 2 : REDACTION -----------------------------------------
-        system_prompt: str = build_format_system_prompt(context.block)
+        # --- Passe 2 : REDACTION (prompt allege) -------------------------
+        system_prompt: str = build_redaction_system_prompt(context.block)
         user_prompt: str = (
             build_comprehension_hint(comprehension)
             + build_format_user_prompt(transcript, rapport_precedent)
