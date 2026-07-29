@@ -24,7 +24,13 @@ import RecorderPanel from "./components/RecorderPanel";
 import ReportPanel from "./components/ReportPanel";
 import CompletionPanel from "./components/CompletionPanel";
 import { formatTranscription, getReport, saveReport, sendFeedback } from "./services/api";
-import type { FormatResult, Marker } from "./services/api";
+import type {
+  FormatResult,
+  Marker,
+  ReportTrace,
+  CoherenceVerdict,
+} from "./services/api";
+import ExplainPanel from "./components/ExplainPanel";
 // v3 backend: FormatResult has formatted_report, organe_detecte, markers (adapted from donnees_manquantes)
 
 type Page = "app" | "history" | "admin";
@@ -316,6 +322,11 @@ export default function App() {
   const [report, setReport] = useState<string | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [organeDetecte, setOrganeDetecte] = useState("");
+  const [explication, setExplication] = useState<{
+    trace: ReportTrace;
+    warnings: string[];
+    coherence: CoherenceVerdict;
+  } | null>(null);
   const [reformatting, setReformatting] = useState(false);
   const [dismissedFields, setDismissedFields] = useState<Set<string>>(new Set());
 
@@ -342,13 +353,14 @@ export default function App() {
         report,
         rawTranscription,
         organeDetecte,
+        explication,
         timestamp: Date.now(),
       }));
     }, 2000);
     return () => {
       if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
     };
-  }, [report, rawTranscription, organeDetecte]);
+  }, [report, rawTranscription, organeDetecte, explication]);
 
   // Restaurer l'autosave au chargement
   useEffect(() => {
@@ -361,6 +373,7 @@ export default function App() {
         setReport(data.report);
         setRawTranscription(data.rawTranscription ?? null);
         setOrganeDetecte(data.organeDetecte ?? "");
+        setExplication(data.explication ?? null);
         setActiveView("report");
         toast("Brouillon restaure automatiquement", "info");
       }
@@ -372,6 +385,7 @@ export default function App() {
     setReport(null);
     setMarkers([]);
     setOrganeDetecte("");
+    setExplication(null);
     setDismissedFields(new Set());
     setSavedReportId(null);
     setFeedbackSent(false);
@@ -383,6 +397,11 @@ export default function App() {
     setReport(result.formatted_report);
     setOrganeDetecte(result.organe_detecte);
     setMarkers(result.markers);
+    setExplication({
+      trace: result.trace,
+      warnings: result.warnings,
+      coherence: result.coherence,
+    });
     setDismissedFields(new Set());
     setSavedReportId(null);
     setFeedbackSent(false);
@@ -398,6 +417,7 @@ export default function App() {
         setRawTranscription(data.raw_transcription ?? null);
         setOrganeDetecte(data.organe_detecte ?? "");
         setMarkers([]);
+        setExplication(null); // pas de trace pour un CR historisé
         setDismissedFields(new Set());
         setSavedReportId(data.id ?? reportId);
         setFeedbackSent(
@@ -607,6 +627,13 @@ export default function App() {
 
           {/* Center: Report canvas */}
           <section className="flex-1 overflow-y-auto p-5 scrollbar-thin max-lg:hidden">
+            {report && explication && (
+              <ExplainPanel
+                trace={explication.trace}
+                warnings={explication.warnings}
+                coherence={explication.coherence}
+              />
+            )}
             <ReportPanel
               report={report}
               onReportChange={setReport}
@@ -640,6 +667,13 @@ export default function App() {
               </div>
             ) : (
               <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
+                {report && explication && (
+                  <ExplainPanel
+                    trace={explication.trace}
+                    warnings={explication.warnings}
+                    coherence={explication.coherence}
+                  />
+                )}
                 <ReportPanel
                   report={report}
                   onReportChange={setReport}

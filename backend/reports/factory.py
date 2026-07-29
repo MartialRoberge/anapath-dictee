@@ -17,13 +17,18 @@ def build_report_engine() -> ReportEngine:
 
         return LocalReportEngine.build()
 
+    if name == "multipass":
+        from reports.multipass_engine import MultiPassReportEngine
+
+        return MultiPassReportEngine.build()
+
     if name == "gilbert":
         from reports.gilbert_engine import GilbertReportEngine
 
         return GilbertReportEngine.build()
 
     raise ValueError(
-        f"Moteur de compte-rendu inconnu : '{name}'. Valeurs : local, gilbert."
+        f"Moteur de compte-rendu inconnu : '{name}'. Valeurs : local, multipass, gilbert."
     )
 
 

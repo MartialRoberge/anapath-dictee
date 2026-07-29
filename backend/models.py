@@ -57,6 +57,9 @@ class FormatResponse(BaseModel):
     type_prelevement: str = "autre"
     # Verdict de coherence medicale calcule a chaque generation.
     coherence: CoherenceVerdict = CoherenceVerdict()
+    # Trace d'explicabilite (moteur multi-passes) : ce que MARC a compris + les
+    # signalements de relecture. Vide pour le moteur mono-passe. Voir engine.py.
+    trace: dict[str, object] = {}
 
 
 class IterationRequest(BaseModel):

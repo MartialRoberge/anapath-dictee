@@ -51,6 +51,11 @@ class GeneratedReport:
     #: Verdict de coherence medicale (structure/coherence interne), calcule a
     #: CHAQUE generation. Voir reports/coherence.py.
     coherence: dict[str, object] = field(default_factory=dict)
+    #: Trace d'EXPLICABILITE : ce que le moteur a compris de la dictee et ce qu'une
+    #: passe de relecture signale. Vide pour un moteur mono-passe. Structure :
+    #: {"comprehension": {organes, type_prelevement, nature_lesion, entites, resume},
+    #:  "signalements": [{"categorie", "message"}], "passes": [{"role", "model"}]}.
+    trace: dict[str, object] = field(default_factory=dict)
     provider: str = ""
     model: str = ""
 

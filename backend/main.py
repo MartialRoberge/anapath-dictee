@@ -278,6 +278,7 @@ def _to_format_response(result: GeneratedReport) -> FormatResponse:
         organes_detectes=result.organes_detectes,
         type_prelevement=result.type_prelevement,
         coherence=CoherenceVerdict.model_validate(result.coherence),
+        trace=result.trace,
     )
 
 

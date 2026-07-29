@@ -32,10 +32,52 @@ export interface Marker {
   auto_filled_value: string;
 }
 
+/** Ce que MARC a compris de la dictée (passe 1 du moteur multi-passes). */
+export interface Comprehension {
+  organes?: string[];
+  type_prelevement?: string;
+  nature_lesion?: string;
+  entites?: string[];
+  elements_dictes?: string[];
+  resume?: string;
+}
+
+/** Un point signalé par la passe de relecture (ne réécrit rien). */
+export interface Signalement {
+  categorie: "fidelite" | "manque" | "incertitude" | "coherence";
+  gravite?: "haute" | "moyenne" | "basse";
+  message: string;
+}
+
+export interface ReportTrace {
+  comprehension?: Comprehension;
+  signalements?: Signalement[];
+  passes?: { role: string; model: string }[];
+}
+
+export interface CoherenceIssue {
+  code: string;
+  message: string;
+  severity: string;
+}
+
+export interface CoherenceVerdict {
+  ok: boolean;
+  structure_complete: boolean;
+  sections_presentes: string[];
+  issues: CoherenceIssue[];
+}
+
 export interface FormatResult {
   formatted_report: string;
   organe_detecte: string;
   markers: Marker[];
+  /* Explicabilité (rebranchée : le backend la calculait déjà). */
+  warnings: string[];
+  organes_detectes: string[];
+  type_prelevement: string;
+  coherence: CoherenceVerdict;
+  trace: ReportTrace;
 }
 
 export type IterationResult = FormatResult;
@@ -113,11 +155,36 @@ export async function transcribeAudio(
   return data.raw_transcription;
 }
 
-/** Reponse brute du backend v3 pour /format et /iterate (structure identique). */
+/** Reponse brute du backend pour /format et /iterate (structure identique). */
 interface V3ReportResponse {
   formatted_report: string;
   organe_detecte: string;
   donnees_manquantes: DonneeManquante[];
+  warnings?: string[];
+  organes_detectes?: string[];
+  type_prelevement?: string;
+  coherence?: CoherenceVerdict;
+  trace?: ReportTrace;
+}
+
+const EMPTY_COHERENCE: CoherenceVerdict = {
+  ok: true,
+  structure_complete: true,
+  sections_presentes: [],
+  issues: [],
+};
+
+function v3ToResult(v3: V3ReportResponse): FormatResult {
+  return {
+    formatted_report: v3.formatted_report,
+    organe_detecte: v3.organe_detecte,
+    markers: v3.donnees_manquantes.map(donneeToMarker),
+    warnings: v3.warnings ?? [],
+    organes_detectes: v3.organes_detectes ?? [],
+    type_prelevement: v3.type_prelevement ?? "autre",
+    coherence: v3.coherence ?? EMPTY_COHERENCE,
+    trace: v3.trace ?? {},
+  };
 }
 
 export async function formatTranscription(
@@ -133,12 +200,7 @@ export async function formatTranscription(
     body: JSON.stringify(body),
   });
 
-  const v3 = await handleResponse<V3ReportResponse>(response);
-  return {
-    formatted_report: v3.formatted_report,
-    organe_detecte: v3.organe_detecte,
-    markers: v3.donnees_manquantes.map(donneeToMarker),
-  };
+  return v3ToResult(await handleResponse<V3ReportResponse>(response));
 }
 
 export async function iterateReport(
@@ -154,12 +216,7 @@ export async function iterateReport(
     }),
   });
 
-  const v3 = await handleResponse<V3ReportResponse>(response);
-  return {
-    formatted_report: v3.formatted_report,
-    organe_detecte: v3.organe_detecte,
-    markers: v3.donnees_manquantes.map(donneeToMarker),
-  };
+  return v3ToResult(await handleResponse<V3ReportResponse>(response));
 }
 
 /* ------------------------------------------------------------------ */

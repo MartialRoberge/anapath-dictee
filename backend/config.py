@@ -49,8 +49,9 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     # Moteur de compte-rendu (orchestration STT + generation)
     # ------------------------------------------------------------------
-    # "local" (defaut) = Voxtral + LLM local ; "gilbert" = moteur distant Lexia.
-    report_engine: str = "local"
+    # "multipass" (defaut) = 3 passes explicables (comprendre -> rediger -> relire) ;
+    # "local" = 1 seule passe (repli, plus rapide) ; "gilbert" = moteur distant Lexia.
+    report_engine: str = "multipass"
     gilbert_api_key: str = ""
 
     # ------------------------------------------------------------------
