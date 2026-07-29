@@ -180,15 +180,14 @@ def build_canonical_block(dictee: str, organes: list[str] | None = None) -> str:
     lignes: list[str] = [
         "════════ FORMULATION DE REFERENCE DU PRATICIEN ════════",
         "Voici comment CE praticien redige habituellement cette (ces) lesion(s),",
-        "extrait de sa propre bible. Inspire-toi de son VOCABULAIRE, de sa STRUCTURE",
-        "et de son niveau de detail : c'est le style et la densite attendus.",
-        "ATTENTION : ce sont des MODELES types, PAS les observations de ce cas.",
-        "REGLE STRICTE — NE VA JAMAIS AU-DELA DE (dictee + modele) : n'ecris AUCUN",
-        "detail descriptif (cytologie, noyaux, nucleoles, mitoses, architecture...) qui",
-        "ne figure NI dans la dictee NI dans le modele ci-dessous. Un element du modele",
-        "qui n'est pas dicte et qui doit etre CONSTATE sur ce cas precis (ex une",
-        "architecture particuliere) se met en [A COMPLETER: element precis] plutot que",
-        "d'etre recopie comme s'il avait ete vu.",
+        "extrait de sa propre bible. C'est SA facon de faire, donc fiable.",
+        "UTILISE son VOCABULAIRE et sa STRUCTURE pour pre-remplir la description",
+        "definitionnelle de la lesion (gain de temps ; il relira). MAIS n'en reprends",
+        "PAS les elements propres au cas-type du modele :",
+        "- aucune VALEUR (mesure, nombre de ganglions, statut ganglionnaire, marge,",
+        "  stade, grade chiffre) -> vient UNIQUEMENT de la dictee de ce cas, sinon [A COMPLETER].",
+        "- aucune CONSTATATION VARIABLE (inflammation associee, co-depots, negations,",
+        "  element accessoire) que ta dictee ne mentionne pas -> ne l'affirme pas.",
         "",
     ]
     for m in matches:
