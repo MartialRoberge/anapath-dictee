@@ -30,12 +30,13 @@ def test_dictee_sans_lesion_connue_pas_de_match():
     assert find_canonical_texts("blablabla xyz", ["colon_rectum"]) == []
 
 
-def test_bloc_precise_que_ce_sont_des_modeles():
-    # Le bloc injecte DOIT rappeler que ce sont des modeles, pas des observations
-    # (sinon le LLM recopierait des constatations non dictees).
+def test_bloc_protege_valeurs_et_constatations_variables():
+    # Le bloc autorise le pre-remplissage depuis la bible du praticien MAIS doit
+    # interdire de reprendre les VALEURS et les CONSTATATIONS VARIABLES du modele
+    # (sinon le LLM recopierait des observations non dictees = "il se gourre").
     bloc = build_canonical_block("hemorroides non compliquees", ["canal_anal"])
     assert bloc
-    assert "MODELES" in bloc and "A COMPLETER" in bloc
+    assert "VALEUR" in bloc and "VARIABLE" in bloc and "A COMPLETER" in bloc
 
 
 def test_bloc_vide_si_aucun_match():
