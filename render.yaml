@@ -20,5 +20,8 @@ services:
       # Moteur de generation : mistral (souverain, defaut) — necessite MISTRAL_API_KEY.
       - key: LLM_PROVIDER
         value: mistral
+      # multipass = 3 passes explicables (comprendre -> rediger -> relire), plus souple.
+      # Repli possible sans redeploiement : passer cette valeur a "local" dans le
+      # dashboard Render (1 seule passe, ~3x moins d'appels LLM).
       - key: REPORT_ENGINE
-        value: local
+        value: multipass
