@@ -61,6 +61,129 @@ def decision_valide(type_proposition: str, decision: str) -> bool:
     return decision in DECISIONS_PAR_TYPE.get(type_proposition, frozenset())
 
 
+# --- Etat de decision d'un bloc -------------------------------------------
+#
+# LA question a laquelle `decision` seul ne repond pas : un bloc que le
+# praticien n'a pas touche etait jusqu'ici compte comme accepte. C'est une
+# INFERENCE, pas une mesure. Elle peut vouloir dire "j'ai lu et c'est juste"
+# ou "je n'ai jamais vu ce bloc" — deux choses qui n'ont rien a voir, et le
+# premier relecteur d'article le reprochera.
+#
+# L'etat separe donc, pour chaque bloc, six situations que l'etude doit
+# pouvoir distinguer sans ambiguite : celui qui VALIDE, celui qui NE VALIDE
+# PAS, celui qui CLIQUE SANS REGARDER, celui qui S'EN VA au milieu, celui qui
+# PREND DU TEMPS, celui qui REFUSE.
+#
+# L'etat ne REMPLACE PAS `decision` : il la resume sur un axe commun aux trois
+# grilles. Un depouillement par type continue de lire `decision` (conforme,
+# juste, pertinent_ajoute...) ; un depouillement de PARCOURS lit `etat`. Les
+# deux colonnes se lisent ensemble et aucune ne se deduit entierement de
+# l'autre.
+
+#: Le bloc n'a JAMAIS ete affiche a l'ecran. Ni refus ni acceptation : une
+#: ABSENCE DE MESURE. Le confondre avec une acceptation gonflerait le taux
+#: d'acceptation avec des blocs que personne n'a lus.
+ETAT_NON_VU: Final = "non_vu"
+
+#: Le bloc a ete affiche, le praticien ne s'est pas prononce. Different de
+#: non_vu : il a eu l'occasion et ne l'a pas saisie, et cela se mesure.
+ETAT_VU_NON_DECIDE: Final = "vu_non_decide"
+
+#: Decision explicite d'acceptation.
+ETAT_ACCEPTE: Final = "accepte"
+
+#: Decision explicite avec une valeur retenue differente. La NATURE de la
+#: correction se lit a part, dans `nature_correction`.
+ETAT_CORRIGE: Final = "corrige"
+
+#: Decision explicite de rejet.
+ETAT_REFUSE: Final = "refuse"
+
+#: Decision explicite de NE PAS SE PRONONCER — le "je ne sais pas" des codes.
+#:
+#: Il faut un septieme etat aux six situations, et c'est celui-la. Replier
+#: cette abstention sur `refuse` punirait l'honnetete exactement comme le
+#: ferait un taux qui la compterait pour une erreur ; la replier sur
+#: `vu_non_decide` effacerait le fait qu'une reponse A ete donnee. Le
+#: depouillement des codes la sort deja des deux termes du rapport
+#: d'exactitude : l'etat doit pouvoir en faire autant.
+ETAT_ABSTENU: Final = "abstenu"
+
+#: Le praticien a quitte le cas avant de trancher ce bloc, alors qu'il
+#: l'avait sous les yeux.
+ETAT_ABANDONNE: Final = "abandonne"
+
+ETATS_DECISION: Final[frozenset[str]] = frozenset({
+    ETAT_NON_VU,
+    ETAT_VU_NON_DECIDE,
+    ETAT_ACCEPTE,
+    ETAT_CORRIGE,
+    ETAT_REFUSE,
+    ETAT_ABSTENU,
+    ETAT_ABANDONNE,
+})
+
+#: Etats ou le praticien S'EST PRONONCE. Le denominateur de tout taux de
+#: decision se prend ici, jamais sur le corpus entier.
+ETATS_EXPLICITES: Final[frozenset[str]] = frozenset({
+    ETAT_ACCEPTE,
+    ETAT_CORRIGE,
+    ETAT_REFUSE,
+    ETAT_ABSTENU,
+})
+
+#: Etats ou AUCUNE decision n'a ete prise. Ils ne sont pas interchangeables
+#: entre eux : non_vu n'a pas ete propose, vu_non_decide a ete propose et
+#: laisse, abandonne a ete propose et le praticien est parti.
+ETATS_SANS_DECISION: Final[frozenset[str]] = frozenset({
+    ETAT_NON_VU,
+    ETAT_VU_NON_DECIDE,
+    ETAT_ABANDONNE,
+})
+
+#: Correspondance decision -> etat, GRILLE PAR GRILLE.
+#:
+#: Elle doit rester TOTALE : une decision sans etat correspondant rendrait un
+#: bloc decide indistinguable d'un bloc jamais vu. Un test le verifie sur les
+#: trois grilles, pour qu'une decision ajoutee plus tard ne passe pas au
+#: travers.
+ETAT_PAR_DECISION: Final[dict[str, dict[str, str]]] = {
+    TYPE_RESTITUTION: {
+        "conforme": ETAT_ACCEPTE,
+        "corrige": ETAT_CORRIGE,
+        # Les deux sont des rejets de la proposition. Ce qui les separe —
+        # hallucination contre bruit — reste lisible dans `decision`, et c'est
+        # la que le taux d'hallucination se calcule.
+        "non_dicte": ETAT_REFUSE,
+        "hors_sujet": ETAT_REFUSE,
+    },
+    TYPE_CODE: {
+        "juste": ETAT_ACCEPTE,
+        "corrige": ETAT_CORRIGE,
+        "je_ne_sais_pas": ETAT_ABSTENU,
+    },
+    TYPE_COMPLETUDE: {
+        "pertinent_ajoute": ETAT_ACCEPTE,
+        # ACCEPTE, et non refuse : le praticien juge la suggestion pertinente
+        # et choisit souverainement de ne pas l'ecrire. C'est une decision
+        # editoriale sur le compte rendu, pas un rejet du systeme — le
+        # depouillement de l'utilite compte deja les deux au numerateur.
+        "pertinent_non_retenu": ETAT_ACCEPTE,
+        "non_pertinent": ETAT_REFUSE,
+    },
+}
+
+
+def etat_de_la_decision(type_proposition: str, decision: str) -> str | None:
+    """L'etat que porte cette decision, ou None si la grille l'ignore.
+
+    None n'est pas un etat de repli : c'est le signal qu'une decision a ete
+    admise sans qu'on sache ou la ranger, et l'appelant doit refuser plutot
+    que d'inventer.
+    """
+    return ETAT_PAR_DECISION.get(type_proposition, {}).get(decision)
+
+
 # --- Nature d'une correction ----------------------------------------------
 #
 # LA question que "corrige" seul ne repond pas : le praticien a-t-il corrige

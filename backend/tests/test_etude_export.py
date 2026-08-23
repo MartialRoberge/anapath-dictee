@@ -31,6 +31,7 @@ from etude.export import (
     NOM_LISEZ_MOI,
     NOM_PAUSES,
     NOM_PROPOSITIONS,
+    NOM_REVISIONS,
     NOM_QUESTIONNAIRES,
 )
 from etude.models import (
@@ -389,13 +390,16 @@ def test_un_praticien_ne_peut_pas_exporter(client):
 # ---------------------------------------------------------------------------
 
 
-def test_l_archive_contient_les_quatre_tables_et_son_lisez_moi(client):
+def test_l_archive_contient_les_cinq_tables_et_son_lisez_moi(client):
     archive = _archive(client)
     assert set(archive) == {
         NOM_DOSSIERS,
         NOM_PROPOSITIONS,
         NOM_QUESTIONNAIRES,
         NOM_PAUSES,
+        # Le journal des decisions : l'etat final vit dans propositions.csv,
+        # le chemin parcouru pour y arriver vit ici.
+        NOM_REVISIONS,
         NOM_LISEZ_MOI,
     }
 

@@ -24,6 +24,7 @@ import type {
   PauseDetaillee,
   PrelevementDetaille,
   PropositionDetaillee,
+  RevisionDecision,
   TempsDossier,
   TypeProposition,
 } from "@/services/etude";
@@ -828,6 +829,70 @@ function CarteProposition({
             proposition.cause_erreur}
         </p>
       )}
+
+      <HistoriqueDecisions
+        revisions={proposition.revisions}
+        type={proposition.type}
+      />
+    </div>
+  );
+}
+
+/**
+ * Le chemin parcouru jusqu'a la decision finale.
+ *
+ * NE S'AFFICHE QUE QUAND L'AVIS A BOUGE. Sur un bloc decide une seule fois —
+ * le cas de loin le plus frequent — l'historique repeterait la decision deja
+ * lue juste au-dessus, et noierait les rares blocs ou il se passe quelque
+ * chose. Ce sont ceux-la qu'on vient chercher ici : un praticien qui accepte,
+ * ouvre la justification, puis refuse, raconte quelque chose sur l'outil que
+ * l'etat final seul efface.
+ */
+function HistoriqueDecisions({
+  revisions,
+  type,
+}: {
+  revisions: RevisionDecision[];
+  type: TypeProposition;
+}) {
+  if (revisions.length < 2) return null;
+
+  return (
+    <div className="mt-2 rounded-md border border-warning/40 bg-warning/5 p-2">
+      <p className="text-xs font-medium text-warning">
+        Avis modifie {revisions.length - 1} fois
+      </p>
+      <ol className="mt-1.5 space-y-1">
+        {revisions.map((revision) => (
+          <li
+            key={revision.rang}
+            className="flex flex-wrap items-baseline gap-x-2 text-xs text-muted-foreground"
+          >
+            <span className="tabular-nums font-medium text-foreground">
+              {revision.rang}.
+            </span>
+            <span className="font-medium text-foreground">
+              {libelleDecision(type, revision.decision as Decision)?.texte ??
+                revision.decision}
+            </span>
+            <time
+              dateTime={revision.decide_a}
+              className="tabular-nums"
+              title={revision.decide_a}
+            >
+              {new Date(revision.decide_a).toLocaleTimeString("fr-FR")}
+            </time>
+            {revision.justif_ouverte && (
+              <span className="italic">justification ouverte</span>
+            )}
+            {revision.valeur_retenue && (
+              <span className="w-full truncate font-mono">
+                « {revision.valeur_retenue} »
+              </span>
+            )}
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

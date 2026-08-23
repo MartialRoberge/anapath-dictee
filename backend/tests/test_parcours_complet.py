@@ -295,3 +295,175 @@ def test_l_ergonomie_est_recoltee(client):
         return int(resultat.scalar_one())
 
     assert client.portal.call(client.lire_base, _compter) == 1
+
+
+def test_une_proposition_non_ancree_acceptee_remonte_jusqu_a_la_synthese(client):
+    """LE CRITERE BLOQUANT DU PROTOCOLE, de la base jusqu'au chiffre publie.
+
+    Une assertion que rien dans la dictee ne soutient, et que le praticien
+    valide telle quelle, est le seul evenement qui peut arreter l'etude. Il
+    etait mesure en base et perdu dans l'adaptateur : la synthese publiait
+    "pas de mesure" sur une population vide, alors que la donnee existait.
+
+    Ce test part d'une proposition NON ANCREE et exige qu'elle arrive dans le
+    denominateur. Il tombe des que le champ se reperd en route.
+    """
+    dossier = _dicter_et_generer(client)
+
+    async def _desancrer(session) -> str:
+        from etude.models import EtudeProposition
+
+        resultat = await session.execute(
+            select(EtudeProposition).where(
+                EtudeProposition.dossier_id == dossier["dossier_id"],
+                EtudeProposition.type == "restitution",
+            )
+        )
+        proposition = resultat.scalars().first()
+        assert proposition is not None, "aucune proposition de restitution"
+        proposition.empan_debut = None
+        proposition.empan_fin = None
+        await session.commit()
+        return proposition.id
+
+    identifiant = client.portal.call(client.lire_base, _desancrer)
+
+    assert (
+        client.post(
+            f"/etude/propositions/{identifiant}/decision",
+            json={"decision": "conforme"},
+        ).status_code
+        == 200
+    )
+    client.post(
+        f"/etude/dossiers/{dossier['dossier_id']}/cloture",
+        json={"cr_valide": CR_VALIDE},
+    )
+
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+    synthese = client.get("/admin/etude/synthese").json()
+    acceptees = synthese["propositions"]["toutes_decisions"]["taux"][
+        "acceptation_non_ancree"
+    ]
+    assert acceptees["denominateur"] >= 1, (
+        "la proposition non ancree n'atteint pas le critere bloquant : "
+        "l'adaptateur reperd `ancree` et la synthese publiera « pas de mesure »"
+    )
+    assert acceptees["numerateur"] >= 1, "elle a ete acceptee, elle doit etre comptee"
+
+    critere = next(
+        c for c in synthese["couverture"] if c["cle"] == "non_soutenues_acceptees"
+    )
+    assert critere["valeur"] is not None, (
+        "le critere bloquant publie « pas de mesure » sur une donnee qui existe"
+    )
+
+
+def test_un_abandon_n_est_ni_un_dossier_clos_ni_une_revision(client):
+    """Un abandon horodate la meme colonne qu'une cloture. Sans distinction, il
+    comptait comme un compte rendu mene a terme ET fournissait un temps de
+    revision de quelques secondes, qui faisait BAISSER le temps moyen publie.
+    Un abandon ameliorait donc le resultat."""
+    dossier = _dicter_et_generer(client)
+    assert (
+        client.post(
+            f"/etude/dossiers/{dossier['dossier_id']}/abandon",
+            json={"motif": "cas_trop_complexe"},
+        ).status_code
+        == 200
+    )
+
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+    corpus = client.get("/admin/etude/synthese").json()["corpus"]
+    assert corpus["nb_abandons"] == 1
+    assert corpus["nb_dossiers_clos"] == 0, (
+        "un dossier abandonne est compte comme clos : « en cours » sera faux"
+    )
+    detail = client.get(f"/admin/etude/dossiers/{dossier['dossier_id']}").json()
+    assert detail["temps"]["revision_ms"] is None, (
+        "un abandon produit un temps de revision : il entrera dans la moyenne"
+    )
+
+
+def test_l_effectif_d_analyse_ne_compte_pas_un_praticien_sans_dossier_retenu(client):
+    """Le denominateur du critere principal d'adoption. Un praticien qui a
+    seulement ouvert l'outil gonflait l'effectif annonce."""
+    client.post("/etude/sessions")  # une session ouverte, aucun dossier
+
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+    corpus = client.get("/admin/etude/synthese").json()["corpus"]
+    assert corpus["nb_praticiens"] == 0, (
+        "un praticien sans aucun dossier entre dans l'effectif d'analyse"
+    )
+    assert corpus["nb_praticiens_sans_dossier"] == 1, (
+        "le recrutement sans dossier exploitable doit rester publie a cote"
+    )
+
+
+def test_un_changement_d_avis_laisse_les_deux_avis_en_base(client):
+    """DANS UNE ETUDE, ON N'ECRASE PAS UNE MESURE.
+
+    Le praticien accepte, rouvre la justification, puis refuse. L'etat courant
+    doit dire "refuse" — c'est ce qui compte dans les taux. Mais la premiere
+    decision doit RESTER lisible : sans elle, un clic errant rattrape dans la
+    seconde et un vrai revirement apres lecture sont la meme ligne, et le
+    critere d'explicabilite ne repose plus que sur un booleen injouable.
+    """
+    dossier = _dicter_et_generer(client)
+    proposition = next(
+        p for p in dossier["propositions"] if p["type"] == "restitution"
+    )
+
+    assert (
+        client.post(
+            f"/etude/propositions/{proposition['id']}/decision",
+            json={"decision": "conforme"},
+        ).status_code
+        == 200
+    )
+    assert (
+        client.post(
+            f"/etude/propositions/{proposition['id']}/decision",
+            json={"decision": "non_dicte", "justif_ouverte": True},
+        ).status_code
+        == 200
+    )
+
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+    detail = client.get(f"/admin/etude/dossiers/{dossier['dossier_id']}").json()
+    ligne = next(p for p in detail["propositions"] if p["id"] == proposition["id"])
+
+    assert ligne["decision"] == "non_dicte", "l'etat courant doit etre le dernier"
+    assert len(ligne["revisions"]) == 2, (
+        "le premier avis a ete efface : le changement d'avis n'est plus rejouable"
+    )
+    assert [r["rang"] for r in ligne["revisions"]] == [1, 2]
+    assert ligne["revisions"][0]["decision"] == "conforme"
+    assert ligne["revisions"][1]["decision"] == "non_dicte"
+    assert ligne["revisions"][1]["justif_ouverte"] is True, (
+        "la justification etait ouverte a CETTE decision-la : c'est ce qui rend "
+        "le critere d'explicabilite demontrable"
+    )
+    assert ligne["decision_changee_apres_justif"] is True
+
+
+def test_une_decision_unique_ne_produit_qu_une_ligne_de_journal(client):
+    """Le journal ne doit pas gonfler le cas normal : un avis, une ligne."""
+    dossier = _dicter_et_generer(client)
+    proposition = dossier["propositions"][0]
+    client.post(
+        f"/etude/propositions/{proposition['id']}/decision",
+        json={"decision": "conforme"}
+        if proposition["type"] == "restitution"
+        else {"decision": "juste"}
+        if proposition["type"] == "code"
+        else {"decision": "pertinent_ajoute"},
+    )
+
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+    detail = client.get(f"/admin/etude/dossiers/{dossier['dossier_id']}").json()
+    ligne = next(p for p in detail["propositions"] if p["id"] == proposition["id"])
+    assert len(ligne["revisions"]) == 1
+    assert ligne["revisions"][0]["decision"] == ligne["decision"], (
+        "le journal et l'etat courant divergent des la premiere ecriture"
+    )

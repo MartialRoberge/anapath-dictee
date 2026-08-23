@@ -88,6 +88,12 @@ class Decision(BaseModel):
     justif_duree_ms: int | None = None
 
 
+class Vues(BaseModel):
+    """Les blocs qui viennent d'apparaitre a l'ecran, signales ensemble."""
+
+    propositions: list[str] = Field(default_factory=list)
+
+
 class Pause(BaseModel):
     debut: datetime
     fin: datetime
@@ -99,6 +105,9 @@ class Cloture(BaseModel):
     omission_signalee: bool | None = None
     omission_texte: str | None = None
     nb_prelevements_corrige: int | None = None
+    #: Ce que le praticien dit du compte rendu en le validant. Souvent la
+    #: seule trace de ce qui l'a gene sans qu'aucune case ne le capture.
+    commentaire_validation: str | None = None
 
 
 class Abandon(BaseModel):
@@ -268,6 +277,55 @@ async def _propositions_affichees(
     ]
 
 
+@router.post("/propositions/{proposition_id}/vue")
+async def signaler_vue(
+    proposition_id: str, user: Utilisateur, db: Base
+) -> dict[str, object]:
+    """Signale qu'un bloc vient d'apparaitre a l'ecran du praticien.
+
+    IDEMPOTENTE : rappelee sur un bloc deja date, elle ne change rien. C'est le
+    PREMIER affichage qui date la mesure — sans cette garantie, un bloc que le
+    praticien fait defiler plusieurs fois verrait son temps de lecture repartir
+    de zero a chaque passage.
+
+    Sans elle, un bloc jamais affiche serait indistinguable d'un bloc lu et
+    approuve en silence, et le taux d'acceptation compterait des blocs que
+    personne n'a lus.
+    """
+    base = _exiger_base(db)
+    await _proposition_du_praticien(base, proposition_id, user.id)
+    try:
+        vue = _ecrit(await service.marquer_vue(base, proposition_id))
+    except EtudeRefus as refus:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(refus)) from refus
+    return {
+        "etat": vue.etat,
+        "vu_a": vue.vu_a.isoformat() if vue.vu_a is not None else None,
+    }
+
+
+@router.post("/dossiers/{dossier_id}/vues")
+async def signaler_vues(
+    dossier_id: str, corps: Vues, user: Utilisateur, db: Base
+) -> dict[str, int]:
+    """Signale l'affichage de plusieurs blocs d'un seul envoi.
+
+    Un observateur de defilement voit entrer plusieurs blocs a la fois : un
+    appel par bloc ferait perdre des signaux au premier ralentissement du
+    reseau, et ces blocs-la seraient comptes non vus alors qu'ils l'ont ete.
+
+    `ignorees` compte les identifiants etrangers au dossier plutot que de
+    rejeter l'envoi entier : refuser en bloc ferait perdre les signaux valides
+    du meme lot, les taire cacherait un defaut du client.
+    """
+    base = _exiger_base(db)
+    await _dossier_du_praticien(base, dossier_id, user.id)
+    marquees, ignorees = await service.marquer_vues(
+        base, dossier_id, corps.propositions
+    )
+    return {"marquees": marquees, "ignorees": ignorees}
+
+
 @router.post("/propositions/{proposition_id}/decision")
 async def decider(
     proposition_id: str, corps: Decision, user: Utilisateur, db: Base
@@ -289,7 +347,15 @@ async def decider(
     except EtudeRefus as refus:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(refus)) from refus
     decidee = _ecrit(decidee)
-    return {"latence_ms": decidee.latence_ms, "hative": decidee.hative}
+    return {
+        "latence_ms": decidee.latence_ms,
+        # Compte depuis l'affichage REEL du bloc. Nul quand aucun affichage n'a
+        # ete signale : la latence generale, elle, part de la remise du CR
+        # entier et ne mesure pas le meme temps.
+        "latence_vue_ms": decidee.latence_vue_ms,
+        "hative": decidee.hative,
+        "etat": decidee.etat,
+    }
 
 
 @router.post("/dossiers/{dossier_id}/pauses")
@@ -323,12 +389,17 @@ async def clore_dossier(
             omission_signalee=corps.omission_signalee,
             omission_texte=corps.omission_texte,
             nb_prelevements_corrige=corps.nb_prelevements_corrige,
+            commentaire_validation=corps.commentaire_validation,
         )
     except EtudeRefus as refus:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(refus)) from refus
     dossier = _ecrit(dossier)
     return {
         "caracteres_modifies": dossier.caracteres_modifies,
+        # Rendu au client pour que l'interface puisse le dire au praticien
+        # AVANT qu'il ne signe : un compte rendu valide dont des blocs n'ont
+        # jamais paru a l'ecran n'est pas un compte rendu entierement revu.
+        "blocs_non_vus": dossier.nb_blocs_non_vus,
         # Le serveur dit quand le releve periodique tombe : un compteur tenu par
         # le client deriverait d'un poste a l'autre.
         "questionnaire_periodique_du": await service.periodique_est_du(base, user.id),

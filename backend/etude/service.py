@@ -21,7 +21,7 @@ import json
 from datetime import UTC, datetime
 from difflib import SequenceMatcher
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from etude.extraction import PropositionExtraite
@@ -30,17 +30,22 @@ from etude.models import (
     EtudePause,
     EtudePrelevement,
     EtudeProposition,
+    EtudeRevisionDecision,
     EtudeReponseQuestionnaire,
     EtudeSession,
 )
 from etude.vocabulaire import (
     CAUSES_ERREUR,
     CAUSES_PAUSE,
+    ETAT_ABANDONNE,
+    ETAT_NON_VU,
+    ETAT_VU_NON_DECIDE,
     MOTIFS_ABANDON,
     NATURES_CORRECTION,
     QUESTIONNAIRES,
     decision_valide,
     est_hative,
+    etat_de_la_decision,
     periodique_du,
 )
 
@@ -152,7 +157,11 @@ async def ouvrir_dossier(
 def _vers_ligne(
     dossier_id: str, extraite: PropositionExtraite, affiche_a: datetime | None
 ) -> EtudeProposition:
-    """Convertit une proposition extraite en ligne de base."""
+    """Convertit une proposition extraite en ligne de base.
+
+    Le bloc nait NON VU, jamais "en attente d'acceptation" : tant que rien ne
+    prouve qu'il a ete affiche a l'ecran, l'etude n'a rien mesure sur lui.
+    """
     return EtudeProposition(
         dossier_id=dossier_id,
         type=extraite.type_proposition,
@@ -164,6 +173,7 @@ def _vers_ligne(
         empan_fin=extraite.empan_fin,
         longueur_mots=extraite.longueur_mots,
         affiche_a=affiche_a,
+        etat=ETAT_NON_VU,
     )
 
 
@@ -192,6 +202,88 @@ async def enregistrer_prelevements(
     if dossier is not None:
         dossier.nb_prelevements_detecte = len(prelevements)
     await db.commit()
+
+
+# --- Affichage reel a l'ecran ----------------------------------------------
+#
+# Ce que le serveur sait sans cette etape : qu'il a REMIS les blocs au client.
+# Ce qu'il ne sait pas : lequel a ete affiche. Un compte rendu qui defile sur
+# trois ecrans peut se clore sans que la moitie des blocs ait paru, et ces
+# blocs-la ne sont ni acceptes ni refuses — ils ne sont pas mesures.
+
+
+def _appliquer_vue(proposition: EtudeProposition, moment: datetime) -> bool:
+    """Date le premier affichage du bloc. Vrai si c'etait bien le premier.
+
+    IDEMPOTENT, et c'est l'invariant de cette fonction : un second signalement
+    ne reecrit ni la date ni l'etat. C'est le PREMIER affichage qui date la
+    mesure. Le reecrire raccourcirait le temps de lecture de tout bloc regarde
+    deux fois, et le praticien qui revient sur un bloc pour le relire
+    paraitrait plus expeditif que celui qui l'a tranche du premier coup.
+    """
+    if proposition.vu_a is not None:
+        return False
+    proposition.vu_a = moment
+    # L'etat ne bouge que si rien n'a encore ete tranche. Un bloc deja decide
+    # garde sa decision, et un bloc deja marque abandonne reste abandonne : un
+    # signal d'affichage arrive en retard ne doit pas defaire une mesure.
+    if proposition.decision is None and proposition.etat != ETAT_ABANDONNE:
+        proposition.etat = ETAT_VU_NON_DECIDE
+    return True
+
+
+async def marquer_vue(
+    db: AsyncSession | None, proposition_id: str
+) -> EtudeProposition | None:
+    """Signale qu'un bloc a ete affiche a l'ecran du praticien.
+
+    L'horodatage est pris cote SERVEUR, comme les latences : un moment fourni
+    par le client pourrait etre recule pour allonger un temps de lecture, et
+    c'est precisement ce temps que l'etude publie.
+    """
+    if db is None:
+        return None
+    proposition = await db.get(EtudeProposition, proposition_id)
+    if proposition is None:
+        raise EtudeRefus("Proposition introuvable.")
+    _appliquer_vue(proposition, _maintenant())
+    await db.commit()
+    await db.refresh(proposition)
+    return proposition
+
+
+async def marquer_vues(
+    db: AsyncSession | None, dossier_id: str, proposition_ids: list[str]
+) -> tuple[int, int]:
+    """Signale l'affichage de plusieurs blocs d'un coup.
+
+    Renvoie (blocs nouvellement dates, identifiants ignores).
+
+    Un envoi groupe plutot qu'un appel par bloc : un observateur de defilement
+    voit entrer plusieurs blocs a la fois, et une route par bloc ferait perdre
+    des signaux au premier ralentissement du reseau — c'est-a-dire des blocs
+    comptes non vus alors qu'ils l'ont ete.
+
+    Les identifiants qui n'appartiennent pas au dossier sont COMPTES et non
+    ecrits : les refuser en bloc ferait perdre les signaux valides du meme
+    envoi, les ignorer en silence cacherait un defaut du client.
+
+    Tous les blocs d'un envoi prennent le MEME horodatage : c'est le moment ou
+    le client a signale, et l'etude n'observe rien de plus fin.
+    """
+    if db is None or not proposition_ids:
+        return 0, 0
+    attendus = set(proposition_ids)
+    resultat = await db.execute(
+        select(EtudeProposition)
+        .where(EtudeProposition.dossier_id == dossier_id)
+        .where(EtudeProposition.id.in_(attendus))
+    )
+    trouvees = list(resultat.scalars().all())
+    moment = _maintenant()
+    marquees = sum(1 for proposition in trouvees if _appliquer_vue(proposition, moment))
+    await db.commit()
+    return marquees, len(attendus) - len(trouvees)
 
 
 # --- Decision --------------------------------------------------------------
@@ -234,8 +326,19 @@ async def enregistrer_decision(
             "Une cause d'erreur ne se renseigne que sur une erreur de fond."
         )
 
+    # La grille a deja accepte la decision : si la correspondance manque, c'est
+    # qu'une decision a ete ajoutee sans lui donner d'etat. On refuse plutot
+    # que d'ecrire un bloc decide qui resterait indistinguable d'un bloc
+    # jamais vu au depouillement.
+    etat = etat_de_la_decision(proposition.type, decision)
+    if etat is None:
+        raise EtudeRefus(
+            f"Aucun etat ne correspond a la decision '{decision}' "
+            f"du type '{proposition.type}'."
+        )
+
     _appliquer_decision(
-        proposition, decision, valeur_retenue, nature_correction, cause_erreur,
+        proposition, decision, etat, valeur_retenue, nature_correction, cause_erreur,
         justif_ouverte, justif_duree_ms,
     )
     await _horodater_dossier(db, proposition)
@@ -247,13 +350,14 @@ async def enregistrer_decision(
 def _appliquer_decision(
     proposition: EtudeProposition,
     decision: str,
+    etat: str,
     valeur_retenue: str | None,
     nature_correction: str | None,
     cause_erreur: str | None,
     justif_ouverte: bool,
     justif_duree_ms: int | None,
 ) -> None:
-    """Ecrit la decision et sa telemetrie sur la ligne."""
+    """Ecrit la decision, son etat et sa telemetrie sur la ligne."""
     # LA metrique d'explicabilite : la justification a-t-elle change l'avis ?
     # Elle ne se mesure qu'au moment ou l'avis change, donc avant l'ecrasement.
     if (
@@ -264,7 +368,26 @@ def _appliquer_decision(
         proposition.decision_changee_apres_justif = True
 
     maintenant = _maintenant()
+    # LE JOURNAL AVANT L'ECRASEMENT. La ligne courante va etre remplacee ;
+    # celle-ci reste. C'est ce qui separe, au depouillement, un clic errant
+    # rattrape dans la seconde d'un changement d'avis apres lecture de la
+    # justification — deux gestes que l'etat courant seul rend identiques.
+    proposition.revisions.append(
+        EtudeRevisionDecision(
+            rang=len(proposition.revisions) + 1,
+            decision=decision,
+            etat=etat,
+            valeur_retenue=valeur_retenue,
+            nature_correction=nature_correction,
+            cause_erreur=cause_erreur,
+            justif_ouverte=justif_ouverte,
+            decide_a=maintenant,
+        )
+    )
     proposition.decision = decision
+    # Une decision explicite ecrase toujours l'etat de parcours : elle prouve
+    # a elle seule que le bloc etait sous les yeux du praticien.
+    proposition.etat = etat
     proposition.valeur_retenue = valeur_retenue
     proposition.nature_correction = nature_correction
     proposition.cause_erreur = cause_erreur
@@ -278,6 +401,17 @@ def _appliquer_decision(
         latence = int((maintenant - affiche_a).total_seconds() * 1000)
         proposition.latence_ms = max(0, latence)
         proposition.hative = est_hative(proposition.latence_ms, proposition.longueur_mots)
+
+    # Le temps de lecture REEL, compte depuis l'affichage du bloc et non depuis
+    # la remise du compte rendu entier. Il reste NUL quand aucun affichage n'a
+    # ete signale : dater le debut de la lecture au moment de la decision
+    # donnerait zero milliseconde a tout bloc decide sans signal, et ferait
+    # passer pour expeditif un praticien qu'on n'a simplement pas observe.
+    if proposition.vu_a is not None:
+        vue = _en_utc(proposition.vu_a)
+        proposition.latence_vue_ms = max(
+            0, int((maintenant - vue).total_seconds() * 1000)
+        )
 
 
 async def _horodater_dossier(db: AsyncSession, proposition: EtudeProposition) -> None:
@@ -332,8 +466,16 @@ async def clore_dossier(
     omission_signalee: bool | None = None,
     omission_texte: str | None = None,
     nb_prelevements_corrige: int | None = None,
+    commentaire_validation: str | None = None,
 ) -> EtudeDossier | None:
-    """Fige le compte rendu valide et calcule la charge d'edition."""
+    """Fige le compte rendu valide, son commentaire et la charge d'edition.
+
+    Le nombre de blocs jamais affiches est fige ICI, au moment ou le praticien
+    valide : un compte rendu valide dont la moitie des blocs n'a jamais paru a
+    l'ecran ne se lit pas comme un compte rendu entierement revu, et le compte
+    ne serait plus reconstituable si un signal d'affichage tardif arrivait
+    apres la cloture.
+    """
     if db is None:
         return None
 
@@ -348,10 +490,44 @@ async def clore_dossier(
     dossier.omission_signalee = omission_signalee
     dossier.omission_texte = omission_texte
     dossier.nb_prelevements_corrige = nb_prelevements_corrige
+    dossier.commentaire_validation = _commentaire(commentaire_validation)
+    dossier.nb_blocs_non_vus = await _compter_non_vus(db, dossier_id)
     dossier.t5_cloture = _maintenant()
     await db.commit()
     await db.refresh(dossier)
     return dossier
+
+
+def _commentaire(texte: str | None) -> str | None:
+    """Le commentaire de validation, ou None quand rien n'a ete ecrit.
+
+    Une chaine vide et une absence de commentaire se lisent pareil mais se
+    COMPTENT differemment : sans cette normalisation, le nombre de cas
+    commentes compterait chaque champ laisse vide, et le seul indicateur
+    qualitatif de l'etude serait faux vers le haut.
+    """
+    if texte is None:
+        return None
+    return texte.strip() or None
+
+
+async def _compter_non_vus(db: AsyncSession, dossier_id: str) -> int:
+    """Blocs de ce dossier jamais affiches a l'ecran.
+
+    Compte sur l'ETAT et non sur `vu_a` : une decision explicite prouve que le
+    bloc etait a l'ecran, meme quand aucun signal d'affichage n'est arrive. Le
+    compter non vu contredirait la decision qu'il porte.
+
+    Un etat NUL — ligne anterieure a l'instrumentation — n'est pas compte : on
+    ne sait pas s'il a ete vu, et une absence de mesure n'est pas un non-vu.
+    """
+    resultat = await db.execute(
+        select(func.count())
+        .select_from(EtudeProposition)
+        .where(EtudeProposition.dossier_id == dossier_id)
+        .where(EtudeProposition.etat == ETAT_NON_VU)
+    )
+    return int(resultat.scalar_one())
 
 
 async def periodique_est_du(db: AsyncSession | None, praticien_id: str) -> bool:
@@ -403,7 +579,30 @@ async def abandonner_dossier(
     dossier.abandonne = True
     dossier.motif_abandon = motif
     dossier.t5_cloture = _maintenant()
+    await _marquer_blocs_abandonnes(db, dossier_id)
+    dossier.nb_blocs_non_vus = await _compter_non_vus(db, dossier_id)
     await db.commit()
+
+
+async def _marquer_blocs_abandonnes(db: AsyncSession, dossier_id: str) -> None:
+    """Passe a `abandonne` les blocs vus et laisses sans decision.
+
+    SEULEMENT ceux-la, et les deux exclusions comptent autant que la regle.
+
+    Un bloc jamais affiche reste NON VU : on ne peut pas dire d'un praticien
+    qu'il a quitte un bloc qu'il n'a jamais eu sous les yeux. L'ecraser
+    detruirait en plus le compte des blocs non vus, c'est-a-dire justement ce
+    qui distingue un cas survole d'un cas interrompu.
+
+    Un bloc deja tranche garde sa decision : l'abandon survient apres, il ne
+    l'annule pas.
+    """
+    await db.execute(
+        update(EtudeProposition)
+        .where(EtudeProposition.dossier_id == dossier_id)
+        .where(EtudeProposition.etat == ETAT_VU_NON_DECIDE)
+        .values(etat=ETAT_ABANDONNE)
+    )
 
 
 async def exclure_dossier(

@@ -110,6 +110,13 @@ class PropositionDetaillee(BaseModel):
     hative: bool
     justif_ouverte: bool
     decision_changee_apres_justif: bool
+    #: L'ETAT DE PARCOURS, distinct de la decision : un bloc jamais affiche
+    #: n'est pas un bloc accepte en silence.
+    etat: str | None
+    #: TOUTES les decisions prises sur ce bloc, dans l'ordre. Une seule ligne
+    #: quand l'avis n'a pas bouge ; plusieurs quand il a change. C'est la seule
+    #: facon de distinguer un clic errant d'un vrai revirement.
+    revisions: list[dict[str, object]]
 
 
 class DossierDetaille(BaseModel):
@@ -218,7 +225,7 @@ async def synthese(_admin: Admin, db: Base) -> dict[str, object]:
 
     return {
         **resultat.en_dict(),
-        "corpus": await _corpus(base, dossiers),
+        "corpus": await _corpus(base, couples),
         "apprentissage": _apprentissage(dossiers),
     }
 
@@ -313,18 +320,37 @@ async def _pauses_par_dossier(base: AsyncSession) -> dict[str, tuple[int, int]]:
     }
 
 
-async def _corpus(base: AsyncSession, dossiers: list[EtudeDossier]) -> dict[str, object]:
+async def _corpus(
+    base: AsyncSession, couples: list[tuple[EtudeDossier, str | None]]
+) -> dict[str, object]:
     """Ce que contient l'etude a cet instant."""
-    praticiens = await base.execute(select(func.count(func.distinct(EtudeSession.praticien_id))))
+    dossiers = [dossier for dossier, _ in couples]
+    # L'EFFECTIF D'ANALYSE SE COMPTE SUR LES DOSSIERS RETENUS, pas sur les
+    # sessions ouvertes. Compter les sessions faisait entrer dans le
+    # denominateur du critere principal ("praticiens souhaitant continuer
+    # >= 8/10") un praticien qui a seulement ouvert l'outil, ou dont tous les
+    # dossiers ont ete exclus comme essais. Le nombre de praticiens recrutes
+    # sans dossier exploitable reste publie a cote : c'est une information de
+    # recrutement, a mettre dans le diagramme de flux, pas un effectif.
+    sessions = await base.execute(select(func.count(func.distinct(EtudeSession.praticien_id))))
+    analysables = {praticien for _, praticien in couples if praticien is not None}
     edites = [d.caracteres_modifies for d in dossiers if d.caracteres_modifies is not None]
     abandons = [d for d in dossiers if d.abandonne]
     return {
-        "nb_praticiens": int(praticiens.scalar_one()),
+        "nb_praticiens": len(analysables),
+        "nb_praticiens_sans_dossier": max(
+            0, int(sessions.scalar_one()) - len(analysables)
+        ),
         "nb_dossiers": len(dossiers),
         # Compte a part et TOUJOURS affiche : une publication doit dire combien
         # de cas ont ete ecartes et pourquoi.
         "nb_exclus": await _compter_exclus(base),
-        "nb_dossiers_clos": sum(1 for d in dossiers if d.t5_cloture is not None),
+        # Un abandon horodate t5 lui aussi : sans le filtre, il comptait a la
+        # fois comme clos et comme abandonne, et "en cours" (nb_dossiers moins
+        # nb_dossiers_clos) sous-estimait les dossiers reellement inacheves.
+        "nb_dossiers_clos": sum(
+            1 for d in dossiers if d.t5_cloture is not None and not d.abandonne
+        ),
         "nb_abandons": len(abandons),
         "motifs_abandon": _compter(d.motif_abandon for d in abandons),
         "organes": _compter(d.organe for d in dossiers),
@@ -500,6 +526,20 @@ def _detailler(
         hative=proposition.hative,
         justif_ouverte=proposition.justif_ouverte,
         decision_changee_apres_justif=proposition.decision_changee_apres_justif,
+        etat=proposition.etat,
+        revisions=[
+            {
+                "rang": revision.rang,
+                "decision": revision.decision,
+                "etat": revision.etat,
+                "valeur_retenue": revision.valeur_retenue,
+                "nature_correction": revision.nature_correction,
+                "cause_erreur": revision.cause_erreur,
+                "justif_ouverte": revision.justif_ouverte,
+                "decide_a": revision.decide_a.isoformat(),
+            }
+            for revision in proposition.revisions
+        ],
     )
 
 

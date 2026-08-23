@@ -376,6 +376,28 @@ export interface PropositionDetaillee {
   hative: boolean;
   justif_ouverte: boolean;
   decision_changee_apres_justif: boolean;
+  /** Ou en est le bloc : non_vu, vu_non_decide, accepte, corrige, refuse... */
+  etat: string | null;
+  /** Toutes les decisions prises sur ce bloc, dans l'ordre. */
+  revisions: RevisionDecision[];
+}
+
+/**
+ * Une decision telle qu'elle a ete prise, y compris si elle a ete remplacee.
+ *
+ * L'etat courant vit sur la proposition ; le chemin parcouru vit ici. C'est ce
+ * qui distingue un clic errant rattrape dans la seconde d'un vrai changement
+ * d'avis apres lecture de la justification.
+ */
+export interface RevisionDecision {
+  rang: number;
+  decision: string;
+  etat: string;
+  valeur_retenue: string | null;
+  nature_correction: string | null;
+  cause_erreur: string | null;
+  justif_ouverte: boolean;
+  decide_a: string;
 }
 
 export interface TempsDossier {

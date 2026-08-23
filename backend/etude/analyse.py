@@ -381,11 +381,27 @@ def _ecart_ms(depart, arrivee) -> int | None:
 
 
 def calculer_temps(dossier, pauses_ms: int, nb_pauses: int) -> TempsDossier:
-    """Extrait les durees d'un dossier a partir de ses horodatages."""
+    """Extrait les durees d'un dossier a partir de ses horodatages.
+
+    UN ABANDON N'A PAS DE DUREE DE REVISION. L'abandon horodate lui aussi t5,
+    si bien qu'une revision interrompue au bout de quelques secondes ressortait
+    avec un `revision_nette_ms` parfaitement credible, melange a des revisions
+    reellement menees a terme. Ce n'est pas la meme grandeur : l'une mesure le
+    temps qu'il faut pour valider un compte rendu, l'autre le temps qu'il faut
+    pour renoncer. Les moyenner ferait baisser le temps de revision publie a
+    chaque abandon — un abandon ameliorerait le resultat.
+
+    Les temps de dictee et de generation, eux, restent valides : ils sont
+    anterieurs a la decision d'abandonner.
+    """
     return TempsDossier(
         dictee_ms=_ecart_ms(dossier.t0_debut_dictee, dossier.t1_fin_dictee),
         generation_ms=_ecart_ms(dossier.t1_fin_dictee, dossier.t2_affichage),
-        revision_ms=_ecart_ms(dossier.t2_affichage, dossier.t5_cloture),
+        revision_ms=(
+            None
+            if getattr(dossier, "abandonne", False)
+            else _ecart_ms(dossier.t2_affichage, dossier.t5_cloture)
+        ),
         pauses_ms=pauses_ms,
         nb_pauses=nb_pauses,
     )

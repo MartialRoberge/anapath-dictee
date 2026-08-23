@@ -30,6 +30,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from db_models import Base
+from etude.vocabulaire import ETAT_NON_VU
 
 
 def _uuid_str() -> str:
@@ -102,6 +103,27 @@ class EtudeDossier(Base):
     # -- Cloture (cahier §3.4 : la mesure d'omission) --------------------
     omission_signalee: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     omission_texte: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    #: Ce que le praticien dit du compte rendu au moment de le valider, en
+    #: texte libre.
+    #:
+    #: C'est souvent la SEULE trace de ce qui l'a gene sans qu'aucune case ne
+    #: le capture : une case cochee dit qu'il y a eu un probleme, elle ne dit
+    #: jamais lequel. Nul quand rien n'a ete ecrit — une chaine vide et une
+    #: absence de commentaire se compteraient pareil, et le nombre de cas
+    #: commentes serait faux.
+    commentaire_validation: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    #: Nombre de blocs JAMAIS AFFICHES a l'ecran au moment de la cloture.
+    #:
+    #: Un compte rendu valide dont la moitie des blocs n'a jamais ete affichee
+    #: ne se lit pas comme un compte rendu entierement revu. Sans ce compte, la
+    #: validation du dossier laisserait croire a une revue complete.
+    #:
+    #: NUL tant que le dossier n'est pas clos : c'est une absence de mesure et
+    #: non un zero. Ecrire 0 avant la cloture ferait passer tout dossier en
+    #: cours pour un dossier integralement parcouru.
+    nb_blocs_non_vus: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     # -- Abandon (cahier §4, garde-fou n°1) ------------------------------
     abandonne: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -216,9 +238,26 @@ class EtudeProposition(Base):
     regles_evaluees: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # -- Telemetrie de decision (cahier §7) ------------------------------
+    #: Moment ou le serveur a REMIS le bloc au client : t2 du dossier. Il dit
+    #: que la proposition etait dans la page, pas qu'elle a ete vue.
     affiche_a: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    #: PREMIER affichage reel du bloc a l'ecran, signale par le client.
+    #:
+    #: C'est ce champ, et lui seul, qui separe non_vu de vu_non_decide. C'est
+    #: aussi lui qui rend la latence interpretable : une latence comptee depuis
+    #: un affichage qui n'a jamais eu lieu ne mesure rien. Le PREMIER affichage
+    #: date la mesure et ne se reecrit jamais — un second passage devant le
+    #: bloc raccourcirait artificiellement le temps de lecture.
+    vu_a: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     decide_a: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    #: Delai depuis `affiche_a`, donc depuis la remise du CR entier.
     latence_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    #: Delai depuis `vu_a` : le temps de lecture REEL du bloc. Nul quand aucun
+    #: affichage n'a ete signale — on ne fabrique pas une duree de lecture a
+    #: partir d'un affichage qu'on n'a pas observe.
+    latence_vue_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     hative: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     justif_ouverte: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -229,6 +268,21 @@ class EtudeProposition(Base):
     )
 
     # -- Decision ---------------------------------------------------------
+    #: OU EN EST CE BLOC, sur un axe commun aux trois grilles : non_vu,
+    #: vu_non_decide, accepte, corrige, refuse, abstenu, abandonne.
+    #:
+    #: Sans lui, un bloc que le praticien n'a pas touche etait compte comme
+    #: accepte — une inference, pas une mesure, et un bloc jamais affiche
+    #: gonflait le taux d'acceptation.
+    #:
+    #: NULLABLE, et c'est delibere : les lignes ecrites AVANT l'ajout de cette
+    #: colonne n'ont pas d'etat observe. Leur donner "non_vu" par defaut
+    #: declarerait jamais-vues des propositions qui portent une decision. Un
+    #: etat nul se lit "non instrumente a l'epoque", jamais "non vu". Toute
+    #: ligne creee depuis prend `non_vu` a l'insertion.
+    etat: Mapped[str | None] = mapped_column(
+        String(20), nullable=True, default=ETAT_NON_VU
+    )
     decision: Mapped[str | None] = mapped_column(String(30), nullable=True)
     valeur_retenue: Mapped[str | None] = mapped_column(Text, nullable=True)
     #: LA distinction que "corrige" seul ne porte pas : le systeme s'est-il
@@ -241,6 +295,14 @@ class EtudeProposition(Base):
     dossier: Mapped[EtudeDossier] = relationship(back_populates="propositions")
     prelevement: Mapped[EtudePrelevement | None] = relationship(
         back_populates="propositions"
+    )
+    #: Le journal des decisions, du plus ancien au plus recent. Charge d'office :
+    #: sans lui, relire l'historique declencherait une requete par proposition.
+    revisions: Mapped[list["EtudeRevisionDecision"]] = relationship(
+        back_populates="proposition",
+        cascade="all, delete-orphan",
+        order_by="EtudeRevisionDecision.rang",
+        lazy="selectin",
     )
 
     __table_args__ = (
@@ -391,4 +453,60 @@ class EtudeReponseQuestionnaire(Base):
     __table_args__ = (
         Index("ix_etude_reponses_praticien", "praticien_id"),
         Index("ix_etude_reponses_questionnaire", "questionnaire"),
+    )
+
+
+class EtudeRevisionDecision(Base):
+    """Toute decision jamais prise sur un bloc, dans l'ordre, sans ecrasement.
+
+    DANS UNE ETUDE, ON N'ECRASE PAS UNE MESURE. `EtudeProposition` porte l'etat
+    COURANT du bloc — c'est ce qu'il faut pour afficher et pour tous les taux.
+    Mais chaque nouvelle decision y remplacait la precedente, et la precedente
+    disparaissait : au depouillement, un clic errant corrige dans la seconde et
+    un vrai changement d'avis apres avoir ouvert la justification etaient
+    devenus la meme ligne.
+
+    La difference n'est pas cosmetique. Elle porte le critere d'explicabilite :
+    "la justification a-t-elle change l'avis ?" ne se demontre qu'en montrant
+    l'avis d'avant, celui d'apres, et le temps passe entre les deux. Avec un
+    seul champ ecrase, ce critere reposait sur un booleen que rien ne permettait
+    de rejouer. Ici, il se recalcule depuis les lignes.
+
+    Cette table s'ecrit et ne se modifie JAMAIS. Aucun taux n'en depend : elle
+    sert la relecture, la reversibilite et la defense de l'etude. Une ligne de
+    plus ne peut donc pas fausser un resultat, alors qu'une ligne perdue, si.
+    """
+
+    __tablename__ = "etude_revisions_decision"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid_str)
+    proposition_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("etude_propositions.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    #: 1 pour la premiere decision, 2 pour la suivante. Le rang le plus eleve
+    #: correspond a ce que porte `EtudeProposition` : c'est la verification que
+    #: le journal et l'etat courant ne divergent pas.
+    rang: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+
+    decision: Mapped[str] = mapped_column(String(30), nullable=False)
+    etat: Mapped[str] = mapped_column(String(20), nullable=False)
+    valeur_retenue: Mapped[str | None] = mapped_column(Text, nullable=True)
+    nature_correction: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    cause_erreur: Mapped[str | None] = mapped_column(String(20), nullable=True)
+
+    #: La justification etait-elle ouverte AU MOMENT de cette decision-la ?
+    #: Sur la proposition, le champ est cumulatif ; ici il date l'evenement.
+    justif_ouverte: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
+    latence_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    decide_a: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    proposition: Mapped[EtudeProposition] = relationship(back_populates="revisions")
+
+    __table_args__ = (
+        Index("ix_etude_revisions_proposition", "proposition_id"),
     )

@@ -54,6 +54,7 @@ NOM_DOSSIERS: Final = "dossiers.csv"
 NOM_PROPOSITIONS: Final = "propositions.csv"
 NOM_QUESTIONNAIRES: Final = "questionnaires.csv"
 NOM_PAUSES: Final = "pauses.csv"
+NOM_REVISIONS: Final = "revisions_decision.csv"
 NOM_LISEZ_MOI: Final = "lisez_moi.txt"
 
 
@@ -140,6 +141,21 @@ COLONNES_QUESTIONNAIRES: Final[tuple[str, ...]] = (
     "repondu_a",
     "dossier_id",
     "dossier_exclu",
+)
+
+COLONNES_REVISIONS: Final[tuple[str, ...]] = (
+    "proposition_id",
+    "dossier_id",
+    "praticien",
+    "dossier_exclu",
+    "rang",
+    "decision",
+    "etat",
+    "valeur_retenue",
+    "nature_correction",
+    "cause_erreur",
+    "justif_ouverte",
+    "decide_a",
 )
 
 COLONNES_PAUSES: Final[tuple[str, ...]] = (
@@ -499,6 +515,43 @@ def ligne_questionnaire(
     }
 
 
+def lignes_revisions(corpus: Corpus, reperes: Reperes) -> list[dict[str, str]]:
+    """TOUTE decision jamais prise, y compris celles remplacees depuis.
+
+    `propositions.csv` porte l'etat FINAL : c'est lui qui sert les taux, et il
+    ne doit pas bouger. Cette table-ci porte le chemin parcouru pour y arriver.
+    Une proposition decidee une seule fois y occupe une ligne ; une proposition
+    sur laquelle le praticien est revenu en occupe autant que d'avis.
+
+    Sans elle, un clic errant rattrape dans la seconde et un revirement apres
+    lecture de la justification sont indistinguables au depouillement.
+    """
+    lignes: list[dict[str, str]] = []
+    for proposition in sorted(corpus.propositions, key=lambda p: (p.dossier_id, p.id)):
+        for revision in proposition.revisions:
+            lignes.append(
+                {
+                    "proposition_id": proposition.id,
+                    "dossier_id": proposition.dossier_id,
+                    "praticien": reperes.pseudonyme_par_dossier.get(
+                        proposition.dossier_id, ""
+                    ),
+                    "dossier_exclu": _booleen(
+                        reperes.exclu_par_dossier.get(proposition.dossier_id)
+                    ),
+                    "rang": _nombre(revision.rang),
+                    "decision": revision.decision,
+                    "etat": revision.etat,
+                    "valeur_retenue": _texte(revision.valeur_retenue),
+                    "nature_correction": _texte(revision.nature_correction),
+                    "cause_erreur": _texte(revision.cause_erreur),
+                    "justif_ouverte": _booleen(revision.justif_ouverte),
+                    "decide_a": _horodatage(revision.decide_a),
+                }
+            )
+    return lignes
+
+
 def lignes_questionnaires(corpus: Corpus, reperes: Reperes) -> list[dict[str, str]]:
     """Une reponse par ligne."""
     ordonnees = sorted(
@@ -573,7 +626,7 @@ class Fichier:
 
 
 def construire_fichiers(corpus: Corpus) -> list[Fichier]:
-    """Produit les quatre CSV a partir du corpus charge."""
+    """Produit les cinq CSV a partir du corpus charge."""
     reperes = construire_reperes(corpus)
     tables: tuple[tuple[str, tuple[str, ...], list[dict[str, str]]], ...] = (
         (NOM_DOSSIERS, COLONNES_DOSSIERS, lignes_dossiers(corpus, reperes)),
@@ -588,6 +641,7 @@ def construire_fichiers(corpus: Corpus) -> list[Fichier]:
             lignes_questionnaires(corpus, reperes),
         ),
         (NOM_PAUSES, COLONNES_PAUSES, lignes_pauses(corpus, reperes)),
+        (NOM_REVISIONS, COLONNES_REVISIONS, lignes_revisions(corpus, reperes)),
     )
     return [
         Fichier(nom, ecrire_csv(colonnes, lignes), len(lignes))
@@ -729,6 +783,38 @@ _DEFINITIONS: Final[tuple[tuple[str, tuple[tuple[str, str], ...]], ...]] = (
             ),
             ("fin", "Vide si la pause n'a jamais ete refermee."),
             ("duree_ms", "Vide si la pause n'a jamais ete refermee."),
+        ),
+    ),
+    (
+        NOM_REVISIONS,
+        (
+            (
+                "rang",
+                "1 pour la premiere decision prise sur le bloc, 2 pour la "
+                "suivante. Le rang le plus eleve d'une proposition correspond "
+                "a la decision publiee dans propositions.csv.",
+            ),
+            (
+                "decision",
+                "L'avis a CE moment-la, y compris s'il a ete remplace depuis. "
+                "NE PAS agreger cette table pour calculer un taux : elle "
+                "compterait plusieurs fois les blocs sur lesquels le praticien "
+                "est revenu. Les taux se calculent sur propositions.csv, qui "
+                "porte un etat final par bloc.",
+            ),
+            (
+                "justif_ouverte",
+                "La justification etait-elle ouverte au moment de CETTE "
+                "decision. Comparer ce champ entre deux rangs successifs "
+                "permet de demontrer qu'une explication a change un avis, au "
+                "lieu de s'en remettre au seul booleen agrege.",
+            ),
+            (
+                "decide_a",
+                "Horodatage de cette decision-la. L'ecart entre deux rangs "
+                "separe un clic errant rattrape dans la seconde d'un "
+                "revirement apres relecture.",
+            ),
         ),
     ),
 )
@@ -877,6 +963,7 @@ def construire_classeur(corpus: Corpus, moment: datetime) -> bytes:
         (NOM_PROPOSITIONS, COLONNES_PROPOSITIONS, lignes_propositions(corpus, reperes)),
         (NOM_QUESTIONNAIRES, COLONNES_QUESTIONNAIRES, lignes_questionnaires(corpus, reperes)),
         (NOM_PAUSES, COLONNES_PAUSES, lignes_pauses(corpus, reperes)),
+        (NOM_REVISIONS, COLONNES_REVISIONS, lignes_revisions(corpus, reperes)),
     )
 
     classeur = Workbook()
