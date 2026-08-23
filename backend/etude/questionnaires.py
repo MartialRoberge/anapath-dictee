@@ -195,6 +195,24 @@ PAR_CAS: Final = Questionnaire(
              ancre_basse=ACCORD[0], ancre_haute=ACCORD[1]),
         Item("par_cas_04", "Le logiciel a facilite la redaction de ce compte rendu.",
              LIKERT_5, ancre_basse=ACCORD[0], ancre_haute=ACCORD[1]),
+        # LA question que la telemetrie ne peut PAS repondre, contrairement a ce
+        # qu'on croit d'abord.
+        #
+        # Une suggestion de completude acceptee dit que le praticien a ajoute le
+        # champ. Elle ne dit PAS qu'il l'avait oublie : il pouvait etre sur le
+        # point de l'ecrire et simplement content qu'on le lui rappelle. Les deux
+        # se ressemblent dans la base et n'ont pas la meme valeur — seul le
+        # premier cas est une affirmation de securite, le second n'est qu'un
+        # confort. Le praticien est le seul a savoir lequel des deux s'est
+        # produit, donc on le lui demande.
+        Item("par_cas_04b",
+             "Le logiciel vous a-t-il signale quelque chose que vous n'auriez "
+             "pas ecrit sans lui ?",
+             CHOIX_UNIQUE,
+             ("Oui, je l'aurais omis",
+              "Oui, mais je l'aurais ecrit de toute facon",
+              "Non"),
+             obligatoire=True),
         Item("par_cas_05", "Par rapport a ma pratique habituelle, ce compte rendu m'a pris :",
              CHOIX_UNIQUE,
              ("Beaucoup plus de temps", "Plus", "Autant", "Moins", "Beaucoup moins")),
@@ -216,9 +234,12 @@ PAR_CAS: Final = Questionnaire(
 #: - "j'ai du faire beaucoup de corrections" -> la distance d'edition entre le
 #:   texte propose et le texte valide la mesure objectivement, sans dependre du
 #:   souvenir qu'en garde le praticien.
-#: - "le logiciel vous a-t-il permis d'identifier un oubli" -> une suggestion de
-#:   completude acceptee repond oui, et une refusee repond non, sans rien
-#:   demander.
+#:
+#: En revanche "le logiciel vous a-t-il signale quelque chose que vous n'auriez
+#: pas ecrit" a ete REMIS apres coup : on avait cru la donnee suffisante, a
+#: tort. Une suggestion acceptee dit que le champ a ete ajoute, jamais qu'il
+#: avait ete oublie — et c'est pourtant toute la difference entre une
+#: affirmation de securite et un confort de redaction.
 #:
 #: Chaque question retiree rend du temps a celles que rien ne remplace.
 

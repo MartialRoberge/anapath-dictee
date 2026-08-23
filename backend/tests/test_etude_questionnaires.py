@@ -99,6 +99,18 @@ def test_l_erreur_introduite_est_demandee():
     assert item.obligatoire
 
 
+def test_l_oubli_rattrape_est_distingue_du_simple_rappel():
+    """Une suggestion acceptee dit que le champ a ete ajoute, jamais qu'il
+    avait ete OUBLIE : le praticien pouvait etre sur le point de l'ecrire. Seul
+    le premier cas est une affirmation de securite ; les confondre gonflerait
+    la valeur de la couche de completude."""
+    item = next(i for i in PAR_CAS.items if "n'auriez" in i.libelle)
+    assert item.obligatoire
+    assert len(item.options) == 3
+    assert any("omis" in o for o in item.options)
+    assert any("de toute facon" in o for o in item.options)
+
+
 def test_la_charge_de_correction_n_est_plus_demandee():
     """La distance d'edition entre texte propose et texte valide la mesure
     objectivement. Redemander ce que la donnee sait deja coute du temps a des

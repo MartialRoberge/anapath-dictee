@@ -20,6 +20,9 @@ export default defineConfig({
       "/auth": "http://localhost:8000",
       "/reports": "http://localhost:8000",
       "/admin": "http://localhost:8000",
+      // Sans cette entree, tous les appels d'instrumentation tombent en 404
+      // en developpement — et l'etude parait vide alors qu'elle fonctionne.
+      "/etude": "http://localhost:8000",
       "/adicap": "http://localhost:8000",
       "/snomed": "http://localhost:8000",
     },

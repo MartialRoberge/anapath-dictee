@@ -4,6 +4,7 @@ import {
   FileText,
   History,
   Shield,
+  FlaskConical,
   LogOut,
   Save,
   Star,
@@ -20,10 +21,12 @@ import { useAuth } from "./hooks/useAuth";
 import LoginPage from "./pages/LoginPage";
 import HistoryPage from "./pages/HistoryPage";
 import AdminPage from "./pages/AdminPage";
+import EtudeAdminPage from "./pages/EtudeAdminPage";
 import RecorderPanel from "./components/RecorderPanel";
 import ReportPanel from "./components/ReportPanel";
 import CompletionPanel from "./components/CompletionPanel";
 import { formatTranscription, getReport, saveReport, sendFeedback } from "./services/api";
+import { useEtudeDossier } from "./hooks/useEtudeDossier";
 import type {
   FormatResult,
   Marker,
@@ -40,7 +43,7 @@ import {
 } from "./lib/drafts";
 // v3 backend: FormatResult has formatted_report, organe_detecte, markers (adapted from donnees_manquantes)
 
-type Page = "app" | "history" | "admin";
+type Page = "app" | "history" | "admin" | "etude";
 type AppView = "record" | "report";
 
 /* ------------------------------------------------------------------ */
@@ -140,19 +143,37 @@ function Sidebar({
         ))}
 
         {isAdmin && (
-          <button
-            onClick={() => setPage("admin")}
-            title="Administration"
-            className={`
-              flex h-10 w-10 items-center justify-center rounded-lg transition-all
-              ${page === "admin"
-                ? "bg-primary/15 text-primary"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground"
-              }
-            `}
-          >
-            <Shield className="h-[18px] w-[18px]" />
-          </button>
+          <>
+            <button
+              onClick={() => setPage("admin")}
+              title="Administration"
+              className={`
+                flex h-10 w-10 items-center justify-center rounded-lg transition-all
+                ${page === "admin"
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                }
+              `}
+            >
+              <Shield className="h-[18px] w-[18px]" />
+            </button>
+            {/* L'etude a sa propre entree : ses chiffres ne se lisent pas comme
+                ceux de l'exploitation, et les melanger ferait chercher un taux
+                d'hallucination dans un tableau de comptes rendus. */}
+            <button
+              onClick={() => setPage("etude")}
+              title="Etude clinique"
+              className={`
+                flex h-10 w-10 items-center justify-center rounded-lg transition-all
+                ${page === "etude"
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                }
+              `}
+            >
+              <FlaskConical className="h-[18px] w-[18px]" />
+            </button>
+          </>
         )}
       </nav>
 
@@ -326,6 +347,20 @@ export default function App() {
 
   // Report state
   const [rawTranscription, setRawTranscription] = useState<string | null>(null);
+
+  // L'instrumentation de l'etude. Elle n'a aucun pouvoir sur la generation :
+  // si elle echoue, le praticien redige quand meme. On ne bloque jamais un
+  // compte rendu pour une mesure.
+  const etude = useEtudeDossier();
+
+  // La transcription est aussi tenue dans une ref : le panneau appelle
+  // onTranscription puis onFormatted dans le meme tour de rendu, et l'etat
+  // n'est pas encore a jour quand le second s'execute.
+  const transcriptionRef = useRef<string | null>(null);
+  const noterTranscription = useCallback((brut: string | null) => {
+    transcriptionRef.current = brut;
+    setRawTranscription(brut);
+  }, []);
   const [report, setReport] = useState<string | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
   // Texte sur lequel les marqueurs ont ete calcules : des que le CR change
@@ -427,7 +462,25 @@ export default function App() {
     setSavedReportId(null);
     setFeedbackSent(false);
     setActiveView("report");
-  }, []);
+
+    // Le dossier d'etude s'ouvre ICI, au moment ou le praticien voit le compte
+    // rendu : c'est cet instant qui date l'affichage des propositions, donc
+    // toutes les latences. L'ouvrir plus tot mesurerait le temps de calcul du
+    // serveur au lieu du temps de lecture.
+    const transcription = transcriptionRef.current;
+    if (transcription) {
+      void etude.ouvrir({
+        transcription,
+        cr_propose: result.formatted_report,
+        organe: result.organe_detecte || null,
+        alertes: result.markers.map((marqueur) => ({
+          champ: marqueur.field,
+          description: marqueur.message,
+          section: marqueur.section,
+        })),
+      });
+    }
+  }, [etude]);
 
   // Rouvre un CR de l'historique dans l'editeur (charge le detail complet).
   const handleOpenReport = useCallback(
@@ -494,13 +547,17 @@ export default function App() {
         organe_detecte: organeDetecte,
       });
       setSavedReportId(data.id);
+      // La cloture d'etude fige le texte VALIDE a cote du texte propose : c'est
+      // la seule facon de calculer la charge d'edition, et elle n'est pas
+      // reconstituable apres coup.
+      void etude.clore({ cr_valide: report });
       toast("Compte-rendu sauvegarde", "success");
     } catch {
       toast("Erreur lors de la sauvegarde", "error");
     } finally {
       setSaving(false);
     }
-  }, [report, rawTranscription, organeDetecte, saving, getToken, toast]);
+  }, [report, rawTranscription, organeDetecte, saving, getToken, toast, etude]);
 
   // --- Raccourcis clavier globaux ---
   useEffect(() => {
@@ -545,6 +602,10 @@ export default function App() {
   // Admin stays as separate page
   if (page === "admin") {
     return <AdminPage token={getToken()} onBack={() => setPage("app")} />;
+  }
+
+  if (page === "etude") {
+    return <EtudeAdminPage token={getToken()} onBack={() => setPage("app")} />;
   }
 
   return (
@@ -642,10 +703,10 @@ export default function App() {
             <RecorderPanel
               rawTranscription={rawTranscription}
               report={report}
-              onTranscription={setRawTranscription}
+              onTranscription={noterTranscription}
               onFormatted={handleFormatted}
               onReset={handleReset}
-              onRawChange={setRawTranscription}
+              onRawChange={noterTranscription}
               onReformat={handleReformat}
               reformatting={reformatting}
             />
@@ -684,10 +745,10 @@ export default function App() {
                 <RecorderPanel
                   rawTranscription={rawTranscription}
                   report={report}
-                  onTranscription={setRawTranscription}
+                  onTranscription={noterTranscription}
                   onFormatted={handleFormatted}
                   onReset={handleReset}
-                  onRawChange={setRawTranscription}
+                  onRawChange={noterTranscription}
                   onReformat={handleReformat}
                   reformatting={reformatting}
                 />

@@ -146,9 +146,25 @@ app.include_router(etude_admin_router)
 
 
 @app.get("/health")
-async def health() -> dict[str, str]:
-    """Verification du statut de l'API."""
-    return {"status": "ok"}
+async def health() -> dict[str, str | bool]:
+    """Statut de l'API, et ce qui decide si l'etude peut recolter.
+
+    `base_persistante` est le point qui compte. Sans base PostgreSQL, la
+    configuration retombe sur un fichier SQLite ecrit dans le conteneur — or un
+    conteneur Render est EPHEMERE : il repart de zero a chaque deploiement, et
+    l'offre gratuite l'endort apres inactivite. Toutes les donnees d'etude
+    seraient perdues sans le moindre message d'erreur. Exposer l'information ici
+    permet de le verifier d'un coup d'oeil apres chaque deploiement, au lieu de
+    s'en apercevoir au depouillement.
+    """
+    settings = get_settings()
+    url: str = settings.database_url or ""
+    return {
+        "status": "ok",
+        "base_configuree": bool(url),
+        "base_persistante": "postgres" in url,
+        "moteur": settings.report_engine,
+    }
 
 
 # ---------------------------------------------------------------------------
