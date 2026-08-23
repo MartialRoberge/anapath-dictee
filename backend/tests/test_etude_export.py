@@ -684,3 +684,55 @@ def test_le_lisez_moi_avertit_qu_une_cellule_vide_n_est_pas_un_zero(client):
 def test_le_lisez_moi_dit_comment_traiter_les_dossiers_exclus(client):
     lisez_moi = _archive(client)[NOM_LISEZ_MOI].decode("utf-8")
     assert "DOSSIERS EXCLUS" in lisez_moi
+
+
+# --- Le classeur Excel ------------------------------------------------------
+
+
+def test_le_classeur_porte_les_memes_lignes_que_les_csv():
+    """Deux exports du meme corpus doivent se recouper a la ligne pres, sinon
+    on ne sait plus lequel fait foi. Le CSV est le format d'ANALYSE, le
+    classeur celui du TRAVAIL — mais ils decrivent le meme corpus."""
+    import io
+    from datetime import UTC, datetime
+
+    from openpyxl import load_workbook
+
+    from etude.export import (
+        construire_classeur,
+        construire_fichiers,
+        Corpus,
+    )
+
+    corpus = Corpus([], [], [], [], [], [])
+    moment = datetime(2026, 9, 1, tzinfo=UTC)
+    classeur = load_workbook(io.BytesIO(construire_classeur(corpus, moment)))
+
+    # Un onglet par table, plus le lisez-moi : dans un classeur, un fichier
+    # texte a cote ne serait jamais ouvert.
+    assert "lisez-moi" in classeur.sheetnames
+    assert len(classeur.sheetnames) == len(construire_fichiers(corpus)) + 1
+
+
+def test_le_classeur_fige_ses_en_tetes():
+    """Une table de milliers de lignes devient illisible des le premier ecran
+    si l'en-tete disparait au defilement."""
+    import io
+    from datetime import UTC, datetime
+
+    from openpyxl import load_workbook
+
+    from etude.export import Corpus, construire_classeur
+
+    classeur = load_workbook(
+        io.BytesIO(
+            construire_classeur(
+                Corpus([], [], [], [], [], []),
+                datetime(2026, 9, 1, tzinfo=UTC),
+            )
+        )
+    )
+    for nom in classeur.sheetnames:
+        if nom == "lisez-moi":
+            continue
+        assert classeur[nom].freeze_panes == "A2", nom

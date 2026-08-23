@@ -20,7 +20,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth import get_admin_user
 from database import get_db_session
 from db_models import User
-from etude.export import charger_corpus, construire_archive, nom_archive
+from etude.export import (
+    charger_corpus,
+    construire_archive,
+    construire_classeur,
+    nom_archive,
+    nom_classeur,
+)
 
 router = APIRouter(prefix="/admin/etude", tags=["admin-etude"])
 
@@ -61,5 +67,28 @@ async def exporter(_admin: Admin, db: Base) -> Response:
         media_type=TYPE_ZIP,
         headers={
             "Content-Disposition": f'attachment; filename="{nom_archive(moment)}"'
+        },
+    )
+
+
+@router.get("/export.xlsx")
+async def exporter_classeur(_admin: Admin, db: Base) -> Response:
+    """Sert les memes donnees en classeur Excel, un onglet par table.
+
+    Le CSV reste le format d'ANALYSE — il se lit partout et ne deforme rien. Le
+    classeur est le format de TRAVAIL, celui qu'on ouvre pour regarder et
+    montrer. Servir les deux evite de perdre l'un des deux publics ; ils portent
+    les memes lignes, donc ils se recoupent.
+    """
+    base = _exiger_base(db)
+    corpus = await charger_corpus(base)
+    moment = datetime.now(timezone.utc)
+    return Response(
+        content=construire_classeur(corpus, moment),
+        media_type=(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ),
+        headers={
+            "Content-Disposition": f'attachment; filename="{nom_classeur(moment)}"'
         },
     )

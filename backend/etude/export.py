@@ -30,6 +30,7 @@ import csv
 import io
 import textwrap
 import zipfile
+from pathlib import Path
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Final, TypeVar
@@ -847,6 +848,71 @@ def construire_archive(corpus: Corpus, moment: datetime) -> bytes:
             NOM_LISEZ_MOI, rediger_lisez_moi(fichiers, moment).encode("utf-8")
         )
     return tampon.getvalue()
+
+
+def construire_classeur(corpus: Corpus, moment: datetime) -> bytes:
+    """Assemble les memes tables en un classeur Excel, un onglet par table.
+
+    POURQUOI EN PLUS DU CSV, et pas a la place.
+
+    Le CSV est le format d'ANALYSE : il se lit dans R, en Python, sans rien
+    installer, et il ne deforme rien. Le classeur est le format de TRAVAIL :
+    c'est celui qu'on ouvre pour regarder, trier, montrer a quelqu'un. Les deux
+    repondent a des besoins differents, et n'en servir qu'un ferait perdre l'un
+    des deux publics.
+
+    Le classeur porte les MEMES colonnes et les MEMES lignes que les CSV : deux
+    exports du meme corpus doivent se recouper a la ligne pres, sinon on ne sait
+    plus lequel fait foi.
+
+    Le lisez-moi devient un onglet : dans un classeur, un fichier texte a cote
+    ne serait jamais ouvert.
+    """
+    from openpyxl import Workbook
+    from openpyxl.styles import Alignment, Font
+
+    reperes = construire_reperes(corpus)
+    tables = (
+        (NOM_DOSSIERS, COLONNES_DOSSIERS, lignes_dossiers(corpus, reperes)),
+        (NOM_PROPOSITIONS, COLONNES_PROPOSITIONS, lignes_propositions(corpus, reperes)),
+        (NOM_QUESTIONNAIRES, COLONNES_QUESTIONNAIRES, lignes_questionnaires(corpus, reperes)),
+        (NOM_PAUSES, COLONNES_PAUSES, lignes_pauses(corpus, reperes)),
+    )
+
+    classeur = Workbook()
+    classeur.remove(classeur.active)
+
+    for nom, colonnes, lignes in tables:
+        onglet = classeur.create_sheet(Path(nom).stem[:31])
+        onglet.append(list(colonnes))
+        for cellule in onglet[1]:
+            cellule.font = Font(bold=True)
+        for ligne in lignes:
+            onglet.append([ligne.get(colonne, "") for colonne in colonnes])
+        # Les en-tetes restent visibles au defilement : sans cela, une table de
+        # milliers de lignes devient illisible des le premier ecran.
+        onglet.freeze_panes = "A2"
+        for index, colonne in enumerate(colonnes, start=1):
+            largeur = max(len(colonne), 12)
+            onglet.column_dimensions[onglet.cell(1, index).column_letter].width = min(
+                largeur + 2, 60
+            )
+
+    lecture = classeur.create_sheet("lisez-moi", 0)
+    for numero, ligne in enumerate(
+        rediger_lisez_moi(construire_fichiers(corpus), moment).splitlines(), start=1
+    ):
+        lecture.cell(numero, 1, ligne).alignment = Alignment(wrap_text=False)
+    lecture.column_dimensions["A"].width = 110
+
+    tampon = io.BytesIO()
+    classeur.save(tampon)
+    return tampon.getvalue()
+
+
+def nom_classeur(moment: datetime) -> str:
+    """Nomme le classeur par sa date, a la seconde, comme l'archive."""
+    return f"export_etude_marc_{moment.strftime('%Y%m%d_%H%M%S')}.xlsx"
 
 
 def nom_archive(moment: datetime) -> str:

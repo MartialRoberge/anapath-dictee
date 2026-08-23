@@ -516,10 +516,11 @@ export default function AdminPage({ token, onBack }: AdminPageProps) {
    * preparation est en cours — une archive de plusieurs milliers de lignes ne
    * se fabrique pas instantanement.
    */
-  const telechargerExport = useCallback(async () => {
+  const telechargerExport = useCallback(async (format: "zip" | "xlsx") => {
     setExportEnCours(true);
     try {
-      const reponse = await fetch(`${API_BASE}/admin/etude/export`, {
+      const chemin = format === "xlsx" ? "/export.xlsx" : "/export";
+      const reponse = await fetch(`${API_BASE}/admin/etude${chemin}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!reponse.ok) throw new Error(`Export impossible (${reponse.status})`);
@@ -527,7 +528,7 @@ export default function AdminPage({ token, onBack }: AdminPageProps) {
       const url = URL.createObjectURL(blob);
       const lien = document.createElement("a");
       lien.href = url;
-      lien.download = `marc-etude-${new Date().toISOString().slice(0, 10)}.zip`;
+      lien.download = `marc-etude-${new Date().toISOString().slice(0, 10)}.${format}`;
       lien.click();
       URL.revokeObjectURL(url);
     } catch (erreur) {
@@ -624,6 +625,29 @@ export default function AdminPage({ token, onBack }: AdminPageProps) {
     setRechargement((n) => n + 1);
   }, []);
 
+  /**
+   * Detruit un cas d'ESSAI, puis recharge.
+   *
+   * Reserve aux dossiers d'avant l'etude : une fois celle-ci commencee, effacer
+   * un cas rendrait l'etude incapable de rendre compte de son effectif, et
+   * c'est l'exclusion qu'il faut. Le rechargement est immediat parce qu'une
+   * liste qui garde une ligne detruite fait douter de tout le reste.
+   */
+  const supprimerDossier = useCallback(
+    async (dossierId: string) => {
+      const reponse = await fetch(
+        `${API_BASE}/admin/etude/dossiers/${dossierId}`,
+        { method: "DELETE", headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (!reponse.ok) {
+        window.alert(`Suppression impossible (${reponse.status}).`);
+        return;
+      }
+      actualiser();
+    },
+    [token, actualiser],
+  );
+
   const reessayerCas = useCallback(() => {
     setDetailErreur(null);
     setRechargement((n) => n + 1);
@@ -670,18 +694,32 @@ export default function AdminPage({ token, onBack }: AdminPageProps) {
         {/* L'export est la PREMIERE action de cet ecran : aucun depouillement
             serieux ne se fait dans un navigateur. Un tableau qu'on ne peut pas
             sortir n'est pas une donnee d'etude, c'est une capture d'ecran. */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={telechargerExport}
-          disabled={exportEnCours}
-          className="ml-auto"
-        >
-          <Download className="h-3.5 w-3.5" />
-          <span className="hide-mobile">
-            {exportEnCours ? "Préparation…" : "Exporter (CSV)"}
-          </span>
-        </Button>
+        <div className="ml-auto flex items-center gap-1.5">
+          {/* Deux formats parce qu'ils servent deux usages. Excel est celui
+              qu'on ouvre pour regarder et montrer ; le CSV celui qui se lit
+              dans R ou en Python sans rien installer et sans rien deformer.
+              Les deux portent les memes lignes. */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void telechargerExport("xlsx")}
+            disabled={exportEnCours}
+          >
+            <Download className="h-3.5 w-3.5" />
+            <span className="hide-mobile">
+              {exportEnCours ? "Préparation…" : "Excel"}
+            </span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => void telechargerExport("zip")}
+            disabled={exportEnCours}
+            title="Les mêmes données en CSV, pour R ou Python"
+          >
+            <span className="hide-mobile text-xs">CSV</span>
+          </Button>
+        </div>
         <Button
           variant="ghost"
           size="icon"
@@ -794,6 +832,7 @@ export default function AdminPage({ token, onBack }: AdminPageProps) {
                   dossierSelectionne={null}
                   onSelectionnerPraticien={ouvrirPraticien}
                   onSelectionnerDossier={setDossierId}
+                  onSupprimerDossier={supprimerDossier}
                 />
               ) : (
                 <div className="grid gap-4 xl:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
@@ -810,6 +849,7 @@ export default function AdminPage({ token, onBack }: AdminPageProps) {
                       dossierSelectionne={dossierId}
                       onSelectionnerPraticien={ouvrirPraticien}
                       onSelectionnerDossier={setDossierId}
+                      onSupprimerDossier={supprimerDossier}
                       compact
                     />
                   </div>

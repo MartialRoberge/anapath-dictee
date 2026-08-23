@@ -15,7 +15,7 @@ import {
   Star,
   UserRound,
   Users,
-} from "lucide-react";
+  Trash2,} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -64,6 +64,12 @@ interface VuePraticiensProps {
   dossierSelectionne: string | null;
   onSelectionnerPraticien: (praticienId: string | null) => void;
   onSelectionnerDossier: (dossierId: string | null) => void;
+  /**
+   * Detruit un cas d'essai. Reserve aux dossiers d'AVANT l'etude : une fois
+   * celle-ci commencee, effacer un cas rendrait l'etude incapable de rendre
+   * compte de son effectif, et c'est l'EXCLUSION qu'il faut.
+   */
+  onSupprimerDossier: (dossierId: string) => Promise<void>;
   /**
    * Colonne de contexte a cote d'un dossier ouvert : le resume du praticien
    * s'efface pour laisser toute la hauteur a la liste de ses cas.
@@ -564,20 +570,47 @@ function CarteDossier({
   dossier,
   selectionne,
   onSelectionner,
+  onSupprimer,
 }: {
   dossier: LigneDossierEtude;
   selectionne: boolean;
   onSelectionner: () => void;
+  onSupprimer: () => Promise<void>;
 }) {
+  const [suppression, setSuppression] = useState(false);
+
+  async function supprimer(evenement: React.MouseEvent) {
+    // Le clic ne doit pas ouvrir le dossier qu'on est en train d'effacer.
+    evenement.stopPropagation();
+    if (
+      !window.confirm(
+        "Supprimer definitivement ce compte rendu et toutes ses mesures ?\n\n" +
+          "A n'utiliser que sur un ESSAI. Une fois l'etude commencee, utilisez " +
+          "l'exclusion : elle conserve le cas et se defait.",
+      )
+    ) {
+      return;
+    }
+    setSuppression(true);
+    try {
+      await onSupprimer();
+    } finally {
+      setSuppression(false);
+    }
+  }
   const valide = estValide(dossier);
 
   return (
+    // Un conteneur, deux boutons : ouvrir et supprimer. Imbriquer le second
+    // dans le premier serait invalide, et le clic de suppression ouvrirait le
+    // dossier qu'on efface.
+    <div className="group relative">
     <button
       type="button"
       onClick={onSelectionner}
       aria-current={selectionne}
       className={cn(
-        "w-full rounded-xl border bg-card p-3 text-left transition-all",
+        "w-full rounded-xl border bg-card p-3 pr-9 text-left transition-all",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         selectionne
           ? "border-primary bg-primary/5"
@@ -650,6 +683,24 @@ function CarteDossier({
         )}
       </div>
     </button>
+
+      <button
+        type="button"
+        onClick={supprimer}
+        disabled={suppression}
+        title="Supprimer definitivement ce cas d'essai"
+        aria-label="Supprimer ce compte rendu"
+        className={cn(
+          "absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-md",
+          "text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+          "disabled:opacity-40",
+        )}
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
+    </div>
   );
 }
 
@@ -690,6 +741,7 @@ export default function VuePraticiens({
   dossierSelectionne,
   onSelectionnerPraticien,
   onSelectionnerDossier,
+  onSupprimerDossier,
   compact = false,
 }: VuePraticiensProps) {
   const lignes = useMemo(() => agregerPraticiens(dossiers), [dossiers]);
@@ -801,6 +853,7 @@ export default function VuePraticiens({
                 dossier={dossier}
                 selectionne={dossier.id === dossierSelectionne}
                 onSelectionner={() => onSelectionnerDossier(dossier.id)}
+                onSupprimer={() => onSupprimerDossier(dossier.id)}
               />
             ))}
           </div>
