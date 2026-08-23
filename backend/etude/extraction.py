@@ -4,6 +4,23 @@ La proposition est l'unite d'analyse de l'etude : c'est elle qu'on compte, pas
 le compte rendu. Un CR accepte en bloc ne dit rien ; les memes phrases jugees
 une a une disent lesquelles le moteur a eu raison de proposer.
 
+D'OU VIENNENT LES PROPOSITIONS DE RESTITUTION
+
+Du COLLEGE quand il a siege, du decoupage sinon. Ce n'est pas un detail
+d'implementation, c'est la regle centrale : le decoupage sait separer les
+assertions, il ne sait pas dire laquelle merite une verification. Il les propose
+donc toutes, et un praticien a qui l'on fait tout verifier finit par ne plus
+rien verifier. Le college, lui, tranche assertion par assertion (voir
+etude/arbitrage.py) : ce que trois relecteurs affirment a l'unanimite, citations
+verifiees, ne devient PAS une proposition. LE NOMBRE DE PROPOSITIONS N'EST PAS
+UN OBJECTIF — un compte rendu limpide doit en produire peu, et c'est le bon
+comportement.
+
+Le decoupage reste, et il sert deux fois : il NUMEROTE les assertions soumises
+au college (les trois lentilles jugent la meme liste), et il tient lieu de VOIE
+DE REPLI quand le college n'a pas siege — option coupee ou fournisseur en
+panne. L'etude ne s'arrete pas parce qu'un relecteur ne repond pas.
+
 Trois filtres, dans cet ordre, et chacun protege un chiffre publie :
 
 1. Ce qui est une COPIE LITTERALE de la dictee n'est pas une proposition, c'est
@@ -31,11 +48,18 @@ Reference : docs/specs/spec/MARC_cahier_de_recueil.md section 7.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from collections.abc import Iterator
+from dataclasses import dataclass, replace
 from typing import Final
 
-from etude.ancrage import Empan, ancrer, est_copie_litterale
+from etude.ancrage import Empan, ancrer, decouper, est_copie_litterale
+from etude.arbitrage import (
+    MOTIF_CITATION_INTROUVABLE,
+    MOTIF_REFUS_UNANIME,
+    PROPOSER,
+)
 from etude.vocabulaire import TYPE_CODE, TYPE_COMPLETUDE, TYPE_RESTITUTION
+from reports.college import Avis, RapportCollege
 
 # --- Budget d'attention ---------------------------------------------------
 
@@ -113,6 +137,28 @@ _PRIORITE_DEFAUT: Final[int] = 5
 _SECTIONS_NON_VALIDABLES: Final[frozenset[str]] = frozenset({
     "entete", "titre", "identification", "technique",
 })
+
+# --- Arbitrage du college -------------------------------------------------
+
+#: Sous-type d'une completude qui vient du completiste et non du detecteur
+#: deterministe. Le depouillement peut alors comparer les deux sources plutot
+#: que de les confondre dans un seul chiffre.
+SOUS_TYPE_COLLEGE: Final = "college"
+
+#: Sous-type de repli quand une soumission arbitree ne porte pas sa section.
+SOUS_TYPE_RESTITUTION: Final = "restitution"
+
+#: Motifs d'arbitrage qui passent devant tout le reste : aucun relecteur n'a
+#: retrouve l'assertion dans la dictee. C'est la candidate hallucination, la
+#: proposition la plus precieuse de l'etude — elle ne tombe pas hors budget.
+_MOTIFS_PRIORITAIRES: Final[frozenset[str]] = frozenset(
+    {MOTIF_REFUS_UNANIME, MOTIF_CITATION_INTROUVABLE}
+)
+
+_PRIORITE_HALLUCINATION: Final[int] = -1
+
+#: Numero recopie par une lentille en tete de l'assertion qu'elle juge.
+_NUMERO: Final[re.Pattern[str]] = re.compile(r"^\s*(\d{1,3})\s*[.)]\s*")
 
 
 @dataclass(frozen=True)
@@ -234,13 +280,14 @@ def _proposition(
     )
 
 
-def extraire_restitutions(cr: str, verbatim: str) -> list[PropositionExtraite]:
-    """Les assertions du compte rendu qui relevent d'une inference.
+def _assertions_validables(cr: str, verbatim: str) -> Iterator[tuple[str, str]]:
+    """Les couples (section, assertion) que le praticien peut avoir a trancher.
 
-    Une phrase recopiee de la dictee est ecartee : seule l'inference se valide.
+    UNE seule definition de l'unite d'analyse, pour les deux voies : ce que le
+    college juge et ce que le repli propose doivent etre exactement les memes
+    unites, sinon les deux mesures cessent d'etre comparables et le taux de
+    soumission ne veut plus rien dire.
     """
-    retenues: list[tuple[int, PropositionExtraite]] = []
-
     for section, assertion in _decouper_assertions(cr):
         if section in _SECTIONS_NON_VALIDABLES:
             continue
@@ -248,18 +295,181 @@ def extraire_restitutions(cr: str, verbatim: str) -> list[PropositionExtraite]:
             continue
         if est_copie_litterale(assertion, verbatim):
             continue
+        yield section, assertion
+
+
+def extraire_restitutions(cr: str, verbatim: str) -> list[PropositionExtraite]:
+    """Les assertions du compte rendu qui relevent d'une inference.
+
+    Une phrase recopiee de la dictee est ecartee : seule l'inference se valide.
+    """
+    retenues: list[tuple[int, PropositionExtraite]] = []
+
+    for section, assertion in _assertions_validables(cr, verbatim):
         empan = ancrer(assertion, verbatim)
         priorite = _PRIORITE_SECTION.get(section, _PRIORITE_DEFAUT)
         if empan is None:
             # Candidate hallucination : c'est la proposition la plus precieuse
             # de l'etude, elle passe donc devant, pas a la trappe.
-            priorite = -1
+            priorite = _PRIORITE_HALLUCINATION
         retenues.append(
             (priorite, _proposition(TYPE_RESTITUTION, section, assertion, empan))
         )
 
     retenues.sort(key=lambda couple: couple[0])
     return [proposition for _, proposition in retenues]
+
+
+# --- La liste numerotee soumise au college --------------------------------
+
+
+@dataclass(frozen=True)
+class AssertionNumerotee:
+    """Une assertion du compte rendu, telle qu'elle est soumise au college."""
+
+    rang: int
+    section: str
+    texte: str
+
+
+def assertions_a_juger(cr: str, verbatim: str) -> list[AssertionNumerotee]:
+    """Les assertions que le college doit juger, numerotees par le serveur.
+
+    Le decoupage vient d'ICI et pas des lentilles : trois relecteurs qui
+    decouperaient chacun le compte rendu ne jugeraient pas les memes unites, et
+    compter leurs voix n'aurait plus de sens. Ils recoivent donc une seule liste
+    numerotee.
+
+    Les filtres sont ceux des propositions : ce qui ne se valide pas ne se relit
+    pas non plus. Faire juger un en-tete ou une copie litterale de la dictee
+    couterait trois appels de modele pour une unite que personne n'aurait a
+    trancher.
+    """
+    numerotees: list[AssertionNumerotee] = []
+
+    for section, assertion in _assertions_validables(cr, verbatim):
+        numerotees.append(
+            AssertionNumerotee(
+                rang=len(numerotees) + 1, section=section, texte=assertion
+            )
+        )
+
+    return numerotees
+
+
+def rattacher_les_rangs(
+    rapport: RapportCollege, assertions: list[AssertionNumerotee]
+) -> RapportCollege:
+    """Rattache chaque avis a l'assertion numerotee qu'il juge.
+
+    Le rang n'est pas demande au modele, il est retrouve ici : par le numero
+    recopie, sinon par le texte de l'assertion. Un avis qu'on ne sait pas
+    rattacher est ECARTE plutot que devine. Le placer au hasard ferait compter
+    une voix sur la mauvaise assertion, ce qui est pire qu'une voix perdue :
+    l'arbitrage soumet par prudence quand il lui manque des voix, alors qu'une
+    voix mal placee peut faire affirmer a tort.
+    """
+    par_texte = {_cle(une.texte): une.rang for une in assertions}
+    rangs = {une.rang for une in assertions}
+
+    rattaches: list[Avis] = []
+    for un_avis in rapport.avis:
+        rang = _rang_de(un_avis.assertion, par_texte, rangs)
+        if rang is not None:
+            rattaches.append(replace(un_avis, rang=rang))
+
+    return RapportCollege(
+        avis=rattaches,
+        manques=list(rapport.manques),
+        lentilles_muettes=list(rapport.lentilles_muettes),
+    )
+
+
+def _rang_de(
+    assertion: str, par_texte: dict[str, int], rangs: set[int]
+) -> int | None:
+    """Numero de l'assertion jugee, ou None si on ne sait pas la reconnaitre."""
+    numero = _NUMERO.match(assertion)
+    if numero is not None and int(numero.group(1)) in rangs:
+        return int(numero.group(1))
+    return par_texte.get(_cle(_NUMERO.sub("", assertion)))
+
+
+def _cle(texte: str) -> str:
+    """Forme normalisee d'un texte, pour rapprocher deux ecritures du meme.
+
+    Un modele recopie a la ponctuation et a la casse pres ; exiger l'octet exact
+    ferait perdre des avis honnetes, donc des voix, donc de la prudence inutile.
+    """
+    return " ".join(jeton.forme for jeton in decouper(texte))
+
+
+# --- Les propositions que le college a decide de soumettre ----------------
+
+
+def extraire_restitutions_arbitrees(
+    soumissions: list[dict[str, object]], verbatim: str
+) -> list[PropositionExtraite]:
+    """Les assertions soumises par l'arbitrage, et elles seules.
+
+    Ce que le college a affirme a l'unanimite, citations verifiees, ne devient
+    PAS une proposition : le silence est ici un bon comportement. Faire
+    reconfirmer au praticien ce que trois relecteurs ont deja verifie lui coute
+    un geste et dilue son attention sur ce qui compte.
+    """
+    retenues: list[tuple[int, PropositionExtraite]] = []
+
+    for soumission in soumissions:
+        if str(soumission.get("comportement") or "") != PROPOSER:
+            continue
+        assertion = str(soumission.get("assertion") or "").strip()
+        if not assertion:
+            continue
+        section = str(soumission.get("section") or "") or SOUS_TYPE_RESTITUTION
+        retenues.append((
+            _priorite_arbitree(soumission, section),
+            _proposition(
+                TYPE_RESTITUTION,
+                section,
+                assertion,
+                _empan_verifie(soumission, verbatim),
+            ),
+        ))
+
+    # Tri stable : a priorite egale, l'ordre du compte rendu est conserve.
+    retenues.sort(key=lambda couple: couple[0])
+    return [proposition for _, proposition in retenues]
+
+
+def _priorite_arbitree(soumission: dict[str, object], section: str) -> int:
+    """Rang d'affichage d'une soumission : le motif d'abord, la section ensuite."""
+    if str(soumission.get("motif") or "") in _MOTIFS_PRIORITAIRES:
+        return _PRIORITE_HALLUCINATION
+    return _PRIORITE_SECTION.get(section, _PRIORITE_DEFAUT)
+
+
+def _empan_verifie(soumission: dict[str, object], verbatim: str) -> Empan | None:
+    """L'empan qu'un relecteur a REELLEMENT retrouve dans la dictee.
+
+    On ne remplace pas un empan manquant par un ancrage approximatif : quand
+    aucun relecteur n'a retrouve le passage, cette absence EST le resultat, et
+    la question posee au praticien devient "l'avez-vous dit ?". Afficher un
+    surlignage la ou le college n'a rien trouve donnerait a la proposition une
+    caution que personne n'a accordee.
+
+    L'extrait est RECOUPE dans le verbatim que le serveur detient, jamais repris
+    du rapport : les offsets et le texte surligne ne peuvent alors pas diverger,
+    et un empan decale ferait valider un mot pour un autre.
+    """
+    debut = soumission.get("empan_debut")
+    fin = soumission.get("empan_fin")
+    if not isinstance(debut, int) or not isinstance(fin, int):
+        return None
+    if not 0 <= debut < fin <= len(verbatim):
+        return None
+    return Empan(
+        debut=debut, fin=fin, extrait=verbatim[debut:fin], recouvrement=1.0
+    )
 
 
 def extraire_codes(
@@ -297,20 +507,29 @@ def extraire_codes(
 
 
 def extraire_completudes(
-    alertes: list[dict[str, object]], verbatim: str
+    alertes: list[dict[str, object]],
+    verbatim: str,
+    manques: list[dict[str, object]] | None = None,
 ) -> list[PropositionExtraite]:
     """Les champs signales manquants, ancres sur ce qui les rend attendus.
 
     Une suggestion de completude non ancree reste affichable : elle ne porte
     aucune affirmation sur la dictee, elle constate une ABSENCE. On lui donne
     alors un empan vide plutot que de la supprimer.
+
+    Deux sources se rejoignent ici : le detecteur deterministe et le completiste
+    du college. Un champ signale par les deux ne fait qu'une proposition — le
+    faire trancher deux fois couterait une decision et gonflerait le
+    denominateur avec le meme jugement compte deux fois.
     """
     propositions: list[PropositionExtraite] = []
+    champs_vus: set[str] = set()
 
     for alerte in alertes:
         champ = str(alerte.get("champ") or "")
         if not champ:
             continue
+        champs_vus.add(_cle(champ))
         description = str(alerte.get("description") or champ)
         empan = ancrer(description, verbatim)
         propositions.append(
@@ -319,6 +538,22 @@ def extraire_completudes(
                 str(alerte.get("section") or "completude"),
                 description,
                 empan,
+                chemin=champ,
+            )
+        )
+
+    for manque in manques or []:
+        champ = str(manque.get("champ") or "")
+        if not champ or _cle(champ) in champs_vus:
+            continue
+        champs_vus.add(_cle(champ))
+        justification = str(manque.get("justification") or "") or champ
+        propositions.append(
+            _proposition(
+                TYPE_COMPLETUDE,
+                SOUS_TYPE_COLLEGE,
+                justification,
+                ancrer(justification, verbatim),
                 chemin=champ,
             )
         )
@@ -332,21 +567,57 @@ def extraire(
     codes: list[dict[str, object]] | None = None,
     alertes: list[dict[str, object]] | None = None,
     budget: int = BUDGET_MAX,
+    college: dict[str, object] | None = None,
 ) -> list[PropositionExtraite]:
     """Assemble les propositions d'un dossier, dans la limite du budget.
 
     Les codes et les completudes passent avant les restitutions : ils sont peu
     nombreux, ce sont les mesures les plus dures de l'etude, et les perdre au
     profit d'une dixieme phrase de microscopie appauvrirait le depouillement.
+
+    `college` est le rapport d'arbitrage produit a la generation (trace du
+    moteur). Quand il est la, ce sont ses soumissions qui font les restitutions ;
+    sinon on retombe sur le decoupage.
     """
     propositions: list[PropositionExtraite] = []
     propositions.extend(extraire_codes(codes or [], verbatim))
-    propositions.extend(extraire_completudes(alertes or [], verbatim))
+    propositions.extend(
+        extraire_completudes(
+            alertes or [], verbatim, _entrees_du_college(college, "manques")
+        )
+    )
 
     place_restante = max(0, budget - len(propositions))
-    propositions.extend(extraire_restitutions(cr, verbatim)[:place_restante])
+    propositions.extend(_restitutions(cr, verbatim, college)[:place_restante])
 
     return propositions[:budget]
+
+
+def _restitutions(
+    cr: str, verbatim: str, college: dict[str, object] | None
+) -> list[PropositionExtraite]:
+    """Les restitutions arbitrees si le college a siege, sinon celles du decoupage.
+
+    La voie de repli n'est pas une politesse : une panne de relecteur ne doit pas
+    arreter l'etude, et un praticien qui attend son compte rendu ne doit pas
+    payer l'indisponibilite d'un fournisseur.
+    """
+    soumissions = _entrees_du_college(college, "soumissions")
+    if not soumissions:
+        return extraire_restitutions(cr, verbatim)
+    return extraire_restitutions_arbitrees(soumissions, verbatim)
+
+
+def _entrees_du_college(
+    college: dict[str, object] | None, cle: str
+) -> list[dict[str, object]]:
+    """Une liste du rapport de college, ou rien s'il n'a pas siege."""
+    if not isinstance(college, dict):
+        return []
+    entrees = college.get(cle)
+    if not isinstance(entrees, list):
+        return []
+    return [entree for entree in entrees if isinstance(entree, dict)]
 
 
 def sous_extraction(propositions: list[PropositionExtraite]) -> bool:

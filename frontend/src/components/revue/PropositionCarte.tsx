@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from "react";
+import { useRef, useState, type KeyboardEvent } from "react";
 import {
   Check,
   ChevronRight,
@@ -177,6 +177,7 @@ export default function PropositionCarte({
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [motifsOuverts, setMotifsOuverts] = useState(false);
+  const carteRef = useRef<HTMLDivElement>(null);
 
   const compte = decompteVoix(proposition);
   const sansAppui = !proposition.ancree;
@@ -225,6 +226,17 @@ export default function PropositionCarte({
     });
   };
 
+  /**
+   * Referme le second temps et rend le focus a la carte.
+   *
+   * Sans ce retour, le focus tombe sur le corps de page avec le champ qui
+   * disparait, et le praticien doit retraverser l'ecran a la souris.
+   */
+  const fermerEtape = () => {
+    setEtape(null);
+    carteRef.current?.focus({ preventScroll: true });
+  };
+
   const basculerMotifs = () => {
     const ouverture = !motifsOuverts;
     setMotifsOuverts(ouverture);
@@ -235,16 +247,19 @@ export default function PropositionCarte({
 
   const surTouche = (evenement: KeyboardEvent<HTMLDivElement>) => {
     if (partante || envoi) return;
+    // Echap est traite avant tout : c'est la seule touche qui n'ecrit rien, et
+    // le second temps ouvre justement le focus DANS le champ de saisie.
+    if (evenement.key === "Escape") {
+      if (!etape) return;
+      evenement.preventDefault();
+      fermerEtape();
+      return;
+    }
     // Une frappe dans un champ de saisie appartient au champ, jamais a la
     // grille : sinon on ne peut plus ecrire « Conforme » dans une correction.
     const cible = evenement.target as HTMLElement;
     if (cible.tagName === "TEXTAREA" || cible.tagName === "INPUT") return;
-    if (etape) {
-      if (evenement.key !== "Escape") return;
-      evenement.preventDefault();
-      setEtape(null);
-      return;
-    }
+    if (etape) return;
     if (evenement.metaKey || evenement.ctrlKey || evenement.altKey) return;
     const option = grille.find(
       (o) => o.raccourci === evenement.key.toUpperCase(),
@@ -256,6 +271,7 @@ export default function PropositionCarte({
 
   return (
     <div
+      ref={carteRef}
       // Le panneau parent s'appuie sur ces attributs pour amener le praticien
       // a la premiere carte non decidee, et pour ramener le focus sur une
       // carte revenue apres annulation.
@@ -263,7 +279,6 @@ export default function PropositionCarte({
       data-proposition-id={proposition.id}
       role="group"
       aria-label={`Proposition ${TYPE_LIBELLE[proposition.type]}`}
-      aria-hidden={partante}
       tabIndex={partante ? -1 : 0}
       onMouseEnter={() => onActiver(proposition.id)}
       onMouseLeave={() => onActiver(null)}
@@ -365,7 +380,9 @@ export default function PropositionCarte({
         )
       )}
 
-      {proposition.justifications.length > 0 && (
+      {/* Rien de focalisable dans une carte qui part : le focus s'y perdrait
+          au moment meme ou elle disparait. */}
+      {!partante && proposition.justifications.length > 0 && (
         <div className="mt-2">
           {/* Ferme par defaut : ouvert, le motif des relecteurs noierait la
               decision sous du texte que le praticien n'a pas demande. */}
@@ -481,7 +498,7 @@ export default function PropositionCarte({
               size="sm"
               className="h-9"
               disabled={envoi}
-              onClick={() => setEtape(null)}
+              onClick={fermerEtape}
             >
               Annuler
             </Button>
@@ -512,6 +529,7 @@ export default function PropositionCarte({
               size="sm"
               disabled={envoi}
               title={option.aide}
+              aria-keyshortcuts={option.raccourci}
               onClick={() => choisir(option)}
               className={cn(
                 "h-9 whitespace-normal px-3 text-xs",
@@ -520,8 +538,13 @@ export default function PropositionCarte({
             >
               {option.libelle}
               {/* Le raccourci s'affiche sur le bouton : un raccourci qu'il faut
-                  aller chercher dans une aide n'est jamais appris. */}
-              <span className="rounded-sm border border-current px-1 text-[0.6rem] font-bold leading-tight opacity-60">
+                  aller chercher dans une aide n'est jamais appris. Il est dit
+                  aux lecteurs d'ecran par aria-keyshortcuts, pas par ce
+                  caractere isole qui ne s'enonce pas. */}
+              <span
+                aria-hidden="true"
+                className="rounded-sm border border-current px-1 text-[0.6rem] font-bold leading-tight opacity-60"
+              >
                 {option.raccourci}
               </span>
             </Button>

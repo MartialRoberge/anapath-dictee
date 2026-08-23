@@ -1,17 +1,32 @@
-"""Moteur MULTI-PASSES : comprendre -> rediger -> relire (un seul modele).
+"""Moteur MULTI-PASSES : comprendre -> rediger -> relire -> reunir le college.
 
 Meme socle que ``LocalReportEngine`` (STT, provider, guardrails de securite), mais
-la generation est decomposee en 3 passes LLM a role explicite, ce qui apporte
-l'EXPLICABILITE (on montre ce que le moteur a compris et ce que la relecture
-signale) sans changer le contrat : renvoie un ``GeneratedReport`` (avec `trace`).
+la generation est decomposee en passes LLM a role explicite, ce qui apporte
+l'EXPLICABILITE (on montre ce que le moteur a compris, ce que la relecture
+signale et ce que le college a arbitre) sans changer le contrat : renvoie un
+``GeneratedReport`` (avec `trace`).
 
-Plus lent (3 appels LLM au lieu d'1) — choix assume : qualite + transparence.
+LE COLLEGE N'EST PAS UNE QUATRIEME RELECTURE. La passe de relecture signale au
+praticien ; le college, lui, DECIDE de ce qui sera soumis a validation, assertion
+par assertion, sur des comptes de voix (voir reports/college.py et
+etude/arbitrage.py). Ce qu'il affirme a l'unanimite, citations verifiees dans la
+dictee, ne devient pas une proposition : le silence est le bon comportement.
+
+Ce que le college a decide entre dans `trace`, avec les motifs TELS QUE les
+relecteurs les ont ecrits. Rien n'y est reformule : une justification reecrite
+pour le praticien ne serait plus de l'explicabilite, ce serait de la generation.
+
+Plus lent (6 appels LLM au lieu d'1) — choix assume : qualite + transparence.
+La configuration permet de couper le college pour mesurer sans lui.
 """
 
 from __future__ import annotations
 
 import logging
 
+from etude.arbitrage import Arbitrage, Soumission, arbitrer, taux_de_soumission
+from etude.extraction import AssertionNumerotee, assertions_a_juger, rattacher_les_rangs
+from reports.college import LENTILLES, RapportCollege, reunir_le_college
 from reports.engine import EngineCapabilities, GeneratedReport, ReportEngine
 from reports.guardrails import GenerationParseError, build_validated_report, parse_llm_json
 from reports.knowledge import ContextResult, build_context_block
@@ -35,9 +50,16 @@ _CATEGORIE_LABEL: dict[str, str] = {
     "coherence": "Cohérence",
 }
 
+_PASSES_DE_BASE: tuple[str, ...] = ("comprehension", "redaction", "relecture")
+
 
 class MultiPassReportEngine(LocalReportEngine):
-    """Génération en 3 passes explicites, sur le socle local."""
+    """Génération en passes explicites, sur le socle local.
+
+    Trois passes redigent le compte rendu, une quatrieme le fait relire par le
+    college — qui arbitre ce qui sera soumis au praticien, et qui peut etre
+    coupe par configuration.
+    """
 
     capabilities = EngineCapabilities(
         name="multipass",
@@ -78,6 +100,9 @@ class MultiPassReportEngine(LocalReportEngine):
         # --- Passe 3 : RELECTURE (signale, ne reecrit pas) ---------------
         signalements = await self._review(report.cr, transcript)
 
+        # --- Passe 4 : COLLEGE (arbitre ce qui sera soumis) --------------
+        college = await self._reunir_le_college(report.cr, transcript)
+
         # Les signalements de relecture rejoignent les warnings (canal deja
         # remonte au front) et la trace d'explicabilite.
         report.warnings = report.warnings + [
@@ -88,11 +113,10 @@ class MultiPassReportEngine(LocalReportEngine):
         report.trace = {
             "comprehension": comprehension,
             "signalements": signalements,
-            "passes": [
-                {"role": "comprehension", "model": self._provider.model},
-                {"role": "redaction", "model": self._provider.model},
-                {"role": "relecture", "model": self._provider.model},
-            ],
+            # None quand le college n'a pas siege : l'etude retombe alors sur le
+            # decoupage mecanique (voir etude/extraction.py).
+            "college": college,
+            "passes": _passes(self._provider.model, college is not None),
         }
         return report
 
@@ -128,6 +152,110 @@ class MultiPassReportEngine(LocalReportEngine):
         except (GenerationParseError, ValueError, Exception) as exc:  # noqa: BLE001
             logger.warning("relecture ignoree : %s", exc)
             return []
+
+    async def _reunir_le_college(
+        self, cr: str, transcript: str
+    ) -> dict[str, object] | None:
+        """Passe 4. Retourne None quand le college n'a pas siege.
+
+        Trois cas de non-tenue, et tous les trois retombent sur le decoupage :
+        l'option est coupee, le compte rendu ne contient rien a juger, ou aucun
+        relecteur n'a repondu.
+        """
+        if not self._settings.college_actif:
+            return None
+
+        assertions = assertions_a_juger(cr, transcript)
+        if not assertions:
+            return None
+
+        rapport = await reunir_le_college(
+            self._provider,
+            transcript,
+            cr,
+            [(une.rang, une.texte) for une in assertions],
+        )
+        if rapport.quorum == 0:
+            # Aucune lentille n'a repondu : c'est une PANNE, pas un desaccord.
+            # Arbitrer la-dessus soumettrait toutes les assertions en les
+            # declarant non ancrees, alors que le decoupage sait encore les
+            # ancrer dans la dictee. On rend la main au repli.
+            logger.warning("college muet : repli sur le decoupage")
+            return None
+
+        arbitrage = arbitrer(
+            rattacher_les_rangs(rapport, assertions),
+            [une.texte for une in assertions],
+            transcript,
+        )
+        logger.info(
+            "college: quorum=%s | soumises=%s/%s",
+            rapport.quorum, len(arbitrage.a_valider), len(arbitrage.soumissions),
+        )
+        return _trace_du_college(rapport, arbitrage, assertions)
+
+
+def _passes(model: str, avec_college: bool) -> list[dict[str, str]]:
+    """Les passes reellement executees, pour que la latence soit imputable."""
+    passes = [{"role": role, "model": model} for role in _PASSES_DE_BASE]
+    if avec_college:
+        passes.extend(
+            {"role": f"college:{lentille.cle}", "model": model}
+            for lentille in LENTILLES
+        )
+    return passes
+
+
+def _trace_du_college(
+    rapport: RapportCollege,
+    arbitrage: Arbitrage,
+    assertions: list[AssertionNumerotee],
+) -> dict[str, object]:
+    """Ce que le college a decide, sous une forme que le front peut afficher.
+
+    Le taux de soumission est consigne a chaque generation : c'est l'indicateur
+    a suivre, et il doit BAISSER quand la redaction s'ameliore.
+    """
+    sections = {une.rang: une.section for une in assertions}
+    return {
+        "quorum": rapport.quorum,
+        "lentilles_muettes": list(rapport.lentilles_muettes),
+        "taux_de_soumission": taux_de_soumission(arbitrage),
+        "soumissions": [
+            _trace_soumission(soumission, sections.get(soumission.rang, ""))
+            for soumission in arbitrage.soumissions
+        ],
+        "manques": [
+            {"champ": manque.champ, "justification": manque.justification}
+            for manque in arbitrage.manques
+        ],
+    }
+
+
+def _trace_soumission(soumission: Soumission, section: str) -> dict[str, object]:
+    """Le sort d'une assertion, avec de quoi le verifier sans nous croire.
+
+    Les justifications sont RECOPIEES telles que les relecteurs les ont ecrites
+    en jugeant. Les reformuler pour le praticien reviendrait a generer
+    l'explication d'une decision au lieu de la constater — ce ne serait plus de
+    l'explicabilite. Le decompte des voix joue le meme role qu'un score de
+    confiance, en verifiable : "deux relecteurs sur trois ont retrouve ce
+    passage dans votre dictee" se controle, un 0,73 ne se controle pas.
+    """
+    empan = soumission.empan
+    return {
+        "rang": soumission.rang,
+        "section": section,
+        "assertion": soumission.assertion,
+        "comportement": soumission.comportement,
+        "motif": soumission.motif,
+        "voix_pour": soumission.voix_pour,
+        "voix_total": soumission.voix_total,
+        "empan_debut": empan.debut if empan is not None else None,
+        "empan_fin": empan.fin if empan is not None else None,
+        "empan_extrait": empan.extrait if empan is not None else "",
+        "justifications": list(soumission.justifications),
+    }
 
 
 _: type[ReportEngine] = MultiPassReportEngine

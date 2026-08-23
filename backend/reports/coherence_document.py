@@ -30,7 +30,7 @@ from __future__ import annotations
 import re
 from dataclasses import asdict, dataclass
 
-from negation import NEGATION_MARKERS, mask_negations
+from negation import mask_negations
 from reports.knowledge import detect_organs
 from reports.numbers import spelled_numbers_to_digits
 from text_utils import normaliser
@@ -220,34 +220,13 @@ def _mm(valeur: float) -> str:
     return f"{valeur:.0f}" if valeur == int(valeur) else f"{valeur:.1f}"
 
 
-#: negation.py ne connait que les formes NON elidees ("absence de") et une
-#: poignee de tournures. Les CR ecrivent aussi "absence d'atypie" (apostrophe
-#: droite ou typographique), "aucun signe de", "on n'observe jamais". Sans ces
-#: variantes, une lesion NIEE serait lue comme affirmee — c'est exactement ce
-#: qui produisait des alertes sur des lesions benignes lors de l'audit corpus.
-_MARQUEURS_NEGATION: tuple[str, ...] = NEGATION_MARKERS + (
-    "absence d'", "absence d’", "pas d'", "pas d’",
-    "ne montre pas d'", "ne montre pas d’",
-    "ne trouve pas d'", "ne trouve pas d’",
-    "indemne d'", "indemne d’", "ni d'", "ni d’",
-    "aucun ", "aucune ", "n'observe pas", "n’observe pas",
-    "n'observe jamais", "n’observe jamais", "ne presente pas",
-    "ne comporte pas", "il n'existe pas", "il n’existe pas",
-)
-
-
-def _masquer_negations(texte_normalise: str) -> str:
-    """Masque les clauses niees, elisions comprises."""
-    return mask_negations(texte_normalise, _MARQUEURS_NEGATION)
-
-
 def _texte_affirme(texte: str) -> str:
     """Texte normalise dont les clauses niees sont masquees.
 
     Une lesion enoncee sous negation ("absence de carcinome") ne doit jamais
     declencher une regle qui suppose la lesion presente.
     """
-    return _masquer_negations(normaliser(texte))
+    return mask_negations(normaliser(texte))
 
 
 def _clauses_niees(texte: str) -> list[str]:
@@ -257,7 +236,7 @@ def _clauses_niees(texte: str) -> list[str]:
     d'espaces du masque reperent donc exactement les clauses niees.
     """
     norme: str = normaliser(texte)
-    masque: str = _masquer_negations(norme)
+    masque: str = mask_negations(norme)
     clauses: list[str] = []
     for m in re.finditer(r" {2,}", masque):
         extrait: str = norme[m.start() : m.end()].strip()
@@ -933,7 +912,7 @@ def regle_c12_negation_contredite(cr: str) -> AlerteDocument | None:
     """C12 — une phrase n'affirme pas une malignite qu'elle nie par ailleurs."""
     for phrase in re.split(r"[.\n]", cr):
         norme: str = normaliser(phrase)
-        nie: str = _masquer_negations(norme)
+        nie: str = mask_negations(norme)
         # La negation de malignite doit avoir ete MASQUEE (donc etre reellement
         # sous negation), et la partie affirmee contenir malgre tout une lesion
         # maligne : les deux dans la MEME phrase.
@@ -1115,7 +1094,7 @@ def _absence_envahissement_rapportee(cr: str) -> bool:
     norme: str = normaliser(cr)
     if any(formulation in norme for formulation in _ABSENCE_EXPLICITE):
         return True
-    affirme: str = _masquer_negations(norme)
+    affirme: str = mask_negations(norme)
     return any(t in norme and t not in affirme for t in _ABSENCE_SOUS_NEGATION)
 
 

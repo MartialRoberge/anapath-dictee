@@ -54,6 +54,14 @@ class Settings(BaseSettings):
     report_engine: str = "multipass"
     gilbert_api_key: str = ""
 
+    # College de relecture (moteur multipass uniquement).
+    # Trois lentilles independantes relisent le CR redige, et leur arbitrage
+    # decide de ce qui est soumis au praticien (voir reports/college.py).
+    # Actif par defaut : c'est lui qui evite de tout faire verifier.
+    # Le couper retire trois appels LLM par compte rendu — la latence
+    # supplementaire est assumee, mais il faut pouvoir la mesurer sans.
+    college_actif: bool = True
+
     # ------------------------------------------------------------------
     # Transcription (STT)
     # ------------------------------------------------------------------

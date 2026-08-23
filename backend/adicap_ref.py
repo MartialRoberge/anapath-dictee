@@ -15,6 +15,16 @@ Deux regles du referentiel se retrouvent dans cette API :
   de `enfants()`, `lister_dictionnaire()` et `chercher()`, qui alimentent les
   propositions faites au praticien.
 
+Corollaire de la premiere regle, et piege principal de ce module : le SUFFIXE
+d'URI accepte en raccourci n'est PAS le code. Le concept D1H a pour suffixe
+"D1H" et pour code "H". Les deux coincident pour 9161 concepts, ce qui donne
+l'illusion qu'un code est une reference valide ; pour 453 autres le code ne
+designe rien et l'echec est franc ; mais pour 69 concepts le code se trouve
+etre le suffixe d'un AUTRE concept, et la reponse serait alors fausse sans le
+moindre signal. Le cas le plus net : le code "EZ" appartient a D5EZ (TUMEUR
+EPIDERMOIDE, une lesion) alors que le suffixe "EZ" designe SYSTEME ENDOCRINE
+(un organe). Ces 69 references sont donc REFUSEES, voir `_uri_complete`.
+
 Les libelles officiels sont en majuscules et presque toujours sans accents : les
 comparer a du texte dicte impose de passer par text_utils, source unique de
 normalisation du depot. Le libelle normalise n'est pas stocke dans le JSON, il
@@ -77,6 +87,9 @@ class IndexAdicap:
     par_uri: dict[str, Concept]
     enfants: dict[str, tuple[Concept, ...]]
     par_dictionnaire: dict[str, tuple[Concept, ...]]
+    # Un code designe 0, 1 ou plusieurs concepts : le groupe sert a detecter
+    # qu'une reference courte est lisible a la fois comme suffixe et comme code.
+    par_code: dict[str, tuple[Concept, ...]]
 
 
 def _concept(ligne: list[str], base_uri: str, anatomies: dict[str, str]) -> Concept:
@@ -129,18 +142,55 @@ def index() -> IndexAdicap:
         par_uri={concept.uri: concept for concept in concepts},
         enfants=_grouper(concepts, lambda c: c.uri_parent),
         par_dictionnaire=_grouper(concepts, lambda c: c.dictionnaire),
+        par_code=_grouper(concepts, lambda c: c.code),
     )
 
 
-def _uri_complete(reference: str) -> str:
-    """Accepte l'URI entiere ou son seul suffixe ('D1H') et rend l'URI entiere.
+def _concurrents(reference: str) -> tuple[Concept, ...]:
+    """Concepts dont le CODE vaut `reference` sans que leur URI se termine ainsi.
 
-    Le suffixe est la forme lisible cote code ; l'URI entiere est celle que
-    portent les exports RDF et les autres systemes.
+    Leur existence est ce qui rend la reference courte ambigue : elle se lit
+    aussi bien comme un suffixe d'URI que comme un code, et les deux lectures
+    ne designent pas le meme concept.
+    """
+    table = index()
+    uri_du_suffixe = table.base_uri + reference
+    homonymes = table.par_code.get(reference, ())
+    return tuple(c for c in homonymes if c.uri != uri_du_suffixe)
+
+
+def _uri_complete(reference: str) -> str:
+    """Accepte l'URI entiere ou un suffixe NON AMBIGU, et rend l'URI entiere.
+
+    Le raccourci par suffixe est garde parce qu'il est la forme lisible cote
+    code, mais il est refuse des qu'il se lit aussi comme le code d'un autre
+    concept : rendre l'un des deux au hasard serait une reponse fausse que
+    l'appelant n'a aucun moyen de detecter.
+
+    C'est la levee d'ambiguite qui est retenue, PAS l'exigence d'une URI
+    systematique : imposer l'URI ne corrigerait rien ici, puisque l'appelant
+    qui tient le code "EZ" fabriquerait "<base>EZ" et retomberait exactement
+    sur le mauvais concept. Seule la detection de la collision protege. L'URI
+    entiere reste donc acceptee telle quelle : la donner, c'est justement
+    declarer laquelle des deux lectures on veut.
     """
     reference = reference.strip()
-    base = index().base_uri
-    return reference if reference.startswith(base) else base + reference
+    table = index()
+    if reference.startswith(table.base_uri):
+        return reference
+    uri = table.base_uri + reference
+    # Une reference qui ne designe aucun suffixe connu n'est pas ambigue : elle
+    # echouera franchement sur un None, ce qui se voit.
+    if uri in table.par_uri:
+        concurrents = _concurrents(reference)
+        if concurrents:
+            attendus = ", ".join(f"{c.uri} ({c.libelle})" for c in concurrents[:3])
+            raise ValueError(
+                f"reference ambigue {reference!r} : suffixe de {uri} "
+                f"({table.par_uri[uri].libelle}) mais aussi code de {attendus}. "
+                f"Passez l'URI entiere du concept voulu."
+            )
+    return uri
 
 
 def concept(reference: str) -> Concept | None:
@@ -148,6 +198,9 @@ def concept(reference: str) -> Concept | None:
 
     Volontairement sans filtre d'obsolescence : un compte rendu ancien peut citer
     un code retire et doit rester affichable.
+
+    Leve ValueError si la reference courte est ambigue (voir `_uri_complete`) :
+    sur ce module, se tromper de concept est plus grave que s'arreter.
     """
     return index().par_uri.get(_uri_complete(reference))
 

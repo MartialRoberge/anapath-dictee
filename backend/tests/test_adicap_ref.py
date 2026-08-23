@@ -29,6 +29,20 @@ PROFONDEUR_MAX = 13
 RACINE = "ADICAP"
 KIEL = "0290"  # classification obsolete : 59 fils dont 56 retires
 
+# Repartition des concepts selon que leur CODE se lit ou non comme un suffixe
+# d'URI. Les 69 de la troisieme famille sont le piege du module : leur code est
+# le suffixe d'un AUTRE concept, donc l'accepter rendrait le mauvais concept
+# sans rien signaler. Voir `_familles`.
+CODE_EGALE_SUFFIXE = 9161
+CODE_SANS_SUFFIXE = 453
+CODE_AMBIGU = 69
+
+# Prix du refus, mesure et non suppose : une chaine ambigue sert DEUX concepts,
+# celui dont elle est le suffixe et celui dont elle est le code. Refuser la
+# chaine retire donc aussi le raccourci au premier, qui restait pourtant juste.
+# 9161 - 69 = 9092 raccourcis conserves, les 69 autres passant par l'URI.
+RACCOURCIS_CONSERVES = 9092
+
 
 def _profondeur(uri: str) -> int:
     """Nombre d'ancetres jusqu'a la racine, calcule sans passer par l'index."""
@@ -117,6 +131,107 @@ def test_concept_inconnu_rend_none():
     assert concept("PAS_UN_CODE") is None
 
 
+# --- Le suffixe d'URI n'est pas le code -----------------------------------
+#
+# Piege central du module : `concept()` accepte une reference courte, et rien
+# n'empeche un appelant de lui passer un CODE en croyant passer un suffixe. Le
+# concept D1H a pour code "H". Ces tests figent les trois issues possibles.
+
+
+def _familles() -> dict[str, list]:
+    """Classe chaque concept selon la lecture de son code comme suffixe d'URI.
+
+    Recalcule depuis l'index plutot que depuis une liste ecrite en dur : une
+    reconstruction du thesaurus qui deplacerait un concept d'une famille a
+    l'autre doit se voir ici.
+    """
+    table = index()
+    base = table.base_uri
+    suffixes = {uri[len(base):] for uri in table.par_uri}
+    groupes: dict[str, list] = {"egal": [], "absent": [], "ambigu": []}
+    for uri, c in table.par_uri.items():
+        if c.code == uri[len(base):]:
+            groupes["egal"].append(c)
+        elif c.code not in suffixes:
+            groupes["absent"].append(c)
+        else:
+            groupes["ambigu"].append(c)
+    return groupes
+
+
+def test_les_trois_familles_de_references_courtes():
+    familles = _familles()
+    assert len(familles["egal"]) == CODE_EGALE_SUFFIXE
+    assert len(familles["absent"]) == CODE_SANS_SUFFIXE
+    assert len(familles["ambigu"]) == CODE_AMBIGU
+    assert sum(len(v) for v in familles.values()) == TOTAL_CONCEPTS
+
+
+def test_aucun_code_ambigu_ne_rend_un_concept_different():
+    # LE test du defaut : sur ces 69 concepts, passer le code rendait
+    # silencieusement un AUTRE concept. Aucun ne doit plus repondre.
+    ambigus = _familles()["ambigu"]
+    assert len(ambigus) == CODE_AMBIGU
+    for attendu in ambigus:
+        with pytest.raises(ValueError, match="reference ambigue"):
+            concept(attendu.code)
+
+
+def test_le_code_ambigu_le_plus_dangereux_est_refuse():
+    # "EZ" est le seul des 69 ou les deux lectures ont des libelles differents :
+    # une lesion (D5EZ) contre un organe (EZ). Le confondre mettrait un code
+    # d'organe la ou le praticien attend une tumeur.
+    base = index().base_uri
+    assert concept(base + "EZ").libelle == "SYSTEME ENDOCRINE"
+    assert concept(base + "D5EZ").libelle == "TUMEUR EPIDERMOIDE"
+    with pytest.raises(ValueError, match="EZ"):
+        concept("EZ")
+
+
+def test_l_uri_complete_leve_toujours_l_ambiguite():
+    # L'echappatoire : donner l'URI, c'est declarer laquelle des deux lectures
+    # on veut. Les deux restent joignables, et elles different bien.
+    base = index().base_uri
+    for attendu in _familles()["ambigu"]:
+        autre = concept(base + attendu.code)
+        assert concept(attendu.uri) is attendu
+        assert autre is not None
+        assert autre.uri != attendu.uri
+
+
+def test_le_refus_ne_mord_que_sur_les_chaines_ambigues():
+    # Le raccourci reste la regle : seules les 69 chaines en collision le
+    # perdent, et elles le perdent pour LEURS DEUX lectures.
+    base = index().base_uri
+    ambigues = {c.code for c in _familles()["ambigu"]}
+    assert len(ambigues) == CODE_AMBIGU
+    conserves = 0
+    for attendu in _familles()["egal"]:
+        court = attendu.uri[len(base):]
+        if court in ambigues:
+            with pytest.raises(ValueError, match="reference ambigue"):
+                concept(court)
+        else:
+            assert concept(court) is attendu
+            conserves += 1
+    assert conserves == RACCOURCIS_CONSERVES
+
+
+def test_un_code_sans_suffixe_echoue_franchement():
+    # Ni reponse fausse ni exception : None. L'echec se voit, il est sans
+    # danger, et il reste distinct du refus pour ambiguite.
+    absents = _familles()["absent"]
+    assert len(absents) == CODE_SANS_SUFFIXE
+    for attendu in absents:
+        assert concept(attendu.code) is None
+
+
+def test_enfants_refuse_aussi_une_reference_ambigue():
+    # Meme resolution de reference, donc meme garde-fou.
+    with pytest.raises(ValueError, match="reference ambigue"):
+        enfants("EZ")
+
+
 # --- Obsolescence ----------------------------------------------------------
 
 
@@ -189,6 +304,25 @@ def test_chercher_ignore_casse_et_accents():
     for saisie in ("Sein (également utilisé chez l'homme)",
                    "SEIN (EGALEMENT UTILISE CHEZ L'HOMME)"):
         assert [c.uri for c in chercher(saisie)] == [attendu]
+
+
+def test_chercher_ignore_la_ponctuation_typographique():
+    # Dans le thesaurus, 766 libelles ecrivent l'apostrophe DROITE et un seul la
+    # COURBE : SGSE. Sans repli typographique il etait introuvable a la frappe
+    # normale, et l'echec etait muet — zero resultat, aucune erreur levee.
+    sgse = concept("SGSE")
+    assert sgse is not None
+    assert "’" in sgse.libelle
+    for saisie in ("ganglions de l'abdomen", "ganglions de l’abdomen"):
+        assert sgse.uri in {c.uri for c in chercher(saisie, limite=50)}
+
+
+def test_chercher_ignore_les_points_de_suspension():
+    # Meme faux negatif muet sur le seul libelle qui porte "…".
+    x4m0 = concept("X4M0")
+    assert x4m0 is not None
+    assert "…" in x4m0.libelle
+    assert x4m0.uri in {c.uri for c in chercher("pecome ....", limite=50)}
 
 
 def test_chercher_classe_le_libelle_exact_en_premier():

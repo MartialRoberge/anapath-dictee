@@ -2,10 +2,17 @@
 
 Chaque test protege un chiffre publie : ce qui entre au denominateur du taux
 d'acceptation, ce qui n'y entre pas, et ce qui n'est jamais affiche.
+
+Depuis le branchement du college, ce decoupage n'est plus la source ordinaire
+des propositions de restitution — c'est l'arbitrage qui l'est (voir
+test_etude_arbitrage.py). Il garde deux roles, et les tests ci-dessous les
+protegent tous les deux : il NUMEROTE les assertions soumises au college, et il
+reprend la main quand le college n'a pas siege.
 """
 
 from etude.extraction import (
     BUDGET_MAX,
+    assertions_a_juger,
     extraire,
     extraire_codes,
     extraire_completudes,
@@ -223,3 +230,36 @@ def test_une_etiquette_de_bloc_n_est_pas_une_proposition():
     cr = CR + "\n\nTumeur : blocs 11 a 13\n"
     valeurs = [p.valeur_proposee for p in extraire_restitutions(cr, VERBATIM)]
     assert not any("blocs 11" in v for v in valeurs)
+
+
+# --- Les deux roles qui restent au decoupage -------------------------------
+
+
+def test_le_decoupage_reste_la_voie_de_repli():
+    """Sans college — option coupee ou fournisseur en panne — l'extraction
+    d'origine continue de produire l'etude. L'etude ne s'arrete pas parce qu'un
+    relecteur ne repond pas."""
+    propositions = extraire(CR, VERBATIM)
+
+    assert propositions
+    assert all(p.type_proposition == TYPE_RESTITUTION for p in propositions)
+
+
+def test_le_college_juge_exactement_ce_que_le_repli_proposerait():
+    """Une seule definition de l'unite d'analyse. Si le college jugeait des
+    unites differentes de celles que l'etude compte, les deux voies ne seraient
+    plus comparables et le taux de soumission ne voudrait rien dire."""
+    numerotees = {une.texte for une in assertions_a_juger(CR, VERBATIM)}
+    repli = {p.valeur_proposee for p in extraire_restitutions(CR, VERBATIM)}
+
+    assert numerotees == repli
+
+
+def test_la_numerotation_suit_l_ordre_du_compte_rendu():
+    """Le praticien relit son compte rendu de haut en bas : un numero qui suit
+    l'ordre d'affichage des propositions ne se retrouverait pas dans le texte."""
+    numerotees = assertions_a_juger(CR, VERBATIM)
+    positions = [CR.find(une.texte) for une in numerotees]
+
+    assert all(p != -1 for p in positions)
+    assert positions == sorted(positions)
