@@ -2,8 +2,16 @@
 
 Specification unique et source de verite : le fichier
 ``docs/specs/referentiels/Codage_D1_D2_table.json``. Le module ne recopie pas la
-table, il la lit : une correction du referentiel par la pathologiste se propage
-sans toucher au code.
+logique de la table, il la lit : une correction du referentiel par la
+pathologiste se propage sans toucher au code.
+
+Ce que le module lit reellement est ``backend/data/codage_d1_d2.json``, une
+COPIE DEPLOYEE de ce referentiel — le deploiement n'envoie que ``backend/``,
+``docs/`` n'y est pas. La copie est produite par
+``scripts/sync_referentiels.py`` et ne doit jamais etre editee a la main : la
+correction y serait perdue au prochain lancement du script, et entre-temps le
+codeur appliquerait une table que personne n'a relue. Un test de contrat echoue
+si les deux fichiers divergent.
 
 Ce module est AUTONOME. Il ne remplace pas encore ``adicap.py`` : le branchement
 sera fait par le proprietaire du projet.
@@ -55,10 +63,12 @@ from pathlib import Path
 
 from text_utils import normaliser
 
-_TABLE_PATH: Path = (
-    Path(__file__).resolve().parent.parent
-    / "docs" / "specs" / "referentiels" / "Codage_D1_D2_table.json"
-)
+# Chemin construit a partir de __file__, jamais du repertoire courant : le
+# serveur n'est pas toujours demarre depuis la racine du depot, et un chemin
+# relatif au cwd ferait dependre le codage de la ligne de commande. Il pointe
+# DANS backend/ parce que le deploiement n'envoie que ce dossier : viser
+# docs/specs ne resoudrait qu'en local (voir scripts/sync_referentiels.py).
+_TABLE_PATH: Path = Path(__file__).resolve().parent / "data" / "codage_d1_d2.json"
 
 # Codes D1 atteignables uniquement sur syntagme complet exact : ni morphologie,
 # ni similarite, ni pluriel. Une prediction sans correspondance exacte est un
@@ -261,10 +271,44 @@ def _cle_longueur(terme: str) -> tuple[int, int]:
 # ---------------------------------------------------------------------------
 
 
+class TableD1D2Indisponible(RuntimeError):
+    """La table de decision est absente ou illisible : le codeur ne peut pas coder.
+
+    Cette erreur existe pour interdire la panne silencieuse. L'abstention est un
+    resultat legitime du codeur : elle ne se distingue donc pas, dans les
+    resultats, d'une abstention causee par une table jamais chargee. Sans erreur
+    a la lecture, un fichier manquant en production ferait s'abstenir le codeur
+    sur chaque prelevement et rien ne le signalerait avant le depouillement de
+    l'etude. On echoue donc au chargement, bruyamment.
+    """
+
+
+def _lire_table(chemin: Path) -> dict[str, object]:
+    """Lit la table de decision, ou echoue en nommant le fichier et le remede."""
+    remede = "Regenerer la copie deployee : python scripts/sync_referentiels.py"
+    try:
+        contenu = chemin.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as erreur:
+        raise TableD1D2Indisponible(
+            f"Table de decision D1/D2 illisible : {chemin} ({erreur}). {remede}"
+        ) from erreur
+    try:
+        table = json.loads(contenu)
+    except json.JSONDecodeError as erreur:
+        raise TableD1D2Indisponible(
+            f"Table de decision D1/D2 corrompue : {chemin} n'est pas un JSON valide. {remede}"
+        ) from erreur
+    if not isinstance(table, dict):
+        raise TableD1D2Indisponible(
+            f"Table de decision D1/D2 inattendue : {chemin} ne contient pas un objet JSON"
+        )
+    return table
+
+
 @lru_cache(maxsize=1)
 def _table() -> dict[str, object]:
     """Charge la table de decision D1/D2 une seule fois."""
-    return json.loads(_TABLE_PATH.read_text(encoding="utf-8"))
+    return _lire_table(_TABLE_PATH)
 
 
 def _objet(valeur: object) -> dict[str, object]:

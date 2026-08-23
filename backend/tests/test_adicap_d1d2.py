@@ -8,17 +8,25 @@ defaut B pose la ou la table exige une abstention.
 
 from __future__ import annotations
 
+import importlib.util
 import json
+import os
 import re
+import subprocess
+import sys
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 
+import adicap_d1d2
 from adicap_d1d2 import (
     _CAS_PARTICULIERS,
     _TABLE_PATH,
     CODES_RARES,
     D1_CYTOLOGIQUES,
+    TableD1D2Indisponible,
+    _lire_table,
     coder_d1,
     coder_d2,
     composer_codes,
@@ -28,6 +36,13 @@ from adicap_d1d2 import (
 )
 
 TABLE: dict[str, object] = json.loads(Path(_TABLE_PATH).read_text(encoding="utf-8"))
+
+_BACKEND: Path = Path(adicap_d1d2.__file__).resolve().parent
+_RACINE: Path = _BACKEND.parent
+_SOURCE_REFERENTIEL: Path = (
+    _RACINE / "docs" / "specs" / "referentiels" / "Codage_D1_D2_table.json"
+)
+_SCRIPT_SYNC: Path = _RACINE / "scripts" / "sync_referentiels.py"
 
 
 # ---------------------------------------------------------------------------
@@ -475,3 +490,137 @@ def test_libelles_d2_couvrent_primaires_et_secondaires():
 
 def test_codes_rares_declares_conformes_au_json():
     assert CODES_RARES == frozenset(TABLE["codes_rares"]["codes"])
+
+
+# ---------------------------------------------------------------------------
+# Deployabilite : ou la table est lue, et ce qui se passe si elle manque
+#
+# Le deploiement n'envoie que backend/. Une table cherchee ailleurs, ou cherchee
+# a partir du repertoire courant, existe en local et manque en production.
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="module")
+def sync_referentiels() -> ModuleType:
+    """Le script de synchronisation, importe depuis scripts/ (hors de backend/)."""
+    if not _SCRIPT_SYNC.is_file():
+        pytest.skip("image deployee : scripts/ n'est pas embarque")
+    spec = importlib.util.spec_from_file_location("sync_referentiels", _SCRIPT_SYNC)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _vider_caches_du_module() -> None:
+    """Oublie tout ce que le module a deja lu de la table.
+
+    Les chargements sont memorises par ``lru_cache`` : sans ce vidage, un test
+    qui deplace le chemin de la table ne verrait que la table deja en memoire.
+    """
+    for objet in vars(adicap_d1d2).values():
+        vider = getattr(objet, "cache_clear", None)
+        if vider is not None:
+            vider()
+
+
+def test_la_table_lue_est_embarquee_dans_backend():
+    """Le fichier lu doit partir sur Render, donc vivre sous backend/."""
+    assert _TABLE_PATH.is_file()
+    assert _TABLE_PATH.is_relative_to(_BACKEND)
+
+
+def test_la_copie_deployee_est_identique_a_la_source():
+    """Une copie qui derive fait coder selon une table que personne n'a relue.
+
+    La derive ne produit aucun symptome : le codeur repond toujours, il repond
+    seulement selon une regle perimee. Elle ne se verrait qu'au depouillement de
+    l'etude, donc trop tard : c'est ici qu'elle doit s'arreter.
+    """
+    if not _SOURCE_REFERENTIEL.parent.is_dir():
+        pytest.skip("image deployee : docs/specs n'est pas embarque")
+    assert _SOURCE_REFERENTIEL.is_file(), f"referentiel source disparu : {_SOURCE_REFERENTIEL}"
+    assert _TABLE_PATH.read_bytes() == _SOURCE_REFERENTIEL.read_bytes(), (
+        f"{_TABLE_PATH} a derive de {_SOURCE_REFERENTIEL}. La source de verite "
+        "reste docs/specs : reporter la correction la-bas, puis relancer "
+        "python scripts/sync_referentiels.py"
+    )
+
+
+def test_le_codeur_trouve_sa_table_depuis_un_autre_repertoire(tmp_path):
+    """Le chemin part de __file__ : demarrer hors de la racine doit coder pareil.
+
+    Un chemin relatif au repertoire courant passerait ce test suite entiere
+    depuis backend/ et echouerait au demarrage du serveur.
+    """
+    programme = "import adicap_d1d2; print(adicap_d1d2.coder_d1('appendicectomie').code)"
+    execution = subprocess.run(
+        [sys.executable, "-c", programme],
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(_BACKEND)},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert execution.returncode == 0, execution.stderr
+    assert execution.stdout.strip() == "O"
+
+
+def test_une_table_introuvable_leve_une_erreur_nommee(tmp_path):
+    """L'erreur doit nommer le fichier attendu ET le moyen de le retablir."""
+    with pytest.raises(TableD1D2Indisponible) as echec:
+        _lire_table(tmp_path / "jamais_deployee.json")
+    assert "jamais_deployee.json" in str(echec.value)
+    assert "sync_referentiels" in str(echec.value)
+
+
+def test_une_table_illisible_leve_une_erreur_nommee(tmp_path):
+    """JSON tronque ou racine inattendue : deux facons d'avoir un fichier inutile."""
+    tronquee = tmp_path / "tronquee.json"
+    tronquee.write_text('{"actes_simples": {', encoding="utf-8")
+    with pytest.raises(TableD1D2Indisponible):
+        _lire_table(tronquee)
+    liste = tmp_path / "liste.json"
+    liste.write_text("[]", encoding="utf-8")
+    with pytest.raises(TableD1D2Indisponible):
+        _lire_table(liste)
+
+
+def test_une_table_absente_echoue_au_lieu_de_s_abstenir(tmp_path, monkeypatch):
+    """La panne ne doit jamais se deguiser en abstention.
+
+    L'abstention est un resultat legitime du codeur : dans les resultats, une
+    abstention causee par un fichier manquant est indiscernable d'une abstention
+    voulue. Le codeur doit donc echouer bruyamment, pas rendre du vide.
+    """
+    monkeypatch.setattr(adicap_d1d2, "_TABLE_PATH", tmp_path / "jamais_deployee.json")
+    _vider_caches_du_module()
+    try:
+        with pytest.raises(TableD1D2Indisponible):
+            coder_d1("biopsie bronchique")
+    finally:
+        monkeypatch.undo()
+        _vider_caches_du_module()
+    # La table retrouvee, le codeur reprend son travail : le test n'a rien casse
+    # pour les suivants.
+    assert coder_d1("biopsie bronchique").code == "P"
+
+
+def test_le_synchroniseur_alimente_le_fichier_lu_par_le_codeur(sync_referentiels):
+    """Sinon le script recopie un fichier mort pendant que le codeur en lit un autre."""
+    copies = {_RACINE / copie for _, copie in sync_referentiels.REFERENTIELS}
+    assert _TABLE_PATH in copies
+
+
+def test_le_synchroniseur_distingue_une_copie_a_jour_d_une_copie_perimee(
+    sync_referentiels, tmp_path
+):
+    """Un detecteur toujours d'accord desarmerait la garde sans rien signaler."""
+    source = tmp_path / "source.json"
+    copie = tmp_path / "copie.json"
+    source.write_text('{"version": "2.0"}', encoding="utf-8")
+    assert not sync_referentiels._identiques(source, copie)
+    copie.write_text('{"version": "1.0"}', encoding="utf-8")
+    assert not sync_referentiels._identiques(source, copie)
+    sync_referentiels._copier(source, copie)
+    assert sync_referentiels._identiques(source, copie)
