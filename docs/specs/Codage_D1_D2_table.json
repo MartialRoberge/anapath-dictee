@@ -1,0 +1,619 @@
+{
+  "version": "2.0",
+  "avertissement": "Table dérivée du lexique fourni par Jéromine. Les entrées marquées 'a_valider' n'y figuraient pas et sont des propositions à confirmer.",
+  "actes_simples": {
+    "A": {
+      "libelle": "ASPIRATION",
+      "termes": [
+        "aspiration bronchique",
+        "aspiration tracheale",
+        "aspiration endotracheale",
+        "aspiration tracheo-bronchique",
+        "aspiration nasopharyngee",
+        "aspiration oropharyngee",
+        "aspiration gastrique",
+        "tubage gastrique avec aspiration"
+      ],
+      "garde": "Ne jamais declencher sur 'aspiration a l'aiguille' -> famille cytoponction."
+    },
+    "E": {
+      "libelle": "EMPREINTE",
+      "termes": [
+        "empreinte",
+        "apposition"
+      ]
+    },
+    "F": {
+      "libelle": "FROTTIS",
+      "termes": [
+        "frottis",
+        "brossage",
+        "ecouvillonnage",
+        "frottis cervico-uterin",
+        "frottis cervico-vaginal",
+        "fcu"
+      ],
+      "a_valider": [
+        "frottis cervico-uterin",
+        "frottis cervico-vaginal",
+        "fcu"
+      ]
+    },
+    "L": {
+      "libelle": "LIQUIDE EMIS OU DE PONCTION",
+      "termes": [
+        "liquide pleural",
+        "epanchement pleural",
+        "liquide d'ascite",
+        "ascite",
+        "liquide peritoneal",
+        "epanchement peritoneal",
+        "liquide pericardique",
+        "epanchement pericardique",
+        "liquide cephalo-rachidien",
+        "liquide cerebrospinal",
+        "lcr",
+        "liquide synovial",
+        "liquide articulaire",
+        "liquide de kyste",
+        "contenu kystique",
+        "liquide de ponction",
+        "liquide d'epanchement",
+        "ponction pleurale",
+        "ponction d'ascite"
+      ],
+      "a_valider": [
+        "ponction pleurale",
+        "ponction d'ascite"
+      ]
+    },
+    "M": {
+      "libelle": "MATERIEL EXPULSE",
+      "termes": [
+        "expulsion spontanee",
+        "produit expulse spontanement",
+        "produit d'expulsion spontanee",
+        "fausse couche spontanee"
+      ]
+    },
+    "R": {
+      "libelle": "LIQUIDE DE RINCAGE OU LAVAGE",
+      "termes": [
+        "lavage",
+        "liquide de lavage",
+        "liquide de rincage",
+        "rincage",
+        "lavage broncho-alveolaire",
+        "lavage bronchoalveolaire",
+        "lba",
+        "lavage bronchique",
+        "lavage bronchiolo-alveolaire",
+        "lavage gastrique",
+        "lavage vesical",
+        "lavage urinaire",
+        "lavage peritoneal",
+        "lavage peritoneal diagnostique"
+      ]
+    },
+    "S": {
+      "libelle": "SECRETION",
+      "termes": [
+        "crachat",
+        "expectoration",
+        "expectoration induite",
+        "secretion",
+        "ecoulement mamelonnaire",
+        "ecoulement du mamelon",
+        "ecoulement spontane",
+        "produit de massage prostatique"
+      ],
+      "a_valider": "TOUTE la liste. Le document fourni ne contenait aucun indice pour S (les en-tetes R et S avaient fusionne)."
+    },
+    "K": {
+      "libelle": "CURETAGE / RESECTION ENDOSCOPIQUE",
+      "termes": [
+        "curetage",
+        "produit de curetage",
+        "curetage uterin",
+        "curetage endometrial",
+        "resection endoscopique",
+        "resection endoscopique de muqueuse",
+        "mucosectomie",
+        "emr",
+        "dissection sous-muqueuse",
+        "dissection sous-muqueuse endoscopique",
+        "esd",
+        "polypectomie endoscopique",
+        "resection transuretrale",
+        "rtu",
+        "rtuv",
+        "resection transuretrale de vessie",
+        "rtup",
+        "resection transuretrale de prostate"
+      ],
+      "priorite": "Doit etre teste AVANT la famille exerese : mucosectomie et polypectomie endoscopique se terminent en -ectomie."
+    },
+    "N": {
+      "libelle": "NECROPSIE",
+      "termes": [
+        "necropsie",
+        "necroscopie",
+        "autopsie"
+      ],
+      "note": "Mot exact uniquement, jamais de sous-chaine. 'autopsie' a valider. ADICAP ecrit NECROPSIE ; 'necroscopie' est la variante entendue en dictee."
+    },
+    "V": {
+      "libelle": "PRELEVEMENT VETERINAIRE",
+      "termes": [
+        "prelevement veterinaire"
+      ],
+      "note": "Syntagme complet uniquement. Ne jamais declencher sur 'veterinaire' seul."
+    },
+    "X": {
+      "libelle": "EXPERIMENTATION",
+      "termes": [
+        "experimentation"
+      ],
+      "note": "Mot exact uniquement."
+    }
+  },
+  "familles": {
+    "biopsie": {
+      "bases": [
+        "biopsie"
+      ],
+      "modificateurs_ordonnes": [
+        {
+          "nom": "chirurgicale",
+          "code": "B",
+          "declencheurs": [
+            "chirurgicale"
+          ]
+        },
+        {
+          "nom": "transvasculaire",
+          "code": "T",
+          "declencheurs": [
+            "transvasculaire",
+            "transveineuse",
+            "transarterielle",
+            "endomyocardique"
+          ]
+        },
+        {
+          "nom": "guidee_imagerie",
+          "code": "H",
+          "declencheurs": [
+            "guidee par l'imagerie",
+            "sous controle de l'imagerie",
+            "sous scan",
+            "sous scanner",
+            "echoguidee",
+            "sous echo",
+            "sous controle echographique",
+            "sous controle echo",
+            "sous irm",
+            "sous controle irm",
+            "sous tdm",
+            "sous tomodensitometrie",
+            "stereotaxique",
+            "sous stereotaxie",
+            "sous reperage",
+            "guidee"
+          ],
+          "a_valider": [
+            "sous irm",
+            "sous controle irm",
+            "sous tdm",
+            "sous tomodensitometrie",
+            "stereotaxique",
+            "sous stereotaxie",
+            "sous reperage",
+            "guidee"
+          ]
+        }
+      ],
+      "defaut": {
+        "code": "P",
+        "libelle": "PONCTION-BIOPSIE NON GUIDEE"
+      },
+      "cas_particuliers_a_valider": {
+        "macrobiopsie": "H si le guidage est implicite dans le geste — a confirmer",
+        "microbiopsie": "H si le guidage est implicite dans le geste — a confirmer",
+        "tru-cut": "P ou H selon mention du guidage — a confirmer"
+      }
+    },
+    "cytoponction": {
+      "bases": [
+        "cytoponction",
+        "cytoponction a l'aiguille fine",
+        "aspiration a l'aiguille fine",
+        "ponction a l'aiguille fine"
+      ],
+      "bases_a_valider": [
+        "cytoponction a l'aiguille fine",
+        "aspiration a l'aiguille fine",
+        "ponction a l'aiguille fine"
+      ],
+      "modificateurs_ordonnes": [
+        {
+          "nom": "guidee_imagerie",
+          "code": "G",
+          "declencheurs": [
+            "guidee par imagerie",
+            "guidee par l'imagerie",
+            "echoguidee",
+            "sous echo",
+            "sous scanner",
+            "sous controle echographique",
+            "guidee"
+          ],
+          "a_valider": [
+            "echoguidee",
+            "sous echo",
+            "sous scanner",
+            "sous controle echographique",
+            "guidee"
+          ]
+        }
+      ],
+      "defaut": {
+        "code": "C",
+        "libelle": "CYTOPONCTION NON GUIDEE"
+      }
+    }
+  },
+  "famille_exerese": {
+    "bases": [
+      "piece",
+      "exerese"
+    ],
+    "morphologie": "-ectomie",
+    "probleme": "Les codes I et O partagent EXACTEMENT les memes declencheurs. Le lexique seul ne peut pas trancher. Le discriminant est : l'organe est-il retire en entier ?",
+    "discriminant": {
+      "I": "exerese PARTIELLE de l'organe",
+      "O": "exerese COMPLETE de l'organe"
+    },
+    "table_geste_organe": {
+      "_statut": "PROPOSITION DE DEPART — a valider integralement par un pathologiste",
+      "O_organe_entier": [
+        "appendicectomie",
+        "cholecystectomie",
+        "splenectomie",
+        "amygdalectomie",
+        "pneumonectomie",
+        "laryngectomie totale",
+        "thyroidectomie totale",
+        "nephrectomie totale",
+        "nephrectomie elargie",
+        "orchidectomie",
+        "hysterectomie totale",
+        "cystectomie totale",
+        "gastrectomie totale",
+        "prostatectomie totale",
+        "prostatectomie radicale",
+        "surrenalectomie",
+        "mastectomie totale",
+        "colectomie totale",
+        "coloprotectomie totale"
+      ],
+      "I_organe_partiel": [
+        "lobectomie",
+        "segmentectomie",
+        "hemicolectomie",
+        "hemithyroidectomie",
+        "hemihepatectomie",
+        "tumorectomie",
+        "zonectomie",
+        "quadrantectomie",
+        "resection atypique",
+        "wedge",
+        "gastrectomie partielle",
+        "gastrectomie subtotale",
+        "sigmoidectomie",
+        "nephrectomie partielle",
+        "conisation",
+        "exerese cutanee",
+        "exerese de lesion",
+        "colectomie segmentaire",
+        "thyroidectomie partielle",
+        "laryngectomie partielle"
+      ]
+    },
+    "regle_de_repli": "Si le geste n'est dans aucune des deux listes : NE PAS APPLIQUER de defaut. S'abstenir et proposer I et O au praticien. Un defaut sur cette famille produit une erreur systematique sur toute la classe complementaire."
+  },
+  "ordre_evaluation": [
+    "1. Rejeter N, V, X",
+    "2. Phrases exactes multi-mots, de la plus longue a la plus courte",
+    "3. Actes simples : jetons exacts (K teste avant tout ce qui touche -ectomie)",
+    "4. Familles : modificateur d'abord, base nue ensuite",
+    "5. Famille exerese : table geste x organe, puis abstention si absent",
+    "6. Aucune correspondance : abstention explicite, pas de code par defaut"
+  ],
+  "principe": "Correspondance exacte multi-mots > jeton exact > morphologie de suffixe. Ce classement resout a lui seul les 18 inclusions detectees dans le lexique brut.",
+  "codes_rares": {
+    "codes": [
+      "N",
+      "V",
+      "X"
+    ],
+    "regle": "Actifs, mais uniquement sur correspondance exacte du syntagme complet. Jamais atteignables par similarite, par morphologie ou par le modele. Une prediction de N, V ou X sans correspondance exacte est un defaut."
+  },
+  "questions_de_levee_de_doute": {
+    "principe": "Ne poser une question QUE si les reponses possibles conduisent a des sorties differentes, et QUE si le praticien detient la reponse. Sinon : s'abstenir.",
+    "budget_par_compte_rendu": 3,
+    "moment": "En tete de l'ecran de revue, avant les propositions. Jamais pendant la dictee.",
+    "format": "2 a 3 options fermees, un tap. Jamais de texte libre. Toujours une issue 'je ne sais pas / ne pas coder'.",
+    "ambiguites_structurelles": [
+      {
+        "id": "d1_exerese_i_o",
+        "declencheur": "Base exerese detectee et geste absent de la table geste x organe",
+        "question": "L'organe a-t-il ete retire en entier ?",
+        "options": [
+          {
+            "label": "En entier",
+            "resout": "O"
+          },
+          {
+            "label": "En partie",
+            "resout": "I"
+          },
+          {
+            "label": "Je ne sais pas",
+            "resout": "abstention"
+          }
+        ],
+        "impact": "positions 1",
+        "priorite": 1
+      },
+      {
+        "id": "d1_guidage_biopsie",
+        "declencheur": "Base 'biopsie' sans modificateur, ET organe habituellement biopsie sous guidage",
+        "question": "Le prelevement a-t-il ete guide par l'imagerie ?",
+        "options": [
+          {
+            "label": "Oui",
+            "resout": "H"
+          },
+          {
+            "label": "Non",
+            "resout": "P"
+          },
+          {
+            "label": "Non precise",
+            "resout": "abstention"
+          }
+        ],
+        "impact": "positions 1",
+        "priorite": 2,
+        "a_valider": "La liste des organes qui declenchent cette question doit venir du praticien. Sans filtre par organe, la question se poserait sur presque tous les cas."
+      },
+      {
+        "id": "d1_guidage_cytoponction",
+        "declencheur": "Base 'cytoponction' sans modificateur",
+        "question": "La cytoponction a-t-elle ete guidee par l'imagerie ?",
+        "options": [
+          {
+            "label": "Oui",
+            "resout": "G"
+          },
+          {
+            "label": "Non",
+            "resout": "C"
+          },
+          {
+            "label": "Non precise",
+            "resout": "abstention"
+          }
+        ],
+        "impact": "positions 1",
+        "priorite": 2
+      }
+    ],
+    "sources_de_doute": [
+      {
+        "id": "structurelle",
+        "description": "Ambiguite connue du referentiel, enumeree ci-dessus. Question redigee a l'avance et validee par un pathologiste."
+      },
+      {
+        "id": "transcription",
+        "description": "Divergence entre les hypotheses n-best de la reconnaissance vocale sur un empan porteur de decision. Signal plus fiable que le score brut."
+      },
+      {
+        "id": "regle",
+        "description": "Conflit detecte par le moteur deterministe, par exemple un code D7 avec un D1 non cytologique."
+      }
+    ],
+    "ne_pas_demander_si": [
+      "Les deux candidats produisent le meme code final.",
+      "Le repli SAI est une reponse legitime — dans ce cas, s'abstenir sans demander.",
+      "L'information n'a pas ete dite parce qu'elle n'existe pas, et non parce qu'elle a ete omise.",
+      "Le budget de 3 questions est deja atteint : garder les questions a plus fort impact aval."
+    ]
+  },
+  "portee": "D1 (position 1) et D2 (position 2)",
+  "D2": {
+    "principe": "Position 2. H par defaut. Deux roles distincts : code PRIMAIRE ou code SECONDAIRE.",
+    "code_primaire": {
+      "H": {
+        "libelle": "HISTOLOGIE ET CYTOLOGIE PAR INCLUSION",
+        "regle": "DEFAUT"
+      },
+      "C": {
+        "libelle": "CYTOLOGIE PAR ETALEMENT",
+        "declencheurs": [
+          "cytologie",
+          "cytoponction",
+          "etalement",
+          "frottis",
+          "cytospin",
+          "cytocentrifugation"
+        ],
+        "condition_negative": [
+          "cytobloc",
+          "cell-block",
+          "cell block",
+          "inclusion",
+          "paraffine"
+        ],
+        "regle": "C uniquement si AUCUN terme de condition_negative n'est present. Un cytobloc est une inclusion, donc H."
+      }
+    },
+    "codes_secondaires": {
+      "_regle": "Ne remplacent JAMAIS le code primaire. Ils s'ajoutent : un code ADICAP supplementaire par technique realisee, identique au primaire sauf en position 2.",
+      "E": {
+        "libelle": "EXTEMPORANE",
+        "declencheurs": [
+          "extempo",
+          "extemporane"
+        ]
+      },
+      "F": {
+        "libelle": "CYTOMETRIE EN FLUX",
+        "declencheurs": [
+          "cytometrie en flux"
+        ]
+      },
+      "G": {
+        "libelle": "GENETIQUE",
+        "declencheurs": [
+          "caryotype",
+          "cytogenetique"
+        ]
+      },
+      "K": {
+        "libelle": "MATERIEL CONGELE - TISSUTHEQUE",
+        "declencheurs": [
+          "tissu congele",
+          "materiel congele",
+          "congelation",
+          "conservation a -80",
+          "cryoconservation",
+          "prelevement congele",
+          "tumorotheque"
+        ]
+      },
+      "L": {
+        "libelle": "RELECTURE",
+        "declencheurs": [
+          "relecture"
+        ]
+      },
+      "U": {
+        "libelle": "ULTRASTRUCTURE",
+        "declencheurs": [
+          "ultrastructure",
+          "etude ultrastructurale",
+          "examen ultrastructural",
+          "microscopie electronique",
+          "microscopie electronique en transmission"
+        ]
+      },
+      "Y": {
+        "libelle": "BIOLOGIE MOLECULAIRE",
+        "declencheurs": [
+          "biologie moleculaire",
+          "fish",
+          "ish",
+          "hybridation in situ",
+          "pcr",
+          "sequencage",
+          "ngs",
+          "rna-seq",
+          "dna-seq",
+          "analyse moleculaire",
+          "recherche de mutation",
+          "recherche de fusion"
+        ]
+      }
+    },
+    "codes_inactifs": {
+      "codes": [
+        "A",
+        "B",
+        "D",
+        "I",
+        "M",
+        "P",
+        "Q",
+        "R",
+        "S",
+        "T",
+        "W",
+        "X",
+        "Z"
+      ],
+      "regle": "Declares jamais utilises. Toute prediction est un defaut.",
+      "notes": {
+        "M": "MACROSCOPIE inactif — confirme que 'macro' est un marqueur de section, jamais un code.",
+        "I": "IMMUNO-HISTOCHIMIE inactif alors que l'IHC est realisee en routine. L'IHC releve de la COTATION, pas de la codification. Deux axes distincts."
+      }
+    }
+  },
+  "cardinalite_des_codes": {
+    "probleme_v1": "Retour Jeromine : 'si plusieurs prelevements, il faut plusieurs codes' et 'j'ai dicte plusieurs prelevements, il n'en prend en compte qu'un seul'.",
+    "modele": "Le nombre de codes ADICAP d'un dossier resulte de DEUX multiplicites independantes.",
+    "axe_1_prelevements": "Un code primaire par prelevement. D1 et D3 peuvent varier d'un prelevement a l'autre.",
+    "axe_2_techniques": "Un code secondaire par technique supplementaire, PAR prelevement concerne. Identique au primaire sauf en position 2.",
+    "formule": "codes = somme sur les prelevements de (1 + nb de techniques secondaires du prelevement)",
+    "exemple": {
+      "dictee": "Deux biopsies bronchiques et un LBA. Extemporane sur la premiere. Recherche de mutation EGFR sur la premiere.",
+      "codes": [
+        {
+          "prelevement": 1,
+          "code": "P H R B ....",
+          "role": "primaire"
+        },
+        {
+          "prelevement": 1,
+          "code": "P E R B ....",
+          "role": "secondaire extemporane"
+        },
+        {
+          "prelevement": 1,
+          "code": "P Y R B ....",
+          "role": "secondaire biologie moleculaire"
+        },
+        {
+          "prelevement": 2,
+          "code": "P H R B ....",
+          "role": "primaire"
+        },
+        {
+          "prelevement": 3,
+          "code": "R C R P ....",
+          "role": "primaire LBA cytologie"
+        }
+      ],
+      "total": 5
+    },
+    "regle_ui": "Le nombre de codes doit etre visible et verifiable en un coup d'oeil. Un dossier a n prelevements affiche n blocs de codes, jamais un seul."
+  },
+  "coherence_inter_positions": [
+    {
+      "id": "K1",
+      "regle": "D1 cytologique (A,C,E,F,G,L,R,S) => D2 primaire = C, sauf mention de cytobloc ou d'inclusion auquel cas H.",
+      "type": "bloquant"
+    },
+    {
+      "id": "K2",
+      "regle": "D2 = C => D7 devient accessible en positions 5-8.",
+      "type": "informatif"
+    },
+    {
+      "id": "K3",
+      "regle": "D2 = H => D7 INTERDIT en positions 5-8.",
+      "type": "bloquant"
+    },
+    {
+      "id": "K4",
+      "regle": "Un code secondaire porte les memes positions 1, 3-4 et 5-8 que son primaire. Seule la position 2 differe.",
+      "type": "bloquant"
+    },
+    {
+      "id": "K5",
+      "regle": "Aucun code secondaire ne peut exister sans code primaire rattache.",
+      "type": "bloquant"
+    }
+  ]
+}

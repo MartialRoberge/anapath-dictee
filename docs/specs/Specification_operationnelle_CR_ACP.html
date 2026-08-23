@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aide à la rédaction du CR-ACP — spécification opérationnelle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBFBFC;
+  --panel:#FFFFFF;
+  --ink:#12151A;
+  --ink-2:#3E444E;
+  --mute:#767E8B;
+  --rule:#E2E4E9;
+  --hema:#3B3178;        /* hématoxyline */
+  --hema-w:#EEEBF7;
+  --eosin:#B44A6B;       /* éosine */
+  --eosin-w:#FBEDF1;
+  --valid:#2C6A5C;
+  --valid-w:#E8F2EF;
+  --amber:#9A6B12;
+  --amber-w:#FAF1DE;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px 120px}
+
+/* ---------- eyebrow / labels ---------- */
+.eyebrow{
+  font-family:var(--cond);font-weight:600;font-size:12px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--mute);
+}
+
+/* ---------- hero ---------- */
+.hero{padding:76px 0 40px;border-bottom:1px solid var(--rule)}
+.hero h1{
+  font-size:clamp(30px,4.4vw,50px);line-height:1.06;font-weight:600;
+  letter-spacing:-.022em;margin:16px 0 0;max-width:19ch;
+}
+.hero .lede{
+  margin:22px 0 0;max-width:62ch;font-size:17.5px;color:var(--ink-2);
+}
+.meta{
+  margin-top:34px;display:flex;flex-wrap:wrap;gap:8px 26px;
+  font-family:var(--mono);font-size:12.5px;color:var(--mute);
+}
+
+/* ---------- code strip (signature) ---------- */
+.strip-block{margin:54px 0 8px}
+.strip{
+  display:grid;grid-template-columns:repeat(15,1fr);gap:3px;
+  border:1px solid var(--rule);border-radius:3px;overflow:hidden;background:var(--rule);
+}
+.cell{
+  background:var(--panel);padding:11px 3px 9px;text-align:center;
+  opacity:0;transform:translateY(5px);
+  animation:rise .42s cubic-bezier(.2,.7,.3,1) forwards;
+}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.cell{animation:none;opacity:1;transform:none}}
+.cell .pos{font-family:var(--mono);font-size:9.5px;color:var(--mute);display:block}
+.cell .chr{
+  font-family:var(--mono);font-weight:600;font-size:21px;line-height:1.5;display:block;
+}
+.cell .dic{
+  font-family:var(--cond);font-size:9.5px;font-weight:600;letter-spacing:.05em;
+  text-transform:uppercase;display:block;color:var(--mute);
+}
+.c-oblig .chr{color:var(--hema)}
+.c-oblig{background:var(--hema-w)}
+.c-lesion{background:var(--eosin-w)}
+.c-lesion .chr{color:var(--eosin)}
+.c-fac .chr{color:var(--ink-2)}
+.c-void .chr{color:#C9CCD3}
+.strip-legend{
+  display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:12px;
+  font-size:12.5px;color:var(--mute);font-family:var(--mono);
+}
+.strip-caption{margin-top:20px;font-size:14.5px;color:var(--ink-2);max-width:74ch}
+.strip-caption b{font-weight:600;color:var(--ink)}
+
+/* ---------- sections ---------- */
+section{padding:66px 0 0;border-top:1px solid var(--rule);margin-top:56px}
+section:first-of-type{border-top:none;margin-top:0}
+h2{
+  font-size:clamp(23px,2.7vw,31px);font-weight:600;letter-spacing:-.015em;
+  line-height:1.18;margin:12px 0 0;max-width:26ch;
+}
+h3{font-size:17px;font-weight:600;margin:38px 0 8px;letter-spacing:-.005em}
+p{margin:16px 0;max-width:74ch;color:var(--ink-2)}
+p strong{color:var(--ink);font-weight:600}
+.lead{font-size:17.5px;color:var(--ink)}
+
+/* ---------- verdict split ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:34px;background:var(--rule);border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.split>div{background:var(--panel);padding:26px 24px 28px}
+.split .tag{font-family:var(--cond);font-size:11.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase}
+.split .t-a{color:var(--hema)}
+.split .t-b{color:var(--eosin)}
+.split h4{margin:9px 0 10px;font-size:18px;font-weight:600;letter-spacing:-.01em}
+.split p{margin:0 0 12px;font-size:14.5px;max-width:none}
+.split ul{margin:0;padding-left:17px;font-size:14px;color:var(--ink-2)}
+.split li{margin:5px 0}
+
+/* ---------- callout ---------- */
+.callout{
+  border-left:3px solid var(--eosin);background:var(--eosin-w);
+  padding:20px 24px;margin:30px 0;border-radius:0 4px 4px 0;
+}
+.callout.calm{border-left-color:var(--hema);background:var(--hema-w)}
+.callout.ok{border-left-color:var(--valid);background:var(--valid-w)}
+.callout p{margin:0;max-width:none;color:var(--ink)}
+.callout p+p{margin-top:10px}
+
+/* ---------- steps ---------- */
+.steps{margin-top:36px;border-top:1px solid var(--rule)}
+.step{
+  display:grid;grid-template-columns:64px 1fr 210px;gap:22px;
+  padding:20px 0;border-bottom:1px solid var(--rule);align-items:start;
+}
+.step .n{font-family:var(--mono);font-size:13px;color:var(--mute);padding-top:3px}
+.step h4{margin:0 0 5px;font-size:16.5px;font-weight:600}
+.step p{margin:0;font-size:14.5px;max-width:none}
+.step .io{font-family:var(--mono);font-size:11.5px;line-height:1.65;color:var(--mute);padding-top:3px}
+.step .io b{color:var(--ink-2);font-weight:500}
+.step.human{background:linear-gradient(90deg,var(--valid-w),transparent 70%)}
+.step.human .n{color:var(--valid)}
+
+/* ---------- rules table ---------- */
+.tbl{width:100%;border-collapse:collapse;margin-top:26px;font-size:14px}
+.tbl th{
+  text-align:left;font-family:var(--cond);font-size:11.5px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--mute);
+  padding:0 14px 9px 0;border-bottom:1px solid var(--rule);vertical-align:bottom;
+}
+.tbl td{padding:11px 14px 11px 0;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--ink-2)}
+.tbl td:first-child{width:34%;color:var(--ink)}
+.tbl code{font-family:var(--mono);font-size:12.5px;background:var(--hema-w);color:var(--hema);padding:1px 5px;border-radius:2px;white-space:nowrap}
+.tbl .num{font-family:var(--mono);color:var(--ink);white-space:nowrap}
+
+/* ---------- principles ---------- */
+.prin{margin-top:30px;display:grid;gap:0}
+.prin>div{padding:18px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:1fr 2fr;gap:24px}
+.prin h4{margin:0;font-size:16px;font-weight:600;letter-spacing:-.005em}
+.prin p{margin:0;font-size:14.5px;max-width:none}
+
+/* ---------- go/nogo ---------- */
+.gate td:first-child{width:38%}
+.gate .thr{font-family:var(--mono);font-size:13px;color:var(--hema);white-space:nowrap}
+.gate .crit{color:var(--eosin);font-weight:600}
+
+footer{margin-top:70px;padding-top:26px;border-top:1px solid var(--rule);font-size:13px;color:var(--mute);max-width:74ch}
+footer p{font-size:13px;color:var(--mute)}
+
+@media (max-width:840px){
+  .split{grid-template-columns:1fr}
+  .step{grid-template-columns:38px 1fr}
+  .step .io{grid-column:2;padding-top:8px}
+  .prin>div{grid-template-columns:1fr;gap:4px}
+  .cell .dic{display:none}
+  .cell .chr{font-size:15px}
+  .strip{gap:2px}
+}
+@media print{
+  body{background:#fff}
+  section{page-break-inside:avoid}
+  .cell{animation:none;opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Spécification opérationnelle · v0.1 · à pré-enregistrer avant l'étude</div>
+  <h1>Dictée vocale → compte rendu d'anatomopathologie vérifié</h1>
+  <p class="lede">Architecture cible, workflow opérationnel, socle d'explicabilité et protocole
+  d'évaluation auprès de 10 anatomopathologistes. L'ossature de codage est ADICAP —
+  mais elle ne suffit pas, et ce document explique pourquoi.</p>
+  <div class="meta">
+    <span>Thésaurus ADICAP · 9 511 concepts · 10 dictionnaires</span>
+    <span>Édition 2009 · version 5-04</span>
+    <span>XLSX + OWL · licence LOv2 · esante.gouv.fr</span>
+  </div>
+</header>
+
+<div class="strip-block">
+  <div class="eyebrow" style="margin-bottom:12px">Anatomie d'un code — exemple réel du référentiel</div>
+  <div class="strip" id="strip"></div>
+  <div class="strip-legend">
+    <span style="color:var(--hema)">■ origine · positions 1-4</span>
+    <span style="color:var(--eosin)">■ lésion · positions 5-8</span>
+    <span>■ facultatif · positions 9-15</span>
+  </div>
+  <p class="strip-caption">Pièce opératoire avec exérèse complète, vue en histologie par inclusion,
+  sur un ganglion lymphatique — <b>métastase d'un carcinome colloïde colique</b>, ganglion sus-claviculaire
+  gauche, primitif colique. Quinze caractères portent tout cela. C'est la sortie que la machine doit
+  produire, et c'est aussi ce qui la rend vérifiable : chaque position a un domaine de valeurs fermé.</p>
+</div>
+
+<!-- ============ 1 ============ -->
+<section>
+  <div class="eyebrow">Le point de départ</div>
+  <h2>ADICAP est la bonne ossature de sortie. Ce n'est pas la bonne ossature de rédaction.</h2>
+
+  <p class="lead">C'est la seule chose qui peut faire échouer le produit dès la conception, donc autant
+  la poser en premier.</p>
+
+  <p>ADICAP est un thésaurus d'<strong>indexation</strong>. Il répond à « comment classer ce prélèvement
+  dans une chaîne normalisée », pas à « qu'est-ce qui doit figurer dans ce compte rendu ». Il n'a
+  aucune notion de champ obligatoire selon le type de lésion. Un carcinome mammaire infiltrant et un
+  polype hyperplasique se codent avec la même grammaire à quatre caractères — alors que l'un exige
+  marges, grade, statut ganglionnaire et récepteurs, et l'autre presque rien.</p>
+
+  <p><strong>Conséquence directe :</strong> si tu construis uniquement sur ADICAP, ton outil saura coder
+  ce qui a été dit. Il ne saura jamais dire « il manque les marges ». Or c'est exactement la valeur que
+  tu décris.</p>
+
+  <div class="split">
+    <div>
+      <div class="tag t-a">Couche 1 — concept</div>
+      <h4>ADICAP</h4>
+      <p>Ce qui a été dit, normalisé.</p>
+      <ul>
+        <li>Vocabulaire contrôlé, fermé, hiérarchique, en français</li>
+        <li>Arbre déjà construit dans le XLSX/OWL (<code>id</code> / <code>parentId</code>)</li>
+        <li>Aligné CIM-O3 par FRANCIM et l'INCa</li>
+        <li>Intégré au volet CRACP du CI-SIS</li>
+        <li>Sortie exportable, auditable, non ambiguë</li>
+      </ul>
+    </div>
+    <div>
+      <div class="tag t-b">Couche 2 — complétude</div>
+      <h4>Data set synoptique</h4>
+      <p>Ce qui aurait dû être dit.</p>
+      <ul>
+        <li>Comptes rendus standardisés INCa / SFP par localisation</li>
+        <li>Protocoles synoptiques internationaux (ICCR, CAP)</li>
+        <li>Classifications OMS en vigueur par organe</li>
+        <li>Définit les <b>champs obligatoires</b> et <b>conditionnels</b></li>
+        <li>C'est d'ici que sortent les suggestions d'oubli</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout calm">
+    <p><strong>Le lien entre les deux couches est le vrai actif du produit.</strong> Une fois le couple
+    (organe D3, famille lésionnelle D5/D4) identifié, il déclenche le data set correspondant, qui liste
+    les champs attendus. La comparaison « champs attendus / champs couverts par la dictée » produit la
+    suggestion. Ce mapping n'existe nulle part sur étagère : c'est lui qu'il faut construire, organe par
+    organe, en commençant par deux ou trois localisations à fort volume.</p>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section>
+  <div class="eyebrow">Explicabilité</div>
+  <h2>Le code n'est jamais généré. Il est composé.</h2>
+
+  <p>C'est le principe qui permet de tenir la promesse « sans prendre de risque sur l'interprétation ».
+  Un modèle de langage qui écrit <code>OHSGA7N4</code> en sortie de texte peut écrire n'importe quoi
+  de plausible. Un modèle qui choisit un item dans une liste de dix, puis un item dans une liste de neuf,
+  ne peut produire qu'un code existant.</p>
+
+  <h3>Trois responsabilités séparées, jamais fusionnées</h3>
+
+  <table class="tbl">
+    <tr><th>Composant</th><th>Fait</th><th>Ne fait jamais</th></tr>
+    <tr>
+      <td><b>Transcription</b></td>
+      <td>Produit le verbatim horodaté, avec lexique métier et modèle de langue française médicale.</td>
+      <td>Corriger, reformuler, résumer.</td>
+    </tr>
+    <tr>
+      <td><b>Modèle de langage</b></td>
+      <td>Segmente en énoncés, repère les empans porteurs de sens, classe parmi une liste de candidats
+      <b>fournie</b> par la couche de recherche.</td>
+      <td>Émettre une chaîne de code. Inventer un libellé. Compléter un diagnostic non dicté.</td>
+    </tr>
+    <tr>
+      <td><b>Moteur de règles</b></td>
+      <td>Valide la composition contre les masques et les contraintes croisées. Déterministe, testable,
+      versionné.</td>
+      <td>Deviner. En cas d'échec il remonte d'un niveau, jamais il ne complète.</td>
+    </tr>
+  </table>
+
+  <h3>Ce que porte chaque proposition affichée</h3>
+  <p>Aucune suggestion n'apparaît à l'écran sans ces six attributs, tous consultables en un clic.
+  C'est la définition opérationnelle de l'explicabilité pour ce produit — pas une explication générée
+  après coup, mais la trace réelle de la décision.</p>
+
+  <table class="tbl">
+    <tr><th>Attribut</th><th>Contenu</th></tr>
+    <tr><td>Empan source</td><td>Position exacte dans le verbatim, surlignable, avec l'audio associé</td></tr>
+    <tr><td>Référentiel</td><td>Dictionnaire, millésime, identifiant du concept</td></tr>
+    <tr><td>Chemin</td><td>La descente complète : chapitre → groupe → variété</td></tr>
+    <tr><td>Contraintes</td><td>Liste des règles évaluées et de leur résultat</td></tr>
+    <tr><td>Confiance</td><td>Score calibré, avec seuil d'affichage distinct du seuil de pré-sélection</td></tr>
+    <tr><td>Abstention</td><td>Si aucun candidat ne passe : dire « je ne sais pas », proposer le repli SAI</td></tr>
+  </table>
+</section>
+
+<!-- ============ 3 ============ -->
+<section>
+  <div class="eyebrow">Socle déterministe</div>
+  <h2>Les contraintes que le référentiel te donne gratuitement</h2>
+
+  <p>Elles sont dans la spécification ADICAP, elles sont vérifiables sans modèle, et chacune est une
+  ligne de défense contre une erreur silencieuse. À implémenter avant toute intelligence.</p>
+
+  <table class="tbl">
+    <tr><th>Règle</th><th>Formulation</th><th>Ce qu'elle attrape</th></tr>
+    <tr>
+      <td>Masque par cas d'usage</td>
+      <td><code>D4 = NNNN</code> · <code>D5 = A·A·</code> · <code>D7 = 0A··</code></td>
+      <td>Un code tumoral écrit dans le format non tumoral</td>
+    </tr>
+    <tr>
+      <td>Exclusivité positions 5-8</td>
+      <td>D4, D5, D6 et D7 se substituent l'un à l'autre. Jamais deux à la fois.</td>
+      <td>Double écriture sur la zone lésionnelle</td>
+    </tr>
+    <tr>
+      <td>Cohérence cytologie</td>
+      <td>Un code D7 implique <code>D1 ∈ {A, C, E, F, G, L, R, S}</code></td>
+      <td>Code de cytopathologie posé sur un prélèvement histologique</td>
+    </tr>
+    <tr>
+      <td>Codes liés D6</td>
+      <td>Le code lésionnel est indissociable des positions 3-4. Les 4 digits n'ont aucun sens isolés.</td>
+      <td>Un code d'organe transposé sur un autre organe</td>
+    </tr>
+    <tr>
+      <td>Lavage bronchoalvéolaire</td>
+      <td>D7L impose <code>positions 3-4 = RP</code></td>
+      <td>Codes LBA hors poumon</td>
+    </tr>
+    <tr>
+      <td>Séparateur</td>
+      <td>Position 9 laissée vide entre zone obligatoire et zone facultative</td>
+      <td>Décalage de toute la zone facultative</td>
+    </tr>
+    <tr>
+      <td>Origine du primitif</td>
+      <td>Positions 14-15 employées uniquement pour la localisation primitive d'une métastase
+      diagnostiquée</td>
+      <td>Organe primitif renseigné sur une tumeur primitive</td>
+    </tr>
+    <tr>
+      <td>Topographie complémentaire</td>
+      <td>Positions 11-12 illisibles seules : la séquence topographique se lit sur 4 digits avec 3-4.
+      <code>NC</code> = non codable est une valeur légitime.</td>
+      <td>Topographie orpheline, et fausse précision quand la localisation n'est pas connue</td>
+    </tr>
+    <tr>
+      <td>Grammaire tumorale</td>
+      <td>Positions 7-8 = une lettre + un chiffre. Le groupe est <code>lettre + 0</code>, les variétés
+      <code>lettre + 1..9</code>.</td>
+      <td>Variété inventée hors du groupe retenu</td>
+    </tr>
+  </table>
+
+  <div class="callout ok">
+    <p><strong>Le repli est normé, pas dégradé.</strong> 414 codes du seul dictionnaire D4 portent la
+    mention SAI — sans autre indication. Le pathologiste qui dit « inflammation chronique » sans préciser
+    a un code juste et complet. Un outil qui force la descente jusqu'à la variété fabrique de la fausse
+    précision, et c'est précisément le risque interprétatif que tu veux éviter.</p>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section>
+  <div class="eyebrow">Workflow opérationnel</div>
+  <h2>Onze étapes, dont une seule appartient au praticien</h2>
+
+  <p>Les étapes surlignées sont celles où l'humain agit. Tout le reste doit être invisible : s'il faut
+  apprendre le workflow, l'outil a déjà perdu contre le dictaphone.</p>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="n">00</div>
+      <div>
+        <h4>Contexte du dossier</h4>
+        <p>Pré-remplissage depuis la demande d'examen et le SGL. Le mode de prélèvement, l'organe,
+        l'indication et le contexte clinique sont souvent déjà connus — ils ne doivent pas être dictés.
+        Bien exploitée, cette étape résout à elle seule les positions 1 à 4.</p>
+      </div>
+      <div class="io"><b>entrée</b> demande, SGL<br><b>sortie</b> D1, D3, contexte</div>
+    </div>
+
+    <div class="step human">
+      <div class="n">01</div>
+      <div>
+        <h4>Dictée libre</h4>
+        <p>Aucune structure imposée, aucun formulaire, aucun mot-clé à prononcer. Le praticien décrit ce
+        qu'il voit comme il le fait déjà. C'est le point de rupture avec la dictée à commandes : la
+        contrainte de forme est ce qui fait abandonner ces outils.</p>
+      </div>
+      <div class="io"><b>entrée</b> voix<br><b>sortie</b> audio horodaté</div>
+    </div>
+
+    <div class="step">
+      <div class="n">02</div>
+      <div>
+        <h4>Transcription</h4>
+        <p>Reconnaissance vocale française avec lexique d'anatomopathologie, gestion des éponymes et des
+        classifications. Le verbatim est conservé intact et lié à l'audio, phrase par phrase.</p>
+      </div>
+      <div class="io"><b>sortie</b> verbatim + alignement temporel</div>
+    </div>
+
+    <div class="step">
+      <div class="n">03</div>
+      <div>
+        <h4>Segmentation</h4>
+        <p>Découpage en énoncés rattachés à un prélèvement et à une lésion. C'est ici que se joue la
+        cardinalité réelle : un dossier porte plusieurs prélèvements, chacun plusieurs techniques,
+        chacune plusieurs lésions codées.</p>
+      </div>
+      <div class="io"><b>sortie</b> graphe dossier → prélèvement → lésion</div>
+    </div>
+
+    <div class="step">
+      <div class="n">04</div>
+      <div>
+        <h4>Ancrage des candidats</h4>
+        <p>Pour chaque énoncé, recherche dans le thésaurus normalisé et proposition d'une liste courte
+        de concepts candidats, chacun rattaché à son empan dans le verbatim. Le modèle classe, il ne
+        rédige pas.</p>
+      </div>
+      <div class="io"><b>sortie</b> candidats + empans + scores</div>
+    </div>
+
+    <div class="step">
+      <div class="n">05</div>
+      <div>
+        <h4>Composition contrainte</h4>
+        <p>Descente d'arbre position par position. Aiguillage D4 / D5 / D6 / D7, puis chapitre, groupe,
+        variété. Chaque niveau est un vocabulaire fermé et court.</p>
+      </div>
+      <div class="io"><b>sortie</b> code candidat + chemin</div>
+    </div>
+
+    <div class="step">
+      <div class="n">06</div>
+      <div>
+        <h4>Validation par règles</h4>
+        <p>Application des masques et des contraintes croisées listées plus haut. Échec sur une règle :
+        remontée d'un niveau vers le code pivot, jamais complétion.</p>
+      </div>
+      <div class="io"><b>sortie</b> code validé ou abstention</div>
+    </div>
+
+    <div class="step">
+      <div class="n">07</div>
+      <div>
+        <h4>Contrôle de complétude</h4>
+        <p>Déclenchement du data set synoptique correspondant au couple organe / famille lésionnelle.
+        Comparaison entre champs attendus et champs couverts. Produit la liste des manques probables.</p>
+      </div>
+      <div class="io"><b>sortie</b> champs manquants, avec source citée</div>
+    </div>
+
+    <div class="step">
+      <div class="n">08</div>
+      <div>
+        <h4>Restitution en trois volets</h4>
+        <p>Le verbatim d'origine, intact. La proposition de compte rendu structuré. Le panneau des
+        suggestions et des codes, chacun justifiable. Les trois sont visibles ensemble, jamais l'un à
+        la place de l'autre.</p>
+      </div>
+      <div class="io"><b>sortie</b> écran de revue</div>
+    </div>
+
+    <div class="step human">
+      <div class="n">09</div>
+      <div>
+        <h4>Validation, item par item</h4>
+        <p>Le praticien accepte, modifie ou rejette chaque proposition séparément. Aucune validation en
+        bloc. Chaque geste est enregistré : c'est la donnée d'apprentissage la plus précieuse du
+        dispositif, et la mesure principale de l'étude.</p>
+      </div>
+      <div class="io"><b>sortie</b> décisions tracées</div>
+    </div>
+
+    <div class="step">
+      <div class="n">10</div>
+      <div>
+        <h4>Journal et export</h4>
+        <p>Compte rendu structuré, codes ADICAP, et journal complet reliant chaque code à son empan
+        audio, son référentiel et sa décision humaine. Le journal est le livrable réglementaire autant
+        que scientifique.</p>
+      </div>
+      <div class="io"><b>sortie</b> CR-ACP + codes + piste d'audit</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section>
+  <div class="eyebrow">Règles d'interaction</div>
+  <h2>Cinq règles non négociables</h2>
+
+  <div class="prin">
+    <div>
+      <h4>Le verbatim est intouchable</h4>
+      <p>L'outil annote, il ne réécrit pas. Dès qu'il reformule silencieusement, le praticien perd le
+      contrôle de ce qu'il signe — et tu prends une responsabilité que tu ne veux pas.</p>
+    </div>
+    <div>
+      <h4>Suggérer, jamais substituer</h4>
+      <p>Une proposition non validée n'entre pas dans le compte rendu. Rien ne se pré-coche, rien ne
+      s'accepte par défaut, rien ne part sans un geste explicite.</p>
+    </div>
+    <div>
+      <h4>L'abstention est un résultat</h4>
+      <p>« Je ne sais pas » est une sortie légitime, affichée comme telle. Le repli SAI est prévu par le
+      référentiel. Un système qui ne s'abstient jamais est un système qui ment parfois.</p>
+    </div>
+    <div>
+      <h4>Une justification toujours à un clic</h4>
+      <p>Empan surligné, source citée, chemin visible, audio réécoutable. Si la justification demande un
+      effort, elle ne sera pas consultée, et l'explicabilité devient décorative.</p>
+    </div>
+    <div>
+      <h4>Le compte rendu reste celui du pathologiste</h4>
+      <p>À dire explicitement dans l'interface, pas seulement dans les CGU. La responsabilité
+      diagnostique n'est pas déplaçable et l'outil ne doit jamais laisser croire le contraire.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section>
+  <div class="eyebrow">Protocole</div>
+  <h2>L'étude auprès de dix anatomopathologistes</h2>
+
+  <p class="lead">Dix praticiens, c'est une étude pilote de faisabilité et d'utilisabilité. Ce n'est pas
+  un essai de performance diagnostique, et il faut l'écrire ainsi dès le protocole — sinon les
+  résultats seront contestés sur ce point précis.</p>
+
+  <h3>Conception</h3>
+  <p>Intra-sujet, sur cas appariés : chaque praticien traite les mêmes cas avec et sans l'outil, dans un
+  ordre randomisé, avec un délai de lavage suffisant pour limiter la mémorisation. Cette conception
+  neutralise la variabilité inter-praticien, qui est énorme en ACP et écraserait tout effet sur dix
+  sujets seulement.</p>
+
+  <p>Les cas sont codés à l'avance par un panel indépendant de deux ou trois relecteurs, avec résolution
+  des désaccords par consensus. Ce corpus de référence est indispensable : sans lui, on ne mesure que
+  l'accord entre l'outil et un praticien, pas la justesse.</p>
+
+  <p>Volume cible : au moins vingt cas par praticien, incluant des cas simples à fort volume, des cas
+  avec lésions multiples, et une minorité de cas non contributifs — ces derniers testent le comportement
+  le plus critique du système, sa capacité à ne rien affirmer.</p>
+
+  <h3>Ce qu'on mesure</h3>
+
+  <table class="tbl">
+    <tr><th>Mesure</th><th>Définition opérationnelle</th><th>Rôle</th></tr>
+    <tr>
+      <td>Temps jusqu'au CR validé</td>
+      <td>De la fin de la dictée à la signature, hors interruptions</td>
+      <td class="num">Principal — efficacité</td>
+    </tr>
+    <tr>
+      <td>Erreur acceptée non détectée</td>
+      <td>Proposition fausse validée par le praticien, rapportée à la référence du panel</td>
+      <td class="num">Principal — sécurité</td>
+    </tr>
+    <tr>
+      <td>Exactitude du code</td>
+      <td>Accord exact sur les positions 1-8 avec la référence, en premier rang et dans les trois premiers</td>
+      <td class="num">Secondaire</td>
+    </tr>
+    <tr>
+      <td>Complétude</td>
+      <td>Part des champs obligatoires du CR standardisé effectivement renseignés</td>
+      <td class="num">Secondaire</td>
+    </tr>
+    <tr>
+      <td>Acceptation sans modification</td>
+      <td>Part des propositions validées telles quelles</td>
+      <td class="num">Secondaire</td>
+    </tr>
+    <tr>
+      <td>Taux d'abstention</td>
+      <td>Part des énoncés où l'outil ne propose rien, et justesse de ces abstentions</td>
+      <td class="num">Secondaire</td>
+    </tr>
+    <tr>
+      <td>Charge et utilisabilité</td>
+      <td>SUS et NASA-TLX en fin de session ; questionnaire de cinq items après chaque cas</td>
+      <td class="num">Secondaire</td>
+    </tr>
+    <tr>
+      <td>Consultation des justifications</td>
+      <td>Fréquence d'ouverture du panneau d'explication, et effet sur la décision</td>
+      <td class="num">Exploratoire</td>
+    </tr>
+  </table>
+
+  <p>Le questionnaire par cas doit rester sous trente secondes et être rempli immédiatement. Les
+  jugements globaux recueillis en fin de session sont peu fiables : le praticien se souvient de la
+  dernière frustration, pas de la moyenne.</p>
+
+  <div class="callout">
+    <p><strong>Mesurer le biais d'automatisation, sinon l'étude passe à côté du risque principal.</strong>
+    Le danger d'un outil comme celui-ci n'est pas de se tromper — c'est de se tromper de façon
+    plausible, et d'être suivi. La méthode consiste à introduire, dans une petite fraction des cas, des
+    suggestions délibérément fausses mais crédibles, et à mesurer le taux de détection.</p>
+    <p>Trois conditions pour que ce soit acceptable : aucun impact patient, puisqu'on travaille sur cas
+    rétrospectifs ; information des participants dès le consentement, sur le principe sans révéler les
+    cas concernés ; et débriefing systématique. À faire valider par le comité d'éthique.</p>
+  </div>
+
+  <h3>Ce qu'il faut cadrer avant de commencer</h3>
+  <p>Hébergement des données de santé, analyse d'impact au titre du RGPD, sort des enregistrements
+  audio, et surtout la qualification réglementaire. Une aide à la rédaction qui restitue ce qui a été
+  dicté n'est probablement pas un dispositif médical. Un outil qui suggère une lésion non mentionnée
+  s'en rapproche nettement. La frontière passe exactement dans le module de complétude — c'est-à-dire
+  dans ta fonctionnalité différenciante. À faire trancher tôt, par quelqu'un dont c'est le métier.</p>
+</section>
+
+<!-- ============ 7 ============ -->
+<section>
+  <div class="eyebrow">Décision</div>
+  <h2>Critères de réussite, à figer avant le premier cas</h2>
+
+  <p>Seuils proposés, à discuter puis à pré-enregistrer. Un seuil fixé après avoir vu les données ne
+  vaut rien, et sur une étude à dix praticiens la tentation sera forte.</p>
+
+  <table class="tbl gate">
+    <tr><th>Critère</th><th>Seuil</th><th>Statut</th></tr>
+    <tr><td>Réduction du temps jusqu'au CR validé, en médiane</td><td class="thr">≥ 30 %</td><td>Go / no-go</td></tr>
+    <tr><td>Erreurs acceptées non détectées, sur les items à portée thérapeutique</td><td class="thr">0</td><td class="crit">Bloquant</td></tr>
+    <tr><td>Erreurs acceptées non détectées, tous items</td><td class="thr">&lt; 1 %</td><td class="crit">Bloquant</td></tr>
+    <tr><td>Détection des suggestions volontairement fausses</td><td class="thr">≥ 80 %</td><td class="crit">Bloquant</td></tr>
+    <tr><td>Exactitude du code, positions 1-8, premier rang</td><td class="thr">≥ 90 %</td><td>Go / no-go</td></tr>
+    <tr><td>Exactitude du code, dans les trois premiers rangs</td><td class="thr">≥ 98 %</td><td>Go / no-go</td></tr>
+    <tr><td>Champs obligatoires du CR standardisé renseignés</td><td class="thr">≥ 95 %</td><td>Go / no-go</td></tr>
+    <tr><td>Propositions acceptées sans modification</td><td class="thr">≥ 70 %</td><td>Indicatif</td></tr>
+    <tr><td>Abstentions justifiées, parmi les abstentions</td><td class="thr">≥ 90 %</td><td>Indicatif</td></tr>
+    <tr><td>Score SUS moyen</td><td class="thr">≥ 75</td><td>Go / no-go</td></tr>
+    <tr><td>Praticiens souhaitant continuer à utiliser l'outil</td><td class="thr">≥ 8 / 10</td><td>Go / no-go</td></tr>
+  </table>
+
+  <div class="callout">
+    <p><strong>Le piège du gain de temps seul.</strong> Un outil qui fait gagner quarante pour cent de
+    temps et laisse passer une erreur sur cent ne sera pas adopté — il sera adopté puis abandonné après
+    le premier incident, et il ne se remettra pas de la réputation. Les critères de sécurité sont
+    bloquants au sens propre : ils ne se compensent pas par les critères d'efficacité, et aucune
+    moyenne pondérée ne doit être calculée entre les deux.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Sources normatives : thésaurus ADICAP, index raisonné des lésions, édition 2009 version 5-04 ·
+  ADICAP, présentation détaillée, ASIP Santé, version 1.0, 31 mai 2019 · disponible en XLSX et OWL sous
+  licence LOv2 sur esante.gouv.fr. Le millésime du thésaurus est figé à 2009 : toute décision produit
+  qui suppose une mise à jour du référentiel doit être documentée comme telle.</p>
+  <p>Document de travail. Les seuils et le protocole sont des propositions à arbitrer avec le comité
+  scientifique et à pré-enregistrer avant inclusion.</p>
+</footer>
+
+</div>
+
+<script>
+const code = [
+  {c:'O', d:'D1', z:'oblig'}, {c:'H', d:'D2', z:'oblig'},
+  {c:'S', d:'D3', z:'oblig'}, {c:'G', d:'D3', z:'oblig'},
+  {c:'A', d:'D5', z:'lesion'}, {c:'7', d:'D5', z:'lesion'},
+  {c:'N', d:'D5', z:'lesion'}, {c:'4', d:'D5', z:'lesion'},
+  {c:'·', d:'—',  z:'void'},  {c:'·', d:'grade', z:'void'},
+  {c:'S', d:'D8', z:'fac'},   {c:'C', d:'D8', z:'fac'},
+  {c:'G', d:'D8L',z:'fac'},   {c:'D', d:'D3', z:'fac'},
+  {c:'C', d:'D3', z:'fac'}
+];
+const titles = [
+  'Pièce opératoire avec exérèse complète de l’organe',
+  'Histologie et cytologie par inclusion',
+  'Ganglion lymphatique', 'Ganglion lymphatique',
+  'Tumeur adénomateuse — adénocarcinome', 'Cancer invasif',
+  'Groupe et variété : carcinome colloïde', 'Groupe et variété : carcinome colloïde',
+  'Position laissée vide — séparateur', 'Grading des tumeurs — non renseigné',
+  'Ganglion sus-claviculaire (Troisier)', 'Ganglion sus-claviculaire (Troisier)',
+  'Gauche', 'Organe siège de la tumeur primitive : côlon',
+  'Organe siège de la tumeur primitive : côlon'
+];
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.getElementById('strip').innerHTML = code.map((k,i)=>`
+  <div class="cell c-${k.z}" style="animation-delay:${reduce?0:i*45}ms" title="${titles[i]}">
+    <span class="pos">${i+1}</span>
+    <span class="chr">${k.c}</span>
+    <span class="dic">${k.d}</span>
+  </div>`).join('');
+</script>
+</body>
+</html>
