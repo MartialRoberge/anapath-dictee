@@ -331,6 +331,10 @@ export interface CorpusEtude {
 export interface ApprentissageEtude {
   caracteres_modifies_par_tercile: (number | null)[];
   nb_dossiers_retenus: number;
+  /** L'effectif REEL de cette courbe : elle parle d'accoutumance individuelle. */
+  nb_praticiens_retenus: number;
+  /** En dessous, un praticien n'a pas de terciles et n'entre pas dans la courbe. */
+  minimum_par_praticien: number;
 }
 
 export interface SyntheseEtude {

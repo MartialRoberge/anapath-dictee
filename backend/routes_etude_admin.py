@@ -15,7 +15,7 @@ s'explique. Sans la vue cas par cas, une anomalie reste une conjecture.
 """
 
 import logging
-from typing import Annotated
+from typing import Annotated, Final
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
@@ -226,7 +226,7 @@ async def synthese(_admin: Admin, db: Base) -> dict[str, object]:
     return {
         **resultat.en_dict(),
         "corpus": await _corpus(base, couples),
-        "apprentissage": _apprentissage(dossiers),
+        "apprentissage": _apprentissage(couples),
     }
 
 
@@ -376,24 +376,79 @@ def _compter(valeurs) -> dict[str, int]:
     return dict(sorted(compte.items(), key=lambda paire: -paire[1]))
 
 
-def _apprentissage(dossiers: list[EtudeDossier]) -> dict[str, object]:
-    """Charge d'edition par tercier d'ordre de passage.
+#: En dessous de trois cas, un praticien n'a pas de terciles : on ne coupe pas
+#: une serie de deux en trois groupes. Il compte dans le corpus, pas ici.
+MINIMUM_POUR_TERCILES: Final[int] = 3
+
+
+def _apprentissage(
+    couples: list[tuple[EtudeDossier, str | None]],
+) -> dict[str, object]:
+    """Charge d'edition par tercile d'ordre de passage, PRATICIEN PAR PRATICIEN.
 
     Si elle baisse du premier au dernier tercile, c'est le praticien qui
     s'habitue — pas l'outil qui s'ameliore. Sans ce decoupage, on publierait
     l'un pour l'autre.
+
+    DEUX DEFAUTS DE METHODE CORRIGES ICI, et le second annulait la mesure.
+
+    L'ordre etait `(session_id, index_session)`. `session_id` est un UUID
+    ALEATOIRE : l'ordre entre sessions n'avait donc aucun sens chronologique,
+    et une meme personne travaillant sur deux sessions voyait ses cas
+    reordonnes au hasard. On trie desormais sur `cree_a`, qui est le temps.
+
+    Surtout, la serie etait CONCATENEE sur tous les praticiens avant d'etre
+    coupee. Avec un praticien a 30 cas et un a 3, les trois terciles tombaient
+    entierement chez le premier : la courbe publiee etait celle d'une seule
+    personne, presentee comme celle de l'etude. Et si ce praticien-la ecrit
+    long, le « premier tercile » mesurait son style, pas l'apprentissage.
+
+    Chaque praticien est donc coupe en trois chez lui, puis les terciles sont
+    moyennes ENTRE praticiens, a poids egal. Un praticien tres actif ne pese
+    plus dix fois plus lourd qu'un autre dans une courbe qui parle
+    d'accoutumance individuelle.
     """
-    ordonnes = sorted(
-        (d for d in dossiers if d.caracteres_modifies is not None),
-        key=lambda d: (d.session_id, d.index_session),
-    )
-    valeurs = [float(d.caracteres_modifies or 0) for d in ordonnes]
-    debut, milieu, fin = terciles(valeurs)
+    par_praticien: dict[str, list[EtudeDossier]] = {}
+    for dossier, praticien in couples:
+        if praticien is None or dossier.caracteres_modifies is None:
+            continue
+        par_praticien.setdefault(praticien, []).append(dossier)
+
+    tercile_debut: list[float] = []
+    tercile_milieu: list[float] = []
+    tercile_fin: list[float] = []
+    retenus = 0
+
+    for cas in par_praticien.values():
+        if len(cas) < MINIMUM_POUR_TERCILES:
+            continue
+        cas.sort(key=lambda d: d.cree_a)
+        valeurs = [float(d.caracteres_modifies or 0) for d in cas]
+        debut, milieu, fin = terciles(valeurs)
+        for groupe, accumulateur in (
+            (debut, tercile_debut),
+            (milieu, tercile_milieu),
+            (fin, tercile_fin),
+        ):
+            valeur = moyenne(groupe)
+            if valeur is not None:
+                accumulateur.append(valeur)
+        retenus += len(valeurs)
+
     return {
         "caracteres_modifies_par_tercile": [
-            moyenne(debut), moyenne(milieu), moyenne(fin)
+            moyenne(tercile_debut),
+            moyenne(tercile_milieu),
+            moyenne(tercile_fin),
         ],
-        "nb_dossiers_retenus": len(valeurs),
+        "nb_dossiers_retenus": retenus,
+        # Le vrai effectif de CETTE courbe : elle porte sur des praticiens,
+        # pas sur des dossiers. Publier le seul nombre de dossiers laissait
+        # croire a une base large la ou un seul praticien pouvait tout porter.
+        "nb_praticiens_retenus": len(
+            [c for c in par_praticien.values() if len(c) >= MINIMUM_POUR_TERCILES]
+        ),
+        "minimum_par_praticien": MINIMUM_POUR_TERCILES,
     }
 
 

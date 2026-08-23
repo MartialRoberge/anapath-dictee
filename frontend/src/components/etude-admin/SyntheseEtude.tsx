@@ -48,6 +48,8 @@ export interface DonneesSynthese {
   apprentissage: {
     caracteres_modifies_par_tercile: (number | null)[];
     nb_dossiers_retenus: number;
+    nb_praticiens_retenus: number;
+    minimum_par_praticien: number;
   };
 }
 
@@ -462,7 +464,9 @@ export default function SyntheseEtude({
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
             Charge d'edition moyenne par tiers d'ordre de passage. Si elle
             baisse du premier au dernier tiers, c'est le praticien qui
-            s'habitue — pas l'outil qui s'ameliore.
+            s'habitue — pas l'outil qui s'ameliore. Chaque praticien est
+            decoupe chez lui, puis les tiers sont moyennes a poids egal : sans
+            cela, le praticien le plus actif porterait la courbe a lui seul.
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -483,9 +487,15 @@ export default function SyntheseEtude({
           })}
         </div>
         <p className="text-xs text-muted-foreground">
-          {pluriel(apprentissage.nb_dossiers_retenus, "dossier")} retenu
-          {apprentissage.nb_dossiers_retenus > 1 ? "s" : ""} pour ce decoupage
-          (seuls les dossiers clotures comptent).
+          {/* L'effectif de PRATICIENS d'abord : c'est lui qui dit si la courbe
+              tient debout. Un seul praticien a 30 cas donnerait 30 dossiers et
+              une courbe qui ne parle que de lui. */}
+          {pluriel(apprentissage.nb_praticiens_retenus, "praticien")} retenu
+          {apprentissage.nb_praticiens_retenus > 1 ? "s" : ""} (
+          {pluriel(apprentissage.nb_dossiers_retenus, "dossier")}) pour ce
+          decoupage. Seuls les dossiers clotures comptent, et il faut au moins{" "}
+          {apprentissage.minimum_par_praticien} cas par praticien pour le
+          decouper en tiers.
         </p>
       </section>
     </div>
