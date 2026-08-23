@@ -1,0 +1,288 @@
+"""Contenu des questionnaires de l'etude.
+
+Les items vivent ici, pas dans le frontend : le depouillement doit pouvoir
+associer une reponse a un libelle exact des mois plus tard, et un libelle
+recopie a la main dans un composant React derive au premier remaniement.
+
+Un mot sur le F-SUS. Sa formulation francaise est un instrument PUBLIE et
+VALIDE (Gronier & Baudet, 2021). Le retraduire soi-meme detruit precisement ce
+qui rend le score comparable a la litterature : un F-SUS paraphrase n'est plus
+un F-SUS, et le score qu'il produit n'a aucune valeur publiable. Les dix items
+sont donc declares avec leur polarite et leur cotation, mais leur LIBELLE reste
+vide jusqu'a ce qu'il soit recopie mot pour mot depuis la source. La fonction
+`fsus_pret()` dit si c'est fait ; tant que non, le questionnaire de fin
+d'etude ne doit pas etre servi.
+
+Reference : docs/specs/spec/MARC_cahier_de_recueil.md section 6.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Final
+
+from etude.vocabulaire import (
+    QUESTIONNAIRE_FIN_ETUDE,
+    QUESTIONNAIRE_INCLUSION,
+    QUESTIONNAIRE_PAR_CAS,
+)
+
+# --- Types d'items ---------------------------------------------------------
+
+LIKERT_5: Final = "likert_5"
+ECHELLE_10: Final = "echelle_10"
+CHOIX_UNIQUE: Final = "choix_unique"
+CHOIX_MULTIPLE: Final = "choix_multiple"
+TEXTE_LIBRE: Final = "texte_libre"
+NOMBRE: Final = "nombre"
+OUI_NON: Final = "oui_non"
+CLASSEMENT: Final = "classement"
+
+
+@dataclass(frozen=True)
+class Item:
+    """Un item de questionnaire.
+
+    `depend_de` porte l'identifiant d'un item precedent : l'item ne s'affiche
+    que si celui-la a recu une reponse autre que la premiere option. C'est ce
+    qui evite de demander « lequel ? » a quelqu'un qui vient de repondre
+    « jamais ».
+    """
+
+    id: str
+    libelle: str
+    type: str
+    options: tuple[str, ...] = ()
+    obligatoire: bool = False
+    inverse: bool = False
+    depend_de: str | None = None
+
+
+@dataclass(frozen=True)
+class Questionnaire:
+    """Un questionnaire complet, pret a etre servi au frontend."""
+
+    nom: str
+    titre: str
+    duree_estimee_s: int
+    items: tuple[Item, ...] = field(default_factory=tuple)
+
+
+# --- Inclusion (une fois, ~5 minutes) --------------------------------------
+
+_EXERCICE: Final = ("CHU", "CH", "Liberal", "Mixte")
+_REDACTION: Final = (
+    "Saisie clavier",
+    "Dictee avec transcription humaine",
+    "Reconnaissance vocale",
+    "Mixte",
+)
+_USAGE_IA: Final = (
+    "Jamais",
+    "Une ou deux fois",
+    "Occasionnellement",
+    "Regulierement",
+    "Systematiquement",
+)
+
+INCLUSION: Final = Questionnaire(
+    nom=QUESTIONNAIRE_INCLUSION,
+    titre="Avant de commencer",
+    duree_estimee_s=300,
+    items=(
+        Item("inclusion_01", "Annees d'exercice en anatomopathologie", NOMBRE, obligatoire=True),
+        Item("inclusion_02", "Type d'exercice", CHOIX_UNIQUE, _EXERCICE, obligatoire=True),
+        Item("inclusion_03", "Nombre approximatif de comptes rendus par semaine", NOMBRE),
+        Item("inclusion_04", "Localisations les plus frequentes dans votre activite", TEXTE_LIBRE),
+        Item("inclusion_05", "Comment redigez-vous habituellement vos comptes rendus ?",
+             CHOIX_UNIQUE, _REDACTION, obligatoire=True),
+        Item("inclusion_06", "Si reconnaissance vocale, laquelle ?", TEXTE_LIBRE,
+             depend_de="inclusion_05"),
+        Item("inclusion_07",
+             "Temps moyen consacre a la redaction d'un compte rendu de routine (minutes)",
+             NOMBRE),
+        Item("inclusion_08",
+             "La redaction represente-t-elle une charge pesante dans votre activite ?", LIKERT_5),
+        # Item 9 : la question qui portera le resume de l'etude. Comparer a une
+        # pratique reelle vaut mieux qu'affirmer une superiorite sans mesure.
+        Item("inclusion_09",
+             "Avez-vous deja utilise un assistant d'IA generative (ChatGPT, Claude, Copilot, "
+             "autre) pour rediger, reformuler ou structurer un compte rendu ?",
+             CHOIX_UNIQUE, _USAGE_IA, obligatoire=True),
+        Item("inclusion_10", "Si oui : lequel ou lesquels ?", TEXTE_LIBRE,
+             depend_de="inclusion_09"),
+        Item("inclusion_11", "Si oui : pour quoi faire ?", CHOIX_MULTIPLE,
+             ("Mise en forme", "Reformulation", "Traduction",
+              "Redaction de la conclusion", "Recherche d'information", "Autre"),
+             depend_de="inclusion_09"),
+        Item("inclusion_12",
+             "Si oui : saviez-vous ou sont hebergees les donnees transmises ?",
+             CHOIX_UNIQUE, ("Oui", "Non", "Je ne me suis pas pose la question"),
+             depend_de="inclusion_09"),
+        Item("inclusion_13", "Cet usage vous pose-t-il un probleme de confidentialite ?",
+             LIKERT_5, depend_de="inclusion_09"),
+        Item("inclusion_14", "Faites-vous confiance a ce que produit un tel assistant ?",
+             LIKERT_5, depend_de="inclusion_09"),
+        Item("inclusion_15",
+             "Qu'attendez-vous en priorite d'un outil d'assistance a la redaction ?",
+             CLASSEMENT,
+             ("Gagner du temps", "Reduire les oublis",
+              "Homogeneiser mes comptes rendus", "Reduire la fatigue")),
+    ),
+)
+
+
+# --- Apres chaque cas (~40 secondes) ---------------------------------------
+
+#: Affiche immediatement apres la validation, jamais en fin de session : les
+#: jugements retrospectifs globaux sont peu fiables.
+PAR_CAS: Final = Questionnaire(
+    nom=QUESTIONNAIRE_PAR_CAS,
+    titre="Sur ce cas",
+    duree_estimee_s=40,
+    items=(
+        # La mesure d'omission : la seule chose que l'instrumentation ne peut
+        # pas voir toute seule, puisqu'un oubli ne laisse aucune trace.
+        Item("par_cas_00", "Quelque chose que vous avez dicte a-t-il ete omis ?",
+             OUI_NON, obligatoire=True),
+        Item("par_cas_00b", "Lequel ?", TEXTE_LIBRE, depend_de="par_cas_00"),
+        Item("par_cas_01", "La proposition correspondait a ce que j'ai dicte.", LIKERT_5),
+        Item("par_cas_02", "J'ai du faire beaucoup de corrections.", LIKERT_5, inverse=True),
+        Item("par_cas_03", "Les suggestions de completude m'ont ete utiles sur ce cas.",
+             LIKERT_5, ("Non applicable",)),
+        # Item 4 : la mesure d'explicabilite declaree. Le cahier interdit de le
+        # retirer meme si le questionnaire doit etre raccourci — il n'a pas de
+        # substitut, aucune telemetrie ne dit si le praticien a COMPRIS.
+        Item("par_cas_04", "J'ai compris pourquoi le systeme proposait ce qu'il proposait.",
+             LIKERT_5, obligatoire=True),
+        Item("par_cas_05", "J'ai confiance dans le compte rendu que je viens de valider.",
+             LIKERT_5),
+        Item("par_cas_06", "Par rapport a ma pratique habituelle, ce compte rendu m'a pris :",
+             CHOIX_UNIQUE,
+             ("Beaucoup plus de temps", "Plus", "Autant", "Moins", "Beaucoup moins")),
+        Item("par_cas_07", "Un mot si vous voulez (facultatif)", TEXTE_LIBRE),
+    ),
+)
+
+#: Ordre de retrait si le rodage montre que 40 secondes est deja trop (cahier
+#: §6.2). par_cas_04 n'y figure pas : il ne se retire jamais.
+ORDRE_DE_RETRAIT_PAR_CAS: Final[tuple[str, ...]] = ("par_cas_05", "par_cas_03")
+
+
+# --- Fin d'etude (~15 minutes) ---------------------------------------------
+
+#: Les dix items du F-SUS, sans libelle. Voir l'avertissement en tete de module :
+#: la formulation doit etre recopiee mot pour mot depuis Gronier & Baudet (2021),
+#: International Journal of Human-Computer Interaction, 37(16), 1571-1582.
+#: Un F-SUS paraphrase n'est plus un F-SUS.
+FSUS_ITEMS: Final[tuple[Item, ...]] = tuple(
+    Item(
+        id=f"fsus_{rang:02d}",
+        libelle="",  # a recopier depuis la source publiee
+        type=LIKERT_5,
+        obligatoire=True,
+        inverse=(rang % 2 == 0),  # polarite alternee : les items pairs sont negatifs
+    )
+    for rang in range(1, 11)
+)
+
+PDQI9_DIMENSIONS: Final[tuple[str, ...]] = (
+    "A jour", "Exact", "Comprehensible", "Utile", "Organise",
+    "Concis", "Coherent en interne", "Succinct", "Synthetique",
+)
+
+CHARGE_TRAVAIL: Final[tuple[Item, ...]] = (
+    Item("charge_01", "Exigence mentale", ECHELLE_10),
+    Item("charge_02", "Rythme", ECHELLE_10),
+    Item("charge_03", "Effort", ECHELLE_10),
+    Item("charge_04", "Frustration", ECHELLE_10),
+)
+
+_COMPARATIF: Final = (
+    "Nettement moins bon", "Moins bon", "Equivalent", "Meilleur", "Nettement meilleur",
+)
+
+COMPARAISON_PRATIQUE: Final[tuple[Item, ...]] = (
+    Item("comparaison_01", "Le temps", CHOIX_UNIQUE, _COMPARATIF),
+    Item("comparaison_02", "La qualite du compte rendu", CHOIX_UNIQUE, _COMPARATIF),
+    Item("comparaison_03", "La charge mentale", CHOIX_UNIQUE, _COMPARATIF),
+)
+
+#: Servis uniquement a qui a declare un usage d'assistant generaliste (item 9
+#: de l'inclusion). C'est la comparaison que l'etude peut honnetement porter :
+#: un usage reel contre un usage reel, sans bras controle fabrique.
+_AXES_ASSISTANT: Final = (
+    "Justesse du contenu", "Possibilite de verifier", "Confiance", "Confort d'usage",
+)
+
+COMPARAISON_ASSISTANT: Final[tuple[Item, ...]] = tuple(
+    Item(
+        id=f"assistant_{rang:02d}",
+        libelle=f"Par rapport a l'assistant que vous utilisiez — {axe}",
+        type=CHOIX_UNIQUE,
+        options=("Moins bon", "Equivalent", "Meilleur"),
+        depend_de="inclusion_09",
+    )
+    for rang, axe in enumerate(_AXES_ASSISTANT, start=1)
+)
+
+INTENTION: Final[tuple[Item, ...]] = (
+    Item("intention_01", "Souhaitez-vous continuer a utiliser l'outil ?",
+         CHOIX_UNIQUE, ("Oui", "Non", "Peut-etre")),
+    Item("intention_02", "Pourquoi ?", TEXTE_LIBRE),
+    Item("intention_03", "Le recommanderiez-vous a un confrere ?", ECHELLE_10),
+    Item("intention_04", "Qu'est-ce qui vous a le plus gene ?", TEXTE_LIBRE),
+    Item("intention_05",
+         "Qu'est-ce qui vous manquerait le plus si on vous le retirait demain ?",
+         TEXTE_LIBRE),
+)
+
+
+def fin_etude() -> Questionnaire:
+    """Assemble le questionnaire de fin d'etude."""
+    pdqi = tuple(
+        Item(f"pdqi_{rang:02d}", dimension, LIKERT_5)
+        for rang, dimension in enumerate(PDQI9_DIMENSIONS, start=1)
+    )
+    return Questionnaire(
+        nom=QUESTIONNAIRE_FIN_ETUDE,
+        titre="Pour finir",
+        duree_estimee_s=900,
+        items=(
+            *FSUS_ITEMS, *pdqi, *CHARGE_TRAVAIL,
+            *COMPARAISON_PRATIQUE, *COMPARAISON_ASSISTANT, *INTENTION,
+        ),
+    )
+
+
+def fsus_pret() -> bool:
+    """Les dix items du F-SUS ont-ils recu leur libelle publie ?
+
+    Tant que non, le questionnaire de fin d'etude ne doit pas etre servi : un
+    score calcule sur des items sans libelle, ou sur des items retraduits, ne
+    se compare a rien.
+    """
+    return all(item.libelle.strip() for item in FSUS_ITEMS)
+
+
+def score_fsus(reponses: dict[str, int]) -> float | None:
+    """Score F-SUS de 0 a 100, selon la cotation standard du SUS.
+
+    Items impairs : reponse moins 1. Items pairs : 5 moins la reponse. Somme
+    multipliee par 2,5. Un item manquant rend le score incalculable — mieux
+    vaut None qu'un score partiel qu'on prendrait pour un score complet.
+    """
+    total = 0
+    for rang in range(1, 11):
+        reponse = reponses.get(f"fsus_{rang:02d}")
+        if reponse is None or not 1 <= reponse <= 5:
+            return None
+        total += (reponse - 1) if rang % 2 else (5 - reponse)
+    return round(total * 2.5, 1)
+
+
+CATALOGUE: Final[dict[str, Questionnaire]] = {
+    QUESTIONNAIRE_INCLUSION: INCLUSION,
+    QUESTIONNAIRE_PAR_CAS: PAR_CAS,
+    QUESTIONNAIRE_FIN_ETUDE: fin_etude(),
+}

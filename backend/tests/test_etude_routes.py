@@ -224,3 +224,28 @@ def test_un_dossier_abandonne_ne_se_clot_plus(client):
         f"/etude/dossiers/{dossier['dossier_id']}/cloture", json={"cr_valide": CR}
     )
     assert reponse.status_code == 400
+
+
+# --- Questionnaires --------------------------------------------------------
+
+
+def test_le_questionnaire_par_cas_est_servi_par_le_backend(client):
+    """Les libelles viennent du backend : un libelle recopie dans un composant
+    React derive au premier remaniement, et le depouillement ne s'y retrouve
+    plus des mois apres."""
+    reponse = client.get("/etude/questionnaires/par_cas")
+    assert reponse.status_code == 200
+    items = reponse.json()["items"]
+    assert any(item["id"] == "par_cas_04" for item in items)
+
+
+def test_le_questionnaire_de_fin_est_bloque_tant_que_le_fsus_n_est_pas_recopie(client):
+    """Servir un F-SUS sans ses libelles publies produirait un score qui ne se
+    compare a rien : mieux vaut bloquer que recolter de l'inexploitable."""
+    reponse = client.get("/etude/questionnaires/fin_etude")
+    assert reponse.status_code == 409
+    assert "Gronier" in reponse.json()["detail"]
+
+
+def test_un_questionnaire_inexistant_sort_en_404(client):
+    assert client.get("/etude/questionnaires/inconnu").status_code == 404

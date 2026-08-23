@@ -22,7 +22,9 @@ from db_models import User
 from etude import service
 from etude.extraction import extraire, sous_extraction
 from etude.models import EtudeDossier, EtudeProposition, EtudeSession
+from etude.questionnaires import CATALOGUE, fsus_pret
 from etude.service import EtudeRefus
+from etude.vocabulaire import QUESTIONNAIRE_FIN_ETUDE
 
 _T = TypeVar("_T")
 
@@ -337,6 +339,44 @@ async def abandonner(
     except EtudeRefus as refus:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(refus)) from refus
     return {"statut": "abandonne"}
+
+
+@router.get("/questionnaires/{nom}")
+async def servir_questionnaire(nom: str, _user: Utilisateur) -> dict[str, object]:
+    """Sert les items d'un questionnaire.
+
+    Les libelles viennent du backend et pas du frontend : le depouillement doit
+    pouvoir associer une reponse a un libelle exact des mois plus tard, et un
+    libelle recopie dans un composant derive au premier remaniement.
+    """
+    questionnaire = CATALOGUE.get(nom)
+    if questionnaire is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"Questionnaire inconnu : '{nom}'.")
+    if nom == QUESTIONNAIRE_FIN_ETUDE and not fsus_pret():
+        # Servir un F-SUS sans ses libelles publies produirait un score qui ne
+        # se compare a rien. Mieux vaut bloquer que recolter de l'inexploitable.
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "Les items F-SUS n'ont pas encore recu leur formulation publiee "
+            "(Gronier & Baudet, 2021). Questionnaire non servi.",
+        )
+    return {
+        "nom": questionnaire.nom,
+        "titre": questionnaire.titre,
+        "duree_estimee_s": questionnaire.duree_estimee_s,
+        "items": [
+            {
+                "id": item.id,
+                "libelle": item.libelle,
+                "type": item.type,
+                "options": list(item.options),
+                "obligatoire": item.obligatoire,
+                "inverse": item.inverse,
+                "depend_de": item.depend_de,
+            }
+            for item in questionnaire.items
+        ],
+    }
 
 
 @router.post("/questionnaires", status_code=status.HTTP_201_CREATED)
