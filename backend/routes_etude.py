@@ -378,6 +378,8 @@ async def servir_questionnaire(nom: str, _user: Utilisateur) -> dict[str, object
                 "obligatoire": item.obligatoire,
                 "inverse": item.inverse,
                 "depend_de": item.depend_de,
+                "ancre_basse": item.ancre_basse,
+                "ancre_haute": item.ancre_haute,
             }
             for item in questionnaire.items
         ],

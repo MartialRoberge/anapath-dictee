@@ -27,6 +27,14 @@ from etude.vocabulaire import (
     QUESTIONNAIRE_PAR_CAS,
 )
 
+#: Ancres par famille d'echelle. Elles sont declarees ici, une fois, plutot
+#: que repetees sur chaque item.
+ACCORD: Final[tuple[str, str]] = ("Pas du tout d'accord", "Tout a fait d'accord")
+DEGRE: Final[tuple[str, str]] = ("Pas du tout", "Tout a fait")
+FREQUENCE: Final[tuple[str, str]] = ("Jamais", "Toujours")
+INTENSITE: Final[tuple[str, str]] = ("Tres faible", "Tres elevee")
+PROBABILITE: Final[tuple[str, str]] = ("Pas du tout probable", "Tout a fait probable")
+
 # --- Types d'items ---------------------------------------------------------
 
 LIKERT_5: Final = "likert_5"
@@ -56,6 +64,16 @@ class Item:
     obligatoire: bool = False
     inverse: bool = False
     depend_de: str | None = None
+    #: Ancres des echelles, cote SERVEUR et par item.
+    #:
+    #: Une constante cote frontend appliquerait les memes ancres a toutes les
+    #: echelles a cinq points. Or elles ne mesurent pas la meme chose : les
+    #: items par cas sont des AFFIRMATIONS, qu'on cote en accord ; le PDQI-9
+    #: cote un DEGRE de qualite ; et un item formule en question n'appelle pas
+    #: "tout a fait d'accord" comme reponse. Coter un instrument publie sur les
+    #: mauvaises ancres, c'est la meme faute que le retraduire.
+    ancre_basse: str = ""
+    ancre_haute: str = ""
 
 
 @dataclass(frozen=True)
@@ -102,7 +120,7 @@ INCLUSION: Final = Questionnaire(
              "Temps moyen consacre a la redaction d'un compte rendu de routine (minutes)",
              NOMBRE),
         Item("inclusion_08",
-             "La redaction represente-t-elle une charge pesante dans votre activite ?", LIKERT_5),
+             "La redaction represente-t-elle une charge pesante dans votre activite ?", LIKERT_5, ancre_basse=DEGRE[0], ancre_haute=DEGRE[1]),
         # Item 9 : la question qui portera le resume de l'etude. Comparer a une
         # pratique reelle vaut mieux qu'affirmer une superiorite sans mesure.
         Item("inclusion_09",
@@ -120,9 +138,9 @@ INCLUSION: Final = Questionnaire(
              CHOIX_UNIQUE, ("Oui", "Non", "Je ne me suis pas pose la question"),
              depend_de="inclusion_09"),
         Item("inclusion_13", "Cet usage vous pose-t-il un probleme de confidentialite ?",
-             LIKERT_5, depend_de="inclusion_09"),
+             LIKERT_5, ancre_basse=DEGRE[0], ancre_haute=DEGRE[1], depend_de="inclusion_09"),
         Item("inclusion_14", "Faites-vous confiance a ce que produit un tel assistant ?",
-             LIKERT_5, depend_de="inclusion_09"),
+             LIKERT_5, ancre_basse=DEGRE[0], ancre_haute=DEGRE[1], depend_de="inclusion_09"),
         Item("inclusion_15",
              "Qu'attendez-vous en priorite d'un outil d'assistance a la redaction ?",
              CLASSEMENT,
@@ -146,17 +164,18 @@ PAR_CAS: Final = Questionnaire(
         Item("par_cas_00", "Quelque chose que vous avez dicte a-t-il ete omis ?",
              OUI_NON, obligatoire=True),
         Item("par_cas_00b", "Lequel ?", TEXTE_LIBRE, depend_de="par_cas_00"),
-        Item("par_cas_01", "La proposition correspondait a ce que j'ai dicte.", LIKERT_5),
-        Item("par_cas_02", "J'ai du faire beaucoup de corrections.", LIKERT_5, inverse=True),
+        Item("par_cas_01", "La proposition correspondait a ce que j'ai dicte.", LIKERT_5, ancre_basse=ACCORD[0], ancre_haute=ACCORD[1]),
+        Item("par_cas_02", "J'ai du faire beaucoup de corrections.", LIKERT_5, ancre_basse=ACCORD[0], ancre_haute=ACCORD[1], inverse=True),
         Item("par_cas_03", "Les suggestions de completude m'ont ete utiles sur ce cas.",
-             LIKERT_5, ("Non applicable",)),
+             LIKERT_5, ("Non applicable",),
+             ancre_basse=ACCORD[0], ancre_haute=ACCORD[1]),
         # Item 4 : la mesure d'explicabilite declaree. Le cahier interdit de le
         # retirer meme si le questionnaire doit etre raccourci — il n'a pas de
         # substitut, aucune telemetrie ne dit si le praticien a COMPRIS.
         Item("par_cas_04", "J'ai compris pourquoi le systeme proposait ce qu'il proposait.",
-             LIKERT_5, obligatoire=True),
+             LIKERT_5, ancre_basse=ACCORD[0], ancre_haute=ACCORD[1], obligatoire=True),
         Item("par_cas_05", "J'ai confiance dans le compte rendu que je viens de valider.",
-             LIKERT_5),
+             LIKERT_5, ancre_basse=ACCORD[0], ancre_haute=ACCORD[1]),
         Item("par_cas_06", "Par rapport a ma pratique habituelle, ce compte rendu m'a pris :",
              CHOIX_UNIQUE,
              ("Beaucoup plus de temps", "Plus", "Autant", "Moins", "Beaucoup moins")),
@@ -182,6 +201,8 @@ FSUS_ITEMS: Final[tuple[Item, ...]] = tuple(
         type=LIKERT_5,
         obligatoire=True,
         inverse=(rang % 2 == 0),  # polarite alternee : les items pairs sont negatifs
+        # Ancres vides comme les libelles : elles font partie de l'instrument
+        # publie et se recopient depuis la source, elles ne s'improvisent pas.
     )
     for rang in range(1, 11)
 )
@@ -191,11 +212,12 @@ PDQI9_DIMENSIONS: Final[tuple[str, ...]] = (
     "Concis", "Coherent en interne", "Succinct", "Synthetique",
 )
 
-CHARGE_TRAVAIL: Final[tuple[Item, ...]] = (
-    Item("charge_01", "Exigence mentale", ECHELLE_10),
-    Item("charge_02", "Rythme", ECHELLE_10),
-    Item("charge_03", "Effort", ECHELLE_10),
-    Item("charge_04", "Frustration", ECHELLE_10),
+CHARGE_TRAVAIL: Final[tuple[Item, ...]] = tuple(
+    Item(f"charge_{rang:02d}", libelle, ECHELLE_10,
+         ancre_basse=INTENSITE[0], ancre_haute=INTENSITE[1])
+    for rang, libelle in enumerate(
+        ("Exigence mentale", "Rythme", "Effort", "Frustration"), start=1
+    )
 )
 
 _COMPARATIF: Final = (
@@ -230,7 +252,8 @@ INTENTION: Final[tuple[Item, ...]] = (
     Item("intention_01", "Souhaitez-vous continuer a utiliser l'outil ?",
          CHOIX_UNIQUE, ("Oui", "Non", "Peut-etre")),
     Item("intention_02", "Pourquoi ?", TEXTE_LIBRE),
-    Item("intention_03", "Le recommanderiez-vous a un confrere ?", ECHELLE_10),
+    Item("intention_03", "Le recommanderiez-vous a un confrere ?", ECHELLE_10,
+         ancre_basse=PROBABILITE[0], ancre_haute=PROBABILITE[1]),
     Item("intention_04", "Qu'est-ce qui vous a le plus gene ?", TEXTE_LIBRE),
     Item("intention_05",
          "Qu'est-ce qui vous manquerait le plus si on vous le retirait demain ?",
@@ -240,8 +263,12 @@ INTENTION: Final[tuple[Item, ...]] = (
 
 def fin_etude() -> Questionnaire:
     """Assemble le questionnaire de fin d'etude."""
+    # Le PDQI-9 cote un DEGRE de qualite documentaire, dimension par dimension.
+    # Le coter en accord ("tout a fait d'accord" que le CR est "Exact") change
+    # la question posee : c'est la meme faute que retraduire le F-SUS.
     pdqi = tuple(
-        Item(f"pdqi_{rang:02d}", dimension, LIKERT_5)
+        Item(f"pdqi_{rang:02d}", dimension, LIKERT_5,
+             ancre_basse=DEGRE[0], ancre_haute=DEGRE[1])
         for rang, dimension in enumerate(PDQI9_DIMENSIONS, start=1)
     )
     return Questionnaire(
@@ -258,11 +285,14 @@ def fin_etude() -> Questionnaire:
 def fsus_pret() -> bool:
     """Les dix items du F-SUS ont-ils recu leur libelle publie ?
 
-    Tant que non, le questionnaire de fin d'etude ne doit pas etre servi : un
-    score calcule sur des items sans libelle, ou sur des items retraduits, ne
-    se compare a rien.
+    Libelles ET ancres : un F-SUS cote sur des ancres improvisees n'est pas
+    plus comparable qu'un F-SUS retraduit. Tant que les deux ne sont pas en
+    place, le questionnaire de fin d'etude ne doit pas etre servi.
     """
-    return all(item.libelle.strip() for item in FSUS_ITEMS)
+    return all(
+        item.libelle.strip() and item.ancre_basse.strip() and item.ancre_haute.strip()
+        for item in FSUS_ITEMS
+    )
 
 
 def score_fsus(reponses: dict[str, int]) -> float | None:

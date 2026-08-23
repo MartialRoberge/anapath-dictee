@@ -118,3 +118,43 @@ def test_tout_item_conditionnel_pointe_vers_un_item_existant():
         for item in questionnaire.items:
             if item.depend_de is not None:
                 assert item.depend_de in connus, f"{item.id} -> {item.depend_de}"
+
+
+# --- Les ancres d'echelle ---------------------------------------------------
+
+
+def test_chaque_echelle_porte_ses_ancres():
+    """Sans ancres, deux praticiens cotent en sens inverse et rien ne le revele
+    au depouillement. Le F-SUS fait exception : les siennes se recopient depuis
+    la source publiee, comme ses libelles."""
+    for questionnaire in CATALOGUE.values():
+        for item in questionnaire.items:
+            if item.type not in ("likert_5", "echelle_10"):
+                continue
+            if item.id.startswith("fsus_"):
+                continue
+            assert item.ancre_basse, item.id
+            assert item.ancre_haute, item.id
+
+
+def test_le_pdqi9_n_est_pas_cote_en_accord():
+    """Le PDQI-9 cote un DEGRE de qualite documentaire. Le coter en accord
+    change la question posee : c'est la meme faute que retraduire le F-SUS."""
+    pdqi = [i for i in CATALOGUE["fin_etude"].items if i.id.startswith("pdqi_")]
+    assert len(pdqi) == 9
+    for item in pdqi:
+        assert "accord" not in item.ancre_basse.lower()
+        assert "accord" not in item.ancre_haute.lower()
+
+
+def test_les_items_par_cas_sont_cotes_en_accord():
+    """Ce sont des AFFIRMATIONS : 'la proposition correspondait a ce que j'ai
+    dicte'. L'accord est la bonne echelle pour celles-la."""
+    item = next(i for i in PAR_CAS.items if i.id == "par_cas_01")
+    assert "accord" in item.ancre_basse.lower()
+
+
+def test_un_item_formule_en_question_n_est_pas_cote_en_accord():
+    """'Faites-vous confiance a ... ?' n'appelle pas 'tout a fait d'accord'."""
+    item = next(i for i in CATALOGUE["inclusion"].items if i.id == "inclusion_14")
+    assert "accord" not in item.ancre_basse.lower()

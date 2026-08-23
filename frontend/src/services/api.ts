@@ -1,6 +1,6 @@
 import { API_BASE } from "@/lib/config";
 
-function getAuthHeaders(): Record<string, string> {
+export function getAuthHeaders(): Record<string, string> {
   const token = localStorage.getItem("iris_access_token");
   if (!token) return {};
   return { Authorization: `Bearer ${token}` };
@@ -118,7 +118,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-function jsonHeaders(): Record<string, string> {
+export function jsonHeaders(): Record<string, string> {
   return { "Content-Type": "application/json", ...getAuthHeaders() };
 }
 
