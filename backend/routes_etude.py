@@ -105,6 +105,12 @@ class Abandon(BaseModel):
     motif: str
 
 
+class Exclusion(BaseModel):
+    motif: str
+    #: Faux pour REINCLURE un dossier ecarte par erreur.
+    exclu: bool = True
+
+
 class Reponses(BaseModel):
     questionnaire: str
     reponses: dict[str, str]
@@ -393,6 +399,30 @@ async def servir_questionnaire(nom: str, _user: Utilisateur) -> dict[str, object
             for item in questionnaire.items
         ],
     }
+
+
+@router.post("/dossiers/{dossier_id}/exclusion")
+async def exclure(
+    dossier_id: str, corps: Exclusion, user: Utilisateur, db: Base
+) -> dict[str, object]:
+    """Ecarte un de ses propres dossiers de l'etude, sans le detruire.
+
+    Un cas ouvert par erreur, une dictee d'essai : ils ne doivent compter dans
+    aucun taux. Les EFFACER rendrait l'etude incapable de rendre compte de son
+    propre effectif — une publication doit dire combien de cas ont ete ecartes
+    et pourquoi. L'operation est reversible.
+    """
+    base = _exiger_base(db)
+    await _dossier_du_praticien(base, dossier_id, user.id)
+    try:
+        dossier = _ecrit(
+            await service.exclure_dossier(
+                base, dossier_id, corps.motif, user.id, corps.exclu
+            )
+        )
+    except EtudeRefus as refus:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(refus)) from refus
+    return {"exclu": dossier.exclu, "motif": dossier.motif_exclusion}
 
 
 @router.post("/questionnaires", status_code=status.HTTP_201_CREATED)

@@ -107,6 +107,19 @@ class EtudeDossier(Base):
     abandonne: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     motif_abandon: Mapped[str | None] = mapped_column(String(40), nullable=True)
 
+    # -- Exclusion (essais, saisies aberrantes) ---------------------------
+    #
+    # On EXCLUT, on ne supprime pas. Une etude qui efface des cas ne peut plus
+    # rendre compte de son propre effectif : le diagramme de flux exige de dire
+    # combien de cas ont ete ecartes et pourquoi. Un cas exclu reste en base,
+    # n'entre dans AUCUN taux, et son motif est publiable.
+    #
+    # L'exclusion est REVERSIBLE : on retire un cas d'essai par erreur bien plus
+    # souvent qu'on ne veut le detruire.
+    exclu: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    motif_exclusion: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    exclu_par: Mapped[str | None] = mapped_column(String(36), nullable=True)
+
     #: Caracteres modifies entre cr_propose et cr_valide, calcule a l'export.
     caracteres_modifies: Mapped[int | None] = mapped_column(Integer, nullable=True)
     organe: Mapped[str | None] = mapped_column(String(80), nullable=True)

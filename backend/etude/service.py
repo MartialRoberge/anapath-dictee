@@ -369,6 +369,7 @@ async def periodique_est_du(db: AsyncSession | None, praticien_id: str) -> bool:
         .where(EtudeSession.praticien_id == praticien_id)
         .where(EtudeDossier.t5_cloture.is_not(None))
         .where(EtudeDossier.abandonne.is_(False))
+        .where(EtudeDossier.exclu.is_(False))
     )
     return periodique_du(int(resultat.scalar_one()))
 
@@ -403,6 +404,42 @@ async def abandonner_dossier(
     dossier.motif_abandon = motif
     dossier.t5_cloture = _maintenant()
     await db.commit()
+
+
+async def exclure_dossier(
+    db: AsyncSession | None,
+    dossier_id: str,
+    motif: str,
+    par: str,
+    exclu: bool = True,
+) -> EtudeDossier | None:
+    """Ecarte un dossier de l'etude, sans le detruire.
+
+    Un essai d'administrateur, une saisie aberrante, un cas ouvert par erreur :
+    ils ne doivent compter dans aucun taux. Mais les EFFACER rendrait l'etude
+    incapable de rendre compte de son propre effectif — le diagramme de flux
+    d'une publication demande combien de cas ont ete ecartes et pourquoi.
+
+    Reversible : on exclut un cas par erreur bien plus souvent qu'on ne veut le
+    detruire.
+    """
+    if db is None:
+        return None
+    if exclu and not motif.strip():
+        # Un motif vide rendrait l'exclusion inexplicable au depouillement, donc
+        # inutilisable dans une publication.
+        raise EtudeRefus("Une exclusion doit porter un motif.")
+
+    dossier = await db.get(EtudeDossier, dossier_id)
+    if dossier is None:
+        raise EtudeRefus("Dossier introuvable.")
+
+    dossier.exclu = exclu
+    dossier.motif_exclusion = motif.strip() if exclu else None
+    dossier.exclu_par = par if exclu else None
+    await db.commit()
+    await db.refresh(dossier)
+    return dossier
 
 
 def distance_edition(propose: str, valide: str) -> int:

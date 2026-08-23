@@ -18,7 +18,9 @@ Reference : docs/specs/spec/MARC_cahier_de_recueil.md section 6.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Final
 
 from etude.vocabulaire import (
@@ -250,22 +252,55 @@ ORDRE_DE_RETRAIT_PAR_CAS: Final[tuple[str, ...]] = ("par_cas_04", "par_cas_02")
 
 # --- Fin d'etude (~15 minutes) ---------------------------------------------
 
-#: Les dix items du F-SUS, sans libelle. Voir l'avertissement en tete de module :
-#: la formulation doit etre recopiee mot pour mot depuis Gronier & Baudet (2021),
-#: International Journal of Human-Computer Interaction, 37(16), 1571-1582.
-#: Un F-SUS paraphrase n'est plus un F-SUS.
-FSUS_ITEMS: Final[tuple[Item, ...]] = tuple(
-    Item(
-        id=f"fsus_{rang:02d}",
-        libelle="",  # a recopier depuis la source publiee
-        type=LIKERT_5,
-        obligatoire=True,
-        inverse=(rang % 2 == 0),  # polarite alternee : les items pairs sont negatifs
-        # Ancres vides comme les libelles : elles font partie de l'instrument
-        # publie et se recopient depuis la source, elles ne s'improvisent pas.
-    )
-    for rang in range(1, 11)
-)
+#: Le F-SUS se remplit dans un FICHIER DE DONNEES, pas dans le code.
+#:
+#: Ses libelles sont ceux d'un instrument publie (Gronier & Baudet, 2021) et se
+#: recopient mot pour mot : un F-SUS paraphrase n'est plus un F-SUS, et son
+#: score ne se compare plus a rien. Mais les faire vivre dans le code obligerait
+#: a un developpeur et un redeploiement pour dix phrases — donc ils vivent dans
+#: backend/data/fsus.json, que n'importe qui remplit en deux minutes.
+_FICHIER_FSUS: Final = Path(__file__).resolve().parent.parent / "data" / "fsus.json"
+
+
+def _charger_fsus() -> tuple[Item, ...]:
+    """Lit les dix items du F-SUS depuis leur fichier.
+
+    Un fichier absent ou illisible ne fait pas echouer le demarrage : il rend
+    dix items sans libelle, et `fsus_pret()` dira que le questionnaire n'est pas
+    servable. Une etude ne doit pas s'arreter parce qu'un fichier manque, mais
+    elle ne doit pas non plus recolter un score qui ne veut rien dire.
+    """
+    try:
+        charge = json.loads(_FICHIER_FSUS.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        charge = {}
+
+    basse = str(charge.get("ancre_basse") or "")
+    haute = str(charge.get("ancre_haute") or "")
+    lus = {str(e.get("id")): e for e in charge.get("items", []) if isinstance(e, dict)}
+
+    items: list[Item] = []
+    for rang in range(1, 11):
+        identifiant = f"fsus_{rang:02d}"
+        entree = lus.get(identifiant, {})
+        items.append(
+            Item(
+                id=identifiant,
+                libelle=str(entree.get("libelle") or ""),
+                type=LIKERT_5,
+                obligatoire=True,
+                # La polarite alternee est la STRUCTURE de l'instrument, pas une
+                # donnee : elle reste dans le code pour qu'une faute de frappe
+                # dans le fichier ne puisse pas inverser la cotation.
+                inverse=(rang % 2 == 0),
+                ancre_basse=basse,
+                ancre_haute=haute,
+            )
+        )
+    return tuple(items)
+
+
+FSUS_ITEMS: Final[tuple[Item, ...]] = _charger_fsus()
 
 PDQI9_DIMENSIONS: Final[tuple[str, ...]] = (
     "A jour", "Exact", "Comprehensible", "Utile", "Organise",

@@ -214,3 +214,82 @@ def test_le_micro_donne_les_temps(client):
 def test_un_dossier_inconnu_sort_en_404(client):
     _passer_admin()
     assert client.get("/admin/etude/dossiers/inexistant").status_code == 404
+
+
+# --- Exclusion : ecarter sans detruire --------------------------------------
+
+
+def test_un_dossier_exclu_ne_compte_dans_aucun_taux(client):
+    """L'administrateur teste l'outil sans etre pathologiste, et des saisies
+    aberrantes arrivent. Une exclusion qui n'exclut pas serait pire qu'aucune :
+    elle donnerait l'illusion d'un corpus propre."""
+    dossier = _jouer_un_cas(client)
+    _passer_admin()
+
+    avant = client.get("/admin/etude/synthese").json()
+    assert avant["corpus"]["nb_dossiers"] == 1
+    assert avant["propositions"]["toutes_decisions"]["decidees"] > 0
+
+    client.post(
+        f"/admin/etude/dossiers/{dossier['dossier_id']}/exclusion",
+        json={"motif": "Essai de l'administrateur, pas un cas reel"},
+    )
+
+    apres = client.get("/admin/etude/synthese").json()
+    assert apres["corpus"]["nb_dossiers"] == 0
+    assert apres["propositions"]["toutes_decisions"]["decidees"] == 0
+
+
+def test_le_nombre_d_exclus_est_toujours_affiche(client):
+    """Une publication doit dire combien de cas ont ete ecartes : les cacher
+    rendrait l'effectif incomprehensible."""
+    dossier = _jouer_un_cas(client)
+    _passer_admin()
+    client.post(
+        f"/admin/etude/dossiers/{dossier['dossier_id']}/exclusion",
+        json={"motif": "Essai"},
+    )
+    corpus = client.get("/admin/etude/synthese").json()["corpus"]
+    assert corpus["nb_exclus"] == 1
+
+
+def test_une_exclusion_se_defait(client):
+    """On ecarte un cas par erreur bien plus souvent qu'on ne veut le detruire."""
+    dossier = _jouer_un_cas(client)
+    _passer_admin()
+    url = f"/admin/etude/dossiers/{dossier['dossier_id']}/exclusion"
+    client.post(url, json={"motif": "Essai"})
+    reponse = client.post(url, json={"motif": "", "exclu": False})
+    assert reponse.status_code == 200
+    assert reponse.json()["exclu"] is False
+    assert client.get("/admin/etude/synthese").json()["corpus"]["nb_dossiers"] == 1
+
+
+def test_une_exclusion_sans_motif_est_refusee(client):
+    """Un motif vide rendrait l'exclusion inexplicable au depouillement, donc
+    inutilisable dans une publication."""
+    dossier = _jouer_un_cas(client)
+    _passer_admin()
+    reponse = client.post(
+        f"/admin/etude/dossiers/{dossier['dossier_id']}/exclusion",
+        json={"motif": "   "},
+    )
+    assert reponse.status_code == 400
+
+
+def test_le_dossier_exclu_reste_consultable(client):
+    """Ecarte n'est pas detruit : on doit pouvoir le relire pour verifier que
+    l'exclusion etait justifiee."""
+    dossier = _jouer_un_cas(client)
+    _passer_admin()
+    client.post(
+        f"/admin/etude/dossiers/{dossier['dossier_id']}/exclusion",
+        json={"motif": "Essai"},
+    )
+    detail = client.get(f"/admin/etude/dossiers/{dossier['dossier_id']}")
+    assert detail.status_code == 200
+    assert detail.json()["transcription"] == TRANSCRIPTION
+
+    lignes = client.get("/admin/etude/dossiers").json()
+    assert lignes[0]["exclu"] is True
+    assert lignes[0]["motif_exclusion"] == "Essai"

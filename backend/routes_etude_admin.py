@@ -25,6 +25,8 @@ from auth import get_admin_user
 from database import get_db_session
 from db_models import User
 from etude.analyse import DecisionObservee, calculer_temps, depouiller, moyenne, terciles
+from etude.service import EtudeRefus
+from etude import service
 from etude.models import (
     EtudeDossier,
     EtudePause,
@@ -58,6 +60,9 @@ class LigneDossier(BaseModel):
     nb_decidees: int
     caracteres_modifies: int | None
     revision_nette_ms: int | None
+    #: Ecarte de tous les taux, mais conserve et re-inclusible.
+    exclu: bool
+    motif_exclusion: str | None
 
 
 class PropositionDetaillee(BaseModel):
@@ -160,10 +165,19 @@ async def synthese(_admin: Admin, db: Base) -> dict[str, object]:
     resultat en soi, pas un detail de methode.
     """
     base = _exiger_base(db)
-    propositions = list(
-        (await base.execute(select(EtudeProposition))).scalars().all()
+    # Les dossiers exclus (essais, saisies aberrantes) restent en base mais
+    # n'entrent dans AUCUN taux : une exclusion qui n'exclut pas serait pire
+    # qu'aucune exclusion, parce qu'elle donnerait l'illusion d'un corpus propre.
+    dossiers = list(
+        (await base.execute(select(EtudeDossier).where(EtudeDossier.exclu.is_(False))))
+        .scalars().all()
     )
-    dossiers = list((await base.execute(select(EtudeDossier))).scalars().all())
+    retenus = {dossier.id for dossier in dossiers}
+    propositions = [
+        proposition
+        for proposition in (await base.execute(select(EtudeProposition))).scalars().all()
+        if proposition.dossier_id in retenus
+    ]
 
     return {
         "corpus": await _corpus(base, dossiers),
@@ -180,12 +194,24 @@ async def _corpus(base: AsyncSession, dossiers: list[EtudeDossier]) -> dict[str,
     return {
         "nb_praticiens": int(praticiens.scalar_one()),
         "nb_dossiers": len(dossiers),
+        # Compte a part et TOUJOURS affiche : une publication doit dire combien
+        # de cas ont ete ecartes et pourquoi.
+        "nb_exclus": await _compter_exclus(base),
         "nb_dossiers_clos": sum(1 for d in dossiers if d.t5_cloture is not None),
         "nb_abandons": len(abandons),
         "motifs_abandon": _compter(d.motif_abandon for d in abandons),
         "organes": _compter(d.organe for d in dossiers),
         "caracteres_modifies_moyen": moyenne([float(v) for v in edites]),
     }
+
+
+async def _compter_exclus(base: AsyncSession) -> int:
+    resultat = await base.execute(
+        select(func.count())
+        .select_from(EtudeDossier)
+        .where(EtudeDossier.exclu.is_(True))
+    )
+    return int(resultat.scalar_one())
 
 
 def _compter(valeurs) -> dict[str, int]:
@@ -243,6 +269,8 @@ async def lister_dossiers(_admin: Admin, db: Base) -> list[LigneDossier]:
                 nb_propositions=len(propositions),
                 nb_decidees=sum(1 for p in propositions if p.decision is not None),
                 caracteres_modifies=dossier.caracteres_modifies,
+                exclu=dossier.exclu,
+                motif_exclusion=dossier.motif_exclusion,
                 revision_nette_ms=calculer_temps(
                     dossier, pauses_ms, nb_pauses
                 ).revision_nette_ms,
@@ -341,3 +369,35 @@ def _detailler(
         justif_ouverte=proposition.justif_ouverte,
         decision_changee_apres_justif=proposition.decision_changee_apres_justif,
     )
+
+
+class Exclusion(BaseModel):
+    motif: str
+    #: Faux pour REINCLURE un dossier ecarte par erreur.
+    exclu: bool = True
+
+
+@router.post("/dossiers/{dossier_id}/exclusion")
+async def exclure(
+    dossier_id: str, corps: Exclusion, admin: Admin, db: Base
+) -> dict[str, object]:
+    """Ecarte n'importe quel dossier de l'etude, sans le detruire.
+
+    L'administrateur teste lui-meme l'outil sans etre pathologiste, et des
+    saisies aberrantes arrivent. Ces cas ne doivent entrer dans aucun taux — mais
+    les effacer empecherait de rendre compte de l'effectif ecarte, que toute
+    publication demande. Reversible.
+    """
+    base = _exiger_base(db)
+    try:
+        dossier = await service.exclure_dossier(
+            base, dossier_id, corps.motif, admin.id, corps.exclu
+        )
+    except EtudeRefus as refus:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(refus)) from refus
+    if dossier is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Dossier introuvable.")
+    return {
+        "exclu": dossier.exclu,
+        "motif": dossier.motif_exclusion,
+    }

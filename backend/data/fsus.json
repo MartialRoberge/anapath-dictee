@@ -1,0 +1,38 @@
+{
+  "_lisez_moi": [
+    "Les dix items du F-SUS, version francaise VALIDEE du System Usability Scale.",
+    "",
+    "Source a recopier MOT POUR MOT, sans reformuler :",
+    "  Gronier, G. & Baudet, A. (2021). Psychometric Evaluation of the F-SUS:",
+    "  Creation and Validation of a French Version of the System Usability Scale.",
+    "  International Journal of Human-Computer Interaction, 37(16), 1571-1582.",
+    "",
+    "POURQUOI ON NE LES ECRIT PAS NOUS-MEMES : un F-SUS paraphrase n'est plus un",
+    "F-SUS. Son score ne se compare plus ni au seuil de 68 ni aux autres etudes,",
+    "et c'est precisement cette comparabilite qui fait sa valeur. Une traduction",
+    "maison donnerait un nombre qui ne veut rien dire — et personne ne s'en",
+    "apercevrait avant la relecture par les pairs.",
+    "",
+    "COMMENT REMPLIR : coller chaque phrase publiee dans 'libelle', et les deux",
+    "ancres de l'echelle dans 'ancre_basse' et 'ancre_haute'. Aucun changement de",
+    "code, aucun redeploiement : le questionnaire se debloque tout seul au",
+    "prochain demarrage.",
+    "",
+    "NE PAS TOUCHER a 'inverse' : c'est la polarite alternee de l'instrument, et",
+    "la cotation en depend."
+  ],
+  "ancre_basse": "",
+  "ancre_haute": "",
+  "items": [
+    { "id": "fsus_01", "inverse": false, "libelle": "" },
+    { "id": "fsus_02", "inverse": true,  "libelle": "" },
+    { "id": "fsus_03", "inverse": false, "libelle": "" },
+    { "id": "fsus_04", "inverse": true,  "libelle": "" },
+    { "id": "fsus_05", "inverse": false, "libelle": "" },
+    { "id": "fsus_06", "inverse": true,  "libelle": "" },
+    { "id": "fsus_07", "inverse": false, "libelle": "" },
+    { "id": "fsus_08", "inverse": true,  "libelle": "" },
+    { "id": "fsus_09", "inverse": false, "libelle": "" },
+    { "id": "fsus_10", "inverse": true,  "libelle": "" }
+  ]
+}
