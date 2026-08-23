@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Info,
   Trash2,
@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   AlertCircle,
   CheckCircle2,
+  HelpCircle,
   BookOpen,
   Lightbulb,
   MapPin,
@@ -14,37 +15,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { Marker } from "../services/api";
-import {
-  findFieldKnowledge,
-  ORGAN_GUIDANCE,
-  type FieldKnowledge,
-} from "../data/field-knowledge";
-
-/* ------------------------------------------------------------------ */
-/*  Admin field filter (RGPD et entete)                                */
-/* ------------------------------------------------------------------ */
-
-const EXCLUDED_ADMIN_FIELDS: string[] = [
-  "hopital", "hôpital", "nom du patient", "nom et prenom", "prenom",
-  "patient", "date de naissance", "numero de dossier", "n° dossier",
-  "numero", "numéro", "medecin prescripteur", "médecin prescripteur",
-  "medecin referent", "médecin référent", "clinicien", "service demandeur",
-  "nom du service", "adresse", "telephone", "téléphone",
-  "securite sociale", "sécurité sociale", "ipp", "nda", "compte-rendu n",
-  "renseignements cliniques", "renseignement clinique",
-  "nom et signature", "signature", "nom du pathologiste",
-  "pathologiste", "medecin signataire",
-  "date du prelevement", "date de prélèvement", "date de reception",
-  "date de réception", "date du compte", "date",
-  "numero de compte", "reference", "référence",
-  "nom",
-];
-
-function isAdminField(field: string): boolean {
-  const normalized = field.toLowerCase();
-  return EXCLUDED_ADMIN_FIELDS.some((excl) => normalized.includes(excl));
-}
+import type { CompletionState, PendingField } from "@/lib/completion";
+import { ORGAN_GUIDANCE } from "../data/field-knowledge";
 
 /* ------------------------------------------------------------------ */
 /*  Section labels for display                                         */
@@ -65,10 +37,10 @@ const SECTION_DISPLAY: Record<string, string> = {
 /* ------------------------------------------------------------------ */
 
 interface CompletionPanelProps {
-  markers: Marker[];
+  /** Etat de completude calcule une seule fois, en amont (lib/completion). */
+  completion: CompletionState;
   organeDetecte: string;
-  onDismiss: (fieldName: string) => void;
-  dismissedFields: Set<string>;
+  onDismiss: (fieldKey: string) => void;
 }
 
 /* ------------------------------------------------------------------ */
@@ -76,25 +48,21 @@ interface CompletionPanelProps {
 /* ------------------------------------------------------------------ */
 
 interface FieldCardProps {
-  marker: Marker;
-  knowledge: FieldKnowledge | null;
+  field: PendingField;
   onDismiss: () => void;
-  isDismissed: boolean;
 }
 
-function FieldCard({ marker, knowledge, onDismiss, isDismissed }: FieldCardProps) {
+function FieldCard({ field, onDismiss }: FieldCardProps) {
   const [infoOpen, setInfoOpen] = useState(false);
   const [dismissing, setDismissing] = useState(false);
 
-  const severity = knowledge?.severity ?? marker.severity;
+  const { marker, knowledge, severity } = field;
   const sectionLabel = SECTION_DISPLAY[marker.section] ?? marker.section;
 
   const handleDismiss = useCallback(() => {
     setDismissing(true);
     setTimeout(() => onDismiss(), 300);
   }, [onDismiss]);
-
-  if (isDismissed) return null;
 
   return (
     <div
@@ -304,48 +272,45 @@ function OrganGuidance({ organe }: { organe: string }) {
 /* ------------------------------------------------------------------ */
 
 export default function CompletionPanel({
-  markers,
+  completion,
   organeDetecte,
   onDismiss,
-  dismissedFields,
 }: CompletionPanelProps) {
-  const relevantMarkers = useMemo(
-    () => markers.filter((m) => !isAdminField(m.field)),
-    [markers],
-  );
+  const { pending, total, dismissed, errorCount, warningCount, verified } = completion;
 
-  const activeMarkers = useMemo(
-    () => relevantMarkers.filter((m) => !dismissedFields.has(m.field)),
-    [relevantMarkers, dismissedFields],
-  );
-
-  const dismissedCount = relevantMarkers.length - activeMarkers.length;
-
-  const errorCount = useMemo(
-    () =>
-      activeMarkers.filter((m) => {
-        const k = findFieldKnowledge(m.field, organeDetecte);
-        return (k?.severity ?? m.severity) === "error";
-      }).length,
-    [activeMarkers, organeDetecte],
-  );
-
-  const warningCount = activeMarkers.length - errorCount;
-
-  if (relevantMarkers.length === 0) {
+  // Rien a completer : on n'affirme « complet » que si le moteur a bien
+  // analyse CE texte. Sinon (CR rouvert, texte modifie depuis) on dit
+  // honnetement qu'on ne sait pas plutot que d'afficher un ecran vert.
+  if (total === 0) {
     return (
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-success/30 bg-success/5 p-6 text-center">
-          <CheckCircle2 className="h-8 w-8 text-success" />
-          <div>
-            <p className="text-sm font-semibold text-success">
-              Compte-rendu complet
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Toutes les donnees obligatoires sont presentes.
-            </p>
+        {verified ? (
+          <div className="flex flex-col items-center gap-3 rounded-lg border border-success/30 bg-success/5 p-6 text-center">
+            <CheckCircle2 className="h-8 w-8 text-success" />
+            <div>
+              <p className="text-sm font-semibold text-success">
+                Compte-rendu complet
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Toutes les donnees obligatoires sont presentes.
+              </p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3 rounded-lg border border-border bg-muted/40 p-6 text-center">
+            <HelpCircle className="h-8 w-8 text-muted-foreground" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Completude non verifiee
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Aucun champ a completer dans le texte, mais la verification
+                automatique n'a pas ete rejouee sur cette version du
+                compte-rendu. Relancez un formatage pour la mettre a jour.
+              </p>
+            </div>
+          </div>
+        )}
         {organeDetecte && <OrganGuidance organe={organeDetecte} />}
       </div>
     );
@@ -372,20 +337,18 @@ export default function CompletionPanel({
       </div>
 
       {/* Barre de progression */}
-      {relevantMarkers.length > 0 && (
-        <div className="space-y-1">
-          <div className="flex items-center justify-between text-[0.65rem] text-muted-foreground">
-            <span>{dismissedCount} / {relevantMarkers.length} verifie{dismissedCount > 1 ? "s" : ""}</span>
-            <span>{Math.round(((relevantMarkers.length - activeMarkers.length) / relevantMarkers.length) * 100)}%</span>
-          </div>
-          <div className="h-1.5 w-full rounded-full bg-muted">
-            <div
-              className="h-1.5 rounded-full bg-primary transition-all duration-500"
-              style={{ width: `${((relevantMarkers.length - activeMarkers.length) / relevantMarkers.length) * 100}%` }}
-            />
-          </div>
+      <div className="space-y-1">
+        <div className="flex items-center justify-between text-[0.65rem] text-muted-foreground">
+          <span>{dismissed} / {total} verifie{dismissed > 1 ? "s" : ""}</span>
+          <span>{Math.round((dismissed / total) * 100)}%</span>
         </div>
-      )}
+        <div className="h-1.5 w-full rounded-full bg-muted">
+          <div
+            className="h-1.5 rounded-full bg-primary transition-all duration-500"
+            style={{ width: `${(dismissed / total) * 100}%` }}
+          />
+        </div>
+      </div>
 
       <p className="rounded-md bg-accent/50 px-3 py-2 text-[0.7rem] text-muted-foreground">
         Dictez les elements manquants ou cliquez sur un champ pour le remplir.
@@ -395,31 +358,19 @@ export default function CompletionPanel({
       {organeDetecte && <OrganGuidance organe={organeDetecte} />}
 
       <div className="space-y-2">
-        {activeMarkers
-          .sort((a, b) => {
-            const ka = findFieldKnowledge(a.field, organeDetecte);
-            const kb = findFieldKnowledge(b.field, organeDetecte);
-            const sa = ka?.severity ?? a.severity;
-            const sb = kb?.severity ?? b.severity;
-            if (sa === "error" && sb !== "error") return -1;
-            if (sa !== "error" && sb === "error") return 1;
-            return 0;
-          })
-          .map((marker) => (
-            <FieldCard
-              key={`${marker.section}:${marker.field}`}
-              marker={marker}
-              knowledge={findFieldKnowledge(marker.field, organeDetecte)}
-              onDismiss={() => onDismiss(marker.field)}
-              isDismissed={dismissedFields.has(marker.field)}
-            />
-          ))}
+        {pending.map((field) => (
+          <FieldCard
+            key={field.key}
+            field={field}
+            onDismiss={() => onDismiss(field.key)}
+          />
+        ))}
       </div>
 
-      {dismissedCount > 0 && (
+      {dismissed > 0 && (
         <p className="text-center text-[0.65rem] text-muted-foreground">
-          {dismissedCount} suggestion{dismissedCount > 1 ? "s" : ""} ignoree
-          {dismissedCount > 1 ? "s" : ""}
+          {dismissed} suggestion{dismissed > 1 ? "s" : ""} ignoree
+          {dismissed > 1 ? "s" : ""}
         </p>
       )}
     </div>

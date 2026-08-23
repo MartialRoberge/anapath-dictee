@@ -100,12 +100,6 @@ function preprocessMarkdown(md: string): string {
   return result;
 }
 
-function countACompleter(text: string): number {
-  const regex = new RegExp(A_COMPLETER_REGEX.source, "gi");
-  const matches = text.match(regex);
-  return matches ? matches.length : 0;
-}
-
 /* ------------------------------------------------------------------ */
 /*  useUndoStack — historique undo/redo pour l'edition de sections     */
 /* ------------------------------------------------------------------ */
@@ -793,12 +787,15 @@ interface ReportPanelProps {
   report: string | null;
   onReportChange: (report: string) => void;
   organeDetecte: string;
+  /** Champs restant a completer, calcules par la source de verite unique. */
+  pendingCount: number;
 }
 
 export default function ReportPanel({
   report,
   onReportChange,
   organeDetecte,
+  pendingCount,
 }: ReportPanelProps) {
   const [rawSections, setRawSections] = useState<Record<string, string> | null>(null);
   const [loadingSections, setLoadingSections] = useState(false);
@@ -806,11 +803,6 @@ export default function ReportPanel({
 
   const { sections, push: pushUndo, replace: replaceUndo, undo, redo, canUndo, canRedo } =
     useUndoStack(rawSections);
-
-  const aCompleterCount = useMemo(() => {
-    if (!report) return 0;
-    return countACompleter(report);
-  }, [report]);
 
   const isUserEditRef = useRef(false);
   const lastEditRef = useRef<{ key: string; t: number }>({ key: "", t: 0 });
@@ -1032,10 +1024,10 @@ export default function ReportPanel({
               {organeDetecte}
             </Badge>
           )}
-          {aCompleterCount > 0 && (
+          {pendingCount > 0 && (
             <Badge variant="warning" className="gap-1.5 text-[0.7rem]">
               <span className="h-1.5 w-1.5 rounded-full bg-warning" />
-              {aCompleterCount} champ{aCompleterCount > 1 ? "s" : ""} obligatoire{aCompleterCount > 1 ? "s" : ""}
+              {pendingCount} champ{pendingCount > 1 ? "s" : ""} a completer
             </Badge>
           )}
         </div>

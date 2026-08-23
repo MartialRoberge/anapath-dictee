@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import {
   Mic,
   FileText,
@@ -31,6 +31,13 @@ import type {
   CoherenceVerdict,
 } from "./services/api";
 import ExplainPanel from "./components/ExplainPanel";
+import { computeCompletion } from "./lib/completion";
+import {
+  createDraftId,
+  loadLatestDraft,
+  removeDraft,
+  saveDraft,
+} from "./lib/drafts";
 // v3 backend: FormatResult has formatted_report, organe_detecte, markers (adapted from donnees_manquantes)
 
 type Page = "app" | "history" | "admin";
@@ -321,6 +328,10 @@ export default function App() {
   const [rawTranscription, setRawTranscription] = useState<string | null>(null);
   const [report, setReport] = useState<string | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
+  // Texte sur lequel les marqueurs ont ete calcules : des que le CR change
+  // (edition, reouverture depuis l'historique), ils sont perimes et
+  // l'interface ne doit plus affirmer que tout est complet.
+  const [markersReport, setMarkersReport] = useState<string | null>(null);
   const [organeDetecte, setOrganeDetecte] = useState("");
   const [explication, setExplication] = useState<{
     trace: ReportTrace;
@@ -338,65 +349,75 @@ export default function App() {
   // Completion drawer
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const activeFieldCount = markers.filter(
-    (m) => m.severity === "error" && !dismissedFields.has(m.field)
-  ).length;
+  // Source de verite unique des trois indicateurs de completude.
+  const completion = useMemo(
+    () =>
+      computeCompletion({
+        report,
+        markers,
+        dismissedFields,
+        organeDetecte,
+        markersMatchReport: markersReport !== null && markersReport === report,
+      }),
+    [report, markers, dismissedFields, organeDetecte, markersReport],
+  );
 
-  // --- Autosave dans localStorage ---
+  // --- Autosave dans localStorage (un brouillon par dossier) ---
+  const [draftId, setDraftId] = useState<string | null>(null);
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!report || !rawTranscription) return;
+    if (!report || !rawTranscription || !draftId) return;
     if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
     autosaveTimerRef.current = setTimeout(() => {
-      localStorage.setItem("iris_autosave", JSON.stringify({
+      saveDraft(draftId, {
         report,
         rawTranscription,
         organeDetecte,
         explication,
         timestamp: Date.now(),
-      }));
+      });
     }, 2000);
     return () => {
       if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
     };
-  }, [report, rawTranscription, organeDetecte, explication]);
+  }, [draftId, report, rawTranscription, organeDetecte, explication]);
 
-  // Restaurer l'autosave au chargement
+  // Restaurer le brouillon le plus recent au chargement
   useEffect(() => {
-    const saved = localStorage.getItem("iris_autosave");
-    if (!saved || report) return;
-    try {
-      const data = JSON.parse(saved);
-      const age = Date.now() - (data.timestamp ?? 0);
-      if (age < 24 * 60 * 60 * 1000 && data.report) {
-        setReport(data.report);
-        setRawTranscription(data.rawTranscription ?? null);
-        setOrganeDetecte(data.organeDetecte ?? "");
-        setExplication(data.explication ?? null);
-        setActiveView("report");
-        toast("Brouillon restaure automatiquement", "info");
-      }
-    } catch { /* ignore corrupt autosave */ }
+    const latest = loadLatestDraft();
+    if (!latest || report) return;
+    setDraftId(latest.id);
+    setReport(latest.draft.report);
+    setRawTranscription(latest.draft.rawTranscription);
+    setOrganeDetecte(latest.draft.organeDetecte);
+    setExplication(latest.draft.explication);
+    setActiveView("report");
+    toast("Brouillon restaure automatiquement", "info");
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleReset = useCallback(() => {
+    if (draftId) removeDraft(draftId);
+    setDraftId(null);
     setRawTranscription(null);
     setReport(null);
     setMarkers([]);
+    setMarkersReport(null);
     setOrganeDetecte("");
     setExplication(null);
     setDismissedFields(new Set());
     setSavedReportId(null);
     setFeedbackSent(false);
     setActiveView("record");
-    localStorage.removeItem("iris_autosave");
-  }, []);
+  }, [draftId]);
 
   const handleFormatted = useCallback((result: FormatResult) => {
     setReport(result.formatted_report);
     setOrganeDetecte(result.organe_detecte);
     setMarkers(result.markers);
+    setMarkersReport(result.formatted_report);
+    // Un nouveau formatage prolonge le dossier en cours : meme brouillon.
+    setDraftId((prev) => prev ?? createDraftId());
     setExplication({
       trace: result.trace,
       warnings: result.warnings,
@@ -416,7 +437,12 @@ export default function App() {
         setReport(data.structured_report ?? "");
         setRawTranscription(data.raw_transcription ?? null);
         setOrganeDetecte(data.organe_detecte ?? "");
+        // Aucun marqueur pour un CR historise : la completude est recalculee
+        // depuis le texte et signalee comme non verifiee par le moteur.
         setMarkers([]);
+        setMarkersReport(null);
+        // Chaque dossier a son propre brouillon : plus d'ecrasement silencieux.
+        setDraftId(data.id ?? reportId);
         setExplication(null); // pas de trace pour un CR historisé
         setDismissedFields(new Set());
         setSavedReportId(data.id ?? reportId);
@@ -531,7 +557,7 @@ export default function App() {
         hasReport={report !== null}
         isAdmin={user.role === "admin"}
         onLogout={logout}
-        completionCount={activeFieldCount}
+        completionCount={completion.remaining}
         onOpenDrawer={() => setDrawerOpen(true)}
       />
 
@@ -593,9 +619,9 @@ export default function App() {
               >
                 <ListChecks className="h-3.5 w-3.5" />
                 Champs obligatoires
-                {activeFieldCount > 0 && (
+                {completion.remaining > 0 && (
                   <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1 text-[10px] font-bold text-warning-foreground">
-                    {activeFieldCount}
+                    {completion.remaining}
                   </span>
                 )}
               </Button>
@@ -638,6 +664,7 @@ export default function App() {
               report={report}
               onReportChange={setReport}
               organeDetecte={organeDetecte}
+              pendingCount={completion.remaining}
             />
 
             {savedReportId && (
@@ -678,6 +705,7 @@ export default function App() {
                   report={report}
                   onReportChange={setReport}
                   organeDetecte={organeDetecte}
+                  pendingCount={completion.remaining}
                 />
               </div>
             )}
@@ -711,10 +739,9 @@ export default function App() {
             </button>
           </div>
           <CompletionPanel
-            markers={markers}
+            completion={completion}
             organeDetecte={organeDetecte}
             onDismiss={handleDismissField}
-            dismissedFields={dismissedFields}
           />
         </div>
       </div>
@@ -724,7 +751,7 @@ export default function App() {
         activeView={activeView}
         setActiveView={setActiveView}
         hasReport={report !== null}
-        completionCount={activeFieldCount}
+        completionCount={completion.remaining}
         onOpenDrawer={() => setDrawerOpen(true)}
         page={page}
         setPage={setPage}
