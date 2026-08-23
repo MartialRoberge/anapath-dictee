@@ -239,13 +239,82 @@ def test_le_questionnaire_par_cas_est_servi_par_le_backend(client):
     assert any(item["id"] == "par_cas_04" for item in items)
 
 
-def test_le_questionnaire_de_fin_est_bloque_tant_que_le_fsus_n_est_pas_recopie(client):
+def test_le_blocage_suit_le_fsus_ou_qu_il_soit(client):
     """Servir un F-SUS sans ses libelles publies produirait un score qui ne se
-    compare a rien : mieux vaut bloquer que recolter de l'inexploitable."""
-    reponse = client.get("/etude/questionnaires/fin_etude")
-    assert reponse.status_code == 409
-    assert "Gronier" in reponse.json()["detail"]
+    compare a rien. Le blocage porte sur la PRESENCE des items F-SUS, pas sur le
+    nom du questionnaire : les deplacer ne doit pas lever le verrou par
+    inadvertance."""
+    periodique = client.get("/etude/questionnaires/periodique")
+    assert periodique.status_code == 409
+    assert "Gronier" in periodique.json()["detail"]
+
+    # La fin d'etude ne porte plus le F-SUS : elle se sert normalement.
+    assert client.get("/etude/questionnaires/fin_etude").status_code == 200
 
 
 def test_un_questionnaire_inexistant_sort_en_404(client):
     assert client.get("/etude/questionnaires/inconnu").status_code == 404
+
+
+# --- Nature des corrections et cadence periodique --------------------------
+
+
+def test_une_correction_de_style_n_impute_pas_d_erreur(client):
+    """Un outil dont les propositions sont reformulees en style maison n'est
+    pas un outil qui se trompe. Sans cette distinction, le taux publie melange
+    une preference de redaction et une erreur clinique."""
+    dossier = _ouvrir_dossier(client)
+    proposition = dossier["propositions"][0]
+    reponse = client.post(
+        f"/etude/propositions/{proposition['id']}/decision",
+        json={
+            "decision": "corrige",
+            "valeur_retenue": "Reformule a ma main.",
+            "nature_correction": "style",
+        },
+    )
+    assert reponse.status_code == 200
+
+
+def test_une_cause_d_erreur_sur_du_style_est_refusee(client):
+    """La cause qualifie une ERREUR. La demander sur une reformulation ferait
+    perdre un geste et polluerait le decompte des causes."""
+    dossier = _ouvrir_dossier(client)
+    proposition = dossier["propositions"][0]
+    reponse = client.post(
+        f"/etude/propositions/{proposition['id']}/decision",
+        json={
+            "decision": "corrige",
+            "nature_correction": "style",
+            "cause_erreur": "transcription",
+        },
+    )
+    assert reponse.status_code == 400
+
+
+def test_une_nature_de_correction_inconnue_est_refusee(client):
+    dossier = _ouvrir_dossier(client)
+    proposition = dossier["propositions"][0]
+    reponse = client.post(
+        f"/etude/propositions/{proposition['id']}/decision",
+        json={"decision": "corrige", "nature_correction": "flemme"},
+    )
+    assert reponse.status_code == 400
+
+
+def test_la_cloture_annonce_le_releve_periodique(client):
+    """Le serveur tient le decompte : un compteur client deriverait d'un poste
+    a l'autre et la courbe ne serait plus alignee entre praticiens."""
+    dossier = _ouvrir_dossier(client)
+    reponse = client.post(
+        f"/etude/dossiers/{dossier['dossier_id']}/cloture",
+        json={"cr_valide": CR},
+    )
+    assert reponse.status_code == 200
+    assert reponse.json()["questionnaire_periodique_du"] is False
+
+
+def test_le_questionnaire_periodique_est_servi(client):
+    """Il ne contient que le F-SUS, donc il est bloque tant que ses libelles
+    publies ne sont pas en place — au meme titre que la fin d'etude."""
+    assert client.get("/etude/questionnaires/periodique").status_code == 409

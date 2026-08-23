@@ -218,6 +218,11 @@ class EtudeProposition(Base):
     # -- Decision ---------------------------------------------------------
     decision: Mapped[str | None] = mapped_column(String(30), nullable=True)
     valeur_retenue: Mapped[str | None] = mapped_column(Text, nullable=True)
+    #: LA distinction que "corrige" seul ne porte pas : le systeme s'est-il
+    #: trompe (erreur_fond), ou le praticien ecrit-il autrement (style,
+    #: precision) ? Sans elle, une reformulation de confort et une erreur
+    #: clinique comptent pareil, et le taux publie ne veut rien dire.
+    nature_correction: Mapped[str | None] = mapped_column(String(20), nullable=True)
     cause_erreur: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     dossier: Mapped[EtudeDossier] = relationship(back_populates="propositions")

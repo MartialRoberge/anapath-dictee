@@ -22,9 +22,11 @@ from dataclasses import dataclass, field
 from typing import Final
 
 from etude.vocabulaire import (
+    CADENCE_PERIODIQUE,
     QUESTIONNAIRE_FIN_ETUDE,
     QUESTIONNAIRE_INCLUSION,
     QUESTIONNAIRE_PAR_CAS,
+    QUESTIONNAIRE_PERIODIQUE,
 )
 
 #: Ancres par famille d'echelle. Elles sont declarees ici, une fois, plutot
@@ -157,35 +159,72 @@ INCLUSION: Final = Questionnaire(
 PAR_CAS: Final = Questionnaire(
     nom=QUESTIONNAIRE_PAR_CAS,
     titre="Sur ce cas",
-    duree_estimee_s=40,
+    duree_estimee_s=60,
     items=(
-        # La mesure d'omission : la seule chose que l'instrumentation ne peut
-        # pas voir toute seule, puisqu'un oubli ne laisse aucune trace.
+        # --- Ce que l'instrumentation ne peut PAS produire seule -----------
+        #
+        # Un oubli ne laisse aucune trace : le systeme ne sait pas ce qu'il n'a
+        # pas ecrit.
         Item("par_cas_00", "Quelque chose que vous avez dicte a-t-il ete omis ?",
              OUI_NON, obligatoire=True),
         Item("par_cas_00b", "Lequel ?", TEXTE_LIBRE, depend_de="par_cas_00"),
-        Item("par_cas_01", "La proposition correspondait a ce que j'ai dicte.", LIKERT_5, ancre_basse=ACCORD[0], ancre_haute=ACCORD[1]),
-        Item("par_cas_02", "J'ai du faire beaucoup de corrections.", LIKERT_5, ancre_basse=ACCORD[0], ancre_haute=ACCORD[1], inverse=True),
-        Item("par_cas_03", "Les suggestions de completude m'ont ete utiles sur ce cas.",
+        # L'ATTESTATION. Sans elle, on ne sait pas si le praticien SIGNERAIT ce
+        # compte rendu — et un CR valide dans une etude mais qu'on ne signerait
+        # pas en routine ne prouve rien de ce que l'etude pretend montrer.
+        Item("par_cas_00c",
+             "Je considere ce compte rendu comme termine, et je le validerais "
+             "tel quel dans ma pratique courante.",
+             OUI_NON, obligatoire=True),
+        # Une erreur que le systeme a AFFIRMEE sans la soumettre echappe a toute
+        # decision, donc a toute telemetrie. C'est le point aveugle, et cette
+        # question est le seul instrument qui le regarde.
+        Item("par_cas_01",
+             "Avez-vous du corriger une erreur introduite par le logiciel ?",
+             OUI_NON, obligatoire=True),
+        Item("par_cas_01b", "Laquelle ?", TEXTE_LIBRE, depend_de="par_cas_01"),
+
+        # --- Ce que le vecu seul peut dire ---------------------------------
+        Item("par_cas_02", "Les suggestions de completude m'ont ete utiles sur ce cas.",
              LIKERT_5, ("Non applicable",),
              ancre_basse=ACCORD[0], ancre_haute=ACCORD[1]),
-        # Item 4 : la mesure d'explicabilite declaree. Le cahier interdit de le
-        # retirer meme si le questionnaire doit etre raccourci — il n'a pas de
-        # substitut, aucune telemetrie ne dit si le praticien a COMPRIS.
-        Item("par_cas_04", "J'ai compris pourquoi le systeme proposait ce qu'il proposait.",
-             LIKERT_5, ancre_basse=ACCORD[0], ancre_haute=ACCORD[1], obligatoire=True),
-        Item("par_cas_05", "J'ai confiance dans le compte rendu que je viens de valider.",
+        # La mesure d'explicabilite declaree. Le cahier interdit son retrait
+        # meme pour raccourcir : aucune telemetrie ne dit si le praticien a
+        # COMPRIS, seulement s'il a ouvert un panneau.
+        Item("par_cas_03", "J'ai compris pourquoi le systeme proposait ce qu'il proposait.",
+             LIKERT_5, obligatoire=True,
+             ancre_basse=ACCORD[0], ancre_haute=ACCORD[1]),
+        Item("par_cas_04", "Le logiciel a facilite la redaction de ce compte rendu.",
              LIKERT_5, ancre_basse=ACCORD[0], ancre_haute=ACCORD[1]),
-        Item("par_cas_06", "Par rapport a ma pratique habituelle, ce compte rendu m'a pris :",
+        Item("par_cas_05", "Par rapport a ma pratique habituelle, ce compte rendu m'a pris :",
              CHOIX_UNIQUE,
              ("Beaucoup plus de temps", "Plus", "Autant", "Moins", "Beaucoup moins")),
+        # L'item qui porte la conclusion de l'etude, et le seul qui la porte
+        # sous une forme que le praticien reconnaitrait comme la sienne.
+        Item("par_cas_06",
+             "Globalement, auriez-vous prefere rediger ce compte rendu :",
+             CHOIX_UNIQUE, ("Avec le logiciel", "Sans le logiciel", "Indifferent"),
+             obligatoire=True),
         Item("par_cas_07", "Un mot si vous voulez (facultatif)", TEXTE_LIBRE),
     ),
 )
 
+#: Items ECARTES a dessein, parce que la donnee les repond deja mieux :
+#:
+#: - "la proposition correspondait a ce que j'ai dicte" -> chaque proposition
+#:   est deja jugee une par une ; la question rendrait un jugement global, plus
+#:   flou, sur ce que le detail mesure exactement.
+#: - "j'ai du faire beaucoup de corrections" -> la distance d'edition entre le
+#:   texte propose et le texte valide la mesure objectivement, sans dependre du
+#:   souvenir qu'en garde le praticien.
+#: - "le logiciel vous a-t-il permis d'identifier un oubli" -> une suggestion de
+#:   completude acceptee repond oui, et une refusee repond non, sans rien
+#:   demander.
+#:
+#: Chaque question retiree rend du temps a celles que rien ne remplace.
+
 #: Ordre de retrait si le rodage montre que 40 secondes est deja trop (cahier
 #: §6.2). par_cas_04 n'y figure pas : il ne se retire jamais.
-ORDRE_DE_RETRAIT_PAR_CAS: Final[tuple[str, ...]] = ("par_cas_05", "par_cas_03")
+ORDRE_DE_RETRAIT_PAR_CAS: Final[tuple[str, ...]] = ("par_cas_04", "par_cas_02")
 
 
 # --- Fin d'etude (~15 minutes) ---------------------------------------------
@@ -261,6 +300,20 @@ INTENTION: Final[tuple[Item, ...]] = (
 )
 
 
+def periodique() -> Questionnaire:
+    """Le F-SUS, tous les CADENCE_PERIODIQUE comptes rendus clos.
+
+    Repete plutot qu'unique : un point ne distingue pas un outil qu'on apprend
+    a aimer d'un outil dont on se lasse, une courbe si.
+    """
+    return Questionnaire(
+        nom=QUESTIONNAIRE_PERIODIQUE,
+        titre=f"Apres {CADENCE_PERIODIQUE} comptes rendus",
+        duree_estimee_s=120,
+        items=FSUS_ITEMS,
+    )
+
+
 def fin_etude() -> Questionnaire:
     """Assemble le questionnaire de fin d'etude."""
     # Le PDQI-9 cote un DEGRE de qualite documentaire, dimension par dimension.
@@ -274,9 +327,12 @@ def fin_etude() -> Questionnaire:
     return Questionnaire(
         nom=QUESTIONNAIRE_FIN_ETUDE,
         titre="Pour finir",
-        duree_estimee_s=900,
+        duree_estimee_s=600,
+        # Le F-SUS n'y figure plus : il est releve tous les
+        # CADENCE_PERIODIQUE cas, et le dernier releve EST la mesure finale.
+        # Le redemander ici ferait un doublon a quelques jours d'intervalle.
         items=(
-            *FSUS_ITEMS, *pdqi, *CHARGE_TRAVAIL,
+            *pdqi, *CHARGE_TRAVAIL,
             *COMPARAISON_PRATIQUE, *COMPARAISON_ASSISTANT, *INTENTION,
         ),
     )
@@ -314,5 +370,6 @@ def score_fsus(reponses: dict[str, int]) -> float | None:
 CATALOGUE: Final[dict[str, Questionnaire]] = {
     QUESTIONNAIRE_INCLUSION: INCLUSION,
     QUESTIONNAIRE_PAR_CAS: PAR_CAS,
+    QUESTIONNAIRE_PERIODIQUE: periodique(),
     QUESTIONNAIRE_FIN_ETUDE: fin_etude(),
 }

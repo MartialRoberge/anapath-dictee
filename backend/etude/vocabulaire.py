@@ -61,8 +61,51 @@ def decision_valide(type_proposition: str, decision: str) -> bool:
     return decision in DECISIONS_PAR_TYPE.get(type_proposition, frozenset())
 
 
+# --- Nature d'une correction ----------------------------------------------
+#
+# LA question que "corrige" seul ne repond pas : le praticien a-t-il corrige
+# parce que le systeme s'est TROMPE, ou parce qu'il ecrit AUTREMENT ?
+#
+# Sans cette distinction, toute correction compte comme un echec du systeme, et
+# le taux publie melange deux choses qui n'ont rien a voir : une reformulation
+# de confort et une erreur de fond. Un outil dont 40 % des propositions sont
+# reecrites en style maison n'est pas un outil a 40 % d'erreurs — mais un
+# tableau qui ne separe pas les deux le dira.
+#
+# Consequence pour l'analyse : "conforme" + "corrige en style" = le systeme
+# avait raison sur le fond. C'est ce total-la qui mesure la justesse.
+
+NATURES_CORRECTION: Final[frozenset[str]] = frozenset({
+    # Le fond etait juste ; le praticien reformule a sa main ou a celle du
+    # laboratoire. Le systeme a REUSSI ; c'est la couche "style de la maison"
+    # qui a du travail, pas la couche de restitution.
+    "style",
+    # Le fond etait juste mais incomplet : le praticien ajoute une precision
+    # que le systeme n'avait pas de quoi produire. Succes partiel.
+    "precision",
+    # Le fond etait FAUX. C'est le seul cas qui compte comme une erreur du
+    # systeme, et c'est le seul qui appelle une cause.
+    "erreur_fond",
+})
+
+#: Natures qui n'imputent PAS d'erreur au systeme. Sert de denominateur au
+#: taux de justesse sur le fond.
+NATURES_SANS_ERREUR: Final[frozenset[str]] = frozenset({"style", "precision"})
+
+
+def impute_une_erreur(nature: str | None) -> bool:
+    """Cette correction compte-t-elle comme une erreur du systeme ?
+
+    Une nature non renseignee ne s'impute pas : on ne fabrique pas une erreur
+    a partir d'une absence de reponse.
+    """
+    return nature == "erreur_fond"
+
+
 # --- Cause d'erreur (cahier §3.1, question facultative sur ✎ et ✗) ---------
 # Separe les deux mecanismes d'erreur maintenant qu'il n'y a plus d'audio.
+# Ne se pose que sur une erreur de FOND : demander la cause d'une reformulation
+# de style n'a pas de sens et ferait perdre un geste.
 
 CAUSES_ERREUR: Final[frozenset[str]] = frozenset({
     "transcription",    # la transcription a mal compris un mot
@@ -121,8 +164,31 @@ def est_hative(latence_ms: int | None, longueur_mots: int | None) -> bool:
 
 QUESTIONNAIRE_INCLUSION: Final = "inclusion"
 QUESTIONNAIRE_PAR_CAS: Final = "par_cas"
+QUESTIONNAIRE_PERIODIQUE: Final = "periodique"
 QUESTIONNAIRE_FIN_ETUDE: Final = "fin_etude"
 
-QUESTIONNAIRES: Final[frozenset[str]] = frozenset(
-    {QUESTIONNAIRE_INCLUSION, QUESTIONNAIRE_PAR_CAS, QUESTIONNAIRE_FIN_ETUDE}
-)
+QUESTIONNAIRES: Final[frozenset[str]] = frozenset({
+    QUESTIONNAIRE_INCLUSION,
+    QUESTIONNAIRE_PAR_CAS,
+    QUESTIONNAIRE_PERIODIQUE,
+    QUESTIONNAIRE_FIN_ETUDE,
+})
+
+#: Le F-SUS revient tous les N comptes rendus clos, au lieu d'une seule fois.
+#:
+#: Deux raisons. Il mesure l'utilisabilite d'un SYSTEME apres usage, pas une
+#: tache : le poser apres chaque cas produirait 250 reponses qui ne se somment
+#: pas en un score valide, et ferait decrocher le praticien. Mais le poser une
+#: seule fois, a la fin, ne donne qu'un point — alors que repete, il donne une
+#: COURBE, et une courbe distingue un outil qu'on apprend a aimer d'un outil
+#: dont on se lasse. C'est une mesure repetee, et cela se publie.
+CADENCE_PERIODIQUE: Final[int] = 5
+
+
+def periodique_du(nb_dossiers_clos: int) -> bool:
+    """Le questionnaire periodique est-il du apres ce dossier ?
+
+    Compte cote SERVEUR : un decompte tenu par le client deriverait d'un poste
+    a l'autre, et la courbe ne serait plus alignee entre praticiens.
+    """
+    return nb_dossiers_clos > 0 and nb_dossiers_clos % CADENCE_PERIODIQUE == 0

@@ -37,9 +37,11 @@ from etude.vocabulaire import (
     CAUSES_ERREUR,
     CAUSES_PAUSE,
     MOTIFS_ABANDON,
+    NATURES_CORRECTION,
     QUESTIONNAIRES,
     decision_valide,
     est_hative,
+    periodique_du,
 )
 
 
@@ -200,6 +202,7 @@ async def enregistrer_decision(
     proposition_id: str,
     decision: str,
     valeur_retenue: str | None = None,
+    nature_correction: str | None = None,
     cause_erreur: str | None = None,
     justif_ouverte: bool = False,
     justif_duree_ms: int | None = None,
@@ -222,9 +225,17 @@ async def enregistrer_decision(
         )
     if cause_erreur is not None and cause_erreur not in CAUSES_ERREUR:
         raise EtudeRefus(f"Cause d'erreur inconnue : '{cause_erreur}'.")
+    if nature_correction is not None and nature_correction not in NATURES_CORRECTION:
+        raise EtudeRefus(f"Nature de correction inconnue : '{nature_correction}'.")
+    if cause_erreur is not None and nature_correction not in (None, "erreur_fond"):
+        # Demander la cause d'une reformulation de style n'a pas de sens : la
+        # cause qualifie une ERREUR, et une correction de style n'en est pas une.
+        raise EtudeRefus(
+            "Une cause d'erreur ne se renseigne que sur une erreur de fond."
+        )
 
     _appliquer_decision(
-        proposition, decision, valeur_retenue, cause_erreur,
+        proposition, decision, valeur_retenue, nature_correction, cause_erreur,
         justif_ouverte, justif_duree_ms,
     )
     await _horodater_dossier(db, proposition)
@@ -237,6 +248,7 @@ def _appliquer_decision(
     proposition: EtudeProposition,
     decision: str,
     valeur_retenue: str | None,
+    nature_correction: str | None,
     cause_erreur: str | None,
     justif_ouverte: bool,
     justif_duree_ms: int | None,
@@ -254,6 +266,7 @@ def _appliquer_decision(
     maintenant = _maintenant()
     proposition.decision = decision
     proposition.valeur_retenue = valeur_retenue
+    proposition.nature_correction = nature_correction
     proposition.cause_erreur = cause_erreur
     proposition.decide_a = maintenant
     proposition.justif_ouverte = proposition.justif_ouverte or justif_ouverte
@@ -339,6 +352,25 @@ async def clore_dossier(
     await db.commit()
     await db.refresh(dossier)
     return dossier
+
+
+async def periodique_est_du(db: AsyncSession | None, praticien_id: str) -> bool:
+    """Le releve periodique tombe-t-il apres ce dossier ?
+
+    Le decompte est tenu ICI, pas par le client : un compteur local deriverait
+    d'un poste a l'autre et la courbe ne serait plus alignee entre praticiens.
+    """
+    if db is None:
+        return False
+    resultat = await db.execute(
+        select(func.count())
+        .select_from(EtudeDossier)
+        .join(EtudeSession, EtudeDossier.session_id == EtudeSession.id)
+        .where(EtudeSession.praticien_id == praticien_id)
+        .where(EtudeDossier.t5_cloture.is_not(None))
+        .where(EtudeDossier.abandonne.is_(False))
+    )
+    return periodique_du(int(resultat.scalar_one()))
 
 
 async def marquer_export(db: AsyncSession | None, dossier_id: str) -> None:

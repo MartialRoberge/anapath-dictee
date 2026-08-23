@@ -24,7 +24,6 @@ from etude.extraction import extraire, sous_extraction
 from etude.models import EtudeDossier, EtudeProposition, EtudeSession
 from etude.questionnaires import CATALOGUE, fsus_pret
 from etude.service import EtudeRefus
-from etude.vocabulaire import QUESTIONNAIRE_FIN_ETUDE
 
 _T = TypeVar("_T")
 
@@ -81,6 +80,9 @@ class DossierOuvert(BaseModel):
 class Decision(BaseModel):
     decision: str
     valeur_retenue: str | None = None
+    #: Pourquoi la correction : style, precision, ou erreur_fond. Sans elle,
+    #: une reformulation de confort compte comme une erreur du systeme.
+    nature_correction: str | None = None
     cause_erreur: str | None = None
     justif_ouverte: bool = False
     justif_duree_ms: int | None = None
@@ -273,6 +275,7 @@ async def decider(
             proposition_id,
             decision=corps.decision,
             valeur_retenue=corps.valeur_retenue,
+            nature_correction=corps.nature_correction,
             cause_erreur=corps.cause_erreur,
             justif_ouverte=corps.justif_ouverte,
             justif_duree_ms=corps.justif_duree_ms,
@@ -302,7 +305,7 @@ async def journaliser_pause(
 @router.post("/dossiers/{dossier_id}/cloture")
 async def clore_dossier(
     dossier_id: str, corps: Cloture, user: Utilisateur, db: Base
-) -> dict[str, int | None]:
+) -> dict[str, object]:
     """Fige le compte rendu valide et calcule la charge d'edition."""
     base = _exiger_base(db)
     await _dossier_du_praticien(base, dossier_id, user.id)
@@ -318,7 +321,12 @@ async def clore_dossier(
     except EtudeRefus as refus:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(refus)) from refus
     dossier = _ecrit(dossier)
-    return {"caracteres_modifies": dossier.caracteres_modifies}
+    return {
+        "caracteres_modifies": dossier.caracteres_modifies,
+        # Le serveur dit quand le releve periodique tombe : un compteur tenu par
+        # le client deriverait d'un poste a l'autre.
+        "questionnaire_periodique_du": await service.periodique_est_du(base, user.id),
+    }
 
 
 @router.post("/dossiers/{dossier_id}/export")
@@ -357,7 +365,8 @@ async def servir_questionnaire(nom: str, _user: Utilisateur) -> dict[str, object
     questionnaire = CATALOGUE.get(nom)
     if questionnaire is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"Questionnaire inconnu : '{nom}'.")
-    if nom == QUESTIONNAIRE_FIN_ETUDE and not fsus_pret():
+    porte_le_fsus = any(item.id.startswith("fsus_") for item in questionnaire.items)
+    if porte_le_fsus and not fsus_pret():
         # Servir un F-SUS sans ses libelles publies produirait un score qui ne
         # se compare a rien. Mieux vaut bloquer que recolter de l'inexploitable.
         raise HTTPException(
