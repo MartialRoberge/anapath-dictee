@@ -56,6 +56,7 @@ from reports.panel import build_panel
 from routes_auth import router as auth_router
 from routes_reports import router as reports_router
 from routes_admin import router as admin_router
+from routes_etude import router as etude_router
 
 logger = logging.getLogger("anapath.api")
 
@@ -133,6 +134,8 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(reports_router)
 app.include_router(admin_router)
+# Instrumentation de l'etude : prefixe et fichier a part, retirable d'une ligne.
+app.include_router(etude_router)
 
 
 # ---------------------------------------------------------------------------
