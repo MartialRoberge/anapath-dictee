@@ -342,6 +342,8 @@ export interface SyntheseEtude {
 export interface LigneDossier {
   id: string;
   praticien_id: string;
+  /** Le nom du praticien : l'identifiant seul ne dit rien a qui gere l'etude. */
+  praticien_nom: string;
   index_session: number;
   organe: string | null;
   cree_a: string;
@@ -351,6 +353,8 @@ export interface LigneDossier {
   nb_decidees: number;
   caracteres_modifies: number | null;
   revision_nette_ms: number | null;
+  exclu: boolean;
+  motif_exclusion: string | null;
 }
 
 export interface PropositionDetaillee {

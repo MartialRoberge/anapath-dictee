@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { markdownToPlainText } from "@/lib/reportText";
 import type {
   Decision,
   DecisionPourType,
@@ -442,7 +443,15 @@ function ComparaisonCr({
   const [mode, setMode] = useState<ModeComparaison>("fusionnee");
 
   const segments = useMemo(
-    () => (crValide === null ? null : diffMots(crPropose, crValide)),
+    () =>
+      crValide === null
+        ? null
+        // La syntaxe markdown est retiree AVANT la comparaison. L'afficher
+        // brute couvrait le texte d'asterisques et rendait la comparaison
+        // illisible — or c'est l'ecran ou l'on vient justement LIRE ce que le
+        // praticien a change. Le diff reste mot a mot, il porte simplement sur
+        // le texte tel qu'il se lit.
+        : diffMots(markdownToPlainText(crPropose), markdownToPlainText(crValide)),
     [crPropose, crValide],
   );
   const resume = useMemo(

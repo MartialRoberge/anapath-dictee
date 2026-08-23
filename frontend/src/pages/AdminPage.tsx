@@ -12,10 +12,11 @@ import {
   RefreshCw,
   Star,
   Users,
-} from "lucide-react";
+  Download,} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { API_BASE } from "@/lib/config";
 import SyntheseEtude from "@/components/etude-admin/SyntheseEtude";
 import type { DonneesSynthese } from "@/components/etude-admin/SyntheseEtude";
 import type { LigneDossierEtude } from "@/components/etude-admin/ListeDossiersEtude";
@@ -504,6 +505,39 @@ function VueEnsemble({
 
 export default function AdminPage({ token, onBack }: AdminPageProps) {
   const [onglet, setOnglet] = useState<Onglet>("ensemble");
+  const [exportEnCours, setExportEnCours] = useState(false);
+
+  /**
+   * Telecharge l'archive des donnees de l'etude.
+   *
+   * Le jeton d'authentification ne peut pas voyager dans une balise de lien :
+   * on recupere donc le fichier, puis on declenche la sauvegarde depuis la
+   * memoire. C'est aussi ce qui permet de dire au praticien quand la
+   * preparation est en cours — une archive de plusieurs milliers de lignes ne
+   * se fabrique pas instantanement.
+   */
+  const telechargerExport = useCallback(async () => {
+    setExportEnCours(true);
+    try {
+      const reponse = await fetch(`${API_BASE}/admin/etude/export`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!reponse.ok) throw new Error(`Export impossible (${reponse.status})`);
+      const blob = await reponse.blob();
+      const url = URL.createObjectURL(blob);
+      const lien = document.createElement("a");
+      lien.href = url;
+      lien.download = `marc-etude-${new Date().toISOString().slice(0, 10)}.zip`;
+      lien.click();
+      URL.revokeObjectURL(url);
+    } catch (erreur) {
+      window.alert(
+        erreur instanceof Error ? erreur.message : "Export impossible.",
+      );
+    } finally {
+      setExportEnCours(false);
+    }
+  }, [token]);
 
   const [synthese, setSynthese] = useState<DonneesSynthese | null>(null);
   const [dossiers, setDossiers] = useState<LigneDossierEtude[]>([]);
@@ -633,11 +667,25 @@ export default function AdminPage({ token, onBack }: AdminPageProps) {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <h1 className="truncate text-base font-bold">Administration</h1>
+        {/* L'export est la PREMIERE action de cet ecran : aucun depouillement
+            serieux ne se fait dans un navigateur. Un tableau qu'on ne peut pas
+            sortir n'est pas une donnee d'etude, c'est une capture d'ecran. */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={telechargerExport}
+          disabled={exportEnCours}
+          className="ml-auto"
+        >
+          <Download className="h-3.5 w-3.5" />
+          <span className="hide-mobile">
+            {exportEnCours ? "Préparation…" : "Exporter (CSV)"}
+          </span>
+        </Button>
         <Button
           variant="ghost"
           size="icon"
           onClick={actualiser}
-          className="ml-auto"
           title="Actualiser"
         >
           <RefreshCw className={cn("h-4 w-4", enChargement && "animate-spin")} />

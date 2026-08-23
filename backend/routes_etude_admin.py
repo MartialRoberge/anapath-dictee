@@ -64,6 +64,13 @@ class LigneDossier(BaseModel):
 
     id: str
     praticien_id: str
+    #: Le NOM, pas seulement l'identifiant technique.
+    #:
+    #: Cet ecran est celui de l'administrateur de l'etude : il connait ses
+    #: praticiens et doit pouvoir les reconnaitre. La pseudonymisation a sa
+    #: place dans l'EXPORT, ou les donnees sortent du systeme — pas ici, ou
+    #: elle ne protege personne et rend l'ecran illisible.
+    praticien_nom: str
     index_session: int
     organe: str | None
     cree_a: str
@@ -110,6 +117,7 @@ class DossierDetaille(BaseModel):
 
     id: str
     praticien_id: str
+    praticien_nom: str
     organe: str | None
     transcription: str
     cr_propose: str
@@ -368,18 +376,20 @@ async def lister_dossiers(_admin: Admin, db: Base) -> list[LigneDossier]:
     """Tous les dossiers de l'etude, du plus recent au plus ancien."""
     base = _exiger_base(db)
     resultat = await base.execute(
-        select(EtudeDossier, EtudeSession.praticien_id)
+        select(EtudeDossier, EtudeSession.praticien_id, User.name)
         .join(EtudeSession, EtudeDossier.session_id == EtudeSession.id)
+        .outerjoin(User, EtudeSession.praticien_id == User.id)
         .order_by(EtudeDossier.cree_a.desc())
     )
     lignes: list[LigneDossier] = []
-    for dossier, praticien_id in resultat.all():
+    for dossier, praticien_id, praticien_nom in resultat.all():
         propositions = await _lignes(base, EtudeProposition, dossier.id)
         pauses_ms, nb_pauses = await _pauses_du_dossier(base, dossier.id)
         lignes.append(
             LigneDossier(
                 id=dossier.id,
                 praticien_id=praticien_id,
+                praticien_nom=praticien_nom or praticien_id,
                 index_session=dossier.index_session,
                 organe=dossier.organe,
                 cree_a=dossier.cree_a.isoformat(),
@@ -417,6 +427,7 @@ async def detailler_dossier(
     if dossier is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Dossier introuvable.")
     session = await base.get(EtudeSession, dossier.session_id)
+    praticien = await base.get(User, session.praticien_id) if session else None
 
     propositions = await _lignes(base, EtudeProposition, dossier_id)
     prelevements = await _lignes(base, EtudePrelevement, dossier_id)
@@ -426,6 +437,8 @@ async def detailler_dossier(
     return DossierDetaille(
         id=dossier.id,
         praticien_id=session.praticien_id if session else "",
+        praticien_nom=(praticien.name if praticien else None)
+        or (session.praticien_id if session else ""),
         organe=dossier.organe,
         transcription=dossier.transcription,
         cr_propose=dossier.cr_propose,

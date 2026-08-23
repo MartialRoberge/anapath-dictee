@@ -33,6 +33,8 @@ import type { AdminCorrection, AdminReport } from "@/services/api";
  */
 export interface LignePraticien {
   praticienId: string;
+  /** Le nom, pour que l'administrateur reconnaisse ses praticiens. */
+  praticienNom: string;
   nbCas: number;
   /** Cas dont le compte rendu a ete VALIDE (charge d'edition calculee). */
   nbValides: number;
@@ -114,8 +116,16 @@ function nomOrgane(organe: string | null): string {
  * On affiche les huit premiers caracteres, comme partout ailleurs dans
  * l'administration, et l'identifiant complet reste en infobulle.
  */
-function pseudonyme(praticienId: string): string {
-  return praticienId.slice(0, 8);
+/**
+ * Le nom du praticien, tel qu'il s'affiche a l'administrateur.
+ *
+ * Un identifiant tronque ne dit RIEN a qui gere l'etude : il connait ses
+ * praticiens et doit les reconnaitre d'un coup d'oeil. La pseudonymisation a
+ * sa place dans l'EXPORT, la ou les donnees sortent du systeme — ici elle ne
+ * protege personne et rend l'ecran inutilisable.
+ */
+function nomPraticien(cas: { praticien_nom?: string; praticien_id: string }[]): string {
+  return cas[0]?.praticien_nom || cas[0]?.praticien_id.slice(0, 8) || "?";
 }
 
 const MOTIF_ABANDON_LABELS: Record<string, string> = {
@@ -157,6 +167,7 @@ function agregerPraticiens(dossiers: LigneDossierEtude[]): LignePraticien[] {
       .sort();
     lignes.push({
       praticienId,
+      praticienNom: nomPraticien(cas),
       nbCas: cas.length,
       nbValides: valides.length,
       nbAbandons: cas.filter((dossier) => dossier.abandonne).length,
@@ -279,7 +290,7 @@ function TableauPraticiens({
                 >
                   <UserRound className="h-4 w-4 shrink-0" />
                   <span className="font-mono text-sm">
-                    {pseudonyme(ligne.praticienId)}
+                    {ligne.praticienNom}
                   </span>
                   <ChevronRight className="h-3.5 w-3.5 shrink-0" />
                 </button>
@@ -718,7 +729,7 @@ export default function VuePraticiens({
               className="truncate font-mono text-base font-bold"
               title={ligneOuverte.praticienId}
             >
-              {pseudonyme(ligneOuverte.praticienId)}
+              {ligneOuverte.praticienNom}
             </h2>
             <Badge variant="secondary" className="text-[0.65rem]">
               {ligneOuverte.nbCas} cas

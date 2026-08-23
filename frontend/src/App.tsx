@@ -4,7 +4,6 @@ import {
   FileText,
   History,
   Shield,
-  FlaskConical,
   LogOut,
   Save,
   Star,
@@ -21,7 +20,6 @@ import { useAuth } from "./hooks/useAuth";
 import LoginPage from "./pages/LoginPage";
 import HistoryPage from "./pages/HistoryPage";
 import AdminPage from "./pages/AdminPage";
-import EtudeAdminPage from "./pages/EtudeAdminPage";
 import RecorderPanel from "./components/RecorderPanel";
 import ReportPanel from "./components/ReportPanel";
 import CompletionPanel from "./components/CompletionPanel";
@@ -50,7 +48,7 @@ import {
 } from "./lib/drafts";
 // v3 backend: FormatResult has formatted_report, organe_detecte, markers (adapted from donnees_manquantes)
 
-type Page = "app" | "history" | "admin" | "etude";
+type Page = "app" | "history" | "admin";
 type AppView = "record" | "report";
 
 /* ------------------------------------------------------------------ */
@@ -150,7 +148,6 @@ function Sidebar({
         ))}
 
         {isAdmin && (
-          <>
             <button
               onClick={() => setPage("admin")}
               title="Administration"
@@ -164,23 +161,6 @@ function Sidebar({
             >
               <Shield className="h-[18px] w-[18px]" />
             </button>
-            {/* L'etude a sa propre entree : ses chiffres ne se lisent pas comme
-                ceux de l'exploitation, et les melanger ferait chercher un taux
-                d'hallucination dans un tableau de comptes rendus. */}
-            <button
-              onClick={() => setPage("etude")}
-              title="Etude clinique"
-              className={`
-                flex h-10 w-10 items-center justify-center rounded-lg transition-all
-                ${page === "etude"
-                  ? "bg-primary/15 text-primary"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                }
-              `}
-            >
-              <FlaskConical className="h-[18px] w-[18px]" />
-            </button>
-          </>
         )}
       </nav>
 
@@ -800,9 +780,6 @@ export default function App() {
     </div>
   );
 
-  if (page === "etude") {
-    return <EtudeAdminPage token={getToken()} onBack={() => setPage("app")} />;
-  }
 
   return (
     <div className="flex h-screen bg-background text-foreground">

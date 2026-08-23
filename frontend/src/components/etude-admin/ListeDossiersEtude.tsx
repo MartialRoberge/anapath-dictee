@@ -9,6 +9,10 @@ import { cn } from "@/lib/utils";
 export interface LigneDossierEtude {
   id: string;
   praticien_id: string;
+  /** Le NOM. La pseudonymisation a sa place dans l'export, pas ici : sur
+   *  l'ecran de l'administrateur elle ne protege personne et rend la liste
+   *  illisible. */
+  praticien_nom: string;
   index_session: number;
   organe: string | null;
   cree_a: string;
@@ -111,7 +115,7 @@ export default function ListeDossiersEtude({
 
           <div className="mt-1 flex items-center gap-2 text-[0.65rem] text-muted-foreground">
             <span className="truncate font-mono">
-              {dossier.praticien_id.slice(0, 8)}
+              {dossier.praticien_nom}
             </span>
             <span className="shrink-0">{dateCourte(dossier.cree_a)}</span>
           </div>
