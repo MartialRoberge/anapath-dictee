@@ -19,7 +19,7 @@ Contexte diagnostique :
 
 from enum import Enum
 
-from negation import NEGATION_MARKERS as _NEGATION_PREFIXES
+from negation import DECLENCHEURS as _NEGATION_PREFIXES
 from text_utils import normaliser as _normaliser
 
 
