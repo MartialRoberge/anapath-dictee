@@ -8,7 +8,7 @@ import logging
 from collections.abc import AsyncGenerator
 
 from sqlalchemy import inspect as sa_inspect
-from sqlalchemy import text
+from sqlalchemy import literal, text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -75,6 +75,39 @@ def _colonnes_manquantes(connexion, table) -> list:
     return [colonne for colonne in table.columns if colonne.name not in presentes]
 
 
+def _defaut_sql(colonne, dialecte) -> str | None:
+    """Le defaut de la colonne, ecrit comme litteral SQL. None s'il n'y en a pas."""
+    defaut = colonne.default
+    if defaut is None or not getattr(defaut, "is_scalar", False):
+        return None
+    return str(
+        literal(defaut.arg).compile(
+            dialect=dialecte, compile_kwargs={"literal_binds": True}
+        )
+    )
+
+
+def _clause_ajout(colonne, dialecte) -> str | None:
+    """La clause ADD COLUMN, ou None si la colonne ne peut pas etre ajoutee seule.
+
+    Une colonne OBLIGATOIRE avec un defaut s'ajoute sans risque : les lignes
+    existantes prennent ce defaut, qui est celui que le modele leur donnerait de
+    toute facon. La refuser bloquait le demarrage sur un ALTER parfaitement sur —
+    et c'est ce qui a produit une erreur 500 en production sur `etude_dossiers`.
+
+    Une colonne obligatoire SANS defaut, elle, reste refusee : il faudrait
+    inventer une valeur pour les lignes existantes, et cette decision appartient
+    a une migration, pas a un demarrage.
+    """
+    type_sql = colonne.type.compile(dialecte)
+    if colonne.nullable:
+        return f'"{colonne.name}" {type_sql}'
+    defaut = _defaut_sql(colonne, dialecte)
+    if defaut is None:
+        return None
+    return f'"{colonne.name}" {type_sql} NOT NULL DEFAULT {defaut}'
+
+
 def _reconcilier(connexion, metadata=None) -> None:
     """Ajoute les colonnes manquantes, sans jamais rien detruire.
 
@@ -92,20 +125,18 @@ def _reconcilier(connexion, metadata=None) -> None:
     dialecte = connexion.dialect
     for table in (metadata or Base.metadata).sorted_tables:
         for colonne in _colonnes_manquantes(connexion, table):
-            if not colonne.nullable:
+            clause = _clause_ajout(colonne, dialecte)
+            if clause is None:
                 logger.error(
-                    "Colonne obligatoire absente en base : %s.%s — migration requise.",
+                    "Colonne %s.%s absente en base, obligatoire et SANS defaut : "
+                    "migration requise, aucune valeur ne peut etre inventee.",
                     table.name, colonne.name,
                 )
                 continue
-            type_sql = colonne.type.compile(dialecte)
             connexion.execute(
-                text(f'ALTER TABLE "{table.name}" ADD COLUMN "{colonne.name}" {type_sql}')
+                text(f'ALTER TABLE "{table.name}" ADD COLUMN {clause}')
             )
-            logger.warning(
-                "Colonne ajoutee a chaud : %s.%s (%s).",
-                table.name, colonne.name, type_sql,
-            )
+            logger.warning("Colonne ajoutee a chaud : %s.%s.", table.name, colonne.name)
 
 
 async def create_tables() -> None:
