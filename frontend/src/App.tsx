@@ -555,6 +555,12 @@ export default function App() {
     [etude.propositions, pointsTraites],
   );
 
+  /** Ce qui reste a verifier, pour que le bouton de validation le dise. */
+  const pointsRestants = useMemo(
+    () => pointsATraiter.filter((point) => !(point.id in pointsTraites)).length,
+    [pointsATraiter, pointsTraites],
+  );
+
   const deciderPoint = useCallback(
     async (
       point: PointATraiter,
@@ -631,11 +637,19 @@ export default function App() {
   const ajouterAuCompteRendu = useCallback(
     async (texte: string) => {
       if (!report) return;
-      const resultat = await iterateReport(report, texte);
-      handleFormatted(resultat);
-      noterTranscription(
-        rawTranscription ? `${rawTranscription} ${texte}` : texte,
-      );
+      // L'indicateur est POSE ICI et pas ailleurs : l'appel dure plusieurs
+      // secondes, et sans retour visuel le praticien croit que rien ne part.
+      // C'est ce qui donnait l'impression que la barre d'ajout etait cassee.
+      setReformatting(true);
+      try {
+        const resultat = await iterateReport(report, texte);
+        handleFormatted(resultat);
+        noterTranscription(
+          rawTranscription ? `${rawTranscription} ${texte}` : texte,
+        );
+      } finally {
+        setReformatting(false);
+      }
     },
     [report, rawTranscription, handleFormatted, noterTranscription],
   );
@@ -826,13 +840,28 @@ export default function App() {
           <div className="flex items-center gap-2">
             {report && (
               <>
+                {/* "Sauvegarder" ne distinguait pas un brouillon d'un compte
+                    rendu fini : personne ne savait ce qu'il validait, et le
+                    texte valide n'arrivait jamais en base. Le libelle dit
+                    desormais l'acte, et le compteur dit ce qui reste. */}
                 {!savedReportId ? (
-                  <Button variant="outline" size="sm" onClick={handleSave} disabled={saving}>
-                    <Save className="h-3.5 w-3.5" />
-                    <span className="hide-mobile">{saving ? "..." : "Sauvegarder"}</span>
-                  </Button>
+                  <div data-ergo="validation" className="flex items-center gap-2">
+                    {pointsRestants > 0 && (
+                      <span className="hide-mobile text-xs tabular-nums text-muted-foreground">
+                        {pointsRestants} à vérifier
+                      </span>
+                    )}
+                    <Button size="sm" onClick={handleSave} disabled={saving}>
+                      <Save className="h-3.5 w-3.5" />
+                      <span className="hide-mobile">
+                        {saving ? "Enregistrement…" : "Valider le compte rendu"}
+                      </span>
+                    </Button>
+                  </div>
                 ) : (
-                  <Badge variant="success" className="text-xs">Sauvegarde</Badge>
+                  <Badge variant="success" className="text-xs">
+                    Compte rendu validé
+                  </Badge>
                 )}
                 <Button
                   variant="outline"

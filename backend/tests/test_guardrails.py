@@ -395,3 +395,42 @@ def test_entete_de_section_vide_retiree():
     assert "**Immunohistochimie :**" not in out
     assert "**Microscopie :**" in out          # section avec contenu : conservee
     assert "CONCLUSION" in out                 # titre gras+souligne : intouchable
+
+
+# --- Perte silencieuse de contenu a l'iteration -----------------------------
+
+
+def test_le_contenu_disparu_est_detecte():
+    """C'est le mode de defaillance le plus dangereux du produit : plus grave
+    qu'une hallucination, parce qu'une hallucination se VOIT et qu'une phrase
+    disparue ne laisse aucune trace. L'iteration reecrit le compte rendu entier
+    a partir d'un prompt qui demande de conserver l'existant, et une instruction
+    n'est pas une garantie."""
+    from reports.guardrails import contenu_perdu
+
+    avant = (
+        "Adenocarcinome infiltrant du colon avec emboles vasculaires. "
+        "Trois ganglions envahis sur douze examines."
+    )
+    apres = "Adenocarcinome infiltrant du colon. Immunohistochimie realisee."
+    perdus = contenu_perdu(avant, apres)
+    assert "emboles" in perdus
+    assert "ganglions" in perdus
+    assert "12" in perdus, "un chiffre disparu doit etre signale"
+
+
+def test_un_ajout_pur_ne_signale_aucune_perte():
+    """Sinon chaque ajout declencherait une alerte et l'on cesserait de les lire."""
+    from reports.guardrails import contenu_perdu
+
+    avant = "Adenocarcinome infiltrant du colon sigmoide."
+    assert contenu_perdu(avant, avant + " Emboles vasculaires presents.") == []
+
+
+def test_un_marqueur_a_completer_rempli_n_est_pas_une_perte():
+    """Il est CENSE disparaitre quand il est renseigne."""
+    from reports.guardrails import contenu_perdu
+
+    avant = "Grade histopronostique : [A COMPLETER: grade SBR]."
+    apres = "Grade histopronostique : SBR II."
+    assert contenu_perdu(avant, apres) == []

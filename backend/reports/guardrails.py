@@ -1014,6 +1014,43 @@ def _collect_guardrail_warnings(
     return warnings, alertes
 
 
+#: Mots de liaison et tournures de constat : leur disparition ne change rien au
+#: contenu clinique, et les compter noierait les vraies pertes.
+_SANS_PORTEE: frozenset[str] = frozenset({
+    "montre", "montrent", "observe", "observee", "note", "notee", "retrouve",
+    "retrouvee", "objective", "met", "mis", "mise", "evidence", "voit", "vue",
+    "existe", "trouve", "examen", "analyse", "etude", "lecture", "aspect",
+    "cette", "cette", "avec", "sans", "dans", "pour", "par", "sur", "les",
+    "des", "une", "aux", "est", "sont", "qui", "que", "son", "sa", "ses",
+})
+
+
+def contenu_perdu(avant: str, apres: str) -> list[str]:
+    """Termes cliniques presents AVANT et absents APRES. Vide si rien ne manque.
+
+    L'iteration reecrit le compte rendu ENTIER a partir d'un prompt qui demande
+    de conserver l'existant. Une instruction n'est pas une garantie : en
+    ajoutant une precision sans rapport, le modele laisse tomber des phrases,
+    et cette perte ne laisse AUCUNE trace. C'est le mode de defaillance le plus
+    dangereux du produit — plus qu'une hallucination, qui elle se voit.
+
+    Ce controle est deterministe et ne juge rien : il compte ce qui a disparu.
+    Les marqueurs [A COMPLETER] ne comptent pas, ils sont censes disparaitre
+    quand ils sont remplis.
+    """
+    def _termes(texte: str) -> set[str]:
+        nu = _A_COMPLETER_REGION.sub(" ", texte)
+        return {
+            mot
+            for mot in re.findall(r"[^\W\d_]{4,}", _strip_accents_lower(nu))
+            if mot not in _SANS_PORTEE
+        }
+
+    perdus = _termes(avant) - _termes(apres)
+    chiffres = source_number_set(avant) - source_number_set(apres)
+    return sorted(perdus | chiffres)
+
+
 def build_validated_report(
     raw_llm_text: str,
     *,

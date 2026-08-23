@@ -19,7 +19,7 @@ from reports.engine import (
     ReportEngine,
     Transcript,
 )
-from reports.guardrails import build_validated_report
+from reports.guardrails import build_validated_report, contenu_perdu
 from reports.knowledge import ContextResult, build_context_block
 from reports.prompts import (
     build_format_system_prompt,
@@ -95,13 +95,35 @@ class LocalReportEngine:
         # aux deux sources ; les organes sont re-detectes sur l'ensemble.
         source: str = f"{rapport_actuel}\n{nouveau_transcript}"
         organes = build_context_block(source).organes
-        return build_validated_report(
+        rapport = build_validated_report(
             raw,
             source_text=source,
             organes=organes,
             provider=self._provider.name,
             model=self._provider.model,
         )
+
+        # CONTROLE DE PERTE. L'iteration reecrit le compte rendu ENTIER a partir
+        # d'un prompt qui demande de conserver l'existant — mais une instruction
+        # n'est pas une garantie. En ajoutant une precision sans rapport, le
+        # modele laisse tomber des phrases, et cette perte ne laisse aucune
+        # trace : c'est le mode de defaillance le plus dangereux du produit,
+        # plus qu'une hallucination, qui elle se voit.
+        #
+        # On ne reecrit pas le texte a sa place : on SIGNALE, et le praticien
+        # tranche. Reinserer automatiquement une phrase supprimee a dessein
+        # serait aussi grave que la perdre.
+        perdus = contenu_perdu(rapport_actuel, rapport.cr)
+        if perdus:
+            rapport.warnings.append(
+                "Des elements du compte rendu precedent n'apparaissent plus : "
+                + ", ".join(perdus[:12])
+                + ("..." if len(perdus) > 12 else "")
+                + ". Verifiez qu'ils devaient bien disparaitre."
+            )
+            logger.warning("iterate: %d element(s) perdu(s)", len(perdus))
+
+        return rapport
 
     # -- Appel LLM avec retry ---------------------------------------------
 
