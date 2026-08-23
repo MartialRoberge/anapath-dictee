@@ -1,5 +1,6 @@
 import { useRef, useState, type KeyboardEvent } from "react";
 import {
+  AudioLines,
   Check,
   ChevronRight,
   CircleSlash,
@@ -58,6 +59,60 @@ const TEXTE_TON: Record<TonDecision, string> = {
   rejet: "text-destructive",
   neutre: "text-muted-foreground",
 };
+
+// Un choix de nature RETENU est rempli, pas seulement borde : c'est la seule
+// reponse obligatoire du second temps, et en colonne etroite une bordure de
+// plus ne se distingue pas du bouton d'a cote.
+const CLASSES_NATURE_RETENUE: Record<TonDecision, string> = {
+  valide:
+    "border-success/50 bg-success/10 text-success hover:bg-success/15 hover:text-success",
+  nuance:
+    "border-warning/50 bg-warning/10 text-warning hover:bg-warning/15 hover:text-warning",
+  rejet:
+    "border-destructive/50 bg-destructive/10 text-destructive hover:bg-destructive/15 hover:text-destructive",
+  neutre: "border-foreground/25 bg-muted text-foreground hover:bg-muted",
+};
+
+/* ------------------------------------------------------------------ */
+/*  Nature d'une correction — ce qui separe l'erreur de l'ecriture     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Ce que le praticien a change en corrigeant.
+ *
+ * Sans cette distinction, « je reformule a ma main » et « c'etait faux »
+ * comptent pour la meme chose, et le taux publie melange une erreur de l'outil
+ * avec le style d'un redacteur — deux mesures sans rapport.
+ */
+export interface NatureCorrection {
+  /** Valeur envoyee au backend : hors grille, il refuse en 400. */
+  valeur: string;
+  libelle: string;
+  /** La phrase du praticien, pas la definition : elle doit se lire sans effort. */
+  aide: string;
+  ton: TonDecision;
+  /**
+   * Seule une erreur de FOND appelle la question de la cause : demander la
+   * cause d'une reformulation de style n'a pas de sens, et le backend refuse
+   * cette combinaison en 400.
+   */
+  demandeCause: boolean;
+}
+
+/** Une option de grille, elargie a la question de la nature. */
+export interface OptionDecisionEtendue extends OptionDecision {
+  /**
+   * Ouvre la question de la nature en tete du second temps. Laisse a faux, la
+   * carte se comporte exactement comme avant : la vue plein ecran ne pose pas
+   * cette question, le panneau lateral si.
+   */
+  demandeNature?: boolean;
+}
+
+/** Les options d'une decision, elargies a la nature de la correction. */
+export interface OptionsDecisionEtendues extends OptionsDecision {
+  natureCorrection?: string;
+}
 
 /* ------------------------------------------------------------------ */
 /*  La confiance est un decompte, jamais un score                      */
@@ -127,8 +182,10 @@ function texteSansAppui(
 /* ------------------------------------------------------------------ */
 
 interface EtapeJustification {
-  option: OptionDecision;
+  option: OptionDecisionEtendue;
   valeur: string;
+  /** Nature de la correction, nulle tant que le praticien ne l'a pas dite. */
+  nature: string | null;
   cause: string | null;
   /** Horodatage d'ouverture : sert a mesurer le temps de justification. */
   ouvertA: number;
@@ -137,8 +194,19 @@ interface EtapeJustification {
 interface PropositionCarteProps {
   proposition: PropositionEtude;
   /** La grille du type de cette proposition. Les trois sont etanches. */
-  grille: readonly OptionDecision[];
+  grille: readonly OptionDecisionEtendue[];
   causes: readonly CauseErreur[];
+  /**
+   * Les natures de correction proposees. Absentes, la question n'est jamais
+   * posee : seule une grille qui porte `demandeNature` la declenche.
+   */
+  natures?: readonly NatureCorrection[];
+  /**
+   * Le passage exact de la dictee, pour un appelant qui n'affiche PAS le
+   * verbatim en permanence. Nul quand rien n'ancre la proposition : la carte
+   * le dit deja, il n'y a alors rien a deplier.
+   */
+  extraitDictee?: string | null;
   /** Vrai quand c'est cette carte qui pilote le surlignage du verbatim. */
   actif: boolean;
   /**
@@ -152,9 +220,10 @@ interface PropositionCarteProps {
   onDecider: (
     id: string,
     decision: string,
-    options?: OptionsDecision,
+    options?: OptionsDecisionEtendues,
   ) => Promise<void>;
-  onJustificationOuverte: (id: string) => void;
+  /** Telemetrie du depliage des motifs : tous les appelants ne la mesurent pas. */
+  onJustificationOuverte?: (id: string) => void;
 }
 
 /**
@@ -166,6 +235,8 @@ export default function PropositionCarte({
   proposition,
   grille,
   causes,
+  natures,
+  extraitDictee,
   actif,
   sortie,
   revenue,
@@ -177,14 +248,34 @@ export default function PropositionCarte({
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [motifsOuverts, setMotifsOuverts] = useState(false);
+  const [extraitOuvert, setExtraitOuvert] = useState(false);
   const carteRef = useRef<HTMLDivElement>(null);
+  const champRef = useRef<HTMLTextAreaElement>(null);
 
   const compte = decompteVoix(proposition);
   const sansAppui = !proposition.ancree;
   const suspecte = sansAppui && proposition.type !== "completude";
   const partante = sortie !== null;
 
-  const envoyer = async (valeur: string, options?: OptionsDecision) => {
+  // La question de la nature n'existe que si l'appelant l'a fournie ET que
+  // l'option la demande : une grille sans natures se comporte comme avant.
+  const natureRequise =
+    etape !== null &&
+    etape.option.demandeNature === true &&
+    natures !== undefined &&
+    natures.length > 0;
+  const natureRetenue =
+    etape === null
+      ? null
+      : (natures?.find((n) => n.valeur === etape.nature) ?? null);
+  // La cause ne se pose que si la nature choisie l'appelle. Hors nature, on
+  // retombe sur le comportement d'origine : l'option seule decide.
+  const causeVisible =
+    etape !== null &&
+    etape.option.demandeCause === true &&
+    (!natureRequise || natureRetenue?.demandeCause === true);
+
+  const envoyer = async (valeur: string, options?: OptionsDecisionEtendues) => {
     setEnvoi(true);
     setErreur(null);
     try {
@@ -197,13 +288,18 @@ export default function PropositionCarte({
     }
   };
 
-  const choisir = (option: OptionDecision) => {
-    if (option.saisieValeur || option.demandeCause) {
+  const choisir = (option: OptionDecisionEtendue) => {
+    const ouvreNature =
+      option.demandeNature === true &&
+      natures !== undefined &&
+      natures.length > 0;
+    if (option.saisieValeur || option.demandeCause || ouvreNature) {
       setErreur(null);
       setEtape({
         option,
         // Pre-remplir evite de retaper une proposition juste sur le fond.
         valeur: option.saisieValeur ? proposition.valeur_proposee : "",
+        nature: null,
         cause: null,
         ouvertA: Date.now(),
       });
@@ -212,13 +308,33 @@ export default function PropositionCarte({
     void envoyer(option.valeur);
   };
 
+  const choisirNature = (nature: NatureCorrection) => {
+    if (!etape) return;
+    setEtape({
+      ...etape,
+      nature: nature.valeur,
+      // Passer de « c'etait faux » a « je reformule » doit OUBLIER la cause :
+      // laissee en place, elle partirait avec une nature qui ne l'admet pas et
+      // le backend refuserait la decision en 400.
+      cause: nature.demandeCause ? etape.cause : null,
+    });
+    // Le geste suivant est d'ecrire la valeur retenue : y amener le curseur
+    // evite un Tab a l'aveugle dans une colonne etroite.
+    if (etape.option.saisieValeur) champRef.current?.focus();
+  };
+
   const validerEtape = () => {
     if (!etape) return;
     const valeur = etape.valeur.trim();
     if (etape.option.saisieValeur && valeur.length === 0) return;
+    // La nature n'est pas facultative : sans elle, la correction retombe dans
+    // le tas indistinct que cet ecran est justement la pour separer.
+    if (natureRequise && etape.nature === null) return;
     void envoyer(etape.option.valeur, {
       ...(etape.option.saisieValeur ? { valeurRetenue: valeur } : {}),
-      ...(etape.cause ? { causeErreur: etape.cause } : {}),
+      ...(etape.nature !== null ? { natureCorrection: etape.nature } : {}),
+      // La cause ne part que si la question a REELLEMENT ete posee a l'ecran.
+      ...(causeVisible && etape.cause ? { causeErreur: etape.cause } : {}),
       // « Ouverte » = le second temps a bien ete presente au praticien ; la
       // duree mesure le temps qu'il y a passe, cause laissee vide ou non.
       justifOuverte: true,
@@ -242,7 +358,7 @@ export default function PropositionCarte({
     setMotifsOuverts(ouverture);
     // Chaque ouverture est un evenement : c'est elle que la telemetrie compte,
     // pas l'etat courant du depliage.
-    if (ouverture) onJustificationOuverte(proposition.id);
+    if (ouverture) onJustificationOuverte?.(proposition.id);
   };
 
   const surTouche = (evenement: KeyboardEvent<HTMLDivElement>) => {
@@ -380,6 +496,37 @@ export default function PropositionCarte({
         )
       )}
 
+      {/* Le passage dicte, a la demande. Un appelant qui montre deja le
+          verbatim en permanence ne passe pas `extraitDictee` : le repeter sous
+          la carte ferait lire deux fois la meme phrase. Ferme par defaut, car
+          la question posee porte sur la proposition, pas sur la dictee. */}
+      {!partante && extraitDictee && (
+        <div className="mt-2">
+          <button
+            type="button"
+            aria-expanded={extraitOuvert}
+            onClick={() => setExtraitOuvert(!extraitOuvert)}
+            className="inline-flex items-center gap-1 rounded-sm text-[0.7rem] font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <ChevronRight
+              className={cn(
+                "h-3 w-3 shrink-0 transition-transform duration-150 motion-reduce:transition-none",
+                extraitOuvert && "rotate-90",
+              )}
+            />
+            <AudioLines className="h-3 w-3 shrink-0" />
+            Ce que vous avez dicte
+          </button>
+          {extraitOuvert && (
+            // Meme surlignage que le verbatim plein ecran : le praticien
+            // reconnait le passage sans reapprendre un code couleur.
+            <p className="mt-1.5 rounded-md bg-primary/[0.07] px-2.5 py-2 text-[0.7rem] leading-relaxed text-foreground ring-1 ring-primary/20">
+              {extraitDictee}
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Rien de focalisable dans une carte qui part : le focus s'y perdrait
           au moment meme ou elle disparait. */}
       {!partante && proposition.justifications.length > 0 && (
@@ -431,13 +578,61 @@ export default function PropositionCarte({
             {etape.option.libelle}
           </p>
 
+          {/* La nature vient EN TETE : c'est elle qui decide de la suite du
+              second temps, et elle seule est obligatoire. */}
+          {natureRequise && natures && (
+            <div className="space-y-1.5 rounded-md border border-border/60 bg-muted/40 p-2">
+              <span className="block text-xs font-medium text-foreground">
+                Qu'avez-vous change&nbsp;?
+              </span>
+              <div className="flex flex-col gap-1.5">
+                {natures.map((nature, rang) => {
+                  const retenue = etape.nature === nature.valeur;
+                  return (
+                    <Button
+                      key={nature.valeur}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      // La premiere prend le focus a l'ouverture : sans cela il
+                      // filerait dans le champ de texte et la question serait
+                      // sautee par tout praticien au clavier.
+                      autoFocus={rang === 0}
+                      aria-pressed={retenue}
+                      disabled={envoi}
+                      onClick={() => choisirNature(nature)}
+                      className={cn(
+                        "h-auto w-full flex-col items-start gap-0.5 whitespace-normal px-2.5 py-2 text-left text-xs",
+                        retenue
+                          ? CLASSES_NATURE_RETENUE[nature.ton]
+                          : CLASSES_TON[nature.ton],
+                      )}
+                    >
+                      <span className="font-semibold">{nature.libelle}</span>
+                      <span className="font-normal opacity-75">
+                        {nature.aide}
+                      </span>
+                    </Button>
+                  );
+                })}
+              </div>
+              {/* Dire pourquoi on demande : sans cette phrase, la question
+                  passe pour une formalite de plus et se repond au hasard. */}
+              <p className="text-[0.65rem] leading-relaxed text-muted-foreground">
+                Sans cette precision, une reformulation de votre main serait
+                comptee comme une erreur de MARC.
+              </p>
+            </div>
+          )}
+
           {etape.option.saisieValeur && (
             <label className="block space-y-1">
               <span className="text-xs text-muted-foreground">
                 Valeur retenue
               </span>
               <Textarea
-                autoFocus
+                ref={champRef}
+                autoFocus={!natureRequise}
                 rows={2}
                 value={etape.valeur}
                 disabled={envoi}
@@ -454,7 +649,7 @@ export default function PropositionCarte({
             </label>
           )}
 
-          {etape.option.demandeCause && (
+          {causeVisible && (
             <div className="space-y-1.5">
               <span className="text-xs text-muted-foreground">
                 Pourquoi&nbsp;? (facultatif)
@@ -508,7 +703,8 @@ export default function PropositionCarte({
               className="h-9"
               disabled={
                 envoi ||
-                (etape.option.saisieValeur && etape.valeur.trim().length === 0)
+                (etape.option.saisieValeur && etape.valeur.trim().length === 0) ||
+                (natureRequise && etape.nature === null)
               }
               onClick={validerEtape}
             >

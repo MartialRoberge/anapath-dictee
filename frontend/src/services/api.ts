@@ -49,10 +49,38 @@ export interface Signalement {
   message: string;
 }
 
+/** Le sort d'une assertion apres arbitrage du college. */
+export interface SoumissionCollege {
+  rang: number;
+  assertion: string;
+  comportement: "affirmer" | "proposer";
+  motif: string;
+  voix_pour: number;
+  voix_total: number;
+  empan_debut: number | null;
+  empan_fin: number | null;
+  /**
+   * Les phrases ECRITES par les relecteurs en jugeant. Jamais reformulees
+   * pour l'affichage : les reecrire reviendrait a generer l'explication d'une
+   * decision au lieu de la constater.
+   */
+  justifications: string[];
+}
+
+export interface TraceCollege {
+  quorum: number;
+  lentilles_muettes: string[];
+  taux_de_soumission: number | null;
+  soumissions: SoumissionCollege[];
+  manques: { champ: string; justification: string }[];
+}
+
 export interface ReportTrace {
   comprehension?: Comprehension;
   signalements?: Signalement[];
   passes?: { role: string; model: string }[];
+  /** Absent quand le college n'a pas siege : l'etude retombe sur le decoupage. */
+  college?: TraceCollege | null;
 }
 
 export interface CoherenceIssue {

@@ -25,8 +25,12 @@ import EtudeAdminPage from "./pages/EtudeAdminPage";
 import RecorderPanel from "./components/RecorderPanel";
 import ReportPanel from "./components/ReportPanel";
 import CompletionPanel from "./components/CompletionPanel";
-import { formatTranscription, getReport, saveReport, sendFeedback } from "./services/api";
+import { formatTranscription, getReport, iterateReport, saveReport, sendFeedback } from "./services/api";
 import { useEtudeDossier } from "./hooks/useEtudeDossier";
+import PanneauAnalyse from "./components/analyse/PanneauAnalyse";
+import Glissiere from "./components/analyse/Glissiere";
+import BarreAjout from "./components/analyse/BarreAjout";
+import { construirePoints, type ActionPoint, type PointATraiter } from "./lib/pointsATraiter";
 import type {
   FormatResult,
   Marker,
@@ -353,6 +357,23 @@ export default function App() {
   // compte rendu pour une mesure.
   const etude = useEtudeDossier();
 
+  // Partage de l'ecran entre l'analyse et le compte rendu. Aucune valeur fixe
+  // ne convient : juger des points demande de la place a gauche, ecrire en
+  // demande a droite. Le praticien arbitre, et son choix survit au dossier
+  // suivant.
+  const [partAnalyse, setPartAnalyse] = useState<number>(() => {
+    const garde = Number(localStorage.getItem("marc_part_analyse"));
+    return Number.isFinite(garde) && garde > 0.15 && garde < 0.7 ? garde : 0.38;
+  });
+  useEffect(() => {
+    localStorage.setItem("marc_part_analyse", String(partAnalyse));
+  }, [partAnalyse]);
+
+  // Ce qui a deja ete traite, et le point survole. Le survol pilote le
+  // surlignage du passage dans le compte rendu.
+  const [pointsTraites, setPointsTraites] = useState<Record<string, string>>({});
+  const [pointActif, setPointActif] = useState<PointATraiter | null>(null);
+
   // La transcription est aussi tenue dans une ref : le panneau appelle
   // onTranscription puis onFormatted dans le meme tour de rendu, et l'etat
   // n'est pas encore a jour quand le second s'execute.
@@ -446,6 +467,94 @@ export default function App() {
     setActiveView("record");
   }, [draftId]);
 
+  const pointsATraiter = useMemo(() => {
+    // Le college rend ses verdicts par ASSERTION, l'etude par identifiant de
+    // proposition : on les rapproche sur le texte, qui est le seul point commun
+    // et qui vient du meme decoupage serveur.
+    const soumissions = explication?.trace?.college?.soumissions ?? [];
+    const parAssertion = new Map(soumissions.map((s) => [s.assertion.trim(), s]));
+
+    const justifications: Record<string, string[]> = {};
+    const citations: Record<string, string> = {};
+    const voix: Record<string, { pour: number; total: number }> = {};
+
+    for (const proposition of etude.propositions) {
+      const soumission = parAssertion.get(proposition.valeur_proposee.trim());
+      if (!soumission) continue;
+      justifications[proposition.id] = soumission.justifications;
+      voix[proposition.id] = {
+        pour: soumission.voix_pour,
+        total: soumission.voix_total,
+      };
+      if (
+        rawTranscription &&
+        soumission.empan_debut !== null &&
+        soumission.empan_fin !== null
+      ) {
+        citations[proposition.id] = rawTranscription.slice(
+          soumission.empan_debut,
+          soumission.empan_fin,
+        );
+      }
+    }
+
+    return construirePoints({
+      propositions: etude.propositions,
+      justifications,
+      citations,
+      voix,
+      marqueurs: completion.pending.map((champ) => champ.marker),
+      coherence: explication?.coherence?.issues ?? [],
+    });
+  }, [etude.propositions, explication, completion.pending, rawTranscription]);
+
+  /** Ce que MARC a verifie sans rien demander : rassurant, donc hors de la file. */
+  const pointsVerifies = useMemo(
+    () =>
+      (explication?.trace?.signalements ?? [])
+        .filter((signalement) => signalement.categorie === "coherence")
+        .map((signalement) => ({ libelle: signalement.message })),
+    [explication],
+  );
+
+  /**
+   * Les codes proposes, en lecture seule : ceux qui demandent une decision sont
+   * dans la file, pas ici. La liste vient des propositions de type "code" deja
+   * tranchees — afficher un code non encore juge en bas de panneau le ferait
+   * passer pour acquis.
+   */
+  const codesAffiches = useMemo(
+    () =>
+      etude.propositions
+        .filter((p) => p.type === "code" && p.id in pointsTraites)
+        .map((p) => ({
+          position: p.sous_type ?? "ADICAP",
+          code: p.valeur_proposee,
+          libelle: p.chemin ?? "",
+        })),
+    [etude.propositions, pointsTraites],
+  );
+
+  const deciderPoint = useCallback(
+    async (point: PointATraiter, action: ActionPoint, valeur?: string) => {
+      // On enregistre AVANT de marquer traite : marquer d'abord ferait
+      // disparaitre le point de la file meme si l'envoi echoue, et le praticien
+      // croirait avoir decide.
+      const proposition = etude.propositions.find((p) => p.id === point.id);
+      if (proposition) {
+        const resultat = await etude.decider(
+          proposition,
+          action.decision as never,
+          valeur ? { valeur_retenue: valeur } : undefined,
+        );
+        if (resultat === null) return;
+      }
+      setPointsTraites((actuel) => ({ ...actuel, [point.id]: action.decision }));
+      setPointActif(null);
+    },
+    [etude],
+  );
+
   const handleFormatted = useCallback((result: FormatResult) => {
     setReport(result.formatted_report);
     setOrganeDetecte(result.organe_detecte);
@@ -481,6 +590,26 @@ export default function App() {
       });
     }
   }, [etude]);
+
+  /**
+   * Ajouter au compte rendu sans tout redicter.
+   *
+   * Le texte ajoute repasse par le moteur avec la dictee d'origine : il est
+   * relu et juge comme le reste. Un ajout n'est pas un passe-droit, sinon il
+   * suffirait d'ecrire une phrase pour contourner tous les garde-fous.
+   */
+  const ajouterAuCompteRendu = useCallback(
+    async (texte: string) => {
+      if (!report) return;
+      const resultat = await iterateReport(report, texte);
+      handleFormatted(resultat);
+      noterTranscription(
+        rawTranscription ? `${rawTranscription} ${texte}` : texte,
+      );
+    },
+    [report, rawTranscription, handleFormatted, noterTranscription],
+  );
+
 
   // Rouvre un CR de l'historique dans l'editeur (charge le detail complet).
   const handleOpenReport = useCallback(
@@ -698,45 +827,90 @@ export default function App() {
             </section>
           ) : (
           <>
-          {/* Left: Recorder rail — hauteur fixe, jamais de scroll (tient en plein ecran) */}
-          <section className="flex w-[340px] shrink-0 flex-col overflow-hidden border-r bg-card/30 p-4 max-lg:hidden lg:w-[380px]">
-            <RecorderPanel
-              rawTranscription={rawTranscription}
-              report={report}
-              onTranscription={noterTranscription}
-              onFormatted={handleFormatted}
-              onReset={handleReset}
-              onRawChange={noterTranscription}
-              onReformat={handleReformat}
-              reformatting={reformatting}
-            />
-          </section>
-
-          {/* Center: Report canvas */}
-          <section className="flex-1 overflow-y-auto p-5 scrollbar-thin max-lg:hidden">
-            {report && explication && (
-              <ExplainPanel
-                trace={explication.trace}
-                warnings={explication.warnings}
-                coherence={explication.coherence}
+          {/* Tant qu'aucun compte rendu n'existe, la dictee occupe la place :
+              c'est la seule chose a faire. Des qu'il en existe un, l'analyse
+              prend la gauche et le compte rendu la droite — l'ordre de lecture
+              du travail qui reste a faire. */}
+          {!report ? (
+            <section className="flex flex-1 justify-center overflow-y-auto p-6 scrollbar-thin max-lg:hidden">
+              <div className="w-full max-w-xl">
+                <RecorderPanel
+                  rawTranscription={rawTranscription}
+                  report={report}
+                  onTranscription={noterTranscription}
+                  onFormatted={handleFormatted}
+                  onReset={handleReset}
+                  onRawChange={noterTranscription}
+                  onReformat={handleReformat}
+                  reformatting={reformatting}
+                />
+              </div>
+            </section>
+          ) : (
+            <div className="relative flex min-w-0 flex-1 overflow-hidden max-lg:hidden">
+              <PanneauAnalyse
+                className="my-3 ml-3"
+                style={{ width: `${partAnalyse * 100}%` }}
+                points={pointsATraiter}
+                traites={pointsTraites}
+                pointActif={pointActif?.id ?? null}
+                occupe={etude.occupe}
+                verifies={pointsVerifies}
+                codes={codesAffiches}
+                onDecider={(point, action, valeur) => {
+                  void deciderPoint(point, action, valeur);
+                }}
+                onSurvol={setPointActif}
+                onOuvrirPourquoi={() => undefined}
               />
-            )}
-            <ReportPanel
-              report={report}
-              onReportChange={setReport}
-              organeDetecte={organeDetecte}
-              pendingCount={completion.remaining}
-            />
 
-            {savedReportId && (
-              <FeedbackPanel
-                savedReportId={savedReportId}
-                feedbackSent={feedbackSent}
-                getToken={getToken}
-                onSent={() => setFeedbackSent(true)}
+              <Glissiere part={partAnalyse} onChange={setPartAnalyse} />
+
+              <section className="min-w-0 flex-1 overflow-y-auto p-5 pb-28 scrollbar-thin">
+                <ReportPanel
+                  report={report}
+                  onReportChange={setReport}
+                  organeDetecte={organeDetecte}
+                  pendingCount={completion.remaining}
+                />
+
+                <details className="mt-4 rounded-xl border bg-card/40 px-4 py-2.5">
+                  <summary className="cursor-pointer text-xs font-medium text-muted-foreground">
+                    Dictée brute et nouvelle dictée
+                  </summary>
+                  <div className="pt-3">
+                    <RecorderPanel
+                      rawTranscription={rawTranscription}
+                      report={report}
+                      onTranscription={noterTranscription}
+                      onFormatted={handleFormatted}
+                      onReset={handleReset}
+                      onRawChange={noterTranscription}
+                      onReformat={handleReformat}
+                      reformatting={reformatting}
+                    />
+                  </div>
+                </details>
+
+                {savedReportId && (
+                  <FeedbackPanel
+                    savedReportId={savedReportId}
+                    feedbackSent={feedbackSent}
+                    getToken={getToken}
+                    onSent={() => setFeedbackSent(true)}
+                  />
+                )}
+              </section>
+
+              {/* Flottante, au-dessus du compte rendu : ajouter sans redicter
+                  l'ensemble etait la chose la moins ergonomique de l'outil. */}
+              <BarreAjout
+                className="absolute inset-x-0 bottom-4"
+                occupe={reformatting}
+                onAjouter={ajouterAuCompteRendu}
               />
-            )}
-          </section>
+            </div>
+          )}
 
           {/* Mobile / tablette : une seule vue a la fois */}
           <div className="hidden max-lg:flex max-lg:flex-1 max-lg:flex-col max-lg:overflow-hidden">

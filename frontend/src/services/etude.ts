@@ -191,6 +191,13 @@ export interface PropositionAffichee {
   /** Offsets de CARACTERES dans la transcription envoyee, calcules serveur. */
   empan_debut: number | null;
   empan_fin: number | null;
+  /**
+   * Faux quand AUCUN passage de la dictee ne soutient l'assertion. Distinct
+   * d'un empan absent par accident : c'est la mesure centrale de l'etude, et
+   * l'interface doit poser la question autrement — non plus "est-ce fidele ?"
+   * mais "l'avez-vous dit ?".
+   */
+  ancree: boolean;
   chemin: string | null;
   confiance: number | null;
 }
