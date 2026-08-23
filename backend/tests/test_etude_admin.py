@@ -74,8 +74,14 @@ def client(tmp_path):
     app.dependency_overrides[get_db_session] = _base
     app.dependency_overrides[get_current_user] = lambda: _user(PRATICIEN, "user")
 
+    async def _lire(travail):
+        """Ouvre une session pour lire la base depuis un test."""
+        async with fabrique() as session:
+            return await travail(session)
+
     with TestClient(app) as c:
         c.portal.call(_creer_schema, moteur)
+        c.lire_base = _lire  # type: ignore[attr-defined]
         yield c
         app.dependency_overrides.clear()
         c.portal.call(moteur.dispose)
@@ -293,3 +299,76 @@ def test_le_dossier_exclu_reste_consultable(client):
     lignes = client.get("/admin/etude/dossiers").json()
     assert lignes[0]["exclu"] is True
     assert lignes[0]["motif_exclusion"] == "Essai"
+
+
+# --- Suppression : les essais d'AVANT l'etude -------------------------------
+
+
+def test_la_suppression_emporte_tout_ce_qui_depend_du_dossier(client):
+    """Sans retour possible : si quelque chose survit, il traine en base sans
+    parent et fausse tous les comptages. On le verifie, on ne le suppose pas."""
+    from sqlalchemy import func, select
+
+    from etude.models import (
+        EtudeDossier,
+        EtudePause,
+        EtudeProposition,
+        EtudeReponseQuestionnaire,
+    )
+
+    dossier = _jouer_un_cas(client)
+    identifiant = dossier["dossier_id"]
+    client.post(
+        "/etude/questionnaires",
+        json={
+            "questionnaire": "par_cas",
+            "reponses": {"par_cas_00": "Non"},
+            "dossier_id": identifiant,
+        },
+    )
+
+    _passer_admin()
+    assert client.delete(f"/admin/etude/dossiers/{identifiant}").status_code == 200
+
+    async def _restes(session) -> dict[str, int]:
+        comptes: dict[str, int] = {}
+        for nom, modele in (
+            ("dossiers", EtudeDossier),
+            ("propositions", EtudeProposition),
+            ("pauses", EtudePause),
+            ("reponses", EtudeReponseQuestionnaire),
+        ):
+            colonne = modele.id if modele is EtudeDossier else modele.dossier_id
+            cible = identifiant if modele is EtudeDossier else identifiant
+            resultat = await session.execute(
+                select(func.count()).select_from(modele).where(colonne == cible)
+            )
+            comptes[nom] = int(resultat.scalar_one())
+        return comptes
+
+    restes = client.portal.call(client.lire_base, _restes)
+    assert restes == {"dossiers": 0, "propositions": 0, "pauses": 0, "reponses": 0}, (
+        f"des lignes survivent au dossier supprime : {restes}"
+    )
+
+
+def test_un_dossier_supprime_sort_de_la_synthese(client):
+    dossier = _jouer_un_cas(client)
+    _passer_admin()
+    client.delete(f"/admin/etude/dossiers/{dossier['dossier_id']}")
+    corpus = client.get("/admin/etude/synthese").json()["corpus"]
+    assert corpus["nb_dossiers"] == 0
+    # Et il ne compte pas non plus comme un exclu : il n'a jamais existe pour
+    # l'etude. Confondre les deux gonflerait l'effectif ecarte a declarer.
+    assert corpus["nb_exclus"] == 0
+
+
+def test_supprimer_un_dossier_inconnu_sort_en_404(client):
+    _passer_admin()
+    assert client.delete("/admin/etude/dossiers/inexistant").status_code == 404
+
+
+def test_un_praticien_ne_peut_pas_supprimer(client):
+    """La suppression est irreversible : elle reste a l'administrateur."""
+    dossier = _jouer_un_cas(client)
+    assert client.delete(f"/admin/etude/dossiers/{dossier['dossier_id']}").status_code == 403

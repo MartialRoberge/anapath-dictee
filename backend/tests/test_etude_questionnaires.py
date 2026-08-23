@@ -7,6 +7,7 @@ de retirer.
 
 from etude.questionnaires import (
     CATALOGUE,
+    fsus_comparable,
     FSUS_ITEMS,
     ORDRE_DE_RETRAIT_PAR_CAS,
     PAR_CAS,
@@ -23,11 +24,19 @@ def _fsus(reponses: list[int]) -> dict[str, int]:
 # --- Le F-SUS ---------------------------------------------------------------
 
 
-def test_le_fsus_n_est_pas_pret_tant_qu_il_n_est_pas_recopie():
-    """Retraduire soi-meme detruit ce qui rend le score comparable : un F-SUS
-    paraphrase n'est plus un F-SUS. Tant que les libelles publies ne sont pas
-    en place, le questionnaire de fin d'etude ne doit pas etre servi."""
-    assert not fsus_pret()
+def test_le_questionnaire_est_servable_mais_pas_comparable():
+    """Deux questions distinctes, et les confondre coute cher dans un sens
+    comme dans l'autre.
+
+    SERVABLE : bloquer une traduction interne empecherait l'etude de tourner
+    sans rien y gagner — le score reste utile pour comparer les releves entre
+    eux, ce qui est l'essentiel de ce qu'on mesure.
+
+    COMPARABLE : le confronter au seuil de 68 reviendrait a comparer deux
+    instruments differents. Tant que les libelles publies ne sont pas en place,
+    aucun seuil ne doit lui etre oppose."""
+    assert fsus_pret()
+    assert not fsus_comparable()
 
 
 def test_la_polarite_du_fsus_est_alternee():

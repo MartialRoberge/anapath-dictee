@@ -261,6 +261,10 @@ ORDRE_DE_RETRAIT_PAR_CAS: Final[tuple[str, ...]] = ("par_cas_04", "par_cas_02")
 #: backend/data/fsus.json, que n'importe qui remplit en deux minutes.
 _FICHIER_FSUS: Final = Path(__file__).resolve().parent.parent / "data" / "fsus.json"
 
+#: D'ou viennent les libelles : "validee" (F-SUS publie), "interne" (traduction
+#: maison), ou "absente". Renseigne au chargement du fichier.
+_SOURCE_FSUS: str = "absente"
+
 
 def _charger_fsus() -> tuple[Item, ...]:
     """Lit les dix items du F-SUS depuis leur fichier.
@@ -277,6 +281,8 @@ def _charger_fsus() -> tuple[Item, ...]:
 
     basse = str(charge.get("ancre_basse") or "")
     haute = str(charge.get("ancre_haute") or "")
+    global _SOURCE_FSUS
+    _SOURCE_FSUS = str(charge.get("source") or "").strip() or "absente"
     lus = {str(e.get("id")): e for e in charge.get("items", []) if isinstance(e, dict)}
 
     items: list[Item] = []
@@ -395,16 +401,32 @@ def fin_etude() -> Questionnaire:
 
 
 def fsus_pret() -> bool:
-    """Les dix items du F-SUS ont-ils recu leur libelle publie ?
+    """Le questionnaire est-il servable ?
 
-    Libelles ET ancres : un F-SUS cote sur des ancres improvisees n'est pas
-    plus comparable qu'un F-SUS retraduit. Tant que les deux ne sont pas en
-    place, le questionnaire de fin d'etude ne doit pas etre servi.
+    Il l'est des que les dix items portent un libelle et des ancres — que la
+    traduction soit interne ou validee. Bloquer une traduction interne
+    empecherait l'etude de tourner sans rien y gagner : le score reste utile
+    pour comparer les releves ENTRE EUX, ce qui est l'essentiel de ce qu'on
+    mesure ici.
     """
     return all(
         item.libelle.strip() and item.ancre_basse.strip() and item.ancre_haute.strip()
         for item in FSUS_ITEMS
     )
+
+
+def fsus_comparable() -> bool:
+    """Le score se compare-t-il a la LITTERATURE, ou seulement a lui-meme ?
+
+    C'est la distinction qui decide de ce qu'on a le droit d'ecrire dans une
+    publication. Une traduction interne donne une courbe exploitable — un
+    praticien contre un autre, un releve contre le precedent — mais la comparer
+    au seuil de 68 reviendrait a comparer deux instruments differents.
+
+    Tant que ceci est faux, la synthese annote le score et le tableau de
+    couverture ne le confronte a aucun seuil.
+    """
+    return _SOURCE_FSUS == "validee"
 
 
 def score_fsus(reponses: dict[str, int]) -> float | None:

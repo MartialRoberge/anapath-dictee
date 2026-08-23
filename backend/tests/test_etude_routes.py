@@ -239,16 +239,12 @@ def test_le_questionnaire_par_cas_est_servi_par_le_backend(client):
     assert any(item["id"] == "par_cas_04" for item in items)
 
 
-def test_le_blocage_suit_le_fsus_ou_qu_il_soit(client):
-    """Servir un F-SUS sans ses libelles publies produirait un score qui ne se
-    compare a rien. Le blocage porte sur la PRESENCE des items F-SUS, pas sur le
-    nom du questionnaire : les deplacer ne doit pas lever le verrou par
-    inadvertance."""
-    periodique = client.get("/etude/questionnaires/periodique")
-    assert periodique.status_code == 409
-    assert "Gronier" in periodique.json()["detail"]
-
-    # La fin d'etude ne porte plus le F-SUS : elle se sert normalement.
+def test_les_questionnaires_sont_servis(client):
+    """Le periodique porte le SUS, la fin d'etude le reste. Les deux se
+    servent : un questionnaire bloque arreterait l'etude sans rien proteger,
+    puisque la reserve sur la comparabilite du score se porte au dépouillement
+    et non a la collecte."""
+    assert client.get("/etude/questionnaires/periodique").status_code == 200
     assert client.get("/etude/questionnaires/fin_etude").status_code == 200
 
 
@@ -314,7 +310,10 @@ def test_la_cloture_annonce_le_releve_periodique(client):
     assert reponse.json()["questionnaire_periodique_du"] is False
 
 
-def test_le_questionnaire_periodique_est_servi(client):
-    """Il ne contient que le F-SUS, donc il est bloque tant que ses libelles
-    publies ne sont pas en place — au meme titre que la fin d'etude."""
-    assert client.get("/etude/questionnaires/periodique").status_code == 409
+def test_le_questionnaire_periodique_porte_les_dix_items(client):
+    """Dix items a polarite alternee : c'est la structure de l'instrument, et
+    la cotation en depend."""
+    items = client.get("/etude/questionnaires/periodique").json()["items"]
+    assert len(items) == 10
+    assert [i["inverse"] for i in items[:4]] == [False, True, False, True]
+    assert all(i["libelle"] for i in items)

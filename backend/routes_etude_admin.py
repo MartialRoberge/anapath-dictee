@@ -14,6 +14,7 @@ Le micro est indispensable : un taux surprenant ne se corrige pas, il
 s'explique. Sans la vue cas par cas, une anomalie reste une conjecture.
 """
 
+import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -44,6 +45,8 @@ from etude.models import (
     EtudeReponseQuestionnaire,
     EtudeSession,
 )
+
+logger = logging.getLogger("anapath.etude.admin")
 
 router = APIRouter(prefix="/admin/etude", tags=["admin-etude"])
 
@@ -517,3 +520,24 @@ async def exclure(
         "exclu": dossier.exclu,
         "motif": dossier.motif_exclusion,
     }
+
+
+@router.delete("/dossiers/{dossier_id}")
+async def supprimer(dossier_id: str, admin: Admin, db: Base) -> dict[str, bool]:
+    """Detruit definitivement un dossier d'essai.
+
+    A n'utiliser QUE tant que l'etude n'a pas commence : ces dossiers-la sont
+    des mises au point et des demonstrations, ils n'ont jamais fait partie de la
+    population etudiee. Une fois l'etude lancee, c'est `exclusion` qu'il faut —
+    effacer un cas rendrait l'etude incapable de rendre compte de son effectif.
+
+    Sans retour possible : le frontend doit demander confirmation.
+    """
+    base = _exiger_base(db)
+    supprime = await service.supprimer_dossier(base, dossier_id)
+    if not supprime:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Dossier introuvable.")
+    logger.warning(
+        "Dossier %s supprime definitivement par %s.", dossier_id, admin.id
+    )
+    return {"supprime": True}

@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Final
 
-from etude.questionnaires import CATALOGUE, score_fsus
+from etude.questionnaires import CATALOGUE, fsus_comparable, score_fsus
 from etude.vocabulaire import (
     QUESTIONNAIRE_FIN_ETUDE,
     QUESTIONNAIRE_PAR_CAS,
@@ -1340,13 +1340,27 @@ def _criteres_d_acceptabilite(
             rang=RANG_PRINCIPAL,
             unite=UNITE_SCORE,
             valeur=fsus.ensemble.moyenne,
-            seuil=fsus.seuil,
+            # Le seuil de 68 vaut pour l'instrument PUBLIE. Une traduction
+            # interne mesure la meme chose de facon coherente avec elle-meme —
+            # la courbe dans le temps reste exploitable — mais la confronter au
+            # seuil reviendrait a comparer deux instruments differents. On
+            # retire donc le seuil plutot que d'annoncer un depassement qui ne
+            # se defendrait pas devant un relecteur.
+            seuil=fsus.seuil if fsus_comparable() else None,
             sens=SEUIL_AU_MOINS,
             effectif=fsus.ensemble.effectif,
             effectif_minimal=EFFECTIF_MINIMAL_RELEVES,
             note=(
-                "L'effectif compte des RELEVES, pas des praticiens : le F-SUS "
+                "L'effectif compte des RELEVES, pas des praticiens : le score "
                 "est repose tous les cinq comptes rendus."
+                + (
+                    ""
+                    if fsus_comparable()
+                    else " TRADUCTION INTERNE : le score compare les releves "
+                    "entre eux, il ne se compare pas au seuil de 68 ni aux "
+                    "scores publies. Remplacer les libelles par ceux du F-SUS "
+                    "valide (Gronier et Baudet, 2021) leve cette reserve."
+                )
             ),
         ),
         Critere(

@@ -21,7 +21,7 @@ import json
 from datetime import UTC, datetime
 from difflib import SequenceMatcher
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from etude.extraction import PropositionExtraite
@@ -440,6 +440,51 @@ async def exclure_dossier(
     await db.commit()
     await db.refresh(dossier)
     return dossier
+
+
+async def supprimer_dossier(db: AsyncSession | None, dossier_id: str) -> bool:
+    """Detruit un dossier et tout ce qui en depend. Sans retour.
+
+    QUAND L'UTILISER, ET QUAND NE PAS L'UTILISER.
+
+    Avant le debut de l'etude, les dossiers sont des ESSAIS : mises au point,
+    demonstrations, praticiens qui decouvrent l'outil. Ils n'ont jamais fait
+    partie de la population etudiee, il n'y a donc rien a justifier a leur sujet
+    et les garder ne ferait que polluer la base. On supprime.
+
+    Une fois l'etude commencee, c'est l'inverse : effacer un cas rendrait
+    l'etude incapable de rendre compte de son propre effectif, et toute
+    publication demande combien de cas ont ete ecartes et pourquoi. On EXCLUT —
+    voir `exclure_dossier`, qui conserve et se defait.
+
+    La suppression emporte propositions, prelevements, pauses et questions par
+    cascade. Les reponses de questionnaire attachees au dossier partent aussi ;
+    celles qui portent sur le praticien, comme le releve periodique, survivent :
+    elles ne dependent d'aucun cas.
+    """
+    if db is None:
+        return False
+    dossier = await db.get(EtudeDossier, dossier_id)
+    if dossier is None:
+        return False
+
+    # Les reponses de questionnaire sont effacees EXPLICITEMENT : elles n'ont
+    # pas de relation ORM vers le dossier, et SQLite n'applique pas les
+    # cascades declarees en base sauf a activer les cles etrangeres. Sans cette
+    # ligne, elles survivaient a leur dossier — verifie par un test, pas
+    # suppose. Une reponse orpheline gonfle un denominateur sans qu'aucun cas ne
+    # lui corresponde.
+    #
+    # `dossier_id` non nul seulement : le releve periodique porte sur le
+    # PRATICIEN et doit survivre a la suppression d'un cas.
+    await db.execute(
+        delete(EtudeReponseQuestionnaire).where(
+            EtudeReponseQuestionnaire.dossier_id == dossier_id
+        )
+    )
+    await db.delete(dossier)
+    await db.commit()
+    return True
 
 
 def distance_edition(propose: str, valide: str) -> int:
