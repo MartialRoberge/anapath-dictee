@@ -12,3 +12,6 @@ Ressources/
 
 # Config locale (chemins machine-specifiques)
 .claude/
+
+# Corpus d'evaluation : dictees reelles, non versionnees
+corpus/

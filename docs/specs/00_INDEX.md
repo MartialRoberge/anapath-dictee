@@ -1,14 +1,36 @@
 # MARC — index de reprise
 
-Point d'entrée pour Claude Code. Déposer ce dossier dans le repo sous `docs/specs/`.
+Point d'entrée pour Claude Code. Déposer ce dossier dans le repo sous `docs/`.
 
 ---
+
+## Arborescence
+
+```
+docs/
+├── 00_INDEX.md                         ← ce fichier
+├── spec/                               ← ce qu'il faut construire
+│   ├── MARC_V2_specification_maitresse.md
+│   ├── MARC_cahier_de_recueil.md
+│   ├── Politique_de_questions.md
+│   └── Outil_ideal_architecture_cible.md
+├── referentiels/                       ← ce qu'il faut implémenter
+│   ├── Codage_D1_D2_table.json
+│   ├── D1_analyse_et_questions.md
+│   └── adicap_D4.csv
+├── etude/
+│   └── Protocole_etude_MARC.md
+├── visuels/
+│   └── MARC_pipeline_dictee_seule.html
+└── archive/                            ← dépassé, ne pas implémenter
+    └── LISEZ_MOI.md
+```
 
 ## Comment reprendre
 
 Ouvre Claude Code dans le repo et donne-lui cette consigne :
 
-> Lis `docs/specs/00_INDEX.md` puis tous les fichiers qu'il référence. Ce sont les
+> Lis `docs/00_INDEX.md` puis tous les fichiers qu'il référence. Ce sont les
 > spécifications de MARC. Confronte-les au code existant et liste les écarts, en distinguant
 > ce qui est implémenté, ce qui est implémenté différemment, et ce qui manque. Ne modifie rien
 > avant que j'aie validé la liste.
@@ -22,64 +44,58 @@ d'être ce qu'il est, et les specs ci-dessous ont été écrites sans le voir.
 
 ### À lire en premier
 
-**`MARC_V2_specification_maitresse.md`** — le document de référence. Diagnostic de la V1 à partir
+**`spec/MARC_V2_specification_maitresse.md`** — le document de référence. Diagnostic de la V1 à partir
 des retours terrain, le concept de dérivation, l'architecture en modèle de concepts + adaptateurs
 d'export, le modèle de cardinalité, l'écran de revue, et la séquence de construction avant le gel
 du 12 septembre. **Tout le reste s'y rattache.**
 
 ### Comprendre le domaine
 
-**`MARC_pipeline_dictee_seule.html`** — la carte fonctionnelle complète. Quatorze étapes de la
+**`visuels/MARC_pipeline_dictee_seule.html`** — la carte fonctionnelle complète. Quatorze étapes de la
 voix au compte rendu, avec pour chacune la question fonctionnelle, les entrées et sorties, le
 référentiel utilisé, les règles dures et ce que l'étude mesure à cet endroit. À ouvrir dans un
 navigateur. C'est le document de référence : tout le reste s'y rattache.
 
-**`adicap_D4.csv`** — les 2 566 codes du dictionnaire D4, extraits du thésaurus, avec chapitre,
+**`referentiels/adicap_D4.csv`** — les 2 566 codes du dictionnaire D4, extraits du thésaurus, avec chapitre,
 groupe, libellé, libellé normalisé et statut de révision. Roue de secours uniquement : la source
 officielle est le XLSX/OWL sous licence LOv2 sur esante.gouv.fr, qui donne l'arbre déjà construit
 via les colonnes identifiant et parent. **Basculer dessus dès que possible.**
 
 ### Implémenter
 
-**`Codage_D1_D2_table.json`** — table de décision D1 et D2. D1 : actes simples, familles
+**`referentiels/Codage_D1_D2_table.json`** — table de décision D1 et D2. D1 : actes simples, familles
 base × modificateur, table geste × organe pour I/O. D2 : H par défaut, C sous condition négative,
 et surtout la distinction code primaire / codes secondaires. Contient le modèle de cardinalité,
 les cinq règles de cohérence inter-positions, et les trois questions de levée de doute
 pré-rédigées. Les champs `a_valider` marquent ce qui vient de moi et non du pathologiste : à ne
 pas implémenter avant validation.
 
-**`D1_analyse_et_questions.md`** — pourquoi la table est structurée ainsi. Trois problèmes du
+**`referentiels/D1_analyse_et_questions.md`** — pourquoi la table est structurée ainsi. Trois problèmes du
 lexique d'origine : collision exacte I/O, code S vide par bug de fusion, dix-huit inclusions
 ordre-dépendantes. Contient la liste des questions à poser au pathologiste.
 
-**`Politique_de_questions.md`** — quand le logiciel pose une question au praticien plutôt que de
+**`spec/Politique_de_questions.md`** — quand le logiciel pose une question au praticien plutôt que de
 deviner ou de s'abstenir. Transversal à D1, D2 et D3. Contient la règle de valeur d'information,
 le budget de trois questions par compte rendu, et les caveats sur les scores de confiance de
 transcription.
 
-**`Outil_ideal_architecture_cible.md`** — la vision cible et le catalogue de cohérence
+**`spec/Outil_ideal_architecture_cible.md`** — la vision cible et le catalogue de cohérence
 déterministe (dix-sept règles vérifiables sans modèle). À construire après le congrès.
 
 ### Instrumenter pour l'étude
 
-**`MARC_cahier_de_recueil.md`** — le plus opérationnel pour le développement. Contient la grille
+**`spec/MARC_cahier_de_recueil.md`** — le plus opérationnel pour le développement. Contient la grille
 de validation, la règle du littéral qui borne le nombre de cases, le verrouillage de l'export et
 ses garde-fous, la spécification complète de mesure du temps, l'intégralité des questionnaires,
 la liste des événements à loguer et le schéma JSON.
 
-**`Protocole_etude_MARC.md`** — la méthode et les seuils. Utile pour comprendre pourquoi certaines
+**`etude/Protocole_etude_MARC.md`** — la méthode et les seuils. Utile pour comprendre pourquoi certaines
 contraintes techniques existent, notamment le verrou d'export et la télémétrie de latence.
 
-### Contexte historique
+### Contexte historique — ne pas implémenter à partir de ces fichiers
 
-**`Specification_operationnelle_CR_ACP.html`** — première version de l'architecture, écrite avant
-la contrainte « dictée seule ». Certains éléments sont dépassés. À lire pour le raisonnement sur
-les deux couches — ADICAP pour le concept, data set synoptique pour la complétude — qui reste
-valable.
-
-**`Workflow_anapath_D4_board.pdf`** et **`Freeform_kit_de_collage.md`** — le board Freeform sur le
-nœud D4. Attention, il indique la position 9 comme « champ libre » : c'est faux, elle est laissée
-vide comme séparateur entre zone obligatoire et zone facultative.
+Tout ce qui est dans `archive/` est dépassé. Voir `archive/LISEZ_MOI.md` pour savoir par quoi
+chaque document a été remplacé et quelles erreurs il contient.
 
 ---
 

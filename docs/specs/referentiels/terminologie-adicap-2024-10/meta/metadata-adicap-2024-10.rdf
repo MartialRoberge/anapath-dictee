@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:j.0="http://data.esante.gouv.fr/meta#"
+    xmlns:schema="http://schema.org/"
+    xmlns:voaf="http://purl.org/vocommons/voaf#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:metadata="http://topbraid.org/metadata#"
+    xmlns:edg="http://edg.topbraid.solutions/model/"
+    xmlns:dct="http://purl.org/dc/terms/"
+    xmlns:adms="http://www.w3.org/ns/adms#"
+    xmlns:core="http://open-services.net/ns/core#"
+    xmlns:j.1="http://topbraid.org/swa#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:duv="http://www.w3.org/ns/duv#"
+    xmlns:teamwork="http://topbraid.org/teamwork#"
+    xmlns:dcat="http://www.w3.org/ns/dcat#"
+    xmlns:j.2="https://data.esante.gouv.fr/profile/ns#"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://esante.gouv.fr/terminologie-profil-adicap" > 
+  <rdf:Description rdf:about="https://data.esante.gouv.fr/profile/agents/LE00080">
+    <rdfs:label xml:lang="fr">ADICAP</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Agent"/>
+    <foaf:name>Association pour le Développement de l'Informatique en Cytologie et en Anatomo-Pathologie</foaf:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/ns/dcat#accessURL">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#value">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://xmlns.com/foaf/0.1/name">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/type">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://schema.org/price">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/publisher">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://schema.org/author">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://data.esante.gouv.fr/meta#technical">
+    <j.0:formats>rdf</j.0:formats>
+    <j.0:chosenClasses rdf:resource="http://urn/urn#x-evn-master:adicap"/>
+    <j.0:publishChoice1>hasConcepts</j.0:publishChoice1>
+    <j.0:publishChoiceNoConcepts>noConceptsCustomArchive</j.0:publishChoiceNoConcepts>
+    <j.0:publishChoiceFHIR>currentOntology</j.0:publishChoiceFHIR>
+  </rdf:Description>
+  <rdf:Description rdf:about="">
+    <j.1:defaultNamespace>http://esante.gouv.fr/terminologie-profil-adicap#</j.1:defaultNamespace>
+    <edg:subjectArea rdf:resource="urn:x-tb-governance:Gestion_du_catalogue_de_terminologies"/>
+    <rdfs:label>ADICAP-META</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+    <owl:imports rdf:resource="http://datashapes.org/graphql"/>
+    <metadata:status rdf:resource="http://topbraid.org/metadata#UnderDevelopmentStatus"/>
+    <edg:subjectArea rdf:resource="urn:x-tb-governance:Les_Terminologies_avec_uniquement_des_métadonnées"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/audience">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/alternative">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/identifier">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://data.esante.gouv.fr/profile/audience/professionnels-santé">
+    <rdfs:label xml:lang="fr">Professionnels de santé</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="http://purl.org/dc/terms/AgentClass"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/language">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#type">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://data.esante.gouv.fr/profile/distributions/mediaTypeOwl">
+    <rdfs:label>OWL</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="http://purl.org/dc/terms/MediaTypeOrExtent"/>
+    <rdf:value>application/rdf+xml</rdf:value>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://open-services.net/ns/core#modifiedBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/ns/adms#status">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://data.esante.gouv.fr/profile/audience/Editeurs">
+    <rdfs:label xml:lang="fr">Editeurs</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="http://purl.org/dc/terms/AgentClass"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/ns/dcat#mediaType">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://data.esante.gouv.fr/profile/distributions/1">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="http://www.w3.org/ns/dcat#Distribution"/>
+    <dcat:mediaType rdf:resource="https://data.esante.gouv.fr/profile/distributions/mediaTypeOwl"/>
+    <dct:license rdf:resource="https://data.esante.gouv.fr/profile/distributions/LicenceLOv2"/>
+    <dcat:downloadURL rdf:resource="https://smt.esante.gouv.fr/wp-content/uploads/terminologies/terminologie-adicap/CGTS_SEM_ADICAP_Fiche-detaillee_v1.3.pdf"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/description">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://esante.gouv.fr/terminologie-adicap">
+    <rdfs:label>ADICAP</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://data.esante.gouv.fr/profile/ns#Terminology"/>
+    <voaf:classNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">9511</voaf:classNumber>
+    <dct:description xml:lang="fr">Modes de prélèvement, types de technique, organes, lésions, topographies, grading</dct:description>
+    <dcat:distribution rdf:resource="https://data.esante.gouv.fr/profile/distributions/1"/>
+    <dcat:distribution rdf:resource="https://data.esante.gouv.fr/profile/distributions/2"/>
+    <dcat:theme>Médical</dcat:theme>
+    <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">02/10/2024</dct:issued>
+    <schema:author rdf:resource="https://data.esante.gouv.fr/profile/agents/LE00010"/>
+    <dct:publisher rdf:resource="https://data.esante.gouv.fr/profile/agents/LE00010"/>
+    <dct:title>Thésaurus de la codification ADICAP - Index raisonné des lésions</dct:title>
+    <dct:identifier>1.2.250.1.213.2.11</dct:identifier>
+    <duv:hasUsage>Cytologie et Anatomo-pathologie</duv:hasUsage>
+    <owl:versionInfo>2024-10</owl:versionInfo>
+    <schema:producer rdf:resource="https://data.esante.gouv.fr/profile/agents/LE00080"/>
+    <dct:type>Thésaurus</dct:type>
+    <dcat:landingPage rdf:resource="https://esante.gouv.fr/"/>
+    <dct:language rdf:resource="http://publications.europa.eu/resource/authority/language/FRA"/>
+    <dct:audience rdf:resource="https://data.esante.gouv.fr/profile/audience/Editeurs"/>
+    <dct:audience rdf:resource="https://data.esante.gouv.fr/profile/audience/professionnels-santé"/>
+    <foaf:isPrimaryTopicOf>Médical</foaf:isPrimaryTopicOf>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/issued">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://data.esante.gouv.fr/profile/distributions/2">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="http://www.w3.org/ns/dcat#Distribution"/>
+    <dcat:mediaType rdf:resource="https://data.esante.gouv.fr/profile/distributions/mediaTypeXlsx"/>
+    <dct:license rdf:resource="https://data.esante.gouv.fr/profile/distributions/LicenceLOv2"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://data.esante.gouv.fr/profile/distributions/LicenceLOv2">
+    <rdfs:label xml:lang="fr">LOv2</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="http://purl.org/dc/terms/LicenseDocument"/>
+    <foaf:homepage rdf:resource="https://github.com/etalab/licence-ouverte/blob/master/LO.md"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/vocommons/voaf#classNumber">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://data.esante.gouv.fr/profile/distributions/mediaTypeXlsx">
+    <rdfs:label>XLSX</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="http://purl.org/dc/terms/MediaTypeOrExtent"/>
+    <rdf:value>xlsx</rdf:value>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/ns/dcat#theme">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/ns/dcat#distribution">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://data.esante.gouv.fr/profile/agents/LE00010">
+    <rdfs:label xml:lang="fr">ANS</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Agent"/>
+    <foaf:name>Agence du numérique en santé</foaf:name>
+    <foaf:homepage rdf:resource="https://esante.gouv.fr/"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/license">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/title">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+</rdf:RDF>
