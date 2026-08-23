@@ -308,6 +308,61 @@ class EtudePause(Base):
     __table_args__ = (Index("ix_etude_pauses_dossier", "dossier_id"),)
 
 
+class EtudeErgonomie(Base):
+    """Un instantane d'usage d'une zone de l'ecran, agrege par le client.
+
+    Mesurer l'ergonomie reelle sans traceur tiers : le produit se vend sur la
+    souverainete des donnees, brancher un service etranger sur un outil medical
+    annulerait l'argument. Tout reste donc ici.
+
+    UNE LIGNE = UN INSTANTANE CUMULE, PAS UN INCREMENT. Le client envoie a
+    intervalles reguliers l'etat COURANT de ses compteurs depuis l'ouverture du
+    dossier ; le depouillement ne retient que le dernier instantane de chaque
+    couple (dossier, zone). Deux consequences, et c'est tout l'interet :
+    un lot perdu ne coute que du detail, jamais un total, et un envoi rejoue ne
+    compte rien deux fois. Sommer ces lignes, en revanche, compterait les memes
+    secondes autant de fois qu'il y a eu d'envois.
+
+    Ce qui n'est PAS ici : le contenu saisi, la position du curseur, les
+    frappes. On mesure des comportements d'usage, pas ce que le praticien ecrit.
+    """
+
+    __tablename__ = "etude_ergonomie"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid_str)
+    dossier_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("etude_dossiers.id", ondelete="CASCADE"), nullable=False
+    )
+    #: Nom de zone du vocabulaire de etude/ergonomie.py, jamais un selecteur CSS.
+    zone: Mapped[str] = mapped_column(String(20), nullable=False)
+
+    #: Temps cumule avec la zone a l'ecran, onglet au premier plan. Un onglet
+    #: masque ne compte pas : ce serait mesurer la pause cafe.
+    visible_ms: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    clics: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    #: Part du contenu atteinte en defilant, entre 0 et 1. NULLE quand la zone
+    #: tient dans l'ecran : il n'y a alors pas de profondeur a mesurer, et
+    #: ecrire 100 % confondrait "il a tout parcouru" et "il n'y avait rien a
+    #: parcourir".
+    profondeur_max: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+    #: 1 pour la zone ou le praticien a agi en premier, 2 pour la suivante...
+    #: Nul tant qu'aucun geste n'y a eu lieu — par ou l'on commence ne se
+    #: devine pas d'un panneau simplement visible, l'ecran en montre deux.
+    rang_premiere_visite: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    #: Part de la largeur du plan de travail donnee a la zone. Le partage choisi
+    #: a la glissiere est une mesure d'ergonomie a lui seul.
+    part_largeur: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+    releve_a: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (Index("ix_etude_ergonomie_dossier", "dossier_id"),)
+
+
 class EtudeReponseQuestionnaire(Base):
     """Une reponse a un item de questionnaire.
 

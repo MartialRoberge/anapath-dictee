@@ -536,7 +536,12 @@ export default function App() {
   );
 
   const deciderPoint = useCallback(
-    async (point: PointATraiter, action: ActionPoint, valeur?: string) => {
+    async (
+      point: PointATraiter,
+      action: ActionPoint,
+      valeur?: string,
+      nature?: string,
+    ) => {
       // On enregistre AVANT de marquer traite : marquer d'abord ferait
       // disparaitre le point de la file meme si l'envoi echoue, et le praticien
       // croirait avoir decide.
@@ -545,7 +550,12 @@ export default function App() {
         const resultat = await etude.decider(
           proposition,
           action.decision as never,
-          valeur ? { valeur_retenue: valeur } : undefined,
+          {
+            ...(valeur ? { valeur_retenue: valeur } : {}),
+            // La nature separe "le systeme s'est trompe" de "j'ecris
+            // autrement". Sans elle, le taux publie melange les deux.
+            ...(nature ? { nature_correction: nature } : {}),
+          },
         );
         if (resultat === null) return;
       }
@@ -857,8 +867,8 @@ export default function App() {
                 occupe={etude.occupe}
                 verifies={pointsVerifies}
                 codes={codesAffiches}
-                onDecider={(point, action, valeur) => {
-                  void deciderPoint(point, action, valeur);
+                onDecider={(point, action, valeur, nature) => {
+                  void deciderPoint(point, action, valeur, nature);
                 }}
                 onSurvol={setPointActif}
                 onOuvrirPourquoi={() => undefined}

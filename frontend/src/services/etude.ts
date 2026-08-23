@@ -213,6 +213,15 @@ export interface DossierOuvert {
 export interface DecisionEnvoi {
   decision: Decision;
   valeur_retenue?: string | null;
+  /**
+   * Pourquoi la correction : style, precision, ou erreur_fond.
+   *
+   * Seule `erreur_fond` impute une erreur au systeme. Sans ce champ, une
+   * reformulation de confort et une erreur clinique comptent pareil, et le taux
+   * publie ne veut rien dire. Le backend refuse une cause d'erreur sur une
+   * nature qui n'est pas `erreur_fond`.
+   */
+  nature_correction?: string | null;
   cause_erreur?: CauseErreur | null;
   justif_ouverte?: boolean;
   justif_duree_ms?: number | null;

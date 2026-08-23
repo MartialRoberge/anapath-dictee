@@ -45,6 +45,8 @@ export interface DecisionPrise {
 
 export interface OptionsDecision {
   valeur_retenue?: string | null;
+  /** style | precision | erreur_fond — seule `erreur_fond` impute une erreur. */
+  nature_correction?: string | null;
   cause_erreur?: CauseErreur | null;
   justif_ouverte?: boolean;
   justif_duree_ms?: number | null;

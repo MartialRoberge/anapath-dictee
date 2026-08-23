@@ -17,11 +17,42 @@ import type { ActionPoint, PointATraiter } from "@/lib/pointsATraiter";
  * mesure d'explicabilite, et elle n'existe pas sans ce signal.
  */
 
+/**
+ * Les trois natures d'une correction, demandees UNIQUEMENT sur une correction
+ * de restitution.
+ *
+ * C'est la question qui separe "le systeme s'est trompe" de "j'ecris
+ * autrement". Sans elle, une reformulation de confort et une erreur clinique
+ * comptent pareil, et le taux publie melange deux choses sans rapport — un
+ * outil dont 40 % des propositions sont reecrites en style maison passerait
+ * pour un outil a 40 % d'erreurs.
+ *
+ * Elle ne se pose pas sur un code : un code ADICAP corrige n'a pas de "nature"
+ * au sens clinique, il est juste ou faux.
+ */
+const NATURES: { valeur: string; libelle: string; aide: string }[] = [
+  {
+    valeur: "style",
+    libelle: "J'écris autrement",
+    aide: "Le fond était juste, je reformule",
+  },
+  {
+    valeur: "precision",
+    libelle: "J'ajoute une précision",
+    aide: "Juste mais incomplet",
+  },
+  {
+    valeur: "erreur_fond",
+    libelle: "C'était faux",
+    aide: "Le système s'est trompé sur le fond",
+  },
+];
+
 interface PointCarteProps {
   point: PointATraiter;
   actif: boolean;
   occupe: boolean;
-  onDecider: (action: ActionPoint, valeur?: string) => void;
+  onDecider: (action: ActionPoint, valeur?: string, nature?: string) => void;
   onSurvol: (point: PointATraiter | null) => void;
   onOuvrirPourquoi: (point: PointATraiter) => void;
 }
@@ -56,6 +87,12 @@ export default function PointCarte({
   const [pourquoiOuvert, setPourquoiOuvert] = useState(false);
   const [saisie, setSaisie] = useState<ActionPoint | null>(null);
   const [valeur, setValeur] = useState(point.valeur ?? point.detail);
+  const [nature, setNature] = useState<string | null>(null);
+
+  // La nature ne se demande que sur une correction de restitution : ailleurs
+  // elle n'a pas de sens, et un geste sans objet fait abandonner la fonction.
+  const natureRequise =
+    saisie?.decision === "corrige" && point.origine === "proposition";
 
   function basculerPourquoi() {
     const ouvre = !pourquoiOuvert;
@@ -69,8 +106,9 @@ export default function PointCarte({
       setSaisie(action);
       return;
     }
-    onDecider(action, action.saisie ? valeur : undefined);
+    onDecider(action, action.saisie ? valeur : undefined, nature ?? undefined);
     setSaisie(null);
+    setNature(null);
   }
 
   return (
@@ -123,6 +161,33 @@ export default function PointCarte({
                 : "Votre formulation…"
             }
           />
+        </div>
+      )}
+
+      {natureRequise && (
+        <div className="border-t px-3 py-2">
+          <p className="mb-1.5 text-xs text-muted-foreground">
+            Pourquoi corrigez-vous&nbsp;?
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {NATURES.map((choix) => (
+              <button
+                key={choix.valeur}
+                type="button"
+                title={choix.aide}
+                onClick={() => setNature(choix.valeur)}
+                className={cn(
+                  "rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
+                  "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  nature === choix.valeur
+                    ? "bg-primary text-primary-foreground"
+                    : "border border-input bg-background hover:bg-accent",
+                )}
+              >
+                {choix.libelle}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

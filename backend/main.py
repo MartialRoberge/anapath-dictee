@@ -58,6 +58,8 @@ from routes_reports import router as reports_router
 from routes_admin import router as admin_router
 from routes_etude import router as etude_router
 from routes_etude_admin import router as etude_admin_router
+from routes_etude_ergonomie import router as etude_ergonomie_router
+from routes_etude_export import router as etude_export_router
 
 logger = logging.getLogger("anapath.api")
 
@@ -138,6 +140,8 @@ app.include_router(admin_router)
 # Instrumentation de l'etude : prefixe et fichier a part, retirable d'une ligne.
 app.include_router(etude_router)
 app.include_router(etude_admin_router)
+app.include_router(etude_ergonomie_router)
+app.include_router(etude_export_router)
 
 
 # ---------------------------------------------------------------------------

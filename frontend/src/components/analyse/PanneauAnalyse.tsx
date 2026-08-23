@@ -43,7 +43,12 @@ interface PanneauAnalyseProps {
   occupe: boolean;
   verifies: PointVerifie[];
   codes: CodeAffiche[];
-  onDecider: (point: PointATraiter, action: ActionPoint, valeur?: string) => void;
+  onDecider: (
+    point: PointATraiter,
+    action: ActionPoint,
+    valeur?: string,
+    nature?: string,
+  ) => void;
   onSurvol: (point: PointATraiter | null) => void;
   onOuvrirPourquoi: (point: PointATraiter) => void;
   className?: string;
@@ -110,7 +115,9 @@ export default function PanneauAnalyse({
                 point={point}
                 actif={point.id === pointActif}
                 occupe={occupe}
-                onDecider={(action, valeur) => onDecider(point, action, valeur)}
+                onDecider={(action, valeur, nature) =>
+                  onDecider(point, action, valeur, nature)
+                }
                 onSurvol={onSurvol}
                 onOuvrirPourquoi={onOuvrirPourquoi}
               />

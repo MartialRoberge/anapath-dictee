@@ -24,7 +24,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth import get_admin_user
 from database import get_db_session
 from db_models import User
-from etude.analyse import DecisionObservee, calculer_temps, depouiller, moyenne, terciles
+from etude.analyse import (
+    DecisionObservee,
+    DossierObserve,
+    ReponseObservee,
+    calculer_temps,
+    moyenne,
+    retenir_reponses,
+    synthetiser,
+    terciles,
+)
 from etude.service import EtudeRefus
 from etude import service
 from etude.models import (
@@ -32,6 +41,7 @@ from etude.models import (
     EtudePause,
     EtudePrelevement,
     EtudeProposition,
+    EtudeReponseQuestionnaire,
     EtudeSession,
 )
 
@@ -142,6 +152,11 @@ def _observee(proposition: EtudeProposition) -> DecisionObservee:
         hative=proposition.hative,
         latence_ms=proposition.latence_ms,
         decision_changee_apres_justif=proposition.decision_changee_apres_justif,
+        nature_correction=proposition.nature_correction,
+        # Pas d'empan verifie dans la dictee : rien ne soutient l'assertion.
+        # C'est la definition operationnelle de "non soutenue par la dictee",
+        # et le critere bloquant du protocole se lit dessus.
+        ancree=proposition.empan_debut is not None,
     )
 
 
@@ -158,20 +173,25 @@ async def _pauses_du_dossier(db: AsyncSession, dossier_id: str) -> tuple[int, in
 
 @router.get("/synthese")
 async def synthese(_admin: Admin, db: Base) -> dict[str, object]:
-    """Les taux de l'etude, avec leurs denominateurs, sur tout le corpus.
+    """Tous les indicateurs de l'etude, avec leurs denominateurs et effectifs.
 
-    Calcules deux fois : toutes decisions, puis hors decisions hatives. L'ecart
-    mesure combien le verrou d'export a gonfle les resultats — c'est un
-    resultat en soi, pas un detail de methode.
+    Trois sources, et il en faut trois. Les DECISIONS donnent les taux de
+    concordance. Les QUESTIONNAIRES donnent ce que la telemetrie ne peut pas
+    produire : l'omission, la comprehension, l'attestation, la preference. Les
+    DOSSIERS donnent les temps et la consultation des justifications. Une
+    synthese batie sur les seules decisions ne couvrirait que la moitie des
+    criteres du protocole.
+
+    Les taux de decision sont calcules deux fois : toutes decisions, puis hors
+    decisions hatives. L'ecart mesure combien le verrou d'export a gonfle les
+    resultats — c'est un resultat en soi, pas un detail de methode.
     """
     base = _exiger_base(db)
     # Les dossiers exclus (essais, saisies aberrantes) restent en base mais
     # n'entrent dans AUCUN taux : une exclusion qui n'exclut pas serait pire
     # qu'aucune exclusion, parce qu'elle donnerait l'illusion d'un corpus propre.
-    dossiers = list(
-        (await base.execute(select(EtudeDossier).where(EtudeDossier.exclu.is_(False))))
-        .scalars().all()
-    )
+    couples = await _dossiers_retenus(base)
+    dossiers = [dossier for dossier, _ in couples]
     retenus = {dossier.id for dossier in dossiers}
     propositions = [
         proposition
@@ -179,10 +199,106 @@ async def synthese(_admin: Admin, db: Base) -> dict[str, object]:
         if proposition.dossier_id in retenus
     ]
 
+    resultat = synthetiser(
+        decisions=[_observee(p) for p in propositions],
+        reponses=await _reponses_retenues(base, retenus),
+        dossiers=await _dossiers_observes(base, couples, propositions),
+    )
+
     return {
+        **resultat.en_dict(),
         "corpus": await _corpus(base, dossiers),
-        "propositions": depouiller([_observee(p) for p in propositions]).en_dict(),
         "apprentissage": _apprentissage(dossiers),
+    }
+
+
+async def _dossiers_retenus(
+    base: AsyncSession,
+) -> list[tuple[EtudeDossier, str | None]]:
+    """Les dossiers qui entrent dans les taux, avec leur praticien.
+
+    Jointure EXTERNE : un dossier dont la session aurait disparu resterait dans
+    le corpus. Le faire tomber ici le retirerait silencieusement de tous les
+    denominateurs, ce qui est exactement ce que l'exclusion explicite existe
+    pour eviter.
+    """
+    resultat = await base.execute(
+        select(EtudeDossier, EtudeSession.praticien_id)
+        .outerjoin(EtudeSession, EtudeDossier.session_id == EtudeSession.id)
+        .where(EtudeDossier.exclu.is_(False))
+    )
+    return [(dossier, praticien_id) for dossier, praticien_id in resultat.all()]
+
+
+async def _reponses_retenues(
+    base: AsyncSession, retenus: set[str]
+) -> list[ReponseObservee]:
+    """Les reponses de questionnaire qui entrent dans les taux.
+
+    Celles attachees a un dossier exclu sont ecartees : une exclusion qui
+    n'exclut pas le questionnaire du meme cas laisserait un essai peser sur le
+    taux d'omission, c'est-a-dire sur un critere de securite.
+    """
+    lignes = (
+        await base.execute(select(EtudeReponseQuestionnaire))
+    ).scalars().all()
+    return retenir_reponses(
+        [
+            ReponseObservee(
+                praticien_id=ligne.praticien_id,
+                questionnaire=ligne.questionnaire,
+                item=ligne.item,
+                valeur=ligne.valeur,
+                dossier_id=ligne.dossier_id,
+                repondu_a=ligne.repondu_a,
+            )
+            for ligne in lignes
+        ],
+        retenus,
+    )
+
+
+async def _dossiers_observes(
+    base: AsyncSession,
+    couples: list[tuple[EtudeDossier, str | None]],
+    propositions: list[EtudeProposition],
+) -> list[DossierObserve]:
+    """Reduit chaque dossier a ce que les agregats de temps ont besoin de lire."""
+    pauses = await _pauses_par_dossier(base)
+    consultes = {p.dossier_id for p in propositions if p.justif_ouverte}
+    observes: list[DossierObserve] = []
+    for dossier, praticien_id in couples:
+        duree_pauses, nb_pauses = pauses.get(dossier.id, (0, 0))
+        observes.append(
+            DossierObserve(
+                praticien_id=praticien_id or "",
+                session_id=dossier.session_id,
+                index_session=dossier.index_session,
+                revision_nette_ms=calculer_temps(
+                    dossier, duree_pauses, nb_pauses
+                ).revision_nette_ms,
+                justification_consultee=dossier.id in consultes,
+            )
+        )
+    return observes
+
+
+async def _pauses_par_dossier(base: AsyncSession) -> dict[str, tuple[int, int]]:
+    """Duree cumulee et nombre de pauses de chaque dossier, en une requete.
+
+    Une requete par dossier ferait grandir la synthese avec le corpus, alors
+    qu'elle sera consultee d'autant plus souvent que l'etude avance.
+    """
+    resultat = await base.execute(
+        select(
+            EtudePause.dossier_id,
+            func.coalesce(func.sum(EtudePause.duree_ms), 0),
+            func.count(),
+        ).group_by(EtudePause.dossier_id)
+    )
+    return {
+        str(dossier_id): (int(duree), int(nombre))
+        for dossier_id, duree, nombre in resultat.all()
     }
 
 
