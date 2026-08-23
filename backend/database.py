@@ -4,8 +4,11 @@ Fournit le moteur async SQLAlchemy et la session factory.
 En mode developpement sans BDD, les operations sont silencieusement ignorees.
 """
 
+import logging
 from collections.abc import AsyncGenerator
 
+from sqlalchemy import inspect as sa_inspect
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -14,6 +17,12 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from config import get_settings
+from db_models import Base
+
+# Les tables de l'etude s'enregistrent sur la meme Base a l'import.
+import etude.models  # noqa: F401,E402
+
+logger = logging.getLogger("anapath.db")
 
 
 def _create_engine() -> AsyncEngine | None:
@@ -50,16 +59,63 @@ async def get_db_session() -> AsyncGenerator[AsyncSession | None, None]:
         yield session
 
 
+def _colonnes_manquantes(connexion, table) -> list:
+    """Colonnes decrites par le modele et absentes de la base.
+
+    `create_all` cree les tables qui manquent, mais ne touche JAMAIS a une
+    table qui existe deja. Une colonne ajoutee au modele apres un premier
+    deploiement n'apparait donc nulle part — et l'application demarre sans rien
+    dire, puis rend une erreur 500 au premier SELECT. C'est arrive en
+    production sur `etude_propositions`.
+    """
+    inspecteur = sa_inspect(connexion)
+    if not inspecteur.has_table(table.name):
+        return []
+    presentes = {colonne["name"] for colonne in inspecteur.get_columns(table.name)}
+    return [colonne for colonne in table.columns if colonne.name not in presentes]
+
+
+def _reconcilier(connexion, metadata=None) -> None:
+    """Ajoute les colonnes manquantes, sans jamais rien detruire.
+
+    STRICTEMENT ADDITIF, et seulement sur des colonnes NULLABLES : on n'altere
+    aucun type, on ne renomme rien, on ne supprime rien. Une colonne obligatoire
+    ne peut pas s'ajouter sans valeur de remplissage, donc elle est signalee et
+    laissee a une vraie migration.
+
+    C'est un filet, pas un remplacement d'Alembic : il rattrape l'ajout de
+    colonne, qui est le cas courant, et il refuse tout le reste bruyamment.
+
+    `metadata` n'existe que pour les tests : sans lui, ils devraient modifier le
+    registre global des tables, qui est immuable et partage.
+    """
+    dialecte = connexion.dialect
+    for table in (metadata or Base.metadata).sorted_tables:
+        for colonne in _colonnes_manquantes(connexion, table):
+            if not colonne.nullable:
+                logger.error(
+                    "Colonne obligatoire absente en base : %s.%s — migration requise.",
+                    table.name, colonne.name,
+                )
+                continue
+            type_sql = colonne.type.compile(dialecte)
+            connexion.execute(
+                text(f'ALTER TABLE "{table.name}" ADD COLUMN "{colonne.name}" {type_sql}')
+            )
+            logger.warning(
+                "Colonne ajoutee a chaud : %s.%s (%s).",
+                table.name, colonne.name, type_sql,
+            )
+
+
 async def create_tables() -> None:
-    """Cree les tables si elles n'existent pas (mode dev)."""
+    """Cree les tables manquantes, puis rattrape les colonnes manquantes."""
     if _engine is None:
         return
-    from db_models import Base
-    # Les tables de l'etude s'enregistrent sur la meme Base a l'import.
-    import etude.models  # noqa: F401
 
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(_reconcilier)
 
 
 async def close_engine() -> None:
