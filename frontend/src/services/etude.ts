@@ -249,6 +249,8 @@ export interface ClotureDossier {
 
 export interface ResultatCloture {
   caracteres_modifies: number | null;
+  /** Le releve periodique tombe-t-il apres ce compte rendu ? */
+  questionnaire_periodique_du: boolean;
 }
 
 export interface ItemQuestionnaire {

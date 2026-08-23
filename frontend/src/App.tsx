@@ -31,6 +31,9 @@ import PanneauAnalyse from "./components/analyse/PanneauAnalyse";
 import Glissiere from "./components/analyse/Glissiere";
 import BarreAjout from "./components/analyse/BarreAjout";
 import { construirePoints, type ActionPoint, type PointATraiter } from "./lib/pointsATraiter";
+import { useHorlogeEtude } from "./hooks/useHorlogeEtude";
+import { useMesureErgonomie } from "./hooks/useMesureErgonomie";
+import Questionnaire from "./components/questionnaire/Questionnaire";
 import type {
   FormatResult,
   Marker,
@@ -356,6 +359,23 @@ export default function App() {
   // si elle echoue, le praticien redige quand meme. On ne bloque jamais un
   // compte rendu pour une mesure.
   const etude = useEtudeDossier();
+
+  // L'horloge deduit les interruptions du temps de revision. Sans elle, le
+  // temps mesure est celui du fauteuil, pas celui du travail.
+  const horloge = useHorlogeEtude(etude.dossierId);
+
+  // Ce que le praticien regarde, ou il clique, jusqu'ou il fait defiler. En
+  // interne : brancher un traceur etranger sur un outil medical annulerait
+  // l'argument de souverainete.
+  useMesureErgonomie(etude.dossierId);
+
+  // Le questionnaire a poser MAINTENANT. Le par-cas suit chaque validation ; le
+  // periodique tombe tous les cinq comptes rendus et c'est le SERVEUR qui le
+  // dit — un compteur tenu par le client deriverait d'un poste a l'autre.
+  const [questionnaireDu, setQuestionnaireDu] = useState<
+    "par_cas" | "periodique" | null
+  >(null);
+  const [dossierQuestionne, setDossierQuestionne] = useState<string | null>(null);
 
   // Partage de l'ecran entre l'analyse et le compte rendu. Aucune valeur fixe
   // ne convient : juger des points demande de la place a gauche, ecrire en
@@ -686,17 +706,25 @@ export default function App() {
         organe_detecte: organeDetecte,
       });
       setSavedReportId(data.id);
-      // La cloture d'etude fige le texte VALIDE a cote du texte propose : c'est
-      // la seule facon de calculer la charge d'edition, et elle n'est pas
-      // reconstituable apres coup.
-      void etude.clore({ cr_valide: report });
+      // L'horloge se ferme AVANT la cloture : une pause en cours au moment de
+      // valider serait perdue, et c'est systematiquement la derniere
+      // interruption du dossier.
+      const dossier = etude.dossierId;
+      await horloge.cloturer();
+      const resultat = await etude.clore({ cr_valide: report });
+      if (dossier) {
+        setDossierQuestionne(dossier);
+        setQuestionnaireDu(
+          resultat?.questionnaire_periodique_du ? "periodique" : "par_cas",
+        );
+      }
       toast("Compte-rendu sauvegarde", "success");
     } catch {
       toast("Erreur lors de la sauvegarde", "error");
     } finally {
       setSaving(false);
     }
-  }, [report, rawTranscription, organeDetecte, saving, getToken, toast, etude]);
+  }, [report, rawTranscription, organeDetecte, saving, getToken, toast, etude, horloge]);
 
   // --- Raccourcis clavier globaux ---
   useEffect(() => {
@@ -743,12 +771,28 @@ export default function App() {
     return <AdminPage token={getToken()} onBack={() => setPage("app")} />;
   }
 
+  // Le questionnaire s'affiche IMMEDIATEMENT apres la validation, jamais en
+  // fin de session : un jugement retrospectif global ne vaut rien.
+  const questionnaireEnCours = questionnaireDu !== null && (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-4 backdrop-blur-sm sm:p-8">
+      <div className="w-full max-w-2xl rounded-xl border bg-card p-5 shadow-xl">
+        <Questionnaire
+          nom={questionnaireDu}
+          dossierId={dossierQuestionne ?? undefined}
+          onTermine={() => setQuestionnaireDu(null)}
+          onIndisponible={() => setQuestionnaireDu(null)}
+        />
+      </div>
+    </div>
+  );
+
   if (page === "etude") {
     return <EtudeAdminPage token={getToken()} onBack={() => setPage("app")} />;
   }
 
   return (
     <div className="flex h-screen bg-background text-foreground">
+      {questionnaireEnCours}
       {/* Sidebar */}
       <Sidebar
         page={page}
@@ -859,6 +903,7 @@ export default function App() {
           ) : (
             <div className="relative flex min-w-0 flex-1 overflow-hidden max-lg:hidden">
               <PanneauAnalyse
+                data-ergo="analyse"
                 className="my-3 ml-3"
                 style={{ width: `${partAnalyse * 100}%` }}
                 points={pointsATraiter}
@@ -876,7 +921,10 @@ export default function App() {
 
               <Glissiere part={partAnalyse} onChange={setPartAnalyse} />
 
-              <section className="min-w-0 flex-1 overflow-y-auto p-5 pb-28 scrollbar-thin">
+              <section
+                data-ergo="compte_rendu"
+                className="min-w-0 flex-1 overflow-y-auto p-5 pb-28 scrollbar-thin"
+              >
                 <ReportPanel
                   report={report}
                   onReportChange={setReport}
@@ -915,6 +963,7 @@ export default function App() {
               {/* Flottante, au-dessus du compte rendu : ajouter sans redicter
                   l'ensemble etait la chose la moins ergonomique de l'outil. */}
               <BarreAjout
+                data-ergo="barre_ajout"
                 className="absolute inset-x-0 bottom-4"
                 occupe={reformatting}
                 onAjouter={ajouterAuCompteRendu}

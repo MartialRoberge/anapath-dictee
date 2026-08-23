@@ -13,7 +13,8 @@ import type { ItemDefinition, TypeItem } from "./ItemQuestionnaire";
 /* ------------------------------------------------------------------ */
 
 export interface QuestionnaireProps {
-  nom: "inclusion" | "par_cas" | "fin_etude";
+  /** `periodique` porte le SUS, repose tous les cinq comptes rendus. */
+  nom: "inclusion" | "par_cas" | "periodique" | "fin_etude";
   dossierId?: string;
   onTermine: () => void;
   onIndisponible?: (raison: string) => void;

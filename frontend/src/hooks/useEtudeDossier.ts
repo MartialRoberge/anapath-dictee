@@ -13,6 +13,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
+  type ResultatCloture,
   abandonnerDossier,
   cloreDossier,
   cloreSession,
@@ -75,7 +76,7 @@ export interface EtudeDossier {
     decision: Decision,
     options?: OptionsDecision,
   ) => Promise<ResultatDecision | null>;
-  clore: (corps: ClotureDossier) => Promise<number | null>;
+  clore: (corps: ClotureDossier) => Promise<ResultatCloture | null>;
   exporter: () => Promise<boolean>;
   abandonner: (motif: MotifAbandon) => Promise<boolean>;
   terminerSession: () => Promise<boolean>;
@@ -173,14 +174,14 @@ export function useEtudeDossier(): EtudeDossier {
   );
 
   const clore = useCallback(
-    async (corps: ClotureDossier): Promise<number | null> => {
+    async (corps: ClotureDossier): Promise<ResultatCloture | null> => {
       if (dossierId === null) return null;
       setOccupe(true);
       setErreur(null);
       try {
-        const { caracteres_modifies } = await cloreDossier(dossierId, corps);
+        const reponse = await cloreDossier(dossierId, corps);
         setClos(true);
-        return caracteres_modifies;
+        return reponse;
       } catch (e) {
         setErreur(messageErreur(e));
         return null;
