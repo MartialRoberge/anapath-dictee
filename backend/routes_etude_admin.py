@@ -71,6 +71,9 @@ class PropositionDetaillee(BaseModel):
     confiance: float | None
     empan_debut: int | None
     empan_fin: int | None
+    #: Faux quand aucun passage de la dictee ne soutient l'assertion :
+    #: candidate hallucination, a lire en priorite au depouillement.
+    ancree: bool
     #: Le passage exact de la dictee, decoupe cote serveur : l'administrateur
     #: ne doit pas avoir a refaire le calcul d'offsets pour relire un cas.
     empan_extrait: str
@@ -327,6 +330,7 @@ def _detailler(
         confiance=proposition.confiance,
         empan_debut=debut,
         empan_fin=fin,
+        ancree=debut is not None,
         empan_extrait=extrait,
         longueur_mots=proposition.longueur_mots,
         decision=proposition.decision,

@@ -1,8 +1,10 @@
 """Ancrage d'une proposition dans le verbatim.
 
-Ces tests protegent la regle fondatrice de l'etude — pas d'empan, pas de
-proposition — et le seul defaut qui serait pire que l'absence d'empan : un
-empan decale, qui ferait valider un mot pour un autre.
+Deux exigences opposees se rencontrent ici. L'ancrage doit resister a la
+reformulation, sinon il ne servirait qu'aux copies mot pour mot — celles qui ne
+se valident pas. Et il ne doit jamais ancrer au hasard, car un empan decale
+fait valider un mot pour un autre : c'est le seul defaut pire que l'absence
+d'empan.
 """
 
 from etude.ancrage import (
@@ -152,3 +154,38 @@ def test_l_ancrage_est_reproductible():
     """Condition pour publier : deux executions donnent le meme empan."""
     fragment = "Noyaux allonges pseudostratifies"
     assert ancrer(fragment, VERBATIM) == ancrer(fragment, VERBATIM)
+
+
+# --- Ancre forte et erreur de transcription --------------------------------
+
+
+def test_un_terme_technique_long_ancre_a_lui_seul():
+    """Un fragment court a un taux grossier : avec deux jetons discriminants,
+    il ne peut valoir que 0, 0,5 ou 1. Sans cette voie, une phrase juste etait
+    declaree non dictee pour un demi-point."""
+    empan = ancrer("Il n'est pas observe de pseudostratification", VERBATIM)
+    assert empan is not None
+    assert "pseudostratifies" in empan.extrait
+
+
+def test_une_erreur_de_transcription_ne_devient_pas_une_hallucination():
+    """La dictee entendue 'mycosecretion' pour 'mucosecretion' : un mot pour
+    l'autre. L'etude tient a separer une erreur de STT d'une invention du
+    moteur — les confondre gonflerait le taux d'hallucination publie."""
+    verbatim = "Proliferation glandulaire. Pas de mycosecretion, stroma fibreux."
+    empan = ancrer("Il n'est pas observe de mucosecretion", verbatim)
+    assert empan is not None
+    assert empan.extrait == "mycosecretion"
+
+
+def test_un_mot_court_ne_beneficie_pas_de_la_tolerance():
+    """Tolerer une substitution sur un mot court ferait correspondre des termes
+    reellement differents."""
+    assert ancrer("Sept ganglions sains", "Cinq ganglions malins") is None
+
+
+def test_adenome_ne_correspond_pas_a_adenocarcinome():
+    """Le prefixe commun 'adeno' fait cinq caracteres, sous le seuil. Confondre
+    une lesion benigne et une lesion maligne serait une faute clinique."""
+    verbatim = "Piece de colectomie, adenocarcinome infiltrant du sigmoide."
+    assert ancrer("Adenome tubuleux du sigmoide", verbatim) is None

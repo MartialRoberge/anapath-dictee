@@ -62,6 +62,10 @@ class PropositionAffichee(BaseModel):
     valeur_proposee: str
     empan_debut: int | None
     empan_fin: int | None
+    #: Faux quand rien dans la dictee ne soutient l'assertion. L'interface
+    #: DOIT le dire au praticien : sans empan a surligner, la question posee
+    #: n'est plus "est-ce fidele ?" mais "l'avez-vous dit ?".
+    ancree: bool
     chemin: str | None
     confiance: float | None
 
@@ -248,6 +252,7 @@ async def _propositions_affichees(
             valeur_proposee=p.valeur_proposee,
             empan_debut=p.empan_debut,
             empan_fin=p.empan_fin,
+            ancree=p.empan_debut is not None,
             chemin=p.chemin,
             confiance=p.confiance,
         )

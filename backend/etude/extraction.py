@@ -9,9 +9,21 @@ Trois filtres, dans cet ordre, et chacun protege un chiffre publie :
 1. Ce qui est une COPIE LITTERALE de la dictee n'est pas une proposition, c'est
    une transcription. La compter gonflerait le taux d'acceptation avec des
    evidences que personne n'a eu a juger.
-2. Ce qui n'est pas ANCRE dans la dictee n'est pas affichable (voir ancrage.py).
-3. Ce qui deborde le BUDGET n'est pas affiche : au-dela d'une quinzaine de
+2. Ce qui n'est pas une ASSERTION CLINIQUE ne se valide pas : un commentaire
+   de machine, un en-tete de section, un gabarit conditionnel.
+3. Ce qui deborde le BUDGET n'est pas affiche : au-dela d'une vingtaine de
    decisions, le praticien clique sans lire et l'on mesure sa fatigue.
+
+Une assertion clinique SANS appui dans la dictee n'est PAS supprimee. Mesure
+sur cinq cas reels : la supprimer faisait disparaitre "absence de metastase
+ganglionnaire (pN0)", "absence de cellules malignes", "la bronche et les
+vaisseaux de section sont sains" — c'est-a-dire exactement les affirmations
+qu'une hallucination rendrait dangereuses. La regle "pas d'empan, pas de
+proposition" protege l'affichage contre du bruit ; appliquee ici en suppression
+seche, elle effacait la mesure centrale de l'etude. Ces propositions sont donc
+conservees, marquees `ancree=False`, et l'interface doit dire franchement
+qu'aucun passage de la dictee ne les soutient — la question posee au praticien
+devient alors simplement : l'avez-vous dit ?
 
 Reference : docs/specs/spec/MARC_cahier_de_recueil.md section 7.
 """
@@ -56,6 +68,21 @@ _A_COMPLETER: Final[re.Pattern[str]] = re.compile(
 
 _MARQUAGE: Final[re.Pattern[str]] = re.compile(r"(?:\*\*|__|\*|_|`)")
 
+#: Commentaires que le moteur s'adresse a lui-meme, et gabarits conditionnels.
+#: Ce ne sont pas des affirmations sur le cas : les faire juger ferait perdre
+#: une decision et brouillerait le taux d'hallucination.
+_META: Final[re.Pattern[str]] = re.compile(
+    r"\[\s*(?:verifier|a\s*completer|note)\b|^\s*note\s*:|\bsi\s+realise\b",
+    re.IGNORECASE,
+)
+
+#: Une ligne qui n'est qu'une etiquette de bloc ("2) Lavage broncho-alveolaire",
+#: "Tumeur : blocs 11 a 13") organise le document, elle n'affirme rien.
+_ETIQUETTE: Final[re.Pattern[str]] = re.compile(
+    r"^\s*(?:\d+[.)]\s*)?[A-Za-zÀ-ÿ'’ ()-]{3,40}\s*:\s*(?:blocs?\b|\d)",
+    re.IGNORECASE,
+)
+
 _FIN_PHRASE: Final[re.Pattern[str]] = re.compile(r"(?<=[.;:])\s+(?=[A-ZÀ-Þ])")
 
 #: Poids clinique par section : a budget serre, on garde ce qui engage le plus.
@@ -77,24 +104,40 @@ _PRIORITE_SECTION: Final[dict[str, int]] = {
 
 _PRIORITE_DEFAUT: Final[int] = 5
 
+#: Sections dont le contenu ne se valide JAMAIS (cahier §7).
+#:
+#: L'entete est le titre du compte rendu : il reformule le geste et l'organe,
+#: il n'infere rien. Mesure sur cas reels : sans cette exclusion, le titre
+#: "EXAMEN ANATOMOPATHOLOGIQUE D'UNE BIOPSIE PULMONAIRE (LOBE INFERIEUR DROIT)"
+#: partait en proposition et consommait une decision pour rien.
+_SECTIONS_NON_VALIDABLES: Final[frozenset[str]] = frozenset({
+    "entete", "titre", "identification", "technique",
+})
+
 
 @dataclass(frozen=True)
 class PropositionExtraite:
     """Une unite validable, prete a etre affichee et decidee.
 
     `empan_debut` / `empan_fin` sont des offsets dans le VERBATIM : c'est le
-    passage de sa propre dictee que le praticien relit pour juger.
+    passage de sa propre dictee que le praticien relit pour juger. Ils valent
+    None quand l'assertion n'a AUCUN appui dans la dictee — voir `ancree`.
     """
 
     type_proposition: str
     sous_type: str
     valeur_proposee: str
-    empan_debut: int
-    empan_fin: int
+    empan_debut: int | None
+    empan_fin: int | None
     empan_extrait: str
     longueur_mots: int
     confiance: float | None = None
     chemin: str | None = None
+    #: Faux quand rien dans la dictee ne soutient l'assertion. Ces propositions
+    #: sont les CANDIDATES HALLUCINATIONS : ce sont les plus precieuses de
+    #: l'etude, et l'interface doit le dire au praticien au lieu de faire comme
+    #: si l'empan avait ete perdu.
+    ancree: bool = True
 
 
 def _nettoyer(ligne: str) -> str:
@@ -160,9 +203,11 @@ def _longueur_mots(texte: str) -> int:
 
 def _assertion_jugeable(texte: str) -> bool:
     """L'assertion porte-t-elle un contenu clinique qu'on peut juger ?"""
-    if _A_COMPLETER.search(texte):
+    if _A_COMPLETER.search(texte) or _META.search(texte):
         # Un champ a completer n'est pas une affirmation du moteur : c'est un
         # aveu d'absence. Le juger comme une restitution serait un contresens.
+        return False
+    if _ETIQUETTE.match(texte):
         return False
     return _longueur_mots(texte) >= MIN_MOTS_ASSERTION
 
@@ -171,7 +216,7 @@ def _proposition(
     type_proposition: str,
     sous_type: str,
     valeur: str,
-    empan: Empan,
+    empan: Empan | None,
     confiance: float | None = None,
     chemin: str | None = None,
 ) -> PropositionExtraite:
@@ -179,12 +224,13 @@ def _proposition(
         type_proposition=type_proposition,
         sous_type=sous_type,
         valeur_proposee=valeur,
-        empan_debut=empan.debut,
-        empan_fin=empan.fin,
-        empan_extrait=empan.extrait,
+        empan_debut=empan.debut if empan else None,
+        empan_fin=empan.fin if empan else None,
+        empan_extrait=empan.extrait if empan else "",
         longueur_mots=_longueur_mots(valeur),
         confiance=confiance,
         chemin=chemin,
+        ancree=empan is not None,
     )
 
 
@@ -196,14 +242,18 @@ def extraire_restitutions(cr: str, verbatim: str) -> list[PropositionExtraite]:
     retenues: list[tuple[int, PropositionExtraite]] = []
 
     for section, assertion in _decouper_assertions(cr):
+        if section in _SECTIONS_NON_VALIDABLES:
+            continue
         if not _assertion_jugeable(assertion):
             continue
         if est_copie_litterale(assertion, verbatim):
             continue
         empan = ancrer(assertion, verbatim)
-        if empan is None:
-            continue
         priorite = _PRIORITE_SECTION.get(section, _PRIORITE_DEFAUT)
+        if empan is None:
+            # Candidate hallucination : c'est la proposition la plus precieuse
+            # de l'etude, elle passe donc devant, pas a la trappe.
+            priorite = -1
         retenues.append(
             (priorite, _proposition(TYPE_RESTITUTION, section, assertion, empan))
         )
@@ -262,7 +312,7 @@ def extraire_completudes(
         if not champ:
             continue
         description = str(alerte.get("description") or champ)
-        empan = ancrer(description, verbatim) or Empan(0, 0, "", 0.0)
+        empan = ancrer(description, verbatim)
         propositions.append(
             _proposition(
                 TYPE_COMPLETUDE,

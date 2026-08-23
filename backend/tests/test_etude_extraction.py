@@ -64,9 +64,13 @@ def test_un_champ_a_completer_n_est_pas_une_restitution():
     assert not any("[A COMPLETER]" in v for v in valeurs)
 
 
-def test_toute_proposition_porte_un_empan():
-    """Regle fondatrice : pas d'empan, pas de proposition."""
+def test_une_proposition_ancree_porte_un_empan_utilisable():
+    """Quand l'empan existe, il doit designer quelque chose : un empan vide
+    afficherait un surlignage de zero caractere, donc un mensonge visuel."""
     for proposition in extraire_restitutions(CR, VERBATIM):
+        if not proposition.ancree:
+            assert proposition.empan_debut is None
+            continue
         assert proposition.empan_fin > proposition.empan_debut
         assert proposition.empan_extrait
 
@@ -74,6 +78,8 @@ def test_toute_proposition_porte_un_empan():
 def test_l_empan_pointe_bien_dans_le_verbatim():
     """Un empan decale ferait valider un mot pour un autre."""
     for proposition in extraire_restitutions(CR, VERBATIM):
+        if not proposition.ancree:
+            continue
         extrait = VERBATIM[proposition.empan_debut:proposition.empan_fin]
         assert extrait == proposition.empan_extrait
 
@@ -125,7 +131,8 @@ def test_une_completude_survit_sans_ancrage():
     resultat = extraire_completudes(alertes, VERBATIM)
     assert len(resultat) == 1
     assert resultat[0].type_proposition == TYPE_COMPLETUDE
-    assert resultat[0].empan_extrait == ""
+    assert resultat[0].empan_debut is None
+    assert not resultat[0].ancree
 
 
 def test_le_budget_est_respecte():
@@ -164,5 +171,55 @@ def test_sous_extraction_signalee():
     assert not sous_extraction(list(range(8)))  # type: ignore[arg-type]
 
 
-def test_un_verbatim_vide_ne_produit_aucune_restitution():
-    assert extraire_restitutions(CR, "") == []
+def test_un_verbatim_vide_rend_tout_non_ancre():
+    """Un compte rendu produit a partir de rien est entierement halluciné.
+    Le dire est plus utile que de ne rien renvoyer."""
+    propositions = extraire_restitutions(CR, "")
+    assert propositions
+    assert all(not p.ancree for p in propositions)
+    assert all(p.empan_debut is None for p in propositions)
+
+
+# --- Les candidates hallucinations -----------------------------------------
+
+
+def test_une_assertion_sans_appui_est_conservee_et_marquee():
+    """Mesure sur cas reels : supprimer ces propositions faisait disparaitre
+    "absence de metastase ganglionnaire", "la bronche et les vaisseaux sont
+    sains" — exactement les affirmations qu'une hallucination rendrait
+    dangereuses. C'est la mesure centrale de l'etude, elle ne se jette pas."""
+    cr = CR + "\n\n**Immunohistochimie :**\nLe marquage p53 est nul, en faveur d'une mutation.\n"
+    propositions = extraire_restitutions(cr, VERBATIM)
+    fantome = [p for p in propositions if "p53" in p.valeur_proposee]
+    assert fantome, "l'assertion non dictee a ete supprimee"
+    assert not fantome[0].ancree
+    assert fantome[0].empan_debut is None
+
+
+def test_une_candidate_hallucination_passe_devant():
+    """Elle est la plus precieuse de l'etude : elle ne doit pas tomber hors
+    budget derriere une dixieme phrase de macroscopie."""
+    cr = CR + "\n\n**Immunohistochimie :**\nLe marquage p53 est nul, en faveur d'une mutation.\n"
+    propositions = extraire_restitutions(cr, VERBATIM)
+    assert not propositions[0].ancree
+
+
+def test_un_commentaire_de_machine_n_est_pas_une_proposition():
+    """Le moteur qui s'adresse a lui-meme n'affirme rien sur le cas : le faire
+    juger ferait perdre une decision et brouillerait le taux d'hallucination."""
+    cr = CR + '\n\nNote : [VERIFIER: "sept bareties" — terme incompris]\n'
+    valeurs = [p.valeur_proposee for p in extraire_restitutions(cr, VERBATIM)]
+    assert not any("VERIFIER" in v for v in valeurs)
+
+
+def test_un_gabarit_conditionnel_n_est_pas_une_proposition():
+    cr = CR + "\n\nPanel standard pour adenocarcinome pulmonaire (TTF1, CK7) si realise.\n"
+    valeurs = [p.valeur_proposee for p in extraire_restitutions(cr, VERBATIM)]
+    assert not any("Panel standard" in v for v in valeurs)
+
+
+def test_une_etiquette_de_bloc_n_est_pas_une_proposition():
+    """"Tumeur : blocs 11 a 13" organise le document, elle n'affirme rien."""
+    cr = CR + "\n\nTumeur : blocs 11 a 13\n"
+    valeurs = [p.valeur_proposee for p in extraire_restitutions(cr, VERBATIM)]
+    assert not any("blocs 11" in v for v in valeurs)
