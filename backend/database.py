@@ -55,6 +55,9 @@ async def create_tables() -> None:
     if _engine is None:
         return
     from db_models import Base
+    # Les tables de l'etude s'enregistrent sur la meme Base a l'import.
+    import etude.models  # noqa: F401
+
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
