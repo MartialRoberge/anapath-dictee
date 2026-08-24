@@ -261,6 +261,10 @@ def _longueur_mots(texte: str) -> int:
     return len(texte.split())
 
 
+#: Une ligne de tableau Markdown : « | TTF1 | Positif | ».
+_LIGNE_TABLEAU: Final[re.Pattern[str]] = re.compile(r"^\s*\|")
+
+
 def _assertion_jugeable(texte: str) -> bool:
     """L'assertion porte-t-elle un contenu clinique qu'on peut juger ?"""
     if _A_COMPLETER.search(texte) or _META.search(texte):
@@ -268,6 +272,24 @@ def _assertion_jugeable(texte: str) -> bool:
         # aveu d'absence. Le juger comme une restitution serait un contresens.
         return False
     if _ETIQUETTE.match(texte):
+        return False
+    if _LIGNE_TABLEAU.match(texte):
+        # UNE LIGNE DE TABLEAU N'EST PAS UNE ASSERTION, et la soumettre faisait
+        # deux degats a la fois.
+        #
+        # D'abord un DOUBLON : le tableau d'immunohistochimie reprend ce que la
+        # section microscopie dit deja en prose. Le praticien tranchait deux
+        # fois la meme chose, et l'etude comptait deux decisions la ou il n'y
+        # avait qu'un jugement.
+        #
+        # Ensuite un FAUX SIGNAL D'HALLUCINATION : « | TTF1 | Positif | » n'a
+        # ni verbe ni contexte, donc rien pour s'ancrer dans la dictee. Elle
+        # ressortait NON ANCREE, c'est-a-dire candidate hallucination — sur le
+        # critere bloquant de l'etude, alors que le marqueur etait bel et bien
+        # dicte. Mesure sur le corpus reel : 4 des 11 assertions non ancrees
+        # restantes etaient des lignes de tableau.
+        #
+        # Le contenu n'est pas perdu : la prose qui l'accompagne est jugee.
         return False
     return _longueur_mots(texte) >= MIN_MOTS_ASSERTION
 

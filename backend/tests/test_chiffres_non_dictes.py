@@ -104,3 +104,37 @@ def test_le_college_ne_peut_pas_faire_taire_un_chiffre_invente():
         "une assertion saine affirmee par le college ne doit PAS etre soumise : "
         "faire reconfirmer ce qui est verifie dilue l'attention"
     )
+
+
+def test_une_ligne_de_tableau_n_est_pas_une_assertion():
+    """Elle faisait deux degats a la fois, mesures sur le corpus reel.
+
+    DOUBLON : le tableau d'immunohistochimie reprend ce que la prose de la
+    section microscopie dit deja. Le praticien tranchait deux fois la meme
+    chose, et l'etude comptait deux decisions pour un seul jugement.
+
+    FAUX SIGNAL D'HALLUCINATION : « | TTF1 | Positif | » n'a ni verbe ni
+    contexte, donc rien pour s'ancrer. Elle ressortait NON ANCREE — candidate
+    hallucination, sur le critere bloquant de l'etude — alors que le marqueur
+    etait bel et bien dicte. Quatre des onze assertions non ancrees du corpus
+    etaient de ce type.
+    """
+    cr = (
+        "**Immunohistochimie :**\n"
+        "| Anticorps | Résultat |\n"
+        "| --- | --- |\n"
+        "| TTF1 | Positif |\n\n"
+        "**Microscopie :**\n"
+        "Le marquage TTF1 est positif sur les cellules tumorales."
+    )
+    valeurs = [
+        p.valeur_proposee
+        for p in extraire_restitutions(cr, "Marquage TTF1 positif sur la tumeur.")
+    ]
+    assert not any(v.lstrip().startswith("|") for v in valeurs), (
+        "une ligne de tableau est soumise a validation : doublon de la prose, "
+        "et fausse candidate hallucination"
+    )
+    assert any("TTF1" in v for v in valeurs), (
+        "le contenu ne doit pas disparaitre : la prose qui l'accompagne reste jugee"
+    )
