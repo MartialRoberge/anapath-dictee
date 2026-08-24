@@ -41,10 +41,12 @@ import type { ActionPoint } from "@/lib/pointsATraiter";
  */
 const FONDS: Readonly<Record<NatureBloc, string>> = {
   // Rien. Ce que le praticien a dit se lit comme un compte rendu normal.
-  dicte: "border-transparent",
-  propose: "border-sky-500/70 bg-sky-500/[0.06] hover:bg-sky-500/[0.10]",
-  verifier: "border-amber-500/70 bg-amber-500/[0.06] hover:bg-amber-500/[0.10]",
-  libre: "border-transparent",
+  dicte: "",
+  propose:
+    "bg-sky-500/[0.055] ring-1 ring-inset ring-sky-500/25 hover:bg-sky-500/[0.09]",
+  verifier:
+    "bg-amber-500/[0.055] ring-1 ring-inset ring-amber-500/25 hover:bg-amber-500/[0.09]",
+  libre: "",
 };
 
 /**
@@ -191,13 +193,17 @@ export default function BlocTexte({
         }
       }}
       className={cn(
-        "group -mx-2 rounded-md border-l-[3px] px-2 py-1 transition-colors",
+        "group -mx-2.5 rounded-lg px-2.5 py-1.5 transition-colors",
         FONDS[bloc.nature],
         bloc.point !== null && "cursor-pointer",
         // L'ECLAIRAGE VA DANS LES DEUX SENS : selectionner a gauche allume ici,
-        // cliquer ici allume a gauche. Sans le retour visuel, on ne sait jamais
-        // de quelle phrase l'explication parle.
-        eclaire && "ring-2 ring-ring/50 ring-offset-1 ring-offset-background",
+        // cliquer ici allume a gauche. Sans retour visuel, on ne sait jamais de
+        // quelle phrase l'explication parle.
+        //
+        // Il REMPLACE le contour de nature au lieu de s'ajouter : deux anneaux
+        // concentriques sur une phrase de compte rendu font une interface
+        // lourde, et c'est ce que le proprietaire a vu tout de suite.
+        eclaire && "!ring-2 !ring-ring/60 bg-accent/40",
       )}
     >
       {correction !== null ? (

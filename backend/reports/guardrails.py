@@ -458,6 +458,12 @@ _A_COMPLETER_REGION: re.Pattern[str] = re.compile(
     r"\[a\s*completer[^\]]*\]", re.IGNORECASE
 )
 
+#: Le NOM du champ demande, et non le marqueur entier. La region sert a effacer
+#: les marqueurs du texte ; celle-ci sert a savoir de quel champ il s'agit.
+_A_COMPLETER_CHAMP: re.Pattern[str] = re.compile(
+    r"\[a\s*completer\s*:\s*([^\]]+)\]", re.IGNORECASE
+)
+
 
 def _asserted_content(cr: str) -> str:
     """Contenu AFFIRME du CR : le texte hors marqueurs [A COMPLETER]."""
@@ -537,14 +543,37 @@ def filter_present_alertes(
     reclamer (priorite absolue a l'absence de faux positif).
     """
     asserted = _asserted_content(cr)
+    # UN MARQUEUR ENCORE OUVERT EST LA PREUVE QUE LE CHAMP N'EST PAS REMPLI.
+    #
+    # Le filtre compare le nom du champ au contenu affirme du CR, marqueurs
+    # retires. Mais la phrase qui ENTOURE un marqueur contient tres souvent le
+    # nom du champ : « Le grade de dysplasie est [A COMPLETER: grade de
+    # dysplasie] ». L'alerte etait alors supprimee comme un faux positif, et le
+    # trou se retrouvait SANS complement — ni menu deroulant, ni phrase
+    # declenchante, ni raison. Le praticien voyait un champ a remplir sur
+    # lequel MARC n'avait plus rien a dire.
+    ouverts = {
+        _cle_de_champ(champ)
+        for champ in _A_COMPLETER_CHAMP.findall(cr)
+        if _cle_de_champ(champ)
+    }
     kept: list[DonneeManquante] = []
     removed = 0
     for alerte in alertes:
+        cle = _cle_de_champ(alerte.champ)
+        if cle and cle in ouverts:
+            kept.append(alerte)
+            continue
         if _field_present(alerte.champ, asserted):
             removed += 1  # deja present -> faux positif ecarte
             continue
         kept.append(alerte)
     return kept, removed
+
+
+def _cle_de_champ(champ: str) -> str:
+    """Rapproche « grade de dysplasie » et « Grade de dysplasie »."""
+    return re.sub(r"[^a-z0-9]+", "", champ.strip().casefold())
 
 
 # (regex [A COMPLETER] : source unique _A_COMPLETER_REGION, definie plus haut)
@@ -1158,15 +1187,19 @@ def build_validated_report(
         warnings.append(
             f"{n_present} champ(s) deja present(s) dans le CR retire(s) des suggestions."
         )
-    # Les alertes du LLM sont des RECOMMANDATIONS (probabilistes), pas des champs
-    # "obligatoires" : seuls les marqueurs [A COMPLETER] deterministes le sont.
-    alertes = [
-        DonneeManquante(
-            champ=a.champ, description=a.description, section=a.section,
-            obligatoire=False,
-        )
-        for a in alertes
-    ]
+    # ICI SE TROUVAIT UNE RECONSTRUCTION QUI NE FAISAIT PLUS QUE DETRUIRE.
+    #
+    # Chaque alerte etait rebatie avec trois champs — champ, description,
+    # section — plus un `obligatoire=False` que `DonneeManquante` ne declare
+    # plus depuis que « obligatoire » a ete retire, et que pydantic ignorait
+    # donc en silence. Il ne restait a ce code aucun effet utile, mais il
+    # jetait au passage `declencheur`, `raison` et `options`, que
+    # `_extract_alertes` venait de lire dans la reponse du modele.
+    #
+    # Consequence, mesuree : AUCUN trou du compte rendu ne pouvait porter de
+    # menu deroulant ni la phrase dictee qui le declenche. Le code des
+    # selecteurs existait cote interface et n'etait jamais atteint ; le
+    # panneau « Pourquoi » retombait sur une phrase passe-partout.
 
     # 3. Gardes non bloquantes (negations, hors-perimetre, fidelite des chiffres).
     check_warnings, check_alertes = _collect_guardrail_warnings(

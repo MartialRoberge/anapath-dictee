@@ -29,6 +29,7 @@ from etude.extraction import AssertionNumerotee, assertions_a_juger, rattacher_l
 from reports.college import LENTILLES, RapportCollege, reunir_le_college
 from reports.engine import EngineCapabilities, GeneratedReport, ReportEngine
 from reports.guardrails import GenerationParseError, build_validated_report, parse_llm_json
+from reports.comblement import combler_depuis_la_dictee
 from reports.knowledge import ContextResult, build_context_block
 from reports.local_engine import LocalReportEngine
 from reports.prompts import build_format_user_prompt
@@ -96,6 +97,25 @@ class MultiPassReportEngine(LocalReportEngine):
             provider=self._provider.name,
             model=self._provider.model,
         )
+
+        # --- GARDE-FOU : ne pas redemander ce qui a ete dicte ------------
+        #
+        # La regle est dans le prompt, en toutes lettres et avec son exemple.
+        # Elle n'a pas suffi : sur une dictee telegraphique — « PD-L1, 5% » —
+        # le modele ne rattache pas la valeur a son etiquette et pose un trou.
+        # Le praticien a parle pour ne pas avoir a taper ; on lui rendait un
+        # formulaire. Ce comblement-ci est DETERMINISTE et ne comble que si
+        # l'etiquette figure une seule fois dans la dictee, suivie d'une valeur.
+        cr_comble, combles = combler_depuis_la_dictee(report.cr, transcript)
+        if combles:
+            report.cr = cr_comble
+            # Trace, pour que l'explicabilite dise d'ou vient chaque valeur :
+            # un comblement qu'on ne peut pas justifier serait indistinguable
+            # d'une invention.
+            report.trace["comblements"] = [
+                {"champ": c.champ, "valeur": c.valeur, "source": c.source}
+                for c in combles
+            ]
 
         # --- Passe 3 : RELECTURE (signale, ne reecrit pas) ---------------
         signalements = await self._review(report.cr, transcript)

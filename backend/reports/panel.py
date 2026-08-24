@@ -37,9 +37,20 @@ _SARCOMES_NON_FNCLCC: tuple[str, ...] = (
 def merge_donnees_manquantes(
     deterministes: list[DonneeManquante], recommandees: list[DonneeManquante]
 ) -> list[DonneeManquante]:
-    """Fusionne les champs deterministes (marqueurs [A COMPLETER], obligatoires) et
-    les recommandations LLM (probabilistes) en dedupliquant : un champ deja couvert
-    par un marqueur deterministe n'est pas re-liste."""
+    """Fusionne les champs deterministes et les recommandations du modele.
+
+    ON FUSIONNE, ON NE JETTE PLUS. Un champ deja couvert par un marqueur
+    deterministe voyait sa recommandation ecartee purement et simplement — or
+    c'est ELLE, et elle seule, qui porte la liste fermee des valeurs possibles
+    et la phrase dictee qui rend le champ attendu. Le marqueur deterministe, lui,
+    n'a que le nom du champ et une raison passe-partout.
+
+    Le trou gardait donc son nom exact — necessaire, l'interface rapproche le
+    marqueur de son complement par ce nom — mais perdait son menu deroulant et
+    sa citation. Aucun trou du compte rendu ne pouvait en porter.
+
+    L'entree deterministe garde son `champ` et recupere ce qui lui manque.
+    """
     resultat: list[DonneeManquante] = list(deterministes)
     vus: list[str] = [cle_alphanum(d.champ) for d in deterministes]
     for reco in recommandees:
@@ -47,7 +58,26 @@ def merge_donnees_manquantes(
         if not cle:
             continue
         # Dedoublonnage par inclusion : "ptnm" et "ptnmtnm8esein" sont le meme champ.
-        if any(cle in v or v in cle for v in vus):
+        deja = next(
+            (
+                d
+                for d in resultat
+                if cle_alphanum(d.champ)
+                and (cle in cle_alphanum(d.champ) or cle_alphanum(d.champ) in cle)
+            ),
+            None,
+        )
+        if deja is not None:
+            if deja.declencheur is None:
+                deja.declencheur = reco.declencheur
+            if not deja.options:
+                deja.options = list(reco.options)
+            # La raison du modele l'emporte sur la phrase generique du
+            # marqueur : le marqueur en pose TOUJOURS une, si bien qu'un
+            # « seulement si absente » ne s'appliquerait jamais et que le
+            # praticien resterait sur le passe-partout.
+            if reco.raison:
+                deja.raison = reco.raison
             continue
         resultat.append(reco)
         vus.append(cle)

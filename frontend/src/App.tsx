@@ -625,11 +625,42 @@ export default function App() {
     return table;
   }, [blocs, pointsTraites]);
 
-  /** Ce qui reste a verifier, pour que le bouton de validation le dise. */
-  const pointsRestants = useMemo(
-    () => pointsATraiter.filter((point) => !(point.id in pointsTraites)).length,
-    [pointsATraiter, pointsTraites],
-  );
+  /**
+   * Les propositions qu'AUCUN bloc du texte ne porte.
+   *
+   * Le rapprochement entre une proposition et sa phrase se fait sur le texte.
+   * Quand il echoue — le moteur a reformule, une ponctuation differe — la
+   * proposition n'apparait NULLE PART dans le compte rendu. Elle etait pourtant
+   * comptee : le bandeau annoncait « 9 a verifier » quand le praticien en
+   * voyait cinq, et les quatre autres etaient introuvables.
+   *
+   * On ne les jette pas : une proposition orpheline est souvent la plus
+   * interessante — c'est une phrase que le college a jugee et que le texte ne
+   * porte plus sous cette forme. Elle est listee a part dans l'analyse.
+   */
+  const orphelines = useMemo(() => {
+    const portees = new Set(
+      blocs.filter((b) => b.point !== null).map((b) => b.point!.id),
+    );
+    return pointsATraiter.filter((point) => !portees.has(point.id));
+  }, [blocs, pointsATraiter]);
+
+  /**
+   * Ce qui reste a verifier. COMPTE SUR CE QUI EST A L'ECRAN, jamais sur une
+   * liste interne : un compteur qui annonce plus que ce qu'on voit fait
+   * chercher des points qui n'existent pas, et un compteur qui n'atteint
+   * jamais zero empeche de finir.
+   */
+  const pointsRestants = useMemo(() => {
+    const aDecider = blocs.filter(
+      (b) => b.point !== null && !(b.point.id in pointsTraites),
+    ).length;
+    const trous = blocs.reduce((total, b) => total + b.trous.length, 0);
+    const orphelinesRestantes = orphelines.filter(
+      (point) => !(point.id in pointsTraites),
+    ).length;
+    return aDecider + trous + orphelinesRestantes;
+  }, [blocs, pointsTraites, orphelines]);
 
   const deciderPoint = useCallback(
     async (
@@ -1143,6 +1174,7 @@ export default function App() {
                 trouSelectionne={trouSelectionne}
                 decisions={decisionsParBloc}
                 transcription={rawTranscription}
+                orphelines={orphelines}
                 verifies={pointsVerifies}
                 codes={codesAffiches}
                 onEclairer={setSelection}

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { CheckCircle2, CircleDot, FileText, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Bloc, Trou } from "@/lib/blocsTexte";
+import type { PointATraiter } from "@/lib/pointsATraiter";
 
 /**
  * Analyse MARC : POURQUOI, et rien d'autre.
@@ -36,6 +37,15 @@ interface PanneauExplicabiliteProps {
   decisions: Readonly<Record<string, string>>;
   transcription: string | null;
   /** Verifications deterministes passees sur le document, en lecture seule. */
+  /**
+   * Les propositions qu'AUCUNE phrase du compte rendu ne porte.
+   *
+   * Le rapprochement se fait sur le texte ; quand il echoue, la proposition
+   * n'apparait nulle part dans le compte rendu tout en restant comptee. On la
+   * montre ici plutot que de la faire disparaitre : c'est souvent la plus
+   * interessante — une phrase jugee que le texte ne porte plus sous cette forme.
+   */
+  orphelines: readonly PointATraiter[];
   verifies: readonly { libelle: string }[];
   /** Les codes retenus, une fois tranches. Un code non encore juge n'apparait
    *  PAS ici : l'afficher le ferait passer pour acquis. */
@@ -52,6 +62,7 @@ export default function PanneauExplicabilite({
   trouSelectionne,
   decisions,
   transcription,
+  orphelines,
   verifies,
   codes,
   onEclairer,
@@ -106,6 +117,7 @@ export default function PanneauExplicabilite({
           )}
         </section>
 
+        <Orphelines points={orphelines} />
         <Verifications verifies={verifies} />
         <Codes codes={codes} />
         <Dictee transcription={transcription} />
@@ -267,6 +279,31 @@ function Explication({ bloc, trou }: { bloc: Bloc; trou: Trou | null }) {
         </ul>
       )}
     </div>
+  );
+}
+
+function Orphelines({ points }: { points: readonly PointATraiter[] }) {
+  if (points.length === 0) return null;
+  return (
+    <section className="border-t px-3 py-2.5">
+      <h3 className="text-[0.62rem] font-semibold uppercase tracking-[0.09em] text-muted-foreground">
+        Sans emplacement dans le texte
+      </h3>
+      <p className="mt-1 text-[0.65rem] leading-relaxed text-muted-foreground/80">
+        Ces points ont été jugés, mais le compte rendu ne porte plus la phrase
+        exacte à laquelle ils se rattachaient.
+      </p>
+      <ul className="mt-1.5 space-y-1">
+        {points.map((point) => (
+          <li
+            key={point.id}
+            className="rounded-md bg-muted/60 px-2 py-1.5 text-xs leading-relaxed"
+          >
+            {point.detail}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
