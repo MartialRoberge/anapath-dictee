@@ -27,8 +27,14 @@ import { useEtudeDossier } from "./hooks/useEtudeDossier";
 import PanneauExplicabilite from "./components/travail/PanneauExplicabilite";
 import CompteRenduTravail from "./components/travail/CompteRenduTravail";
 import ReportPanel from "./components/ReportPanel";
+import CodificationPanel from "./components/CodificationPanel";
+import Confirmation from "./components/ui/Confirmation";
 import { signalerVues } from "./services/etude";
-import { decouperEnBlocs, remplirTrou } from "./lib/blocsTexte";
+import {
+  decouperEnBlocs,
+  remplacerTexteDuBloc,
+  remplirTrou,
+} from "./lib/blocsTexte";
 import type { Bloc, Trou } from "./lib/blocsTexte";
 import type { AjoutContexte } from "./components/analyse/BarreAjout";
 import Glissiere from "./components/analyse/Glissiere";
@@ -364,6 +370,8 @@ export default function App() {
    * Un seul texte derriere les deux : basculer ne perd rien.
    */
   const [modeEdition, setModeEdition] = useState(false);
+  /** La demande de confirmation avant de repartir sur un nouveau compte rendu. */
+  const [confirmerNouveau, setConfirmerNouveau] = useState(false);
   /** Ce qui a ete verse au contexte, du plus recent au plus ancien. */
   const [historiqueAjouts, setHistoriqueAjouts] = useState<AjoutContexte[]>([]);
 
@@ -676,6 +684,14 @@ export default function App() {
    * perdrait la completude ; n'enregistrer que la mesure laisserait le trou
    * beant sous les yeux du praticien.
    */
+  /** Modifier une phrase EN PLACE : le texte du compte rendu change, et
+   *  c'est tout. La decision « corrige » part de son cote, depuis le bloc. */
+  const editerBloc = useCallback((bloc: Bloc, texte: string) => {
+    setReport((actuel) =>
+      actuel ? remplacerTexteDuBloc(actuel, bloc, texte) : actuel,
+    );
+  }, []);
+
   const remplirTrouDuBloc = useCallback(
     (bloc: Bloc, trou: Trou, valeur: string) => {
       setReport((actuel) => (actuel ? remplirTrou(actuel, bloc, trou, valeur) : actuel));
@@ -1032,15 +1048,9 @@ export default function App() {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    if (!savedReportId && report) {
-                      if (window.confirm("Sauvegarder avant de creer un nouveau CR ?")) {
-                        handleSave().then(() => handleReset());
-                      } else {
-                        handleReset();
-                      }
-                    } else {
-                      handleReset();
-                    }
+                    // On ne demande que s'il y a quelque chose a perdre.
+                    if (!savedReportId && report) setConfirmerNouveau(true);
+                    else handleReset();
                   }}
                 >
                   <Plus className="h-3.5 w-3.5" />
@@ -1048,22 +1058,9 @@ export default function App() {
                 </Button>
               </>
             )}
-            {report && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hide-mobile"
-                onClick={() => setDrawerOpen(true)}
-              >
-                <ListChecks className="h-3.5 w-3.5" />
-                À compléter
-                {completion.remaining > 0 && (
-                  <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1 text-[10px] font-bold text-warning-foreground">
-                    {completion.remaining}
-                  </span>
-                )}
-              </Button>
-            )}
+            {/* Plus de bouton « À compléter » : la liste vit dans l'analyse,
+                a cote du texte. Deux listes identiques a deux endroits
+                faisaient croire a deux choses differentes. */}
           </div>
         </header>
 
@@ -1080,8 +1077,18 @@ export default function App() {
               prend la gauche et le compte rendu la droite — l'ordre de lecture
               du travail qui reste a faire. */}
           {!report ? (
-            <section className="flex flex-1 justify-center overflow-y-auto p-6 scrollbar-thin max-lg:hidden">
-              <div className="w-full max-w-xl">
+            /* LA DICTEE PREND LA GAUCHE, comme l'analyse ensuite. La place
+               qu'occupe la dictee est celle que prendra l'analyse : le regard
+               n'a pas a se deplacer quand le compte rendu apparait. Centree,
+               elle sautait d'un cote a l'autre a chaque generation.
+
+               A droite, l'emplacement du compte rendu est esquisse plutot que
+               laisse vide : on voit ou l'on va. */
+            <div className="flex min-w-0 flex-1 overflow-hidden max-lg:hidden">
+              <section
+                className="min-w-0 shrink-0 overflow-y-auto p-5 scrollbar-thin"
+                style={{ width: `${partAnalyse * 100}%` }}
+              >
                 <RecorderPanel
                   rawTranscription={rawTranscription}
                   report={report}
@@ -1092,8 +1099,39 @@ export default function App() {
                   onReformat={handleReformat}
                   reformatting={reformatting}
                 />
-              </div>
-            </section>
+              </section>
+
+              <div className="w-px shrink-0 bg-border" />
+
+              <section
+                aria-hidden
+                className="min-w-0 flex-1 overflow-hidden p-5 opacity-40"
+              >
+                <div className="space-y-3">
+                  <div className="h-3 w-2/5 rounded bg-muted" />
+                  <div className="space-y-1.5">
+                    <div className="h-2.5 w-full rounded bg-muted/70" />
+                    <div className="h-2.5 w-11/12 rounded bg-muted/70" />
+                    <div className="h-2.5 w-4/5 rounded bg-muted/70" />
+                  </div>
+                  <div className="h-3 w-1/3 rounded bg-muted" />
+                  <div className="space-y-1.5">
+                    <div className="h-2.5 w-full rounded bg-muted/70" />
+                    <div className="h-2.5 w-10/12 rounded bg-muted/70" />
+                    <div className="h-2.5 w-full rounded bg-muted/70" />
+                    <div className="h-2.5 w-3/5 rounded bg-muted/70" />
+                  </div>
+                  <div className="h-3 w-1/4 rounded bg-muted" />
+                  <div className="space-y-1.5">
+                    <div className="h-2.5 w-11/12 rounded bg-muted/70" />
+                    <div className="h-2.5 w-2/3 rounded bg-muted/70" />
+                  </div>
+                </div>
+                <p className="mt-6 text-xs text-muted-foreground">
+                  Votre compte rendu s'écrira ici.
+                </p>
+              </section>
+            </div>
           ) : (
             <div className="relative flex min-w-0 flex-1 overflow-hidden max-lg:hidden">
               <PanneauExplicabilite
@@ -1163,12 +1201,24 @@ export default function App() {
                   eclaire={selection}
                   occupe={etude.occupe || reformatting}
                   onDecider={deciderBloc}
+                  onEditer={editerBloc}
                   onRemplirTrou={remplirTrouDuBloc}
                   onEcarterTrou={ecarterTrouDuBloc}
                   onExpliquer={expliquerBloc}
                   onVu={signalerBlocVu}
                   allerA={allerA}
                 />
+                )}
+
+                {/* LES CODES ADICAP ET SNOMED. Ils vivaient dans ReportPanel,
+                    et sont partis avec lui quand la surface de travail l'a
+                    remplace. Ce sont des livrables du compte rendu, pas des
+                    explications : ils restent sous le texte, la ou ils
+                    etaient. */}
+                {report && (
+                  <div className="mt-4">
+                    <CodificationPanel report={report} organe={organeDetecte} />
+                  </div>
                 )}
 
                 {savedReportId && (
@@ -1229,6 +1279,7 @@ export default function App() {
                   eclaire={selection}
                   occupe={etude.occupe || reformatting}
                   onDecider={deciderBloc}
+                  onEditer={editerBloc}
                   onRemplirTrou={remplirTrouDuBloc}
                   onEcarterTrou={ecarterTrouDuBloc}
                   onExpliquer={expliquerBloc}
@@ -1249,6 +1300,34 @@ export default function App() {
           </p>
         </footer>
       </div>
+
+      {/* TROIS ISSUES, pas deux. « Sauvegarder avant de creer un nouveau
+          compte rendu ? » en oui/non obligeait a sauvegarder pour avancer :
+          un essai, un cas abandonne ou un doublon partaient quand meme dans
+          l'historique. Continuer sans sauvegarder est un choix legitime. */}
+      <Confirmation
+        ouverte={confirmerNouveau}
+        titre="Ce compte rendu n'est pas enregistré"
+        message="Vous pouvez l'enregistrer avant de repartir, ou le laisser de côté."
+        onAnnuler={() => setConfirmerNouveau(false)}
+        actions={[
+          {
+            libelle: "Enregistrer puis continuer",
+            principale: true,
+            onChoisir: () => {
+              setConfirmerNouveau(false);
+              void handleSave().then(() => handleReset());
+            },
+          },
+          {
+            libelle: "Continuer sans enregistrer",
+            onChoisir: () => {
+              setConfirmerNouveau(false);
+              handleReset();
+            },
+          },
+        ]}
+      />
 
       {/* Completion drawer */}
       <div

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { MarcLogo } from "../components/MarcLogo";
 import { useToast } from "../components/toast-context";
 import { deleteReport, getReports } from "../services/api";
+import Confirmation from "@/components/ui/Confirmation";
 import type { ReportSummary } from "../services/api";
 
 interface HistoryPageProps {
@@ -99,9 +100,11 @@ export default function HistoryPage({
    * suite ferait croire la suppression faite alors qu'elle a echoue, et le
    * compte rendu reapparaitrait au rafraichissement suivant.
    */
+  const [aSupprimer, setASupprimer] = useState<string | null>(null);
+
   const supprimer = useCallback(
     async (reportId: string) => {
-      if (!window.confirm("Supprimer definitivement ce compte rendu ?")) return;
+      setASupprimer(null);
       setEnSuppression(reportId);
       try {
         await deleteReport(reportId);
@@ -242,7 +245,7 @@ export default function HistoryPage({
                         compte rendu absorberait le clic de suppression. */}
                     <button
                       type="button"
-                      onClick={() => void supprimer(r.id)}
+                      onClick={() => setASupprimer(r.id)}
                       disabled={enSuppression === r.id}
                       aria-label="Supprimer ce compte rendu"
                       title="Supprimer"
@@ -257,6 +260,22 @@ export default function HistoryPage({
           ))}
         </div>
       )}
+
+      <Confirmation
+        ouverte={aSupprimer !== null}
+        titre="Supprimer ce compte rendu ?"
+        message="La suppression est définitive : il n'y a pas de corbeille."
+        onAnnuler={() => setASupprimer(null)}
+        actions={[
+          {
+            libelle: "Supprimer",
+            destructive: true,
+            onChoisir: () => {
+              if (aSupprimer !== null) void supprimer(aSupprimer);
+            },
+          },
+        ]}
+      />
     </div>
   );
 }

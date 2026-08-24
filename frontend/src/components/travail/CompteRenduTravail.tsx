@@ -29,6 +29,8 @@ interface CompteRenduTravailProps {
   eclaire: string | null;
   occupe: boolean;
   onDecider: (bloc: Bloc, action: ActionPoint, valeur?: string) => Promise<void>;
+  /** Remplace le texte d'un bloc dans le compte rendu. */
+  onEditer: (bloc: Bloc, texte: string) => void;
   onRemplirTrou: (bloc: Bloc, trou: Trou, valeur: string) => void;
   onEcarterTrou: (bloc: Bloc, trou: Trou) => void;
   onExpliquer: (bloc: Bloc, trou: Trou | null) => void;
@@ -43,6 +45,7 @@ export default function CompteRenduTravail({
   eclaire,
   occupe,
   onDecider,
+  onEditer,
   onRemplirTrou,
   onEcarterTrou,
   onExpliquer,
@@ -105,6 +108,7 @@ export default function CompteRenduTravail({
             eclaire={eclaire === bloc.id}
             occupe={occupe}
             onDecider={(action, valeur) => onDecider(bloc, action, valeur)}
+            onEditer={(texte) => onEditer(bloc, texte)}
             onRemplirTrou={(trou, valeur) => onRemplirTrou(bloc, trou, valeur)}
             onEcarterTrou={(trou) => onEcarterTrou(bloc, trou)}
             onExpliquer={() => expliquer(bloc, null)}

@@ -26,13 +26,24 @@ import type { ActionPoint } from "@/lib/pointsATraiter";
  * a la jonction des deux.
  */
 
+/**
+ * LE FOND DIT LA NATURE, ET IL N'ACCUSE PAS.
+ *
+ * Le rouge disait « rien dans votre dictee ne soutient cette phrase » — et
+ * c'etait un contresens : si MARC ecrit une phrase, c'est qu'il a une raison,
+ * et une raison se justifie, elle ne s'alarme pas. Le rouge faisait passer une
+ * PROPOSITION pour une FAUTE, alors que le praticien doit simplement juger si
+ * l'interpretation tient.
+ *
+ * Deux teintes suffisent, et la difference porte sur la NATURE du geste
+ * attendu : bleu = une proposition a valider, ambre = une interpellation, une
+ * chose que MARC a deduite et sur laquelle il attire l'attention.
+ */
 const FONDS: Readonly<Record<NatureBloc, string>> = {
   // Rien. Ce que le praticien a dit se lit comme un compte rendu normal.
   dicte: "border-transparent",
-  propose:
-    "border-sky-500/70 bg-sky-500/[0.07] hover:bg-sky-500/[0.11]",
-  verifier:
-    "border-rose-500/70 bg-rose-500/[0.07] hover:bg-rose-500/[0.11]",
+  propose: "border-sky-500/70 bg-sky-500/[0.06] hover:bg-sky-500/[0.10]",
+  verifier: "border-amber-500/70 bg-amber-500/[0.06] hover:bg-amber-500/[0.10]",
   libre: "border-transparent",
 };
 
@@ -54,9 +65,13 @@ const FONDS: Readonly<Record<NatureBloc, string>> = {
  */
 const COURT: Readonly<Record<string, string>> = {
   conforme: "Oui",
-  corrige: "Corriger",
-  non_dicte: "Pas dit",
-  hors_sujet: "Hors sujet",
+  corrige: "Corrigé",
+  // « Je n'ai pas dit ca » se lisait comme une accusation, et « pas dit »
+  // comme une erreur. Ni l'un ni l'autre : une phrase que le praticien n'a pas
+  // dictee peut etre juste et utile — il la garde alors. Ce bouton-ci sert
+  // quand elle ne doit PAS figurer, et le libelle le dit sans juger.
+  non_dicte: "Retirer",
+  hors_sujet: "Pas ici",
   juste: "Juste",
   je_ne_sais_pas: "?",
   pertinent_ajoute: "Ajouter",
@@ -66,8 +81,8 @@ const COURT: Readonly<Record<string, string>> = {
 
 const SENS: Readonly<Record<NatureBloc, string | null>> = {
   dicte: null,
-  propose: "Découle de ce que vous avez dicté, sans que vous l'ayez dit.",
-  verifier: "Rien dans votre dictée ne soutient ce passage.",
+  propose: "Proposition",
+  verifier: "Interpellation",
   libre: null,
 };
 
@@ -78,6 +93,8 @@ interface BlocTexteProps {
   eclaire: boolean;
   occupe: boolean;
   onDecider: (action: ActionPoint, valeur?: string) => Promise<void>;
+  /** Remplace le texte de CE bloc dans le compte rendu. */
+  onEditer: (texte: string) => void;
   onRemplirTrou: (trou: Trou, valeur: string) => void;
   onEcarterTrou: (trou: Trou) => void;
   /** Ouvre l'explicabilite de ce bloc a gauche. Consultation, pas decision. */
@@ -92,6 +109,7 @@ export default function BlocTexte({
   eclaire,
   occupe,
   onDecider,
+  onEditer,
   onRemplirTrou,
   onEcarterTrou,
   onExpliquer,
@@ -102,6 +120,7 @@ export default function BlocTexte({
   const [redecider, setRedecider] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const conteneur = useRef<HTMLDivElement>(null);
+  const champEdition = useRef<HTMLTextAreaElement>(null);
   const dejaVu = useRef(false);
 
   // L'AFFICHAGE REEL, pas le montage. Un bloc rendu hors ecran n'a ete vu de
@@ -123,6 +142,22 @@ export default function BlocTexte({
     observateur.observe(cible);
     return () => observateur.disconnect();
   }, [bloc.point, onVu]);
+
+  /**
+   * L'edition en place s'enregistre a la sortie du champ.
+   *
+   * Un texte inchange n'est PAS une correction : l'enregistrer ferait compter
+   * une modification a chaque fois que le praticien clique dans une phrase et
+   * en ressort, et le taux de correction publie serait faux.
+   */
+  async function enregistrerEdition() {
+    const nouveau = (correction ?? "").trim();
+    setCorrection(null);
+    if (nouveau === "" || nouveau === bloc.texte.trim()) return;
+    onEditer(nouveau);
+    const action = bloc.point?.actions.find((a) => a.decision === "corrige");
+    if (action) await decider(action, nouveau);
+  }
 
   async function decider(action: ActionPoint, valeur?: string) {
     setErreur(null);
@@ -165,7 +200,33 @@ export default function BlocTexte({
         eclaire && "ring-2 ring-ring/50 ring-offset-1 ring-offset-background",
       )}
     >
+      {correction !== null ? (
+        <textarea
+          ref={champEdition}
+          value={correction}
+          onChange={(e) => setCorrection(e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setCorrection(null);
+            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) void enregistrerEdition();
+          }}
+          onBlur={() => void enregistrerEdition()}
+          aria-label="Modifier cette phrase"
+          className={cn(
+            // MEME typographie que le texte : on continue d'ecrire son compte
+            // rendu, on ne remplit pas un formulaire a cote.
+            "w-full resize-none bg-transparent text-[0.95rem] leading-relaxed text-foreground",
+            "rounded-sm outline-none ring-1 ring-ring/40",
+          )}
+          rows={Math.max(1, Math.ceil(correction.length / 70))}
+        />
+      ) : (
       <p
+        onDoubleClick={(e) => {
+          // Double-clic = j'ecris ici. Le geste attendu partout ailleurs.
+          e.stopPropagation();
+          if (!occupe) setCorrection(bloc.texte);
+        }}
         className={cn(
           "text-[0.95rem] leading-relaxed text-foreground",
           bloc.puce && "relative pl-4 before:absolute before:left-1 before:content-['•']",
@@ -186,6 +247,7 @@ export default function BlocTexte({
           ),
         )}
       </p>
+      )}
 
       {erreur && (
         <p role="alert" className="mt-1 text-xs text-destructive">
@@ -193,46 +255,23 @@ export default function BlocTexte({
         </p>
       )}
 
-      {correction !== null && (
-        <div className="mt-1.5 flex items-start gap-1.5">
-          <textarea
-            value={correction}
-            onChange={(e) => setCorrection(e.target.value)}
-            rows={Math.min(8, Math.max(3, Math.ceil(correction.length / 60)))}
-            aria-label="Votre formulation"
-            className="flex-1 resize-y rounded-md border bg-background px-2 py-1 text-sm"
-          />
-          <button
-            type="button"
-            disabled={occupe || correction.trim() === ""}
-            onClick={() =>
-              void decider(
-                { verbe: "modifier", libelle: "À corriger", decision: "corrige" },
-                correction,
-              )
-            }
-            className="rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50"
-          >
-            Remplacer
-          </button>
-        </div>
-      )}
-
       {aDecider && correction === null && (
         <div
           className="mt-1 flex flex-wrap items-center gap-1"
           onClick={(e) => e.stopPropagation()}
         >
-          {bloc.point?.actions.map((action) => (
+          {/* « Corriger » n'est plus un bouton : on modifie la phrase
+              directement, par double-clic. Un bouton qui ouvre un second champ
+              de texte au-dessus du texte demandait de retaper ce qu'on avait
+              deja sous les yeux. */}
+          {bloc.point?.actions
+            .filter((action) => action.decision !== "corrige")
+            .map((action) => (
             <button
               key={action.libelle}
               type="button"
               disabled={occupe}
-              onClick={() =>
-                action.saisie
-                  ? setCorrection(bloc.texte.trim())
-                  : void decider(action)
-              }
+              onClick={() => void decider(action)}
               className={cn(
                 "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium",
                 "transition-colors disabled:opacity-50",

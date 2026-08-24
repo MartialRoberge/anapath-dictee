@@ -331,6 +331,27 @@ function normaliser(texte: string): string {
 /* ------------------------------------------------------------------ */
 
 /**
+ * Remplace le texte d'un bloc, DANS LE COMPTE RENDU COMPLET.
+ *
+ * Comme pour un trou, on travaille sur les offsets absolus et jamais par
+ * recherche de chaine : deux phrases identiques dans deux sections differentes
+ * (« Les limites sont saines. ») feraient remplacer la premiere a la place de
+ * la seconde, sans que rien ne le signale.
+ *
+ * Le garde-fou compare le texte attendu a ce que le compte rendu porte
+ * reellement a ces offsets : si le texte a bouge depuis le decoupage, on ne
+ * touche a rien plutot que d'ecraser une phrase au hasard.
+ */
+export function remplacerTexteDuBloc(
+  cr: string,
+  bloc: Bloc,
+  texte: string,
+): string {
+  if (cr.slice(bloc.debut, bloc.fin) !== bloc.texte) return cr;
+  return cr.slice(0, bloc.debut) + texte + cr.slice(bloc.fin);
+}
+
+/**
  * Remplace un trou par la valeur retenue, DANS LE COMPTE RENDU COMPLET.
  *
  * On travaille sur les offsets absolus et jamais par recherche de texte : deux
