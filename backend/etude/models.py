@@ -237,6 +237,18 @@ class EtudeProposition(Base):
     #: Regles deterministes evaluees : [{"id","resultat"}].
     regles_evaluees: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    #: Les chiffres de l'assertion absents de la dictee, separes par " | ".
+    #: Vide quand il n'y en a pas ; NULL sur les lignes anterieures a la
+    #: mesure, qu'on ne peut pas declarer indemnes retroactivement.
+    #:
+    #: SIGNAL DISTINCT DE L'ANCRAGE, et il le fallait. L'ancrage se fait sur
+    #: les mots — ancrer sur les chiffres faisait qu'un "5 %" s'appuyait sur un
+    #: "5 mm" dicte plus loin. Mais une phrase dont tous les mots sont dictes
+    #: passait alors pour soutenue avec un chiffre invente. Vu sur un cas reel :
+    #: dictee de 5 + 2 + 3 ganglions, compte rendu "0/22 ganglions examines",
+    #: tous les mots ancres, et c'est le 22 qui dit si le curage est adequat.
+    chiffres_non_dictes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     # -- Telemetrie de decision (cahier §7) ------------------------------
     #: Moment ou le serveur a REMIS le bloc au client : t2 du dossier. Il dit
     #: que la proposition etait dans la page, pas qu'elle a ete vue.

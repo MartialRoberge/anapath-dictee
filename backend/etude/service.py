@@ -174,6 +174,9 @@ def _vers_ligne(
         longueur_mots=extraite.longueur_mots,
         affiche_a=affiche_a,
         etat=ETAT_NON_VU,
+        # Chaine vide = verifie, aucun chiffre suspect. NULL serait "non
+        # mesure", ce qui n'est vrai que des lignes d'avant la colonne.
+        chiffres_non_dictes=" | ".join(extraite.chiffres_non_dictes),
     )
 
 

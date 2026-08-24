@@ -52,6 +52,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, replace
 from typing import Final
 
+from reports.numbers import chiffres_non_dictes
 from etude.ancrage import Empan, ancrer, decouper, est_copie_litterale
 from etude.arbitrage import (
     MOTIF_CITATION_INTROUVABLE,
@@ -184,6 +185,19 @@ class PropositionExtraite:
     #: l'etude, et l'interface doit le dire au praticien au lieu de faire comme
     #: si l'empan avait ete perdu.
     ancree: bool = True
+    #: Les chiffres porteurs de l'assertion qu'on ne retrouve NULLE PART dans la
+    #: dictee, forme litterale ou en toutes lettres.
+    #:
+    #: SIGNAL DISTINCT DE `ancree`, ET IL LE FALLAIT. L'ancrage se fait sur les
+    #: mots, volontairement : ancrer sur les chiffres faisait qu'un "5 %"
+    #: s'appuyait sur un "5 mm" dicte plus loin. Mais du coup une phrase dont
+    #: tous les mots sont dictes passait pour soutenue meme avec un chiffre
+    #: invente. Vu sur un cas reel : la dictee enumere 5 + 2 + 3 ganglions, le
+    #: compte rendu annonce "0/22 ganglions examines", chaque mot est ancre, et
+    #: c'est le 22 qui dit si le curage est adequat.
+    #:
+    #: Une assertion qui en porte est TOUJOURS soumise, ancree ou non.
+    chiffres_non_dictes: tuple[str, ...] = ()
 
 
 def _nettoyer(ligne: str) -> str:
@@ -263,6 +277,7 @@ def _proposition(
     sous_type: str,
     valeur: str,
     empan: Empan | None,
+    verbatim: str,
     confiance: float | None = None,
     chemin: str | None = None,
 ) -> PropositionExtraite:
@@ -277,6 +292,7 @@ def _proposition(
         confiance=confiance,
         chemin=chemin,
         ancree=empan is not None,
+        chiffres_non_dictes=chiffres_non_dictes(valeur, verbatim),
     )
 
 
@@ -313,7 +329,12 @@ def extraire_restitutions(cr: str, verbatim: str) -> list[PropositionExtraite]:
             # de l'etude, elle passe donc devant, pas a la trappe.
             priorite = _PRIORITE_HALLUCINATION
         retenues.append(
-            (priorite, _proposition(TYPE_RESTITUTION, section, assertion, empan))
+            (
+                priorite,
+                _proposition(
+                    TYPE_RESTITUTION, section, assertion, empan, verbatim
+                ),
+            )
         )
 
     retenues.sort(key=lambda couple: couple[0])
@@ -416,14 +437,28 @@ def extraire_restitutions_arbitrees(
     PAS une proposition : le silence est ici un bon comportement. Faire
     reconfirmer au praticien ce que trois relecteurs ont deja verifie lui coute
     un geste et dilue son attention sur ce qui compte.
+
+    UNE SEULE EXCEPTION, ET ELLE VIENT D'UN CAS REEL. Une assertion qui porte
+    un chiffre absent de la dictee est soumise MEME si le college l'a affirmee
+    a l'unanimite. Le college juge sur le sens, et le sens est intact : "pas de
+    metastase ganglionnaire (0/22 ganglions examines)" est une phrase
+    parfaitement formee, dont chaque mot figure dans la dictee. Trois
+    relecteurs l'ont laissee passer. Mais la dictee enumere 5 + 2 + 3 ganglions,
+    jamais 22 — et le denominateur est ce qui dit si le curage est adequat.
+
+    Le silence du college porte donc sur les mots, jamais sur les chiffres :
+    la verification des chiffres est deterministe, elle ne depend d'aucun
+    modele, et c'est precisement pour cela qu'on ne la lui delegue pas.
     """
     retenues: list[tuple[int, PropositionExtraite]] = []
 
     for soumission in soumissions:
-        if str(soumission.get("comportement") or "") != PROPOSER:
-            continue
         assertion = str(soumission.get("assertion") or "").strip()
         if not assertion:
+            continue
+        if str(soumission.get("comportement") or "") != PROPOSER and not (
+            chiffres_non_dictes(assertion, verbatim)
+        ):
             continue
         section = str(soumission.get("section") or "") or SOUS_TYPE_RESTITUTION
         retenues.append((
@@ -433,6 +468,7 @@ def extraire_restitutions_arbitrees(
                 section,
                 assertion,
                 _empan_verifie(soumission, verbatim),
+                verbatim,
             ),
         ))
 
@@ -498,6 +534,7 @@ def extraire_codes(
                 str(entree.get("position") or "adicap"),
                 code,
                 empan,
+                verbatim,
                 confiance=float(confiance) if isinstance(confiance, (int, float)) else None,
                 chemin=libelle or None,
             )
@@ -538,6 +575,7 @@ def extraire_completudes(
                 str(alerte.get("section") or "completude"),
                 description,
                 empan,
+                verbatim,
                 chemin=champ,
             )
         )
@@ -554,6 +592,7 @@ def extraire_completudes(
                 SOUS_TYPE_COLLEGE,
                 justification,
                 ancrer(justification, verbatim),
+                verbatim,
                 chemin=champ,
             )
         )
