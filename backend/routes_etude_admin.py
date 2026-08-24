@@ -76,6 +76,20 @@ class LigneDossier(BaseModel):
     cree_a: str
     abandonne: bool
     motif_abandon: str | None
+    #: OU EN EST CE DOSSIER, en un mot et sans ambiguite.
+    #:
+    #: Il fallait auparavant le deduire de trois champs — `abandonne`,
+    #: `caracteres_modifies` a nul, `nb_decidees` — et la deduction se faisait
+    #: de tete, differemment selon l'ecran. Un dossier affiche mais jamais
+    #: valide se lisait comme un dossier accepte tel quel.
+    #:
+    #: UN DOSSIER NAIT A L'AFFICHAGE DU COMPTE RENDU, pas a son enregistrement.
+    #: C'est cet instant qui date toutes les latences de l'etude ; l'ouvrir
+    #: plus tard mesurerait le temps de calcul du serveur au lieu du temps de
+    #: lecture. Un praticien qui genere un compte rendu puis s'en va laisse
+    #: donc une ligne ici — et c'est voulu : sans elle, l'etude ne verrait que
+    #: les cas menes a terme, c'est-a-dire seulement les succes.
+    statut: str
     nb_propositions: int
     nb_decidees: int
     caracteres_modifies: int | None
@@ -328,6 +342,31 @@ async def _pauses_par_dossier(base: AsyncSession) -> dict[str, tuple[int, int]]:
     }
 
 
+#: Les trois etats possibles d'un dossier, et ils s'excluent.
+STATUT_ABANDONNE: Final = "abandonne"
+STATUT_VALIDE: Final = "valide"
+STATUT_EN_COURS: Final = "en_cours"
+
+
+def _statut(dossier: EtudeDossier) -> str:
+    """Ou en est ce dossier, en un mot.
+
+    L'ORDRE COMPTE. Un abandon horodate `t5_cloture` comme une cloture : tester
+    la cloture en premier ferait passer tout abandon pour un compte rendu mene
+    a terme, et le taux d'achevement publie serait faux.
+
+    « en_cours » couvre aussi bien le dossier qu'on est en train de rediger que
+    celui qui a ete genere puis laisse la. Les distinguer demanderait de decider
+    a partir de quel silence un praticien est parti — ce que rien n'observe. On
+    ne le devine donc pas : c'est la cloture, ou l'abandon declare, qui tranche.
+    """
+    if dossier.abandonne:
+        return STATUT_ABANDONNE
+    if dossier.t5_cloture is not None:
+        return STATUT_VALIDE
+    return STATUT_EN_COURS
+
+
 async def _corpus(
     base: AsyncSession, couples: list[tuple[EtudeDossier, str | None]]
 ) -> dict[str, object]:
@@ -491,6 +530,7 @@ async def lister_dossiers(_admin: Admin, db: Base) -> list[LigneDossier]:
                 cree_a=dossier.cree_a.isoformat(),
                 abandonne=dossier.abandonne,
                 motif_abandon=dossier.motif_abandon,
+                statut=_statut(dossier),
                 nb_propositions=len(propositions),
                 nb_decidees=sum(1 for p in propositions if p.decision is not None),
                 caracteres_modifies=dossier.caracteres_modifies,

@@ -522,3 +522,46 @@ def test_un_commentaire_vide_ne_compte_pas_pour_un_commentaire(client):
     )
     main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
     assert client.get("/admin/etude/synthese").json()["corpus"]["nb_commentes"] == 0
+
+
+def test_le_statut_d_un_dossier_est_explicite_et_ne_se_deduit_plus(client):
+    """UN DOSSIER NAIT A L'AFFICHAGE, PAS A L'ENREGISTREMENT.
+
+    Le proprietaire retrouvait dans son compte un compte rendu qu'il n'avait
+    jamais enregistre, et soupconnait un bug. C'est voulu : le dossier date
+    l'affichage, donc toutes les latences de l'etude. Sans lui, on ne verrait
+    que les cas menes a terme — c'est-a-dire seulement les succes.
+
+    Ce qui manquait, c'est de le DIRE. Le statut se deduisait de trois champs,
+    de tete et differemment selon l'ecran, si bien qu'un dossier affiche mais
+    jamais valide se lisait comme un dossier accepte tel quel.
+    """
+    dossier = _dicter_et_generer(client)
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+
+    ligne = client.get("/admin/etude/dossiers").json()[0]
+    assert ligne["id"] == dossier["dossier_id"]
+    assert ligne["statut"] == "en_cours", (
+        "un compte rendu affiche mais jamais valide doit se lire « en cours »"
+    )
+
+    main.app.dependency_overrides[get_current_user] = lambda: _user(PRATICIEN)
+    client.post(
+        f"/etude/dossiers/{dossier['dossier_id']}/cloture",
+        json={"cr_valide": CR_VALIDE},
+    )
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+    assert client.get("/admin/etude/dossiers").json()[0]["statut"] == "valide"
+
+
+def test_un_abandon_ne_se_lit_jamais_comme_un_dossier_valide(client):
+    """L'ORDRE DU TEST COMPTE. Un abandon horodate `t5_cloture` comme une
+    cloture : verifier la cloture en premier ferait passer tout abandon pour un
+    compte rendu mene a terme, et le taux d'achevement publie serait faux."""
+    dossier = _dicter_et_generer(client)
+    client.post(
+        f"/etude/dossiers/{dossier['dossier_id']}/abandon",
+        json={"motif": "interruption"},
+    )
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+    assert client.get("/admin/etude/dossiers").json()[0]["statut"] == "abandonne"

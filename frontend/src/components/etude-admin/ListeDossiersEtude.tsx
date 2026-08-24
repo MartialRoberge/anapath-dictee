@@ -7,6 +7,14 @@ import { cn } from "@/lib/utils";
 /* ------------------------------------------------------------------ */
 
 export interface LigneDossierEtude {
+  /**
+   * Ou en est ce dossier : "en_cours" | "valide" | "abandonne".
+   *
+   * Calcule par le SERVEUR. Il se deduisait auparavant de trois champs, de
+   * tete et differemment selon l'ecran — un dossier affiche mais jamais valide
+   * se lisait comme un dossier accepte tel quel.
+   */
+  statut?: "en_cours" | "valide" | "abandonne";
   id: string;
   praticien_id: string;
   /** Le NOM. La pseudonymisation a sa place dans l'export, pas ici : sur

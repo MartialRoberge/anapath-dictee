@@ -153,6 +153,9 @@ const MOTIF_ABANDON_LABELS: Record<string, string> = {
  * dont le praticien n'a jamais dit qu'il etait termine.
  */
 function estValide(dossier: LigneDossierEtude): boolean {
+  // Le serveur fait foi quand il repond. La deduction locale reste un repli
+  // pour les lignes servies avant que le statut n'existe.
+  if (dossier.statut !== undefined) return dossier.statut === "valide";
   return dossier.caracteres_modifies !== null;
 }
 
@@ -648,12 +651,17 @@ function CarteDossier({
         ) : valide ? (
           <Badge variant="success" className="gap-1 text-[0.6rem] text-success">
             <CheckCircle2 className="h-3 w-3" />
-            Valide
+            Validé
           </Badge>
         ) : (
+          /* « EN COURS », et non « non validé ». Un dossier nait a l'affichage
+             du compte rendu, pas a son enregistrement : c'est cet instant qui
+             date toutes les latences. Le dire « non validé » laissait croire a
+             un refus, alors qu'il s'agit d'un travail commence — ou d'un cas
+             que le praticien a laisse la, ce que l'etude doit voir. */
           <Badge variant="warning" className="gap-1 text-[0.6rem]">
             <AlertTriangle className="h-3 w-3" />
-            Non valide
+            En cours
           </Badge>
         )}
       </div>
@@ -775,6 +783,18 @@ export default function VuePraticiens({
             <ArrowLeft className="h-3.5 w-3.5" />
             Tous les praticiens
           </Button>
+          {/* CE QU'EST UN DOSSIER, dit une fois pour toutes.
+              Sans cette phrase, on cherche pourquoi un compte rendu qu'on n'a
+              jamais enregistre apparait ici, et on soupconne un bug. */}
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            Un dossier s'ouvre dès que le compte rendu s'affiche à l'écran, pas
+            à son enregistrement : c'est cet instant qui date les temps de
+            lecture. Un cas généré puis laissé de côté figure donc ici, en
+            « en cours » — sans lui, l'étude ne verrait que les cas menés à
+            terme. Supprimer un compte rendu de son historique personnel ne
+            retire pas son dossier d'étude : la mesure ne doit pas disparaître
+            quand quelqu'un range ses fichiers.
+          </p>
           <div className="flex flex-wrap items-center gap-2">
             <UserRound className="h-4 w-4 shrink-0 text-primary" />
             <h2
