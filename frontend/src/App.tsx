@@ -29,7 +29,7 @@ import CompteRenduTravail from "./components/travail/CompteRenduTravail";
 import ReportPanel from "./components/ReportPanel";
 import CodificationPanel from "./components/CodificationPanel";
 import Confirmation from "./components/ui/Confirmation";
-import { signalerVues } from "./services/etude";
+import { renoncerAuDossier, signalerVues } from "./services/etude";
 import {
   decouperEnBlocs,
   remplacerTexteDuBloc,
@@ -54,6 +54,7 @@ import type {
 } from "./services/api";
 import ExplainPanel from "./components/ExplainPanel";
 import { computeCompletion } from "./lib/completion";
+import { findFieldKnowledge } from "./data/field-knowledge";
 import {
   createDraftId,
   loadLatestDraft,
@@ -595,14 +596,22 @@ export default function App() {
       const trouve = manquants.find(
         (m) => m.champ.trim().toLowerCase() === cle,
       );
-      if (!trouve) return undefined;
+      // LA REGLE METIER ET SA SOURCE, en plus de ce que le modele a dit.
+      // Elle vient d'une base ecrite a la main — jamais du modele : une source
+      // generee serait une source inventee, et c'est precisement la source qui
+      // fait qu'un praticien accepte ou refuse une demande.
+      const savoir = findFieldKnowledge(champ, organeDetecte);
+      if (!trouve && !savoir) return undefined;
       return {
-        declencheur: trouve.declencheur ?? null,
-        raison: trouve.raison ?? null,
-        options: trouve.options ?? [],
+        declencheur: trouve?.declencheur ?? null,
+        raison: trouve?.raison ?? null,
+        options: trouve?.options ?? [],
+        norme: savoir?.norm ?? null,
+        enjeu: savoir?.why ?? null,
+        risque: savoir?.risk ?? null,
       };
     },
-    [manquants],
+    [manquants, organeDetecte],
   );
 
   /** Le compte rendu decoupe en surface de travail. Refait a chaque frappe :
@@ -943,7 +952,12 @@ export default function App() {
       // interruption du dossier.
       const dossier = etude.dossierId;
       await horloge.cloturer();
-      const resultat = await etude.clore({ cr_valide: report });
+      const resultat = await etude.clore({
+        cr_valide: report,
+        // Relie le dossier au compte rendu enregistre : supprimer l'un
+        // supprimera l'autre.
+        rapport_id: data.id,
+      });
       if (dossier) {
         setDossierQuestionne(dossier);
         setQuestionnaireDu(
@@ -1340,7 +1354,7 @@ export default function App() {
       <Confirmation
         ouverte={confirmerNouveau}
         titre="Ce compte rendu n'est pas enregistré"
-        message="Vous pouvez l'enregistrer avant de repartir, ou le laisser de côté."
+        message="Enregistré, il rejoint votre historique et l'étude. Sinon il est supprimé — rien n'en est conservé."
         onAnnuler={() => setConfirmerNouveau(false)}
         actions={[
           {
@@ -1352,9 +1366,14 @@ export default function App() {
             },
           },
           {
-            libelle: "Continuer sans enregistrer",
+            libelle: "Ne pas garder ce cas",
             onChoisir: () => {
               setConfirmerNouveau(false);
+              // Le dossier d'etude part avec lui : un cas genere puis quitte
+              // n'a rien mesure, et le garder ferait baisser tous les taux
+              // d'achevement avec des lignes vides.
+              const dossier = etude.dossierId;
+              if (dossier) void renoncerAuDossier(dossier);
               handleReset();
             },
           },

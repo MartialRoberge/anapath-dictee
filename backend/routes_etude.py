@@ -108,6 +108,10 @@ class Cloture(BaseModel):
     #: Ce que le praticien dit du compte rendu en le validant. Souvent la
     #: seule trace de ce qui l'a gene sans qu'aucune case ne le capture.
     commentaire_validation: str | None = None
+    #: L'identifiant du compte rendu enregistre, quand il y en a un. Il relie
+    #: les deux stockages : sans lui, supprimer le compte rendu laissait son
+    #: dossier d'etude dans tous les taux.
+    rapport_id: str | None = None
 
 
 class Abandon(BaseModel):
@@ -390,6 +394,7 @@ async def clore_dossier(
             omission_texte=corps.omission_texte,
             nb_prelevements_corrige=corps.nb_prelevements_corrige,
             commentaire_validation=corps.commentaire_validation,
+            rapport_id=corps.rapport_id,
         )
     except EtudeRefus as refus:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(refus)) from refus
@@ -513,3 +518,43 @@ async def repondre(
     except EtudeRefus as refus:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(refus)) from refus
     return {"items_enregistres": ecrites}
+
+
+@router.delete("/dossiers/{dossier_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def renoncer_au_dossier(
+    dossier_id: str,
+    utilisateur: Utilisateur,
+    db: Base,
+) -> None:
+    """Le praticien repart sans garder ce cas : le dossier DISPARAIT.
+
+    POURQUOI SUPPRIMER PLUTOT QU'ARCHIVER. Un compte rendu genere puis quitte
+    sans etre enregistre n'est pas une donnee : le praticien n'a pas travaille
+    dessus, il n'a pas fini, il n'a pas eu le temps. Le garder gonflerait le
+    corpus de cas vides, ferait baisser tous les taux d'achevement et
+    encombrerait l'ecran de suivi de lignes qui ne disent rien.
+
+    L'ABANDON DECLARE, LUI, RESTE. Ce sont deux gestes differents : un abandon
+    est un renoncement MOTIVE sur un cas qu'on a regarde, et c'est une mesure
+    precieuse — savoir pourquoi un praticien renonce vaut mieux que de ne rien
+    savoir. Ici, il n'y a rien a mesurer.
+
+    La cascade emporte propositions, prelevements, pauses, releves d'ergonomie
+    et reponses de questionnaire rattaches a ce dossier : une ligne fille
+    orpheline resterait comptee dans un denominateur sans que rien ne le
+    signale, ce qui est pire que l'absence de donnee.
+    """
+    base = _exiger_base(db)
+    dossier = await _dossier_du_praticien(base, dossier_id, utilisateur.id)
+
+    # UN DOSSIER CLOS NE SE SUPPRIME PAS ICI. Le praticien l'a valide : la
+    # mesure existe et lui appartient a l'etude, plus a lui seul. Le retirer
+    # demanderait une exclusion motivee, cote administration.
+    if dossier.t5_cloture is not None:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "Ce compte rendu a ete valide : il ne peut plus etre abandonne ici.",
+        )
+
+    await base.delete(dossier)
+    await base.commit()

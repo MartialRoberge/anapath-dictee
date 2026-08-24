@@ -245,6 +245,15 @@ export interface ClotureDossier {
   omission_signalee?: boolean | null;
   omission_texte?: string | null;
   nb_prelevements_corrige?: number | null;
+  /**
+   * L'identifiant du compte rendu enregistre, quand il y en a un.
+   *
+   * Il RELIE les deux stockages. Sans lui, supprimer le compte rendu de son
+   * historique laissait son dossier d'etude — decisions, temps, reponses —
+   * dans tous les taux publies : on croyait avoir supprime, on avait supprime
+   * la moitie.
+   */
+  rapport_id?: string | null;
 }
 
 export interface ResultatCloture {
@@ -615,6 +624,29 @@ export async function signalerVues(
   try {
     await poster(`/dossiers/${dossierId}/vues`, {
       propositions: [...propositions],
+    });
+  } catch {
+    // Silencieux a dessein : voir le commentaire ci-dessus.
+  }
+}
+
+/**
+ * Le praticien repart sans garder ce cas : le dossier disparait.
+ *
+ * Un compte rendu genere puis quitte sans etre enregistre n'est pas une
+ * donnee — il n'a pas ete travaille. Le garder gonflerait le corpus de cas
+ * vides et ferait baisser tous les taux d'achevement.
+ *
+ * Ne leve pas : si la suppression echoue, le praticien doit quand meme pouvoir
+ * repartir sur un nouveau compte rendu. Le dossier restera « en cours » cote
+ * administration, ce qui se voit et se rattrape ; le bloquer ici ne se
+ * rattraperait pas.
+ */
+export async function renoncerAuDossier(dossierId: string): Promise<void> {
+  try {
+    await fetch(`${API_BASE}/etude/dossiers/${dossierId}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
     });
   } catch {
     // Silencieux a dessein : voir le commentaire ci-dessus.

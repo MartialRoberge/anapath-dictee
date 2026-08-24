@@ -1,5 +1,12 @@
 import { useMemo } from "react";
-import { CheckCircle2, CircleDot, FileText, Quote } from "lucide-react";
+import {
+  AlertTriangle,
+  BookMarked,
+  CheckCircle2,
+  CircleDot,
+  FileText,
+  Quote,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Bloc, Trou } from "@/lib/blocsTexte";
 import type { PointATraiter } from "@/lib/pointsATraiter";
@@ -220,6 +227,34 @@ function Explication({ bloc, trou }: { bloc: Bloc; trou: Trou | null }) {
             {trou.raison}
           </p>
         )}
+
+        {/* LA REGLE ET SA SOURCE. C'est la difference entre « il figure ça »
+            et une explication sur laquelle un praticien peut s'appuyer : il ne
+            change pas sa pratique parce qu'un logiciel le lui demande, mais
+            parce qu'une reference qu'il connait le dit. */}
+        {trou.norme !== null && (
+          <div className="rounded-md border border-sky-500/30 bg-sky-500/[0.06] px-2 py-1.5">
+            <p className="flex items-start gap-1.5 text-[0.62rem] font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300">
+              <BookMarked className="mt-px h-3 w-3 shrink-0" />
+              Selon
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-foreground">
+              {trou.norme}
+            </p>
+            {trou.enjeu !== null && (
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                {trou.enjeu}
+              </p>
+            )}
+            {trou.risque !== null && (
+              <p className="mt-1.5 flex items-start gap-1.5 text-xs leading-relaxed text-muted-foreground">
+                <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0 text-amber-600" />
+                {trou.risque}
+              </p>
+            )}
+          </div>
+        )}
+
         {trou.options.length > 0 && (
           <p className="text-xs leading-relaxed text-muted-foreground">
             Les valeurs proposées sont les seules possibles pour ce champ. Vous

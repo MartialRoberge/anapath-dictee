@@ -470,6 +470,7 @@ async def clore_dossier(
     omission_texte: str | None = None,
     nb_prelevements_corrige: int | None = None,
     commentaire_validation: str | None = None,
+    rapport_id: str | None = None,
 ) -> EtudeDossier | None:
     """Fige le compte rendu valide, son commentaire et la charge d'edition.
 
@@ -494,6 +495,8 @@ async def clore_dossier(
     dossier.omission_texte = omission_texte
     dossier.nb_prelevements_corrige = nb_prelevements_corrige
     dossier.commentaire_validation = _commentaire(commentaire_validation)
+    if rapport_id is not None:
+        dossier.rapport_id = rapport_id
     dossier.nb_blocs_non_vus = await _compter_non_vus(db, dossier_id)
     dossier.t5_cloture = _maintenant()
     await db.commit()

@@ -363,7 +363,7 @@ function TableauPraticiens({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Comptes utilisateurs — le versant nominatif                        */
+/*  Comptes rendus enregistres — le versant nominatif                  */
 /* ------------------------------------------------------------------ */
 
 interface CompteUtilisateur {
@@ -912,12 +912,17 @@ export default function VuePraticiens({
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-sm font-bold">Comptes utilisateurs</h2>
+          {/* « PRATICIEN » PARTOUT, ET UNE SEULE FOIS.
+              Il n'y a qu'une identite en base : `praticien_id` est une cle
+              etrangere vers `users.id`. « Praticien » et « compte utilisateur »
+              designaient la meme personne sous deux noms, et faisaient croire a
+              deux listes de gens differents. */}
+          <h2 className="text-sm font-bold">Comptes rendus enregistrés</h2>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Les comptes rendus enregistres, avec le nom du compte, l'avis laisse
-            et les modifications journalisees. Ces enregistrements ne portent pas
-            l'identifiant d'etude : les deux listes restent donc distinctes,
-            plutot que rapprochees a tort sur une ressemblance de dates.
+            Les comptes rendus que les praticiens ont enregistrés, avec l'avis
+            laissé et les modifications journalisées. Ce sont les mêmes
+            praticiens que ci-dessus : la liste précédente montre leurs cas
+            d'étude, celle-ci leurs comptes rendus.
           </p>
         </div>
 

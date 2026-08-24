@@ -565,3 +565,39 @@ def test_un_abandon_ne_se_lit_jamais_comme_un_dossier_valide(client):
     )
     main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
     assert client.get("/admin/etude/dossiers").json()[0]["statut"] == "abandonne"
+
+
+def test_quitter_sans_enregistrer_efface_le_dossier(client):
+    """Un cas genere puis quitte n'est PAS une donnee.
+
+    Le praticien n'a pas travaille dessus, il n'a pas fini, il n'a pas eu le
+    temps. Le garder gonflerait le corpus de cas vides, ferait baisser tous les
+    taux d'achevement, et encombrerait l'ecran de suivi de lignes qui ne disent
+    rien. L'abandon DECLARE, lui, reste : c'est un renoncement motive sur un cas
+    qu'on a regarde, et savoir pourquoi vaut mieux que ne rien savoir.
+    """
+    dossier = _dicter_et_generer(client)
+    assert (
+        client.delete(f"/etude/dossiers/{dossier['dossier_id']}").status_code == 204
+    )
+
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+    assert client.get("/admin/etude/dossiers").json() == []
+    assert client.get("/admin/etude/synthese").json()["corpus"]["nb_dossiers"] == 0
+
+
+def test_un_dossier_valide_ne_se_supprime_plus_du_cote_praticien(client):
+    """La mesure existe et appartient a l'etude. La retirer demande une
+    exclusion motivee, cote administration — pas un clic dans l'atelier."""
+    dossier = _dicter_et_generer(client)
+    client.post(
+        f"/etude/dossiers/{dossier['dossier_id']}/cloture",
+        json={"cr_valide": CR_VALIDE},
+    )
+    assert client.delete(f"/etude/dossiers/{dossier['dossier_id']}").status_code == 409
+
+
+def test_le_dossier_d_un_autre_praticien_ne_se_supprime_pas(client):
+    dossier = _dicter_et_generer(client)
+    main.app.dependency_overrides[get_current_user] = lambda: _user("intrus")
+    assert client.delete(f"/etude/dossiers/{dossier['dossier_id']}").status_code == 403

@@ -298,6 +298,25 @@ async def delete_report(
     if report is None:
         raise HTTPException(status_code=404, detail="CR non trouve")
 
+    # LE DOSSIER D'ETUDE PART AVEC LE COMPTE RENDU.
+    #
+    # Les deux stockages etaient etrangers l'un a l'autre : le praticien
+    # supprimait un compte rendu de son historique et son dossier d'etude
+    # restait, avec ses decisions, ses temps et ses reponses, dans tous les
+    # taux publies. Il croyait avoir supprime ; il avait supprime la moitie.
+    #
+    # Suppression EXPLICITE plutot qu'une cascade du schema : effacer des
+    # mesures d'etude par un effet de bord serait le genre de disparition
+    # qu'on ne remarque qu'au depouillement, des mois plus tard. Ici, c'est
+    # ecrit, c'est audite, et la cascade des lignes filles part de ce delete.
+    from etude.models import EtudeDossier  # local : evite un cycle d'import
+
+    dossiers = await db.execute(
+        select(EtudeDossier).where(EtudeDossier.rapport_id == report_id)
+    )
+    for dossier in dossiers.scalars().all():
+        await db.delete(dossier)
+
     await db.delete(report)
 
     audit = AuditLog(

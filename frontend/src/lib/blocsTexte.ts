@@ -51,6 +51,23 @@ export interface Trou {
    * sans la remettre en cause.
    */
   options: readonly string[];
+  /**
+   * LA REGLE METIER qui rend ce champ attendu, et sa SOURCE nommee.
+   *
+   * C'est la difference entre « il figure ça » et « selon la classification
+   * OMS 2022 / les donnees minimales INCa ». Un praticien ne change pas sa
+   * pratique parce qu'un logiciel le lui demande ; il la change parce qu'une
+   * reference qu'il connait le dit. Sans la source nommee, l'explicabilite
+   * n'apporte rien a sa decision.
+   *
+   * Ces phrases viennent d'une base de connaissances ecrite a la main, jamais
+   * du modele : une source generee serait une source inventee.
+   */
+  norme: string | null;
+  /** Ce que ce champ conditionne en pratique. */
+  enjeu: string | null;
+  /** Ce qui se passe s'il manque. */
+  risque: string | null;
 }
 
 export interface Bloc {
@@ -139,6 +156,9 @@ export function trousDe(
       declencheur: complement?.declencheur ?? null,
       raison: complement?.raison ?? null,
       options: complement?.options ?? [],
+      norme: complement?.norme ?? null,
+      enjeu: complement?.enjeu ?? null,
+      risque: complement?.risque ?? null,
     });
   }
   return trous;

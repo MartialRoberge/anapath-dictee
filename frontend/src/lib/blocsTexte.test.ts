@@ -93,9 +93,15 @@ describe("trous", () => {
       declencheur: "adénome tubuleux",
       raison: "Un adénome se grade toujours.",
       options: ["bas grade", "haut grade"],
+      norme: "OMS Classification of Tumours, 5e édition",
+      enjeu: "Le grade conditionne le rythme de surveillance.",
+      risque: null,
     }));
     expect(trou.declencheur).toBe("adénome tubuleux");
     expect(trou.options).toEqual(["bas grade", "haut grade"]);
+    // LA SOURCE NOMMEE : c'est elle qui fait la difference entre « il figure
+    // ça » et une explication sur laquelle un praticien peut s'appuyer.
+    expect(trou.norme).toBe("OMS Classification of Tumours, 5e édition");
   });
 
   it("laisse les options vides quand rien ne les renseigne", () => {

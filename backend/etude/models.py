@@ -114,6 +114,22 @@ class EtudeDossier(Base):
     #: commentes serait faux.
     commentaire_validation: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    #: LE COMPTE RENDU ENREGISTRE auquel ce dossier correspond, quand il y en a
+    #: un. Pose a la cloture.
+    #:
+    #: Sans ce lien, les deux stockages etaient etrangers l'un a l'autre : le
+    #: praticien supprimait un compte rendu de son historique et le dossier
+    #: d'etude restait, avec ses decisions et ses temps, dans tous les taux.
+    #: Il croyait avoir supprime, il avait supprime la moitie.
+    #:
+    #: `SET NULL` et non `CASCADE` : la suppression du compte rendu emporte le
+    #: dossier explicitement, dans la route, et non par un effet de bord du
+    #: schema. Une cascade silencieuse sur des mesures d'etude serait le genre
+    #: d'effacement qu'on ne remarque qu'au depouillement.
+    rapport_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("reports.id", ondelete="SET NULL"), nullable=True
+    )
+
     #: Nombre de blocs JAMAIS AFFICHES a l'ecran au moment de la cloture.
     #:
     #: Un compte rendu valide dont la moitie des blocs n'a jamais ete affichee
