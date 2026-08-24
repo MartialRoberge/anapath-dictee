@@ -55,6 +55,13 @@ export interface Trou {
 
 export interface Bloc {
   id: string;
+  /**
+   * Le bloc est un element de liste. La puce est RETIREE du texte et rendue a
+   * part : la garder dans le texte l'affichait telle quelle (« - Trois
+   * fragments ») puisque le rendu Markdown est neutralise en ligne, et le
+   * compte rendu perdait ses listes.
+   */
+  puce: boolean;
   /** Offsets dans le compte rendu complet : c'est lui la source de verite. */
   debut: number;
   fin: number;
@@ -80,6 +87,9 @@ const MARQUEUR_TROU = /\[A COMPLETER\s*:\s*([^\]]+)\]/gi;
 
 /** Une ligne de tableau Markdown. Elle se lit, elle ne se decide pas. */
 const LIGNE_TABLEAU = /^\s*\|/;
+
+/** Une puce ou une numerotation en debut de ligne. */
+const MARQUEUR_LISTE = /^\s*(?:[-*+]|\d+[.)])\s+/;
 
 function cleDeSection(libelle: string): string {
   return libelle
@@ -205,6 +215,27 @@ export function decouperEnBlocs({
       continue;
     }
 
+    const listeTrouvee = MARQUEUR_LISTE.exec(ligne);
+    if (listeTrouvee !== null) {
+      const decalage = listeTrouvee[0].length;
+      const contenu = ligne.slice(decalage);
+      const point = parTexte.get(normaliser(contenu)) ?? null;
+      const trous = trousDe(contenu, renseignerTrou);
+      blocs.push(
+        construire(
+          contenu,
+          debutLigne + decalage,
+          sectionCle,
+          sectionLibelle,
+          natureDe(point),
+          point,
+          trous,
+          true,
+        ),
+      );
+      continue;
+    }
+
     for (const phrase of phrasesDe(ligne)) {
       const point = parTexte.get(normaliser(phrase.texte)) ?? null;
       const trous = trousDe(phrase.texte, renseignerTrou);
@@ -250,9 +281,11 @@ function construire(
   nature: NatureBloc,
   point: PointATraiter | null,
   trous: readonly Trou[],
+  puce = false,
 ): Bloc {
   return {
     id: `bloc:${debut}`,
+    puce,
     debut,
     fin: debut + texte.length,
     texte,

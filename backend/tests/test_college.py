@@ -340,7 +340,14 @@ async def test_une_lentille_muette_fait_soumettre_par_prudence(moteur):
 async def test_les_justifications_sont_celles_que_les_relecteurs_ont_ecrites(moteur):
     """La justification affichee au praticien n'est ni reformulee ni reecrite :
     c'est ce que les relecteurs ont ecrit en jugeant. Sinon ce n'est plus de
-    l'explicabilite, c'est de la generation."""
+    l'explicabilite, c'est de la generation.
+
+    ELLE NE PORTE PAS NON PLUS LE NOM DE LA LENTILLE. « litteraliste : ... »
+    arrivait tel quel sous les yeux du praticien, qui n'a aucune raison de
+    savoir comment MARC est construit. Ces mots ne lui disent rien et donnent
+    l'impression d'une machinerie qui parle d'elle-meme au lieu d'expliquer.
+    La lentille reste dans les avis, pour le depouillement, ou elle a un sens.
+    """
     sceptique = _tout_soutenu()
     sceptique[3] = (False, "")
     provider = ProviderDeCollege(
@@ -349,10 +356,12 @@ async def test_les_justifications_sont_celles_que_les_relecteurs_ont_ecrites(mot
     report, _ = await _propositions(moteur(provider), provider)
 
     justifications = _soumission(report, rang=3)["justifications"]
-    assert justifications == [
-        f"{LITTERALISTE} : {_motif(LITTERALISTE, 3)}",
-        f"{SCEPTIQUE} : {_motif(SCEPTIQUE, 3)}",
-    ]
+    # Le motif SEUL, sans « litteraliste : » colle devant. Le nom de la
+    # lentille figure ici a l'interieur du motif parce que le faux relecteur le
+    # fabrique ainsi — ce que le test verifie, c'est l'absence du PREFIXE.
+    assert justifications == [_motif(LITTERALISTE, 3), _motif(SCEPTIQUE, 3)]
+    assert not any(j.startswith(f"{LITTERALISTE} :") for j in justifications)
+    assert not any(j.startswith(f"{SCEPTIQUE} :") for j in justifications)
 
 
 async def test_l_empan_affiche_est_celui_que_le_college_a_verifie(moteur):

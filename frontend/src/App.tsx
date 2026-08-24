@@ -26,6 +26,7 @@ import { formatTranscription, getReport, iterateReport, saveReport, sendFeedback
 import { useEtudeDossier } from "./hooks/useEtudeDossier";
 import PanneauExplicabilite from "./components/travail/PanneauExplicabilite";
 import CompteRenduTravail from "./components/travail/CompteRenduTravail";
+import ReportPanel from "./components/ReportPanel";
 import { signalerVues } from "./services/etude";
 import { decouperEnBlocs, remplirTrou } from "./lib/blocsTexte";
 import type { Bloc, Trou } from "./lib/blocsTexte";
@@ -85,38 +86,34 @@ function Sidebar({
   page,
   setPage,
   setActiveView,
-  hasReport,
   isAdmin,
   onLogout,
-  completionCount,
-  onOpenDrawer,
 }: {
   page: Page;
   setPage: (p: Page) => void;
   setActiveView: (v: AppView) => void;
-  hasReport: boolean;
   isAdmin: boolean;
   onLogout: () => void;
-  completionCount: number;
-  onOpenDrawer: () => void;
 }) {
   // Espace de travail unifié : un seul point d'entrée « Atelier »
   // (le recorder et le compte-rendu cohabitent dans la même vue).
-  const items = [
+  const items: {
+    icon: typeof LayoutPanelLeft;
+    label: string;
+    active: boolean;
+    onClick: () => void;
+    disabled?: boolean;
+    badge?: number;
+  }[] = [
     {
       icon: LayoutPanelLeft,
       label: "Atelier",
       active: page === "app",
       onClick: () => { setPage("app"); setActiveView("record"); },
     },
-    {
-      icon: ListChecks,
-      label: "À compléter",
-      active: false,
-      onClick: onOpenDrawer,
-      disabled: !hasReport,
-      badge: completionCount > 0 ? completionCount : undefined,
-    },
+    // « À compléter » n'est plus un panneau a part : la meme liste vit dans
+    // l'analyse, a cote du texte, et deux listes identiques a deux endroits
+    // faisaient croire a deux choses differentes.
     {
       icon: History,
       label: "Historique",
@@ -356,6 +353,17 @@ export default function App() {
   const [trouSelectionne, setTrouSelectionne] = useState<Trou | null>(null);
   /** Demande de defilement vers un bloc, depuis la checklist. */
   const [allerA, setAllerA] = useState<string | null>(null);
+  /**
+   * Deux modes sur le MEME texte : travailler, ou ecrire.
+   *
+   * La surface a blocs sert a trancher ce que MARC propose. Elle ne remplace
+   * pas l'ecriture libre — un compte rendu se retouche partout, tout le temps,
+   * et n'avoir que des boutons obligeait a passer par « corriger » puis a
+   * retaper la phrase entiere pour changer un mot.
+   *
+   * Un seul texte derriere les deux : basculer ne perd rien.
+   */
+  const [modeEdition, setModeEdition] = useState(false);
   /** Ce qui a ete verse au contexte, du plus recent au plus ancien. */
   const [historiqueAjouts, setHistoriqueAjouts] = useState<AjoutContexte[]>([]);
 
@@ -972,11 +980,8 @@ export default function App() {
         page={page}
         setPage={setPage}
         setActiveView={setActiveView}
-        hasReport={report !== null}
         isAdmin={user.role === "admin"}
         onLogout={logout}
-        completionCount={completion.remaining}
-        onOpenDrawer={() => setDrawerOpen(true)}
       />
 
       {/* Main content */}
@@ -1116,6 +1121,42 @@ export default function App() {
                     refuser, combler un trou, choisir dans une liste : tout se
                     fait ici, sur la phrase concernee. Le panneau de gauche
                     explique et ne commande rien. */}
+                {/* DEUX MODES SUR LE MEME TEXTE. « Travailler » pour
+                    trancher ce que MARC propose, « Écrire » pour retoucher
+                    librement. Basculer ne perd rien : c'est le meme texte. */}
+                <div className="mb-3 flex items-center gap-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setModeEdition(false)}
+                    className={
+                      !modeEdition
+                        ? "rounded-md bg-primary px-2.5 py-1 font-medium text-primary-foreground"
+                        : "rounded-md px-2.5 py-1 text-muted-foreground hover:bg-accent"
+                    }
+                  >
+                    Travailler
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModeEdition(true)}
+                    className={
+                      modeEdition
+                        ? "rounded-md bg-primary px-2.5 py-1 font-medium text-primary-foreground"
+                        : "rounded-md px-2.5 py-1 text-muted-foreground hover:bg-accent"
+                    }
+                  >
+                    Écrire librement
+                  </button>
+                </div>
+
+                {modeEdition ? (
+                  <ReportPanel
+                    report={report}
+                    onReportChange={setReport}
+                    organeDetecte={organeDetecte}
+                    pendingCount={completion.remaining}
+                  />
+                ) : (
                 <CompteRenduTravail
                   blocs={blocs}
                   decisions={decisionsParBloc}
@@ -1128,6 +1169,7 @@ export default function App() {
                   onVu={signalerBlocVu}
                   allerA={allerA}
                 />
+                )}
 
                 {savedReportId && (
                   <FeedbackPanel

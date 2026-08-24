@@ -151,10 +151,32 @@ def _voix(avis: list[Avis], transcription: str) -> tuple[int, Empan | None, bool
 
 
 def _justifications(avis: list[Avis]) -> tuple[str, ...]:
-    """Les motifs reellement ecrits par les relecteurs, sans reformulation."""
-    return tuple(
-        f"{un_avis.lentille} : {un_avis.motif}" for un_avis in avis if un_avis.motif
-    )
+    """Les motifs reellement ecrits, sans reformulation ET SANS PREFIXE.
+
+    Le nom de la lentille etait colle devant chaque motif — « litteraliste :
+    ... », « sceptique : ... ». Ces mots arrivaient tels quels sous les yeux du
+    praticien, qui n'a aucune raison de savoir comment MARC est construit :
+    « litteraliste » et « sceptique » ne veulent rien dire pour lui et donnent
+    l'impression d'une machinerie qui parle d'elle-meme au lieu d'expliquer.
+
+    Le motif seul dit le pourquoi. La lentille reste dans `avis`, pour l'etude
+    et le depouillement, ou elle a un sens.
+
+    Les doublons sont retires : deux lentilles ecrivent souvent la meme chose,
+    et l'afficher deux fois donne a croire a deux raisons distinctes.
+    """
+    vus: set[str] = set()
+    motifs: list[str] = []
+    for un_avis in avis:
+        motif = (un_avis.motif or "").strip()
+        if not motif:
+            continue
+        cle = motif.casefold()
+        if cle in vus:
+            continue
+        vus.add(cle)
+        motifs.append(motif)
+    return tuple(motifs)
 
 
 def _trancher(

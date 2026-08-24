@@ -242,8 +242,15 @@ function Explication({ bloc, trou }: { bloc: Bloc; trou: Trou | null }) {
           </blockquote>
         </div>
       ) : (
+        <p className="rounded-md bg-muted/60 px-2 py-1.5 text-xs leading-relaxed text-muted-foreground">
+          Aucune citation n'est rattachée à ce passage. MARC l'a repris de
+          votre dictée, mais sans désigner le passage exact — relisez-le.
+        </p>
+      )}
+
+      {point !== null && point.pourquoi.length === 0 && (
         <p className="text-xs leading-relaxed text-muted-foreground">
-          Ce passage reprend ce que vous avez dicté.
+          Aucun motif n'a été écrit pour ce point.
         </p>
       )}
 

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Trou } from "@/lib/blocsTexte";
@@ -46,8 +46,23 @@ export default function TrouInline({
   occupe,
 }: TrouInlineProps) {
   const [ouvert, setOuvert] = useState(false);
+  // La saisie SURVIT a la fermeture. Sans cela, refermer par megarde effaçait
+  // ce qui venait d'etre tape, et il fallait tout recommencer.
   const [saisie, setSaisie] = useState("");
   const champRef = useRef<HTMLInputElement>(null);
+  const boite = useRef<HTMLSpanElement>(null);
+
+  // Fermer en cliquant a cote, comme partout ailleurs. Sans cette sortie, le
+  // seul moyen de refermer etait la croix — qui, elle, ecarte le champ.
+  useEffect(() => {
+    if (!ouvert) return;
+    function auClicExterieur(evenement: MouseEvent) {
+      if (boite.current?.contains(evenement.target as Node)) return;
+      setOuvert(false);
+    }
+    document.addEventListener("mousedown", auClicExterieur);
+    return () => document.removeEventListener("mousedown", auClicExterieur);
+  }, [ouvert]);
 
   const aOptions = trou.options.length > 0;
 
@@ -91,7 +106,7 @@ export default function TrouInline({
   }
 
   return (
-    <span className="relative mx-0.5 inline-block align-baseline">
+    <span ref={boite} className="relative mx-0.5 inline-block align-baseline">
       <span
         className={cn(
           "inline-flex items-center gap-1 rounded-md border border-amber-500/60",
@@ -129,7 +144,7 @@ export default function TrouInline({
               }}
               placeholder="autre…"
               aria-label={`Autre valeur pour ${trou.champ}`}
-              className="w-20 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
+              className="w-24 min-w-0 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
             />
           </span>
         ) : (
@@ -143,7 +158,7 @@ export default function TrouInline({
             }}
             placeholder={trou.champ}
             aria-label={trou.champ}
-            className="w-40 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            className="w-56 min-w-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         )}
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, HelpCircle, Pencil, X } from "lucide-react";
+import { Check, HelpCircle, Pencil, Undo2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TrouInline from "./TrouInline";
 import MarkdownEnLigne from "./MarkdownEnLigne";
@@ -98,6 +98,8 @@ export default function BlocTexte({
   onVu,
 }: BlocTexteProps) {
   const [correction, setCorrection] = useState<string | null>(null);
+  /** Le praticien rouvre une decision deja prise pour la changer. */
+  const [redecider, setRedecider] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const conteneur = useRef<HTMLDivElement>(null);
   const dejaVu = useRef(false);
@@ -127,6 +129,7 @@ export default function BlocTexte({
     try {
       await onDecider(action, valeur);
       setCorrection(null);
+      setRedecider(false);
     } catch (e) {
       // Le bloc RESTE a decider : effacer la demande sur un echec reseau
       // ferait croire la decision enregistree alors qu'elle est perdue.
@@ -136,7 +139,7 @@ export default function BlocTexte({
 
   const sens = SENS[bloc.nature];
   void sens;
-  const aDecider = bloc.point !== null && decision === null;
+  const aDecider = bloc.point !== null && (decision === null || redecider);
 
   return (
     <div
@@ -162,7 +165,12 @@ export default function BlocTexte({
         eclaire && "ring-2 ring-ring/50 ring-offset-1 ring-offset-background",
       )}
     >
-      <p className="text-[0.95rem] leading-relaxed text-foreground">
+      <p
+        className={cn(
+          "text-[0.95rem] leading-relaxed text-foreground",
+          bloc.puce && "relative pl-4 before:absolute before:left-1 before:content-['•']",
+        )}
+      >
         {segments(bloc).map((segment, rang) =>
           typeof segment === "string" ? (
             <MarkdownEnLigne key={rang} texte={segment} />
@@ -190,7 +198,7 @@ export default function BlocTexte({
           <textarea
             value={correction}
             onChange={(e) => setCorrection(e.target.value)}
-            rows={2}
+            rows={Math.min(8, Math.max(3, Math.ceil(correction.length / 60)))}
             aria-label="Votre formulation"
             className="flex-1 resize-y rounded-md border bg-background px-2 py-1 text-sm"
           />
@@ -259,11 +267,20 @@ export default function BlocTexte({
           revenir sur ce qu'il vient de trancher : un point qui s'evapore
           empeche de revoir son propre parcours, et donne l'impression d'avoir
           perdu quelque chose. */}
-      {decision !== null && (
-        <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[0.65rem] font-medium text-muted-foreground">
+      {decision !== null && !redecider && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setRedecider(true);
+          }}
+          title="Revenir sur cette décision"
+          className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[0.65rem] font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
           <Check className="h-2.5 w-2.5" />
           {COURT[decision] ?? decision}
-        </span>
+          <Undo2 className="h-2.5 w-2.5 opacity-60" />
+        </button>
       )}
     </div>
   );
