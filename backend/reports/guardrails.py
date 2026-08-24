@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import re
+from typing import Final
 
 from models import DonneeManquante
 from reports.engine import GeneratedReport
@@ -140,10 +141,63 @@ def _extract_alertes(payload: dict[str, object]) -> list[DonneeManquante]:
                 champ=champ.strip(),
                 description=desc.strip() if isinstance(desc, str) else "",
                 section=section.strip() if isinstance(section, str) else "microscopie",
-                obligatoire=True,
+                declencheur=_texte_ou_rien(item.get("declencheur")),
+                raison=_texte_ou_rien(item.get("raison")),
+                options=_options_fermees(item.get("options")),
             )
         )
     return alertes
+
+
+def _texte_ou_rien(valeur: object) -> str | None:
+    """Une chaine non vide, ou None. Jamais une chaine vide.
+
+    La difference compte a l'affichage : None se lit « le modele n'a rien
+    fourni » et le champ disparait, la ou une chaine vide dessinerait un
+    intitule suivi d'un blanc, qui se lit « il n'y a pas de raison ».
+    """
+    if not isinstance(valeur, str):
+        return None
+    nettoye = valeur.strip()
+    return nettoye or None
+
+
+#: Au-dela, ce n'est plus un choix, c'est une liste a lire. Le praticien
+#: retapera plus vite qu'il ne parcourra douze entrees.
+_MAX_OPTIONS: Final[int] = 8
+
+
+def _options_fermees(valeur: object) -> list[str]:
+    """Les valeurs proposees au choix, ou rien.
+
+    ON REJETTE LA LISTE ENTIERE plutot que de la rogner quand elle est trop
+    longue. Une liste tronquee reste une liste : le praticien y choisit sans
+    savoir que les valeurs manquantes existaient, et se retrouve enferme dans
+    un sous-ensemble arbitraire. Mieux vaut le champ libre, ou il sait qu'il
+    ecrit ce qu'il veut.
+    """
+    if not isinstance(valeur, list):
+        return []
+    options = [
+        option.strip()
+        for option in valeur
+        if isinstance(option, str) and option.strip()
+    ]
+    # Une seule option n'est pas un choix : c'est une reponse pre-remplie
+    # deguisee en question, et c'est precisement ce qu'on ne veut pas.
+    if len(options) < 2 or len(options) > _MAX_OPTIONS:
+        return []
+    # Doublons retires en gardant l'ordre du modele : deux entrees identiques
+    # dans un menu font douter de la difference entre les deux.
+    vues: set[str] = set()
+    uniques: list[str] = []
+    for option in options:
+        cle = option.casefold()
+        if cle in vues:
+            continue
+        vues.add(cle)
+        uniques.append(option)
+    return uniques if len(uniques) >= 2 else []
 
 
 # ---------------------------------------------------------------------------

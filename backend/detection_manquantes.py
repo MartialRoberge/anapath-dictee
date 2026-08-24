@@ -180,14 +180,23 @@ def extraire_marqueurs_a_completer(rapport: str) -> list[DonneeManquante]:
             continue
 
         section: str = _deviner_section_depuis_contexte(rapport, match.start())
-        est_conditionnel: bool = _est_champ_conditionnel(cle)
 
+        # La distinction conditionnel / systematique portait le caractere
+        # "obligatoire". Ce mot a disparu : MARC n'ordonne pas, il explique.
+        # L'information, elle, reste — convertie en RAISON, qui est ce que le
+        # praticien a besoin de lire pour juger si la question a lieu d'etre.
         resultats.append(
             DonneeManquante(
                 champ=description_brute,
                 description=f"Champ manquant identifie par le systeme : {description_brute}",
                 section=section,
-                obligatoire=not est_conditionnel,
+                raison=(
+                    "Attendu seulement dans certains contextes : verifiez que "
+                    "ce cas en releve."
+                    if _est_champ_conditionnel(cle)
+                    else "Donnee du compte rendu minimal pour ce type de "
+                    "prelevement."
+                ),
             )
         )
 
@@ -280,7 +289,6 @@ def _detecter_sections_multispecimens_manquantes(
                         "section Macroscopie."
                     ),
                     section="macroscopie",
-                    obligatoire=True,
                 )
             )
 
@@ -293,7 +301,6 @@ def _detecter_sections_multispecimens_manquantes(
                         "section Microscopie avec une description morphologique."
                     ),
                     section="microscopie",
-                    obligatoire=True,
                 )
             )
 
@@ -375,7 +382,6 @@ def detecter_champs_obligatoires_manquants(
                     champ=champ.nom,
                     description=champ.exemple_formulation or champ.description,
                     section=champ.section,
-                    obligatoire=True,
                 )
             )
     return manquants

@@ -1,6 +1,6 @@
 """Modèles Pydantic partagés pour l'API Anapath."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class TranscriptionResponse(BaseModel):
@@ -20,12 +20,28 @@ class FormatRequest(BaseModel):
 
 
 class DonneeManquante(BaseModel):
-    """Donnée obligatoire manquante dans le compte-rendu."""
+    """Un trou dans le compte-rendu : ce qui est attendu et n'a pas ete dicte.
+
+    UN TROU N'EST PAS UN BLANC, c'est une question precise rattachee a ce qui
+    l'a declenchee. Le praticien doit pouvoir verifier lui-meme que la question
+    a lieu d'etre, au lieu de la subir.
+    """
 
     champ: str
     description: str
     section: str
-    obligatoire: bool = True
+    #: La phrase DICTEE, recopiee, qui rend ce champ attendu. Elle repond a
+    #: « pourquoi tu me demandes ca ». Recopiee et jamais reformulee : une
+    #: reformulation serait une seconde production du modele, qu'il faudrait
+    #: croire sur parole — l'inverse de l'explicabilite.
+    declencheur: str | None = None
+    #: En une phrase, pourquoi ce champ est attendu APRES cette phrase-la.
+    raison: str | None = None
+    #: La liste FERMEE des valeurs possibles, quand elle existe : le praticien
+    #: choisit au lieu de retaper. VIDE pour une mesure, un compte ou un texte
+    #: libre — proposer trois valeurs plausibles mais fausses est pire que n'en
+    #: proposer aucune, parce qu'on choisit dans une liste sans la contester.
+    options: list[str] = Field(default_factory=list)
 
 
 class CoherenceIssue(BaseModel):

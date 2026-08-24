@@ -251,7 +251,16 @@ sans bloc de code Markdown autour. Forme exacte :
       "champ": "<nom court du champ manquant ou de l'anomalie>",
       "description": "<phrase courte d'aide>",
       "section": "<macroscopie | microscopie | ihc | conclusion | biologie_moleculaire | structure>",
-      "raison": "<pourquoi ce champ est attendu ici>"
+      "raison": "<pourquoi ce champ est attendu APRES cette phrase-la>",
+      "declencheur": "<la phrase DICTEE, recopiee, qui rend ce champ attendu>",
+      "options": ["<valeur possible>", "..."]
+    }
+  ],
+  "derivations": [
+    {
+      "phrase": "<la phrase que tu as ecrite sans qu'elle soit dictee telle quelle>",
+      "source": "<la phrase DICTEE, recopiee, dont elle decoule>",
+      "pourquoi": "<en une phrase, pourquoi elle en decoule sans autre possibilite>"
     }
   ]
 }
@@ -264,7 +273,22 @@ REGLES POUR "alertes" :
 - UNIQUEMENT les champs pertinents pour CE prelevement et CETTE lesion.
 - Ne JAMAIS lever d'alerte sur un champ incompatible avec le type de prelevement
   (pas de pTNM/marges/ganglions sur une biopsie).
-- Peut signaler une incoherence interne (ex: nombres de ganglions divergents)."""
+- Peut signaler une incoherence interne (ex: nombres de ganglions divergents).
+- "declencheur" est RECOPIE de la dictee, jamais reformule : c'est ce qui permet au
+  confrere de verifier lui-meme que la question a lieu d'etre.
+- "options" n'est renseigne que si la liste des reponses possibles est FERMEE et
+  COURTE (grade -> bas grade / haut grade ; limites -> saines / envahies). Pour une
+  mesure, un compte ou un texte libre, laisse la liste vide. Une liste inventee est
+  pire que pas de liste : on choisit dedans sans la remettre en cause.
+
+REGLES POUR "derivations" :
+- Une entree pour CHAQUE phrase du "cr" que le confrere n'a pas dite telle quelle et
+  que tu as pourtant ecrite parce qu'elle decoule strictement de ce qu'il a dit.
+- Si tu ne peux pas nommer la phrase dictee dont elle decoule, alors elle n'en
+  decoule pas : ne l'ecris pas dans le "cr", fais-en une alerte.
+- Une reformulation en prose, un acronyme developpe ou une erreur de reconnaissance
+  vocale corrigee ne sont PAS des derivations : le contenu clinique est inchange.
+- Liste vide si tu n'as rien derive. C'est le cas normal, et c'est un bon cas."""
 
 
 _ITERATION_RULES: str = """Tu recois un compte-rendu ACP EXISTANT et une NOUVELLE dictee a integrer
