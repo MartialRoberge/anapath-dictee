@@ -33,6 +33,7 @@ import type { AjoutContexte } from "./components/analyse/BarreAjout";
 import Glissiere from "./components/analyse/Glissiere";
 import BarreAjout from "./components/analyse/BarreAjout";
 import { useDicteeAppoint } from "./hooks/useDicteeAppoint";
+import { useNavigationInterne } from "./hooks/useNavigationInterne";
 import { construirePoints, type ActionPoint, type PointATraiter } from "./lib/pointsATraiter";
 import { useHorlogeEtude } from "./hooks/useHorlogeEtude";
 import { useMesureErgonomie } from "./hooks/useMesureErgonomie";
@@ -110,7 +111,7 @@ function Sidebar({
     },
     {
       icon: ListChecks,
-      label: "Champs obligatoires",
+      label: "À compléter",
       active: false,
       onClick: onOpenDrawer,
       disabled: !hasReport,
@@ -336,6 +337,9 @@ export default function App() {
   const { user, loading, login, register, logout, getToken } = useAuth();
   const { toast } = useToast();
   const [page, setPage] = useState<Page>("app");
+  // Le retour arriere du navigateur reste dans MARC : sortir du site en pleine
+  // redaction ferait disparaitre le compte rendu en cours.
+  useNavigationInterne(page, setPage);
   const [activeView, setActiveView] = useState<AppView>("record");
 
   // Report state
@@ -450,13 +454,15 @@ export default function App() {
         rawTranscription,
         organeDetecte,
         explication,
+        markers,
+        manquants,
         timestamp: Date.now(),
       });
     }, 2000);
     return () => {
       if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
     };
-  }, [draftId, report, rawTranscription, organeDetecte, explication]);
+  }, [draftId, report, rawTranscription, organeDetecte, explication, markers, manquants]);
 
   // Restaurer le brouillon le plus recent au chargement
   useEffect(() => {
@@ -467,6 +473,11 @@ export default function App() {
     setRawTranscription(latest.draft.rawTranscription);
     setOrganeDetecte(latest.draft.organeDetecte);
     setExplication(latest.draft.explication);
+    setMarkers(latest.draft.markers ?? []);
+    setManquants(latest.draft.manquants ?? []);
+    // Le CR de reference des marqueurs, sans quoi la completude se croit
+    // calculee sur un autre texte et se vide.
+    setMarkersReport(latest.draft.report);
     setActiveView("report");
     toast("Brouillon restaure automatiquement", "info");
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -1040,7 +1051,7 @@ export default function App() {
                 onClick={() => setDrawerOpen(true)}
               >
                 <ListChecks className="h-3.5 w-3.5" />
-                Champs obligatoires
+                À compléter
                 {completion.remaining > 0 && (
                   <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1 text-[10px] font-bold text-warning-foreground">
                     {completion.remaining}
@@ -1205,7 +1216,7 @@ export default function App() {
       <div className={`iris-drawer border-l bg-card shadow-2xl ${drawerOpen ? "open" : ""}`}>
         <div className="flex h-full flex-col overflow-y-auto p-4 scrollbar-thin">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-semibold">Champs obligatoires</h3>
+            <h3 className="text-sm font-semibold">À compléter</h3>
             <button
               onClick={() => setDrawerOpen(false)}
               className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"

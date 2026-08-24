@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { Star, FileText, Clock, RefreshCw, Calendar, Tag } from "lucide-react";
+import { Star, FileText, Clock, RefreshCw, Calendar, Tag, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MarcLogo } from "../components/MarcLogo";
 import { useToast } from "../components/toast-context";
-import { getReports } from "../services/api";
+import { deleteReport, getReports } from "../services/api";
 import type { ReportSummary } from "../services/api";
 
 interface HistoryPageProps {
@@ -87,6 +87,37 @@ export default function HistoryPage({
   const [reports, setReports] = useState<ReportSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [enSuppression, setEnSuppression] = useState<string | null>(null);
+
+  /**
+   * Supprime un compte rendu, apres confirmation.
+   *
+   * On confirme parce que c'est DEFINITIF et qu'il n'y a pas de corbeille : un
+   * clic malheureux sur une liste dense couterait un compte rendu signe.
+   *
+   * La liste n'est mise a jour qu'APRES l'accord du serveur. La retirer tout de
+   * suite ferait croire la suppression faite alors qu'elle a echoue, et le
+   * compte rendu reapparaitrait au rafraichissement suivant.
+   */
+  const supprimer = useCallback(
+    async (reportId: string) => {
+      if (!window.confirm("Supprimer definitivement ce compte rendu ?")) return;
+      setEnSuppression(reportId);
+      try {
+        await deleteReport(reportId);
+        setReports((actuels) => actuels.filter((r) => r.id !== reportId));
+        toast("Compte rendu supprime", "success");
+      } catch (e) {
+        toast(
+          e instanceof Error ? e.message : "La suppression n'a pas abouti.",
+          "error",
+        );
+      } finally {
+        setEnSuppression(null);
+      }
+    },
+    [toast],
+  );
 
   const fetchReports = useCallback(async () => {
     if (!token) return;
@@ -156,18 +187,22 @@ export default function HistoryPage({
               {/* Reports */}
               <div className="space-y-2">
                 {groupReports.map((r) => (
-                  <button
+                  <div
                     key={r.id}
-                    onClick={() => onOpenReport(r.id)}
-                    className="group flex w-full items-start gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:border-iris-300 hover:shadow-sm"
+                    className="group relative flex w-full items-start gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:border-iris-300 hover:shadow-sm"
                   >
+                  <button
+                    onClick={() => onOpenReport(r.id)}
+                    className="absolute inset-0 rounded-xl"
+                    aria-label={`Ouvrir le compte rendu du ${formatTime(r.created_at)}`}
+                  />
                     {/* Icon */}
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-iris-50 text-iris-600 dark:bg-iris-950/30 dark:text-iris-400">
+                    <div className="pointer-events-none relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-iris-50 text-iris-600 dark:bg-iris-950/30 dark:text-iris-400">
                       <FileText className="h-5 w-5" />
                     </div>
 
                     {/* Content */}
-                    <div className="min-w-0 flex-1">
+                    <div className="pointer-events-none relative z-10 min-w-0 flex-1">
                       {/* Top row: organ + status + rating */}
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-foreground">
@@ -202,7 +237,20 @@ export default function HistoryPage({
                         </span>
                       </div>
                     </div>
-                  </button>
+
+                    {/* AU-DESSUS de la surface cliquable, sinon l'ouverture du
+                        compte rendu absorberait le clic de suppression. */}
+                    <button
+                      type="button"
+                      onClick={() => void supprimer(r.id)}
+                      disabled={enSuppression === r.id}
+                      aria-label="Supprimer ce compte rendu"
+                      title="Supprimer"
+                      className="relative z-10 shrink-0 rounded-lg p-2 text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100 disabled:opacity-40"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>

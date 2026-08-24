@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, HelpCircle, Pencil, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TrouInline from "./TrouInline";
+import MarkdownEnLigne from "./MarkdownEnLigne";
 import type { Bloc, NatureBloc, Trou } from "@/lib/blocsTexte";
 import type { ActionPoint } from "@/lib/pointsATraiter";
 
@@ -42,6 +43,27 @@ const FONDS: Readonly<Record<NatureBloc, string>> = {
  * vote » : personne n'a a savoir comment MARC est construit pour s'en servir.
  * On dit le POURQUOI, jamais la mecanique.
  */
+/**
+ * Ce que dit un bouton, en un ou deux mots.
+ *
+ * Les libelles du protocole (« Je n'ai pas dit ca », « Pertinent, mais je ne le
+ * mets pas ») restent la MESURE et ne bougent pas : c'est eux qui partent dans
+ * la grille de l'etude. Mais empiles sous chaque phrase, ils transformaient le
+ * compte rendu en formulaire. Le praticien lit un mot, l'etude enregistre la
+ * mesure exacte.
+ */
+const COURT: Readonly<Record<string, string>> = {
+  conforme: "Oui",
+  corrige: "Corriger",
+  non_dicte: "Pas dit",
+  hors_sujet: "Hors sujet",
+  juste: "Juste",
+  je_ne_sais_pas: "?",
+  pertinent_ajoute: "Ajouter",
+  pertinent_non_retenu: "Pertinent, non retenu",
+  non_pertinent: "Sans objet",
+};
+
 const SENS: Readonly<Record<NatureBloc, string | null>> = {
   dicte: null,
   propose: "Découle de ce que vous avez dicté, sans que vous l'ayez dit.",
@@ -113,22 +135,37 @@ export default function BlocTexte({
   }
 
   const sens = SENS[bloc.nature];
+  void sens;
   const aDecider = bloc.point !== null && decision === null;
 
   return (
     <div
       ref={conteneur}
       data-bloc={bloc.id}
+      onClick={bloc.point !== null ? onExpliquer : undefined}
+      role={bloc.point !== null ? "button" : undefined}
+      tabIndex={bloc.point !== null ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (bloc.point === null) return;
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onExpliquer();
+        }
+      }}
       className={cn(
         "group -mx-2 rounded-md border-l-[3px] px-2 py-1 transition-colors",
         FONDS[bloc.nature],
-        eclaire && "ring-2 ring-ring/40",
+        bloc.point !== null && "cursor-pointer",
+        // L'ECLAIRAGE VA DANS LES DEUX SENS : selectionner a gauche allume ici,
+        // cliquer ici allume a gauche. Sans le retour visuel, on ne sait jamais
+        // de quelle phrase l'explication parle.
+        eclaire && "ring-2 ring-ring/50 ring-offset-1 ring-offset-background",
       )}
     >
       <p className="text-[0.95rem] leading-relaxed text-foreground">
         {segments(bloc).map((segment, rang) =>
           typeof segment === "string" ? (
-            <span key={rang}>{segment}</span>
+            <MarkdownEnLigne key={rang} texte={segment} />
           ) : (
             <TrouInline
               key={rang}
@@ -174,10 +211,10 @@ export default function BlocTexte({
       )}
 
       {aDecider && correction === null && (
-        <div className="mt-1 flex flex-wrap items-center gap-1">
-          {sens && (
-            <span className="mr-1 text-xs text-muted-foreground">{sens}</span>
-          )}
+        <div
+          className="mt-1 flex flex-wrap items-center gap-1"
+          onClick={(e) => e.stopPropagation()}
+        >
           {bloc.point?.actions.map((action) => (
             <button
               key={action.libelle}
@@ -203,7 +240,7 @@ export default function BlocTexte({
               {action.verbe === "accepter" && <Check className="h-3 w-3" />}
               {action.verbe === "modifier" && <Pencil className="h-3 w-3" />}
               {action.verbe === "ecarter" && <X className="h-3 w-3" />}
-              {action.libelle}
+              {COURT[action.decision] ?? action.libelle}
             </button>
           ))}
           <button
@@ -223,17 +260,10 @@ export default function BlocTexte({
           empeche de revoir son propre parcours, et donne l'impression d'avoir
           perdu quelque chose. */}
       {decision !== null && (
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">{decision}</span>
-          {" · "}
-          <button
-            type="button"
-            onClick={onExpliquer}
-            className="underline underline-offset-2 hover:text-foreground"
-          >
-            revoir
-          </button>
-        </p>
+        <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[0.65rem] font-medium text-muted-foreground">
+          <Check className="h-2.5 w-2.5" />
+          {COURT[decision] ?? decision}
+        </span>
       )}
     </div>
   );

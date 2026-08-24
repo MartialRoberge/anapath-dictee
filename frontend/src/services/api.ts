@@ -410,6 +410,23 @@ export interface SavedReport {
 }
 
 /** Liste des comptes-rendus de l'utilisateur (historique). */
+/**
+ * Supprime definitivement un compte rendu de l'historique.
+ *
+ * La route existait cote serveur depuis toujours ; rien ne l'appelait. Un
+ * historique qu'on ne peut pas nettoyer se remplit d'essais et de doublons, et
+ * devient inutilisable exactement au moment ou l'on en a besoin.
+ */
+export async function deleteReport(reportId: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/reports/${reportId}`, {
+    method: "DELETE",
+    headers: { ...getAuthHeaders() },
+  });
+  if (!response.ok) {
+    throw new Error("La suppression n'a pas abouti.");
+  }
+}
+
 export async function getReports(): Promise<ReportSummary[]> {
   const response = await fetch(`${API_BASE}/reports`, {
     headers: getAuthHeaders(),

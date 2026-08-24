@@ -467,3 +467,58 @@ def test_une_decision_unique_ne_produit_qu_une_ligne_de_journal(client):
     assert ligne["revisions"][0]["decision"] == ligne["decision"], (
         "le journal et l'etat courant divergent des la premiere ecriture"
     )
+
+
+def test_le_commentaire_de_validation_se_retrouve_partout(client):
+    """LE SEUL MATERIAU QUALITATIF DU DISPOSITIF.
+
+    Tout le reste est un compte ou un taux. Le commentaire etait ecrit en base
+    et ne ressortait NULLE PART — ni dans le detail d'un dossier, ni dans la
+    synthese, ni dans l'export. Une donnee qu'on ne peut pas relire n'a pas ete
+    recoltee : on aurait demande au praticien d'ecrire dans le vide.
+    """
+    dossier = _dicter_et_generer(client)
+    reponse = client.post(
+        f"/etude/dossiers/{dossier['dossier_id']}/cloture",
+        json={
+            "cr_valide": CR_VALIDE,
+            "commentaire_validation": "La proposition sur le grade m'a fait relire.",
+        },
+    )
+    assert reponse.status_code == 200, reponse.text
+
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+
+    detail = client.get(f"/admin/etude/dossiers/{dossier['dossier_id']}").json()
+    assert detail["commentaire_validation"] == (
+        "La proposition sur le grade m'a fait relire."
+    ), "le commentaire ne ressort pas dans le detail du dossier"
+
+    corpus = client.get("/admin/etude/synthese").json()["corpus"]
+    assert corpus["nb_commentes"] == 1, (
+        "le nombre de comptes rendus commentes n'est pas publie"
+    )
+
+    export = client.get("/admin/etude/export")
+    assert export.status_code == 200
+    import io
+    import zipfile
+
+    with zipfile.ZipFile(io.BytesIO(export.content)) as archive:
+        dossiers_csv = archive.read("dossiers.csv").decode("utf-8")
+    assert "commentaire_validation" in dossiers_csv.splitlines()[0], (
+        "la colonne manque a l'export : le statisticien ne la verra jamais"
+    )
+    assert "m'a fait relire" in dossiers_csv
+
+
+def test_un_commentaire_vide_ne_compte_pas_pour_un_commentaire(client):
+    """Sinon le nombre de comptes rendus commentes vaudrait le total, et ne
+    dirait plus rien."""
+    dossier = _dicter_et_generer(client)
+    client.post(
+        f"/etude/dossiers/{dossier['dossier_id']}/cloture",
+        json={"cr_valide": CR_VALIDE, "commentaire_validation": "   "},
+    )
+    main.app.dependency_overrides[get_current_user] = lambda: _user("adm", "admin")
+    assert client.get("/admin/etude/synthese").json()["corpus"]["nb_commentes"] == 0

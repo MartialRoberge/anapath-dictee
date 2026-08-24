@@ -136,6 +136,14 @@ class DossierDetaille(BaseModel):
     omission_texte: str | None
     nb_prelevements_detecte: int | None
     nb_prelevements_corrige: int | None
+    #: CE QUE LE PRATICIEN A ECRIT DE SA MAIN a la validation. C'est le seul
+    #: materiau qualitatif du dispositif : tout le reste est un compte ou un
+    #: taux. Il etait ecrit en base et ne ressortait NULLE PART — ni ici, ni
+    #: dans l'export. Une donnee qu'on ne peut pas relire n'a pas ete recoltee.
+    commentaire_validation: str | None
+    #: Blocs jamais affiches a l'ecran au moment de la cloture. NULL = non
+    #: mesure (avant instrumentation), jamais « tout a ete vu ».
+    nb_blocs_non_vus: int | None
     prelevements: list[dict]
     propositions: list[PropositionDetaillee]
     temps: dict
@@ -351,6 +359,13 @@ async def _corpus(
         "nb_dossiers_clos": sum(
             1 for d in dossiers if d.t5_cloture is not None and not d.abandonne
         ),
+        # Le NOMBRE de comptes rendus commentes, pas les commentaires : un
+        # taux ne se fait pas avec du texte libre. Les commentaires eux-memes
+        # se lisent dans le detail et dans l'export, comme materiau de
+        # discussion.
+        "nb_commentes": sum(
+            1 for d in dossiers if (d.commentaire_validation or "").strip()
+        ),
         "nb_abandons": len(abandons),
         "motifs_abandon": _compter(d.motif_abandon for d in abandons),
         "organes": _compter(d.organe for d in dossiers),
@@ -531,6 +546,8 @@ async def detailler_dossier(
         omission_texte=dossier.omission_texte,
         nb_prelevements_detecte=dossier.nb_prelevements_detecte,
         nb_prelevements_corrige=dossier.nb_prelevements_corrige,
+        commentaire_validation=dossier.commentaire_validation,
+        nb_blocs_non_vus=dossier.nb_blocs_non_vus,
         prelevements=[
             {"rang": p.rang, "libelle": p.libelle, "codes": p.codes}
             for p in sorted(prelevements, key=lambda p: p.rang)

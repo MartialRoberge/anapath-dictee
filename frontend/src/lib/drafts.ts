@@ -7,7 +7,12 @@
  * navigateur ne conserve pas indefiniment des donnees de compte-rendu.
  */
 
-import type { CoherenceVerdict, ReportTrace } from "../services/api";
+import type {
+  CoherenceVerdict,
+  DonneeManquante,
+  Marker,
+  ReportTrace,
+} from "../services/api";
 
 const PREFIX = "iris_autosave:";
 
@@ -30,6 +35,17 @@ export interface Draft {
   rawTranscription: string | null;
   organeDetecte: string;
   explication: DraftExplication | null;
+  /**
+   * CE QUI RESTE A COMPLETER, et il faut le garder.
+   *
+   * Sans ces deux listes, un rafraichissement de page rendait le compte rendu
+   * et son explicabilite, mais plus rien de la completude : les trous du texte
+   * restaient affiches sans leur declencheur, sans leur raison et sans leurs
+   * options, et la liste « a completer » sortait vide. Le praticien voyait donc
+   * un compte rendu qui n'avait plus rien a completer, ce qui est faux.
+   */
+  markers?: Marker[];
+  manquants?: DonneeManquante[];
   timestamp: number;
 }
 

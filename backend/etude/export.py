@@ -79,6 +79,8 @@ COLONNES_DOSSIERS: Final[tuple[str, ...]] = (
     "omission_texte",
     "nb_prelevements_detecte",
     "nb_prelevements_corrige",
+    "commentaire_validation",
+    "nb_blocs_non_vus",
     "nb_propositions",
     "nb_decidees",
     "caracteres_modifies",
@@ -382,6 +384,8 @@ def ligne_dossier(
         "omission_texte": _texte(dossier.omission_texte),
         "nb_prelevements_detecte": _nombre(dossier.nb_prelevements_detecte),
         "nb_prelevements_corrige": _nombre(dossier.nb_prelevements_corrige),
+        "commentaire_validation": _texte(dossier.commentaire_validation),
+        "nb_blocs_non_vus": _nombre(dossier.nb_blocs_non_vus),
         "nb_propositions": _nombre(len(propositions)),
         "nb_decidees": _nombre(
             sum(1 for p in propositions if p.decision is not None)
@@ -661,6 +665,19 @@ _DEFINITIONS: Final[tuple[tuple[str, tuple[tuple[str, str], ...]], ...]] = (
         (
             ("praticien", "Pseudonyme stable, attribue par ordre d'inclusion."),
             ("index_session", "Rang du cas dans la session : 0 pour le premier."),
+            (
+                "commentaire_validation",
+                "Ce que le praticien a ecrit de sa main a la validation. "
+                "SEUL MATERIAU QUALITATIF du dispositif : tout le reste est un "
+                "compte ou un taux. A lire, pas a agreger.",
+            ),
+            (
+                "nb_blocs_non_vus",
+                "Blocs jamais affiches a l'ecran au moment de la cloture. "
+                "VIDE signifie non mesure, jamais « tout a ete vu » : un zero "
+                "fabrique dirait que le compte rendu a ete integralement "
+                "parcouru alors que rien ne l'a observe.",
+            ),
             (
                 "exclu",
                 "Dossier ecarte de l'analyse (essai, saisie aberrante). "

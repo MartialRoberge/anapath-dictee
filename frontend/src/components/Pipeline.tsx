@@ -34,7 +34,7 @@ const IRIS_MESSAGES_INITIAL: string[] = [
   "Verification des negations...",
   "Structuration du compte-rendu...",
   "Generation du tableau IHC...",
-  "Verification des donnees obligatoires...",
+  "Recherche de ce qui manque...",
   "Redaction de la conclusion...",
 ];
 

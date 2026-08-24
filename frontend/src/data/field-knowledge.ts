@@ -485,7 +485,7 @@ export const FIELD_KNOWLEDGE: FieldKnowledge[] = [
   {
     keywords: ["idh", "idh1", "idh2", "statut idh"],
     title: "Statut IDH",
-    why: "Biomarqueur obligatoire pour la classification OMS 2021 des gliomes. IDH-mutant vs IDH-wildtype.",
+    why: "Biomarqueur retenu par la classification OMS 2021 des gliomes. IDH-mutant vs IDH-wildtype.",
     norm: "OMS Classification of CNS Tumours, 5e edition (2021)",
     risk: "Classification moleculaire du gliome impossible.",
     severity: "error",
@@ -538,14 +538,14 @@ export const ORGAN_GUIDANCE: Record<string, { title: string; tips: string[] }> =
       "Statut RE, RP, HER2 et Ki-67 obligatoires (ASCO/CAP)",
       "Si HER2 score 2+, la FISH/CISH est requise",
       "Grade SBR modifie Nottingham avec detail des 3 composantes",
-      "pTNM obligatoire sur piece operatoire (AJCC 8e ed.)",
+      "pTNM attendu sur piece operatoire (AJCC 8e ed.)",
     ],
   },
   colon_rectum: {
     title: "Colon-Rectum",
     tips: [
       "Minimum 12 ganglions examines pour un staging adequat",
-      "Marge circonferentielle (CRM) obligatoire pour le rectum",
+      "Marge circonferentielle (CRM) attendue pour le rectum",
       "Statut MMR/MSI a rechercher systematiquement",
       "Tumour budding a evaluer (ITBCC 2024)",
     ],

@@ -292,7 +292,7 @@ export default function CompletionPanel({
                 Compte-rendu complet
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Toutes les donnees obligatoires sont presentes.
+                Rien ne manque a ce compte rendu.
               </p>
             </div>
           </div>
@@ -324,7 +324,7 @@ export default function CompletionPanel({
           {errorCount > 0 && (
             <Badge variant="destructive" className="gap-1 text-[0.65rem]">
               <AlertCircle className="h-3 w-3" />
-              {errorCount} obligatoire{errorCount > 1 ? "s" : ""}
+              {errorCount} à voir
             </Badge>
           )}
           {warningCount > 0 && (

@@ -171,25 +171,34 @@ export function decouperEnBlocs({
   let sectionLibelle = "Document";
   let curseur = 0;
 
-  for (const ligne of cr.split("\n")) {
+  const lignes = cr.split("\n");
+  for (let rang = 0; rang < lignes.length; rang += 1) {
+    const ligne = lignes[rang];
     const debutLigne = curseur;
     curseur += ligne.length + 1; // +1 pour le \n retire par le split
 
     if (ligne.trim() === "") continue;
 
-    if (estEntete(ligne)) {
-      sectionLibelle = libelleDEntete(ligne);
-      sectionCle = cleDeSection(sectionLibelle) || "document";
+    // UN TABLEAU SE LIT D'UN SEUL TENANT. Le couper ligne par ligne le
+    // detruisait a l'affichage : chaque ligne devenait un paragraphe avec ses
+    // barres verticales apparentes, au lieu d'un tableau.
+    if (LIGNE_TABLEAU.test(ligne)) {
+      let fin = rang;
+      while (fin + 1 < lignes.length && LIGNE_TABLEAU.test(lignes[fin + 1])) {
+        fin += 1;
+        curseur += lignes[fin].length + 1;
+      }
+      const tableau = lignes.slice(rang, fin + 1).join("\n");
       blocs.push(
-        construire(ligne, debutLigne, sectionCle, sectionLibelle, "libre", null, []),
+        construire(tableau, debutLigne, sectionCle, sectionLibelle, "libre", null, []),
       );
+      rang = fin;
       continue;
     }
 
-    // Une ligne de tableau ne se decide pas : la prose qui l'accompagne porte
-    // le meme contenu et, elle, est jugee. La soumettre ferait trancher deux
-    // fois la meme chose.
-    if (LIGNE_TABLEAU.test(ligne)) {
+    if (estEntete(ligne)) {
+      sectionLibelle = libelleDEntete(ligne);
+      sectionCle = cleDeSection(sectionLibelle) || "document";
       blocs.push(
         construire(ligne, debutLigne, sectionCle, sectionLibelle, "libre", null, []),
       );

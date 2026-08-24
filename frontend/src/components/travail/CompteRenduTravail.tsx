@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import BlocTexte from "./BlocTexte";
 import type { Bloc, Trou } from "@/lib/blocsTexte";
 import type { ActionPoint } from "@/lib/pointsATraiter";
+import { cn } from "@/lib/utils";
 
 /**
  * Le compte rendu comme SURFACE DE TRAVAIL.
@@ -65,14 +68,33 @@ export default function CompteRenduTravail({
         // Un en-tete de section garde son role de reperage : il se lit, il ne
         // se decide pas. Le passer par BlocTexte lui donnerait des boutons.
         if (bloc.nature === "libre" && bloc.trous.length === 0) {
+          // Titres et tableaux se rendent EN BLOC, avec le rendu Markdown
+          // complet. Les afficher tels quels laissait leurs etoiles et leurs
+          // barres verticales a l'ecran, et un tableau se lisait comme une
+          // suite de paragraphes.
           return (
-            <p
+            <div
               key={bloc.id}
               data-bloc={bloc.id}
-              className="whitespace-pre-wrap pt-2 text-[0.95rem] font-semibold leading-relaxed text-foreground first:pt-0"
+              className={cn(
+                "prose-marc pt-2 text-[0.95rem] leading-relaxed first:pt-0",
+                "[&_h1]:text-base [&_h1]:font-bold [&_h2]:text-[0.95rem] [&_h2]:font-semibold",
+                "[&_p]:font-semibold",
+                "[&_table]:w-full [&_table]:border-collapse [&_table]:text-xs",
+                "[&_th]:border [&_th]:bg-muted/50 [&_th]:px-2 [&_th]:py-1 [&_th]:text-left",
+                "[&_td]:border [&_td]:px-2 [&_td]:py-1",
+              )}
             >
-              {bloc.texte}
-            </p>
+              <div className="overflow-x-auto">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  disallowedElements={["a", "img"]}
+                  unwrapDisallowed
+                >
+                  {bloc.texte}
+                </ReactMarkdown>
+              </div>
+            </div>
           );
         }
         return (
