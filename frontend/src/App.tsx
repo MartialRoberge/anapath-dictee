@@ -21,11 +21,15 @@ import LoginPage from "./pages/LoginPage";
 import HistoryPage from "./pages/HistoryPage";
 import AdminPage from "./pages/AdminPage";
 import RecorderPanel from "./components/RecorderPanel";
-import ReportPanel from "./components/ReportPanel";
 import CompletionPanel from "./components/CompletionPanel";
 import { formatTranscription, getReport, iterateReport, saveReport, sendFeedback } from "./services/api";
 import { useEtudeDossier } from "./hooks/useEtudeDossier";
-import PanneauAnalyse from "./components/analyse/PanneauAnalyse";
+import PanneauExplicabilite from "./components/travail/PanneauExplicabilite";
+import CompteRenduTravail from "./components/travail/CompteRenduTravail";
+import { signalerVues } from "./services/etude";
+import { decouperEnBlocs, remplirTrou } from "./lib/blocsTexte";
+import type { Bloc, Trou } from "./lib/blocsTexte";
+import type { AjoutContexte } from "./components/analyse/BarreAjout";
 import Glissiere from "./components/analyse/Glissiere";
 import BarreAjout from "./components/analyse/BarreAjout";
 import { useDicteeAppoint } from "./hooks/useDicteeAppoint";
@@ -38,6 +42,7 @@ import type {
   Marker,
   ReportTrace,
   CoherenceVerdict,
+  DonneeManquante,
 } from "./services/api";
 import ExplainPanel from "./components/ExplainPanel";
 import { computeCompletion } from "./lib/completion";
@@ -339,6 +344,17 @@ export default function App() {
   // distincte de la dictee initiale, qui le produit.
   const dicteeAppoint = useDicteeAppoint();
 
+  /** Les alertes TELLES QUELLES : c'est d'elles que viennent declencheur,
+   *  raison et options. Les `markers` les ont deja aplaties. */
+  const [manquants, setManquants] = useState<DonneeManquante[]>([]);
+  /** Le bloc dont l'explication est ouverte a gauche, et le trou vise. */
+  const [selection, setSelection] = useState<string | null>(null);
+  const [trouSelectionne, setTrouSelectionne] = useState<Trou | null>(null);
+  /** Demande de defilement vers un bloc, depuis la checklist. */
+  const [allerA, setAllerA] = useState<string | null>(null);
+  /** Ce qui a ete verse au contexte, du plus recent au plus ancien. */
+  const [historiqueAjouts, setHistoriqueAjouts] = useState<AjoutContexte[]>([]);
+
   // L'instrumentation de l'etude. Elle n'a aucun pouvoir sur la generation :
   // si elle echoue, le praticien redige quand meme. On ne bloque jamais un
   // compte rendu pour une mesure.
@@ -376,7 +392,6 @@ export default function App() {
   // Ce qui a deja ete traite, et le point survole. Le survol pilote le
   // surlignage du passage dans le compte rendu.
   const [pointsTraites, setPointsTraites] = useState<Record<string, string>>({});
-  const [pointActif, setPointActif] = useState<PointATraiter | null>(null);
 
   // La transcription est aussi tenue dans une ref : le panneau appelle
   // onTranscription puis onFormatted dans le meme tour de rendu, et l'etat
@@ -539,6 +554,50 @@ export default function App() {
     [etude.propositions, pointsTraites],
   );
 
+  /**
+   * Le complement d'un trou, retrouve par le nom du champ.
+   *
+   * On rapproche sur le NOM parce que c'est le seul lien entre le marqueur
+   * ecrit dans le texte — « [A COMPLETER: taille] » — et l'alerte qui explique
+   * pourquoi il est attendu. Deux trous du meme nom partagent donc la meme
+   * explication, ce qui est correct : c'est la meme question posee deux fois.
+   */
+  const renseignerTrou = useCallback(
+    (champ: string) => {
+      const cle = champ.trim().toLowerCase();
+      const trouve = manquants.find(
+        (m) => m.champ.trim().toLowerCase() === cle,
+      );
+      if (!trouve) return undefined;
+      return {
+        declencheur: trouve.declencheur ?? null,
+        raison: trouve.raison ?? null,
+        options: trouve.options ?? [],
+      };
+    },
+    [manquants],
+  );
+
+  /** Le compte rendu decoupe en surface de travail. Refait a chaque frappe :
+   *  le TEXTE est la source de verite, le decoupage n'en est qu'une lecture. */
+  const blocs = useMemo(
+    () => decouperEnBlocs({ cr: report ?? "", points: pointsATraiter, renseignerTrou }),
+    [report, pointsATraiter, renseignerTrou],
+  );
+
+  /** Decisions indexees par BLOC : le bloc est ce que le praticien voit. */
+  const decisionsParBloc = useMemo(() => {
+    const table: Record<string, string> = {};
+    for (const bloc of blocs) {
+      if (bloc.point === null) continue;
+      const prise = pointsTraites[bloc.point.id];
+      if (prise === undefined) continue;
+      const action = bloc.point.actions.find((a) => a.decision === prise);
+      table[bloc.id] = action?.libelle ?? prise;
+    }
+    return table;
+  }, [blocs, pointsTraites]);
+
   /** Ce qui reste a verifier, pour que le bouton de validation le dise. */
   const pointsRestants = useMemo(
     () => pointsATraiter.filter((point) => !(point.id in pointsTraites)).length,
@@ -570,15 +629,116 @@ export default function App() {
         if (resultat === null) return;
       }
       setPointsTraites((actuel) => ({ ...actuel, [point.id]: action.decision }));
-      setPointActif(null);
+      setSelection(null);
+      setTrouSelectionne(null);
     },
     [etude],
   );
+
+  /* ---------------- Les gestes, tous faits DANS le texte -------------- */
+
+  const deciderBloc = useCallback(
+    async (bloc: Bloc, action: ActionPoint, valeur?: string) => {
+      if (bloc.point === null) return;
+      // On laisse remonter l'echec : le bloc affiche l'erreur et RESTE a
+      // decider. L'avaler ferait croire la decision enregistree alors qu'elle
+      // est perdue, et l'etude compterait un blanc pour un jugement.
+      await deciderPoint(bloc.point, action, valeur);
+    },
+    // deciderPoint est defini plus haut ; la dependance est explicite.
+    [deciderPoint],
+  );
+
+  /**
+   * Combler un trou MODIFIE LE TEXTE, et enregistre la mesure.
+   *
+   * Les deux, et dans cet ordre. Le texte est ce qui part dans le dossier du
+   * patient ; la mesure est ce qui alimente l'etude. N'ecrire que le texte
+   * perdrait la completude ; n'enregistrer que la mesure laisserait le trou
+   * beant sous les yeux du praticien.
+   */
+  const remplirTrouDuBloc = useCallback(
+    (bloc: Bloc, trou: Trou, valeur: string) => {
+      setReport((actuel) => (actuel ? remplirTrou(actuel, bloc, trou, valeur) : actuel));
+      const point = pointsATraiter.find(
+        (p) =>
+          p.origine === "champ_manquant" &&
+          p.detail.trim().toLowerCase().includes(trou.champ.trim().toLowerCase()),
+      );
+      if (point) {
+        const action = point.actions.find((a) => a.decision === "pertinent_ajoute");
+        if (action) void deciderPoint(point, action, valeur);
+      }
+    },
+    [pointsATraiter, deciderPoint],
+  );
+
+  /** Le champ ne s'applique pas ici : le marqueur disparait du texte, et
+   *  l'etude enregistre un FAUX POSITIF de completude — c'est une mesure
+   *  precieuse, pas un abandon. */
+  const ecarterTrouDuBloc = useCallback(
+    (bloc: Bloc, trou: Trou) => {
+      setReport((actuel) => (actuel ? remplirTrou(actuel, bloc, trou, "") : actuel));
+      const point = pointsATraiter.find(
+        (p) =>
+          p.origine === "champ_manquant" &&
+          p.detail.trim().toLowerCase().includes(trou.champ.trim().toLowerCase()),
+      );
+      if (point) {
+        const action = point.actions.find((a) => a.decision === "non_pertinent");
+        if (action) void deciderPoint(point, action);
+      }
+    },
+    [pointsATraiter, deciderPoint],
+  );
+
+  /**
+   * Consulter l'explicabilite. C'EST UNE MESURE, pas un simple affichage :
+   * l'etude compare les decisions prises apres consultation du motif a celles
+   * prises sans. Le signal part sur un acte DELIBERE — un clic — jamais au
+   * survol, qui porterait le taux a 100 % et le rendrait inexploitable.
+   */
+  /**
+   * L'AFFICHAGE REEL D'UN BLOC, groupe puis envoye.
+   *
+   * Sans ce signal, toutes les propositions restent « non vu » et l'etude
+   * publie un faux : elle ne peut plus distinguer un bloc qui n'a jamais paru
+   * d'un bloc que le praticien a vu et laisse.
+   *
+   * On accumule et on envoie par paquets : un observateur de defilement voit
+   * entrer plusieurs blocs d'un coup, et un appel par bloc perdrait des
+   * signaux au premier ralentissement reseau — ces blocs seraient alors
+   * comptes non vus alors qu'ils l'ont bien ete.
+   */
+  const enAttenteDeVue = useRef<Set<string>>(new Set());
+  const minuterieVue = useRef<number | null>(null);
+
+  const signalerBlocVu = useCallback(
+    (bloc: Bloc) => {
+      const dossier = etude.dossierId;
+      if (bloc.point === null || dossier === null) return;
+      enAttenteDeVue.current.add(bloc.point.id);
+      if (minuterieVue.current !== null) return;
+      minuterieVue.current = window.setTimeout(() => {
+        const lot = [...enAttenteDeVue.current];
+        enAttenteDeVue.current.clear();
+        minuterieVue.current = null;
+        void signalerVues(dossier, lot);
+      }, 400);
+    },
+    [etude.dossierId],
+  );
+
+  const expliquerBloc = useCallback((bloc: Bloc, trou: Trou | null) => {
+    setSelection(bloc.id);
+    setTrouSelectionne(trou);
+  }, []);
 
   const handleFormatted = useCallback((result: FormatResult) => {
     setReport(result.formatted_report);
     setOrganeDetecte(result.organe_detecte);
     setMarkers(result.markers);
+    setManquants(result.manquants);
     setMarkersReport(result.formatted_report);
     // Un nouveau formatage prolonge le dossier en cours : meme brouillon.
     setDraftId((prev) => prev ?? createDraftId());
@@ -619,7 +779,7 @@ export default function App() {
    * suffirait d'ecrire une phrase pour contourner tous les garde-fous.
    */
   const ajouterAuCompteRendu = useCallback(
-    async (texte: string) => {
+    async (texte: string, voix = false) => {
       if (!report) return;
       // L'indicateur est POSE ICI et pas ailleurs : l'appel dure plusieurs
       // secondes, et sans retour visuel le praticien croit que rien ne part.
@@ -631,6 +791,14 @@ export default function App() {
         noterTranscription(
           rawTranscription ? `${rawTranscription} ${texte}` : texte,
         );
+        // L'ajout reste VISIBLE apres coup. Sans historique, le praticien qui
+        // vient de dicter une precision ne voit plus nulle part ce qu'il a
+        // ajoute : le texte a change quelque part, et il doit le retrouver a
+        // l'oeil pour verifier que la transcription l'a bien compris.
+        setHistoriqueAjouts((actuel) => [
+          { id: `${Date.now()}`, texte, voix, a: Date.now() },
+          ...actuel,
+        ]);
       } finally {
         setReformatting(false);
       }
@@ -912,21 +1080,19 @@ export default function App() {
             </section>
           ) : (
             <div className="relative flex min-w-0 flex-1 overflow-hidden max-lg:hidden">
-              <PanneauAnalyse
+              <PanneauExplicabilite
                 data-ergo="analyse"
                 className="my-3 ml-3"
                 style={{ width: `${partAnalyse * 100}%` }}
-                points={pointsATraiter}
-                traites={pointsTraites}
-                pointActif={pointActif?.id ?? null}
-                occupe={etude.occupe}
+                blocs={blocs}
+                selection={selection}
+                trouSelectionne={trouSelectionne}
+                decisions={decisionsParBloc}
+                transcription={rawTranscription}
                 verifies={pointsVerifies}
                 codes={codesAffiches}
-                onDecider={(point, action, valeur, nature) => {
-                  void deciderPoint(point, action, valeur, nature);
-                }}
-                onSurvol={setPointActif}
-                onOuvrirPourquoi={() => undefined}
+                onEclairer={setSelection}
+                onAllerAuBloc={setAllerA}
               />
 
               <Glissiere part={partAnalyse} onChange={setPartAnalyse} />
@@ -935,11 +1101,21 @@ export default function App() {
                 data-ergo="compte_rendu"
                 className="min-w-0 flex-1 overflow-y-auto p-5 pb-28 scrollbar-thin"
               >
-                <ReportPanel
-                  report={report}
-                  onReportChange={setReport}
-                  organeDetecte={organeDetecte}
-                  pendingCount={completion.remaining}
+                {/* LE COMPTE RENDU EST LA SURFACE DE TRAVAIL. Accepter,
+                    refuser, combler un trou, choisir dans une liste : tout se
+                    fait ici, sur la phrase concernee. Le panneau de gauche
+                    explique et ne commande rien. */}
+                <CompteRenduTravail
+                  blocs={blocs}
+                  decisions={decisionsParBloc}
+                  eclaire={selection}
+                  occupe={etude.occupe || reformatting}
+                  onDecider={deciderBloc}
+                  onRemplirTrou={remplirTrouDuBloc}
+                  onEcarterTrou={ecarterTrouDuBloc}
+                  onExpliquer={expliquerBloc}
+                  onVu={signalerBlocVu}
+                  allerA={allerA}
                 />
 
                 {savedReportId && (
@@ -959,6 +1135,7 @@ export default function App() {
                 className="absolute inset-x-0 bottom-4"
                 occupe={reformatting}
                 onAjouter={ajouterAuCompteRendu}
+                historique={historiqueAjouts}
                 onDicterDebut={dicteeAppoint.demarrer}
                 onDicterFin={dicteeAppoint.arreter}
               />
@@ -989,11 +1166,21 @@ export default function App() {
                     coherence={explication.coherence}
                   />
                 )}
-                <ReportPanel
-                  report={report}
-                  onReportChange={setReport}
-                  organeDetecte={organeDetecte}
-                  pendingCount={completion.remaining}
+                {/* LE COMPTE RENDU EST LA SURFACE DE TRAVAIL. Accepter,
+                    refuser, combler un trou, choisir dans une liste : tout se
+                    fait ici, sur la phrase concernee. Le panneau de gauche
+                    explique et ne commande rien. */}
+                <CompteRenduTravail
+                  blocs={blocs}
+                  decisions={decisionsParBloc}
+                  eclaire={selection}
+                  occupe={etude.occupe || reformatting}
+                  onDecider={deciderBloc}
+                  onRemplirTrou={remplirTrouDuBloc}
+                  onEcarterTrou={ecarterTrouDuBloc}
+                  onExpliquer={expliquerBloc}
+                  onVu={signalerBlocVu}
+                  allerA={allerA}
                 />
               </div>
             )}

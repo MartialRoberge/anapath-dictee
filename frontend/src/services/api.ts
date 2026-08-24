@@ -18,7 +18,18 @@ export interface DonneeManquante {
   champ: string;
   description: string;
   section: string;
-  obligatoire: boolean;
+  /**
+   * La phrase DICTEE, recopiee, qui rend ce champ attendu. Elle repond a
+   * « pourquoi tu me demandes ca ». Jamais reformulee.
+   */
+  declencheur?: string | null;
+  /** En une phrase, pourquoi ce champ est attendu apres cette phrase-la. */
+  raison?: string | null;
+  /**
+   * La liste FERMEE des valeurs possibles. Absente ou vide pour une mesure, un
+   * compte ou un texte libre : le praticien ecrit ce qu'il veut.
+   */
+  options?: string[];
 }
 
 /** Marker unifie pour le CompletionPanel (adapte depuis DonneeManquante). */
@@ -106,6 +117,15 @@ export interface FormatResult {
   type_prelevement: string;
   coherence: CoherenceVerdict;
   trace: ReportTrace;
+  /**
+   * Les alertes TELLES QUELLES, en plus de leur aplatissement en `markers`.
+   *
+   * `donneeToMarker` perd le declencheur, la raison et les options — c'est-a-
+   * dire tout ce qui fait qu'un trou est une question et non un blanc. Le
+   * Marker reste pour le panneau de completude historique ; la surface de
+   * travail, elle, a besoin de l'original.
+   */
+  manquants: DonneeManquante[];
 }
 
 export type IterationResult = FormatResult;
@@ -123,7 +143,11 @@ function donneeToMarker(d: DonneeManquante): Marker {
     field: d.champ,
     section: d.section as Marker["section"],
     rule_id: `v3.${d.section}.${d.champ}`,
-    severity: d.obligatoire ? "error" : "warning",
+    // « Obligatoire » a disparu du modele : MARC n'ordonne pas, il explique.
+    // Un champ dont on sait POURQUOI il est attendu porte une vraie
+    // justification et merite d'etre vu ; sans raison, il reste un simple
+    // signalement.
+    severity: d.raison ? "error" : "warning",
     message: d.description,
     auto_filled: false,
     auto_filled_value: "",
@@ -212,6 +236,7 @@ function v3ToResult(v3: V3ReportResponse): FormatResult {
     type_prelevement: v3.type_prelevement ?? "autre",
     coherence: v3.coherence ?? EMPTY_COHERENCE,
     trace: v3.trace ?? {},
+    manquants: v3.donnees_manquantes,
   };
 }
 

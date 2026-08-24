@@ -585,3 +585,38 @@ export function chargerDossiers(): Promise<LigneDossier[]> {
 export function chargerDossier(dossierId: string): Promise<DossierDetaille> {
   return obtenir<DossierDetaille>(`/admin/etude/dossiers/${dossierId}`);
 }
+
+/* ------------------------------------------------------------------ */
+/*  Affichage reel des blocs                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Signale que des blocs ont ETE VUS a l'ecran.
+ *
+ * SANS CE SIGNAL, L'ETUDE PUBLIE UN FAUX. C'est lui, et lui seul, qui separe
+ * « le bloc n'a jamais paru » de « il a paru et le praticien l'a laisse ». Tant
+ * que rien ne l'envoie, toutes les propositions restent `non_vu` et le compte
+ * de blocs non parcourus vaut le total a chaque cloture — un signal aussi faux
+ * que celui qu'on cherche a eviter, dans l'autre sens.
+ *
+ * ENVOI GROUPE, parce qu'un observateur de defilement voit entrer plusieurs
+ * blocs d'un coup. Un appel par bloc perdrait des signaux au premier
+ * ralentissement reseau, et ces blocs seraient comptes non vus alors qu'ils
+ * l'ont ete.
+ *
+ * Ne leve jamais : un signal de mesure perdu ne doit pas faire disparaitre le
+ * compte rendu sous les yeux du praticien.
+ */
+export async function signalerVues(
+  dossierId: string,
+  propositions: readonly string[],
+): Promise<void> {
+  if (propositions.length === 0) return;
+  try {
+    await poster(`/dossiers/${dossierId}/vues`, {
+      propositions: [...propositions],
+    });
+  } catch {
+    // Silencieux a dessein : voir le commentaire ci-dessus.
+  }
+}

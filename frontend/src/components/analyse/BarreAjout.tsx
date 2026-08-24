@@ -18,9 +18,18 @@ import { cn } from "@/lib/utils";
  * Flottante et discrete : elle accompagne le travail, elle ne le commande pas.
  */
 
+/** Un ajout deja verse au contexte, du plus recent au plus ancien. */
+export interface AjoutContexte {
+  id: string;
+  texte: string;
+  /** Dicte a la voix, ou tape au clavier. La distinction se mesure. */
+  voix: boolean;
+  a: number;
+}
+
 interface BarreAjoutProps {
   /** Envoie le texte a ajouter. Rejette si l'ajout echoue. */
-  onAjouter: (texte: string) => Promise<void>;
+  onAjouter: (texte: string, voix: boolean) => Promise<void>;
   /**
    * Demarre l'enregistrement. ABSENT tant que la dictee d'appoint n'est pas
    * disponible : le bouton disparait alors, plutot que de promettre une
@@ -37,6 +46,13 @@ interface BarreAjoutProps {
   /** Arrete l'enregistrement et rend le texte transcrit. */
   onDicterFin?: () => Promise<string>;
   occupe: boolean;
+  /**
+   * CE QUI A DEJA ETE AJOUTE. Sans cet historique, le praticien qui vient de
+   * dicter une precision ne voit plus nulle part ce qu'il a ajoute : le texte
+   * a change quelque part dans le compte rendu, et il doit le retrouver a
+   * l'oeil pour verifier que la transcription l'a bien compris.
+   */
+  historique: readonly AjoutContexte[];
   className?: string;
 }
 
@@ -45,19 +61,25 @@ export default function BarreAjout({
   onDicterDebut,
   onDicterFin,
   occupe,
+  historique,
   className,
 }: BarreAjoutProps) {
   const [texte, setTexte] = useState("");
   const [dictee, setDictee] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
+  // Un texte insere par la dictee reste marque comme tel meme si le praticien
+  // le retouche avant d'envoyer : il vient bien de la voix.
+  const [venaitDeLaVoix, setVenaitDeLaVoix] = useState(false);
+
   async function envoyer() {
     const contenu = texte.trim();
     if (!contenu || occupe) return;
     setErreur(null);
     try {
-      await onAjouter(contenu);
+      await onAjouter(contenu, venaitDeLaVoix);
       setTexte("");
+      setVenaitDeLaVoix(false);
     } catch (e) {
       // On NE VIDE PAS le champ en cas d'echec : le praticien perdrait ce
       // qu'il vient d'ecrire, et c'est le meilleur moyen de lui faire
@@ -95,6 +117,7 @@ export default function BarreAjout({
         setTexte((actuel) =>
           actuel ? `${actuel} ${texteDicte}` : texteDicte,
         );
+        setVenaitDeLaVoix(true);
       }
     } catch (e) {
       setErreur(e instanceof Error ? e.message : "La dictée n'a pas abouti.");
@@ -106,6 +129,28 @@ export default function BarreAjout({
   return (
     <div className={cn("pointer-events-none flex justify-center px-4", className)}>
       <div className="pointer-events-auto w-full max-w-2xl">
+        {historique.length > 0 && (
+          <ol className="mb-1.5 space-y-1">
+            {/* Les trois derniers seulement : la barre flotte au-dessus du
+                compte rendu, et un historique qui grandit finirait par le
+                masquer. Le reste vit dans la dictee, a gauche. */}
+            {historique.slice(0, 3).map((ajout) => (
+              <li
+                key={ajout.id}
+                className="flex items-start gap-1.5 rounded-md bg-card/90 px-2.5 py-1 text-xs shadow-sm backdrop-blur"
+              >
+                {ajout.voix ? (
+                  <Mic className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
+                ) : (
+                  <CornerDownLeft className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
+                )}
+                <span className="min-w-0 flex-1 truncate text-muted-foreground">
+                  {ajout.texte}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
         {erreur && (
           <p
             role="alert"
