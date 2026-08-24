@@ -22,18 +22,28 @@ interface BarreAjoutProps {
   /** Envoie le texte a ajouter. Rejette si l'ajout echoue. */
   onAjouter: (texte: string) => Promise<void>;
   /**
-   * Demarre la dictee et rend le texte transcrit. ABSENT tant que la dictee
-   * d'appoint n'est pas disponible : le bouton disparait alors, plutot que de
-   * promettre une fonction qui echouerait au clic.
+   * Demarre l'enregistrement. ABSENT tant que la dictee d'appoint n'est pas
+   * disponible : le bouton disparait alors, plutot que de promettre une
+   * fonction qui echouerait au clic.
+   *
+   * DEUX CALLBACKS ET NON UNE, parce qu'une seule ne pouvait pas s'arreter.
+   * Le contrat precedent etait `onDicter(): Promise<string>` — demarrer et
+   * resoudre quand c'est fini — sans aucun moyen de dire "c'est fini". Le
+   * bouton affichait bien un carre « Arreter la dictee », mais le clic
+   * retombait sur une garde `if (dictee) return` et ne faisait rien. On
+   * demarrait une dictee qu'on ne pouvait plus arreter.
    */
-  onDicter?: () => Promise<string>;
+  onDicterDebut?: () => Promise<void>;
+  /** Arrete l'enregistrement et rend le texte transcrit. */
+  onDicterFin?: () => Promise<string>;
   occupe: boolean;
   className?: string;
 }
 
 export default function BarreAjout({
   onAjouter,
-  onDicter,
+  onDicterDebut,
+  onDicterFin,
   occupe,
   className,
 }: BarreAjoutProps) {
@@ -56,19 +66,40 @@ export default function BarreAjout({
     }
   }
 
-  async function dicter() {
-    if (dictee || occupe || !onDicter) return;
+  const [transcrit, setTranscrit] = useState(false);
+
+  async function basculerDictee() {
+    if (occupe || !onDicterDebut || !onDicterFin || transcrit) return;
     setErreur(null);
-    setDictee(true);
+
+    if (!dictee) {
+      try {
+        await onDicterDebut();
+        setDictee(true);
+      } catch (e) {
+        setErreur(
+          e instanceof Error ? e.message : "Le micro n'a pas pu démarrer.",
+        );
+      }
+      return;
+    }
+
+    // Deuxieme clic : on arrete, on transcrit, on INSERE dans le champ plutot
+    // que d'envoyer directement — le praticien relit ce que la transcription a
+    // compris avant que ca parte.
+    setDictee(false);
+    setTranscrit(true);
     try {
-      const transcrit = await onDicter();
-      // On INSERE dans le champ plutot que d'envoyer directement : le praticien
-      // relit ce que la transcription a compris avant que ca parte.
-      setTexte((actuel) => (actuel ? `${actuel} ${transcrit}` : transcrit));
+      const texteDicte = await onDicterFin();
+      if (texteDicte.trim()) {
+        setTexte((actuel) =>
+          actuel ? `${actuel} ${texteDicte}` : texteDicte,
+        );
+      }
     } catch (e) {
       setErreur(e instanceof Error ? e.message : "La dictée n'a pas abouti.");
     } finally {
-      setDictee(false);
+      setTranscrit(false);
     }
   }
 
@@ -84,12 +115,18 @@ export default function BarreAjout({
           </p>
         )}
         <div className="flex items-end gap-1.5 rounded-xl border bg-card/95 p-1.5 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-card/80">
-          {onDicter && (
+          {onDicterDebut && onDicterFin && (
           <button
             type="button"
-            onClick={dicter}
-            disabled={occupe}
-            aria-label={dictee ? "Arrêter la dictée" : "Ajouter à la voix"}
+            onClick={basculerDictee}
+            disabled={occupe || transcrit}
+            aria-label={
+              transcrit
+                ? "Transcription en cours"
+                : dictee
+                  ? "Arrêter la dictée"
+                  : "Ajouter à la voix"
+            }
             className={cn(
               "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
               "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -99,7 +136,13 @@ export default function BarreAjout({
                 : "text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
           >
-            {dictee ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            {transcrit ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : dictee ? (
+              <Square className="h-4 w-4" />
+            ) : (
+              <Mic className="h-4 w-4" />
+            )}
           </button>
           )}
 

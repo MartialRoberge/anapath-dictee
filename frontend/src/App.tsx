@@ -28,6 +28,7 @@ import { useEtudeDossier } from "./hooks/useEtudeDossier";
 import PanneauAnalyse from "./components/analyse/PanneauAnalyse";
 import Glissiere from "./components/analyse/Glissiere";
 import BarreAjout from "./components/analyse/BarreAjout";
+import { useDicteeAppoint } from "./hooks/useDicteeAppoint";
 import { construirePoints, type ActionPoint, type PointATraiter } from "./lib/pointsATraiter";
 import { useHorlogeEtude } from "./hooks/useHorlogeEtude";
 import { useMesureErgonomie } from "./hooks/useMesureErgonomie";
@@ -334,6 +335,9 @@ export default function App() {
 
   // Report state
   const [rawTranscription, setRawTranscription] = useState<string | null>(null);
+  // La dictee d'APPOINT : completer un compte rendu deja redige. Elle est
+  // distincte de la dictee initiale, qui le produit.
+  const dicteeAppoint = useDicteeAppoint();
 
   // L'instrumentation de l'etude. Elle n'a aucun pouvoir sur la generation :
   // si elle echoue, le praticien redige quand meme. On ne bloque jamais un
@@ -938,24 +942,6 @@ export default function App() {
                   pendingCount={completion.remaining}
                 />
 
-                <details className="mt-4 rounded-xl border bg-card/40 px-4 py-2.5">
-                  <summary className="cursor-pointer text-xs font-medium text-muted-foreground">
-                    Dictée brute et nouvelle dictée
-                  </summary>
-                  <div className="pt-3">
-                    <RecorderPanel
-                      rawTranscription={rawTranscription}
-                      report={report}
-                      onTranscription={noterTranscription}
-                      onFormatted={handleFormatted}
-                      onReset={handleReset}
-                      onRawChange={noterTranscription}
-                      onReformat={handleReformat}
-                      reformatting={reformatting}
-                    />
-                  </div>
-                </details>
-
                 {savedReportId && (
                   <FeedbackPanel
                     savedReportId={savedReportId}
@@ -973,6 +959,8 @@ export default function App() {
                 className="absolute inset-x-0 bottom-4"
                 occupe={reformatting}
                 onAjouter={ajouterAuCompteRendu}
+                onDicterDebut={dicteeAppoint.demarrer}
+                onDicterFin={dicteeAppoint.arreter}
               />
             </div>
           )}
