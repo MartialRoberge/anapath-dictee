@@ -23,6 +23,14 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 class AdminReportSummary(BaseModel):
     """Resume d'un CR pour l'admin."""
     id: str
+    #: L'IDENTIFIANT DU PRATICIEN, et non seulement son nom.
+    #:
+    #: Sans lui, l'ecran d'administration ne pouvait pas rattacher un compte
+    #: rendu enregistre au praticien qui l'a produit autrement que par
+    #: comparaison de noms. Resultat : la liste des praticiens etait batie sur
+    #: les seuls dossiers d'etude, et un praticien qui avait enregistre des
+    #: comptes rendus sans dossier d'etude n'y figurait PAS DU TOUT.
+    user_id: str
     user_name: str
     user_email: str
     organe_detecte: str
@@ -83,6 +91,7 @@ async def admin_list_reports(
 
         summaries.append(AdminReportSummary(
             id=str(report.id),
+            user_id=str(user.id),
             user_name=user.name,
             user_email=user.email,
             organe_detecte=report.organe_detecte,

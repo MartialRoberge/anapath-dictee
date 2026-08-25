@@ -484,6 +484,8 @@ export interface AdminStats {
 
 export interface AdminReport {
   id: string;
+  /** L'identifiant du praticien, pour rattacher ce CR a la bonne personne. */
+  user_id: string;
   user_name: string;
   user_email: string;
   organe_detecte: string;

@@ -32,6 +32,8 @@ import type { AdminCorrection, AdminReport } from "@/services/api";
  * recue, et vaut `null` quand la mesure n'existe pas.
  */
 export interface LignePraticien {
+  /** Comptes rendus enregistres, meme sans dossier d'etude. */
+  nbRapports: number;
   praticienId: string;
   /** Le nom, pour que l'administrateur reconnaisse ses praticiens. */
   praticienNom: string;
@@ -159,12 +161,40 @@ function estValide(dossier: LigneDossierEtude): boolean {
   return dossier.caracteres_modifies !== null;
 }
 
-function agregerPraticiens(dossiers: LigneDossierEtude[]): LignePraticien[] {
+/**
+ * UN PRATICIEN EST UNE PERSONNE, pas une source de donnees.
+ *
+ * Cette liste etait batie sur les seuls DOSSIERS D'ETUDE. Un praticien qui
+ * avait enregistre des comptes rendus sans qu'un dossier d'etude soit ouvert —
+ * parce qu'il a depose un fichier audio, parce que son cas est anterieur a
+ * l'instrumentation, parce que le reseau a lache au mauvais moment — n'y
+ * figurait PAS DU TOUT. On regardait la liste des praticiens et il en manquait.
+ *
+ * On part donc de la reunion des deux sources. Un praticien connu par ses
+ * seuls comptes rendus apparait, avec zero cas d'etude : c'est une information
+ * en soi, et bien plus utile que son absence.
+ */
+function agregerPraticiens(
+  dossiers: LigneDossierEtude[],
+  rapports: AdminReport[],
+): LignePraticien[] {
   const parPraticien = new Map<string, LigneDossierEtude[]>();
   for (const dossier of dossiers) {
     const liste = parPraticien.get(dossier.praticien_id);
     if (liste) liste.push(dossier);
     else parPraticien.set(dossier.praticien_id, [dossier]);
+  }
+
+  // Les praticiens connus par leurs seuls comptes rendus enregistres.
+  const nomParPraticien = new Map<string, string>();
+  const rapportsParPraticien = new Map<string, AdminReport[]>();
+  for (const rapport of rapports) {
+    if (!rapport.user_id) continue;
+    nomParPraticien.set(rapport.user_id, rapport.user_name);
+    const liste = rapportsParPraticien.get(rapport.user_id);
+    if (liste) liste.push(rapport);
+    else rapportsParPraticien.set(rapport.user_id, [rapport]);
+    if (!parPraticien.has(rapport.user_id)) parPraticien.set(rapport.user_id, []);
   }
 
   const lignes: LignePraticien[] = [];
@@ -176,7 +206,14 @@ function agregerPraticiens(dossiers: LigneDossierEtude[]): LignePraticien[] {
       .sort();
     lignes.push({
       praticienId,
-      praticienNom: nomPraticien(cas),
+      // Le nom vient des dossiers quand il y en a, sinon des comptes rendus :
+      // afficher un identifiant technique a quelqu'un qui connait ses
+      // praticiens ne sert personne.
+      praticienNom:
+        cas.length > 0
+          ? nomPraticien(cas)
+          : (nomParPraticien.get(praticienId) ?? praticienId.slice(0, 8)),
+      nbRapports: rapportsParPraticien.get(praticienId)?.length ?? 0,
       nbCas: cas.length,
       nbValides: valides.length,
       nbAbandons: cas.filter((dossier) => dossier.abandonne).length,
@@ -317,6 +354,15 @@ function TableauPraticiens({
               </td>
               <td className="px-4 py-3 text-sm font-semibold tabular-nums">
                 {ligne.nbCas}
+                {/* UN PRATICIEN SANS CAS D'ETUDE MAIS AVEC DES COMPTES RENDUS
+                    n'est pas un praticien inactif : c'est un praticien dont
+                    les cas n'ont pas ete instrumentes. Le dire evite de le
+                    croire absent — et evite surtout de le chercher. */}
+                {ligne.nbCas === 0 && ligne.nbRapports > 0 && (
+                  <span className="ml-1 text-[0.65rem] font-normal text-muted-foreground">
+                    ({ligne.nbRapports} CR hors étude)
+                  </span>
+                )}
               </td>
               <td className="px-4 py-3">
                 <CelluleValides valides={ligne.nbValides} total={ligne.nbCas} />
@@ -752,7 +798,10 @@ export default function VuePraticiens({
   onSupprimerDossier,
   compact = false,
 }: VuePraticiensProps) {
-  const lignes = useMemo(() => agregerPraticiens(dossiers), [dossiers]);
+  const lignes = useMemo(
+    () => agregerPraticiens(dossiers, rapports),
+    [dossiers, rapports],
+  );
   const { comptes, parRapport } = useMemo(
     () => agregerComptes(rapports, corrections),
     [rapports, corrections],
