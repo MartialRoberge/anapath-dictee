@@ -1,0 +1,2000 @@
+{
+ "id": "demo",
+ "version": "3",
+ "titre": "BIOPSIES PULMONAIRES DU LOBE SUPÉRIEUR DROIT",
+ "dictee": {
+  "brute": "Biopsies pulmonaires, lobe supérieur droit. 4 fragments. On a une prolifération carcinomateuse infiltrante, avec des structures glandulaires irrégulières, parfois cribriformes, et des cellules cubocylindriques avec des noyaux augmentés de taille, nucléolés. Il y a aussi quelques zones solides. Pas de nécrose visible. En immuno, TTF1 + diffus, p40 neg. Ah oui, et le stroma est fibreux, avec une réaction desmoplastique.",
+  "corrigee": "Biopsies pulmonaires, lobe supérieur droit. 4 fragments. On a une prolifération carcinomateuse infiltrante, avec des structures glandulaires irrégulières, parfois cribriformes, et des cellules cubocylindriques avec des noyaux augmentés de taille, nucléolés. Il y a aussi quelques zones solides. Pas de nécrose visible. En immuno, TTF1 positif diffus, p40 négatif. Ah oui, et le stroma est fibreux, avec une réaction desmoplastique."
+ },
+ "contexte": {
+  "organes": [
+   "organe:poumon"
+  ],
+  "organes_libelles": [
+   "Poumon"
+  ],
+  "prelevement": "biopsie",
+  "contexte_lesionnel": "malin",
+  "niveau_service": "N0"
+ },
+ "corrections": [
+  {
+   "id": "corr1",
+   "original": "TTF1 +",
+   "corrige": "TTF1 positif",
+   "debut": 330,
+   "fin": 336,
+   "confiance": 0.97,
+   "raison": "signe « + » dicté en notation abrégée après le marqueur TTF1 (poumon) : lu « positif »",
+   "candidats": [
+    "TTF1 positif",
+    "TTF1 plus"
+   ],
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:seed_marc_v3",
+     "libelle": "Semences MARC v3 (à valider)",
+     "extrait": "Lexique : TTF1 (marqueur, poumon)",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "D",
+     "url": null
+    },
+    {
+     "kind": "agent",
+     "ref": "correcteur",
+     "libelle": "Correcteur phonétique",
+     "extrait": "TTF1 +",
+     "debut": null,
+     "fin": null,
+     "fiabilite": null,
+     "url": null
+    }
+   ],
+   "appliquee": true
+  },
+  {
+   "id": "corr2",
+   "original": "p40 neg",
+   "corrige": "p40 négatif",
+   "debut": 345,
+   "fin": 352,
+   "confiance": 0.96,
+   "raison": "abréviation « neg » après le marqueur p40 (poumon) : lue « négatif »",
+   "candidats": [
+    "p40 négatif",
+    "p40 négative"
+   ],
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:seed_marc_v3",
+     "libelle": "Semences MARC v3 (à valider)",
+     "extrait": "Lexique : p40 (marqueur, poumon)",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "D",
+     "url": null
+    },
+    {
+     "kind": "agent",
+     "ref": "correcteur",
+     "libelle": "Correcteur phonétique",
+     "extrait": "p40 neg",
+     "debut": null,
+     "fin": null,
+     "fiabilite": null,
+     "url": null
+    }
+   ],
+   "appliquee": true
+  }
+ ],
+ "sections": [
+  {
+   "id": "clinique",
+   "titre": "Renseignements cliniques",
+   "ordre": 0
+  },
+  {
+   "id": "macroscopie",
+   "titre": "Macroscopie",
+   "ordre": 1
+  },
+  {
+   "id": "microscopie",
+   "titre": "Microscopie",
+   "ordre": 2
+  },
+  {
+   "id": "ihc",
+   "titre": "Immunohistochimie",
+   "ordre": 3
+  },
+  {
+   "id": "conclusion",
+   "titre": "Conclusion",
+   "ordre": 4
+  }
+ ],
+ "elements": [
+  {
+   "id": "e1",
+   "section_id": "clinique",
+   "type": "trou",
+   "texte": "Renseignements cliniques",
+   "statut": "a_completer",
+   "confiance": 0.55,
+   "niveau": "basse",
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:conventions_cr_acp",
+     "libelle": "Conventions de rédaction des CR d'ACP",
+     "extrait": "Section 1 : renseignements cliniques",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "explication": "Les renseignements cliniques ne sont pas dictés : ils sont demandés avant validation du compte rendu.",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "info",
+     "titre": "Mention dans la dictée",
+     "detail": "« Renseignements cliniques » n'est pas mentionné dans la dictée.",
+     "calcul": "0 mention trouvée pour : renseignements cliniques, contexte clinique, antécédents, indication, motif",
+     "source": null,
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "info",
+     "titre": "Pourquoi ce champ est demandé",
+     "detail": "Section d'ouverture des comptes rendus de biopsie ; rendue obligatoire pour ce compte rendu.",
+     "calcul": "section « Renseignements cliniques » du gabarit poumon · biopsie ; obligatoire = oui ; 0 valeur dictée",
+     "source": null,
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Conventions de rédaction des CR d'ACP",
+     "detail": "Le gabarit de biopsie pulmonaire prévoit cette section en tête du compte rendu (structure de la section 1 des conventions). La bible de la pathologiste la renseigne par une phrase libre (indication, antécédents).",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:conventions_cr_acp",
+      "libelle": "Conventions de rédaction des CR d'ACP",
+      "extrait": "Section 1 : renseignements cliniques",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    }
+   ],
+   "a_verifier": "« Renseignements cliniques » est exigé pour ce compte rendu et n'a pas été dicté.",
+   "champ_id": null,
+   "obligatoire": true,
+   "options": [],
+   "unite": null
+  },
+  {
+   "id": "e2",
+   "section_id": "macroscopie",
+   "type": "phrase",
+   "texte": "4 carottes biopsiques parvenues fixées, mesurant de 3 à 6 mm.",
+   "statut": "normalise",
+   "confiance": 0.62,
+   "niveau": "moyenne",
+   "sources": [
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "4 fragments",
+     "debut": 44,
+     "fin": 55,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : macroscopie",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "explication": "Formule type de macroscopie : seul le nombre « 4 fragments » est dicté ; le type de prélèvement et la mesure ne le sont pas.",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "ok",
+     "titre": "Passage de la dictée",
+     "detail": "Passage retrouvé mot pour mot dans la dictée : « 4 fragments ». Ni la mesure ni le mot « carottes » n'y figurent.",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "4 fragments",
+      "debut": 44,
+      "fin": 55,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.9
+    },
+    {
+     "categorie": "regle",
+     "verdict": "ok",
+     "titre": "Chiffres conservés",
+     "detail": "Le nombre 4 figure dans la dictée.",
+     "calcul": "4 présent(s) dans la dictée",
+     "source": {
+      "kind": "regle",
+      "ref": "src:garde_fous",
+      "libelle": "Garde-fous déterministes MARC",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "attention",
+     "titre": "Mesure non dictée",
+     "detail": "« 3 à 6 mm » ne figure pas dans la dictée : aucune mesure n'a été dictée.",
+     "calcul": "valeurs 3 et 6 : 0 présente(s) dans la dictée ; seule la valeur 4 (nombre de fragments) l'est",
+     "source": {
+      "kind": "regle",
+      "ref": "src:garde_fous",
+      "libelle": "Garde-fous déterministes MARC",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": -0.28
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "ok",
+     "titre": "Formule type de la bible",
+     "detail": "Formule type de macroscopie des biopsies pulmonaires : la bible écrit « ont été adressés fixés en formol » ; « parvenues fixées » en est l'équivalent standard. La formule ne vient pas de la dictée.",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:docs_bibles_pathologiste",
+      "libelle": "Bible de la pathologiste · Biopsies",
+      "extrait": "Thorax › Poumon › Biopsies : macroscopie",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "modele",
+     "verdict": "attention",
+     "titre": "Ce que le modèle a fait",
+     "detail": "Formule standard ajoutée par le modèle de rédaction : « fragments » devient « carottes biopsiques » (prélèvement à l'aiguille ou à la pince : non dicté) et « parvenues fixées » est ajouté. La mesure est reprise de la formule, pas de la dictée.",
+     "calcul": "0,90 (dictée) − 0,28 (mesure non dictée) = 0,62",
+     "source": {
+      "kind": "agent",
+      "ref": "redacteur",
+      "libelle": "Rédacteur (mistral-large-2512)",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": null
+    }
+   ],
+   "a_verifier": "Mesure non dictée : à confirmer ou corriger avant validation.",
+   "champ_id": null,
+   "obligatoire": false,
+   "options": [],
+   "unite": null
+  },
+  {
+   "id": "e3",
+   "section_id": "macroscopie",
+   "type": "trou",
+   "texte": "Inclusion (nombre de blocs ou cassettes, mode d'inclusion)",
+   "statut": "a_completer",
+   "confiance": 0.6,
+   "niveau": "moyenne",
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : macroscopie",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "explication": "L'inclusion n'est pas dictée : la bible des biopsies pulmonaires la précise toujours (blocs, paraffine, niveaux de coupe).",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "info",
+     "titre": "Mention dans la dictée",
+     "detail": "« Inclusion (nombre de blocs ou cassettes, mode d'inclusion) » n'est pas mentionné dans la dictée.",
+     "calcul": "0 mention trouvée pour : inclusion, bloc, blocs, cassette, cassettes, paraffine",
+     "source": null,
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "info",
+     "titre": "Pourquoi ce champ est demandé",
+     "detail": "Précision de la macroscopie des biopsies : nombre de blocs et mode d'inclusion.",
+     "calcul": "section macroscopie ; formule type de la bible : « inclus en paraffine en un bloc » ; 0 valeur dictée",
+     "source": null,
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Formule de la bible",
+     "detail": "Les macroscopies de la bible pour les biopsies pulmonaires indiquent le nombre de blocs et le mode d'inclusion (« inclus en paraffine en un bloc, examinés sur deux plans de coupe »).",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:docs_bibles_pathologiste",
+      "libelle": "Bible de la pathologiste · Biopsies",
+      "extrait": "Thorax › Poumon › Biopsies : macroscopie",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    }
+   ],
+   "a_verifier": "« Inclusion (nombre de blocs ou cassettes, mode d'inclusion) » est précisé dans les macroscopies de référence et n'a pas été dicté.",
+   "champ_id": null,
+   "obligatoire": true,
+   "options": [],
+   "unite": null
+  },
+  {
+   "id": "e4",
+   "section_id": "microscopie",
+   "type": "phrase",
+   "texte": "Les prélèvements intéressent une prolifération carcinomateuse infiltrante, constituée de cellules cubocylindriques atypiques, présentant des noyaux augmentés de taille, nucléolés.",
+   "statut": "reformule",
+   "confiance": 0.93,
+   "niveau": "haute",
+   "sources": [
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "prolifération carcinomateuse infiltrante",
+     "debut": 66,
+     "fin": 106,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "cellules cubocylindriques avec des noyaux augmentés de taille, nucléolés",
+     "debut": 184,
+     "fin": 256,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : microscopie",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "explication": "Reformulation fidèle de deux passages dictés ; « atypiques » reprend la description des noyaux, sans rien ajouter de nouveau.",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "ok",
+     "titre": "Passage de la dictée : prolifération",
+     "detail": "Passage retrouvé mot pour mot dans la dictée : « prolifération carcinomateuse infiltrante ».",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "prolifération carcinomateuse infiltrante",
+      "debut": 66,
+      "fin": 106,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.9
+    },
+    {
+     "categorie": "dictee",
+     "verdict": "ok",
+     "titre": "Passage de la dictée : cellules et noyaux",
+     "detail": "Passage retrouvé mot pour mot dans la dictée : « cellules cubocylindriques avec des noyaux augmentés de taille, nucléolés ».",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "cellules cubocylindriques avec des noyaux augmentés de taille, nucléolés",
+      "debut": 184,
+      "fin": 256,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "ok",
+     "titre": "Chiffres et négations",
+     "detail": "Aucun nombre ni négation dans la phrase ni dans les passages dictés.",
+     "calcul": "0 nombre ; 0 négation",
+     "source": {
+      "kind": "regle",
+      "ref": "src:garde_fous",
+      "libelle": "Garde-fous déterministes MARC",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Formule de la bible",
+     "detail": "La bible décrit de la même façon les cellules d'un adénocarcinome : « cellules modérément atypiques […] au noyau augmenté de taille, parfois nucléolé ». « atypiques » en est repris ; il traduit « noyaux augmentés de taille, nucléolés ».",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:docs_bibles_pathologiste",
+      "libelle": "Bible de la pathologiste · Biopsies",
+      "extrait": "Thorax › Poumon › Biopsies : microscopie",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "modele",
+     "verdict": "info",
+     "titre": "Ce que le modèle a fait",
+     "detail": "Reformulé par le modèle de rédaction (« atypiques » ajouté pour qualifier les cellules). Relecteur indépendant : fidèle à la dictée.",
+     "calcul": "−0,03 (reformule) +0,06 (relecteur) = +0,03",
+     "source": {
+      "kind": "agent",
+      "ref": "relecteur",
+      "libelle": "Relecteur (mistral-medium-latest)",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.03
+    }
+   ],
+   "a_verifier": null,
+   "champ_id": null,
+   "obligatoire": false,
+   "options": [],
+   "unite": null
+  },
+  {
+   "id": "e5",
+   "section_id": "microscopie",
+   "type": "phrase",
+   "texte": "La prolifération présente une architecture glandulaire irrégulière, focalement cribriforme, associée à des territoires d'architecture solide. Le stroma tumoral est fibreux, avec une réaction desmoplastique.",
+   "statut": "reformule",
+   "confiance": 0.9,
+   "niveau": "haute",
+   "sources": [
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "structures glandulaires irrégulières, parfois cribriformes",
+     "debut": 117,
+     "fin": 175,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "quelques zones solides",
+     "debut": 271,
+     "fin": 293,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "le stroma est fibreux, avec une réaction desmoplastique",
+     "debut": 375,
+     "fin": 430,
+     "fiabilite": null,
+     "url": null
+    }
+   ],
+   "explication": "Reformulation de trois passages dictés : « parfois » devient « focalement », « zones » devient « territoires », « tumoral » qualifie le stroma.",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "ok",
+     "titre": "Passage de la dictée : architecture",
+     "detail": "Passage retrouvé mot pour mot dans la dictée : « structures glandulaires irrégulières, parfois cribriformes ».",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "structures glandulaires irrégulières, parfois cribriformes",
+      "debut": 117,
+      "fin": 175,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.9
+    },
+    {
+     "categorie": "dictee",
+     "verdict": "ok",
+     "titre": "Passage de la dictée : zones solides",
+     "detail": "Passage retrouvé mot pour mot dans la dictée : « quelques zones solides ».",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "quelques zones solides",
+      "debut": 271,
+      "fin": 293,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "dictee",
+     "verdict": "ok",
+     "titre": "Passage de la dictée : stroma",
+     "detail": "Passage retrouvé mot pour mot dans la dictée : « le stroma est fibreux, avec une réaction desmoplastique ».",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "le stroma est fibreux, avec une réaction desmoplastique",
+      "debut": 375,
+      "fin": 430,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "ok",
+     "titre": "Chiffres et négations",
+     "detail": "Aucun nombre ni négation dans la phrase ni dans les passages dictés.",
+     "calcul": "0 nombre ; 0 négation",
+     "source": {
+      "kind": "regle",
+      "ref": "src:garde_fous",
+      "libelle": "Garde-fous déterministes MARC",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Champ du référentiel",
+     "detail": "L'architecture décrite alimente le champ « Pattern prédominant » du gabarit poumon (formulation libre acceptée).",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:templates_organes_py",
+      "libelle": "Référentiel interne MARC (à valider)",
+      "extrait": "Gabarit MARC Poumon, champ 3 : Pattern prédominant",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "C",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "modele",
+     "verdict": "info",
+     "titre": "Ce que le modèle a fait",
+     "detail": "Reformulé par le modèle de rédaction : « parfois » devient « focalement », « zones » devient « territoires », « tumoral » qualifie le stroma. Relecteur indépendant : fidèle à la dictée.",
+     "calcul": "−0,06 (reformule) +0,06 (relecteur) = 0,00",
+     "source": {
+      "kind": "agent",
+      "ref": "relecteur",
+      "libelle": "Relecteur (mistral-medium-latest)",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.0
+    }
+   ],
+   "a_verifier": null,
+   "champ_id": null,
+   "obligatoire": false,
+   "options": [],
+   "unite": null
+  },
+  {
+   "id": "e6",
+   "section_id": "microscopie",
+   "type": "phrase",
+   "texte": "Il n'est pas identifié de nécrose tumorale ni d'embole vasculaire sur le matériel examiné.",
+   "statut": "reformule",
+   "confiance": 0.58,
+   "niveau": "basse",
+   "sources": [
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "Pas de nécrose visible",
+     "debut": 295,
+     "fin": 317,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:templates_organes_py",
+     "libelle": "Référentiel interne MARC (à valider)",
+     "extrait": "Gabarit MARC Poumon, champ 6 : Emboles vasculaires",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "C",
+     "url": null
+    }
+   ],
+   "explication": "La nécrose est dictée (« Pas de nécrose visible ») ; l'absence d'embole vasculaire n'est pas dictée.",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "ok",
+     "titre": "Passage de la dictée : nécrose",
+     "detail": "Passage retrouvé mot pour mot dans la dictée : « Pas de nécrose visible ».",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "Pas de nécrose visible",
+      "debut": 295,
+      "fin": 317,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.9
+    },
+    {
+     "categorie": "dictee",
+     "verdict": "attention",
+     "titre": "Embole : non mentionné dans la dictée",
+     "detail": "Aucune mention d'embole ni d'invasion vasculaire dans la dictée.",
+     "calcul": "0 mention trouvée pour : embole, emboles, invasion vasculaire",
+     "source": null,
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "ok",
+     "titre": "Négation de la nécrose conservée",
+     "detail": "La négation de la nécrose figure aussi dans la dictée.",
+     "calcul": "dictée : « pas de » ; élément : « pas identifié »",
+     "source": {
+      "kind": "regle",
+      "ref": "src:garde_fous",
+      "libelle": "Garde-fous déterministes MARC",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "attention",
+     "titre": "Négation d'embole non dictée",
+     "detail": "« ni d'embole vasculaire » est une négation qui n'a pas été dictée : MARC ne peut pas la déduire de l'absence de nécrose.",
+     "calcul": "négations de l'élément : 2 (nécrose, embole) ; négations dictées : 1 (nécrose)",
+     "source": {
+      "kind": "regle",
+      "ref": "src:garde_fous",
+      "libelle": "Garde-fous déterministes MARC",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": -0.32
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Champ « Emboles vasculaires »",
+     "detail": "Le gabarit poumon contient ce champ pour les pièces opératoires et les cas indéterminés ; il n'est pas exigé sur biopsie : son absence de la dictée n'est donc pas une erreur, mais l'affirmer demande une confirmation.",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:templates_organes_py",
+      "libelle": "Référentiel interne MARC (à valider)",
+      "extrait": "Gabarit MARC Poumon, champ 6 : Emboles vasculaires",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "C",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "modele",
+     "verdict": "attention",
+     "titre": "Ce que le modèle a fait",
+     "detail": "Le modèle de rédaction a ajouté « ni d'embole vasculaire » à la nécrose dictée et qualifié la nécrose de « tumorale » (non dicté).",
+     "calcul": "0,90 (dictée) − 0,32 (négation d'embole non dictée) = 0,58",
+     "source": {
+      "kind": "agent",
+      "ref": "redacteur",
+      "libelle": "Rédacteur (mistral-large-2512)",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": null
+    }
+   ],
+   "a_verifier": "Absence d'embole non dictée : à confirmer.",
+   "champ_id": null,
+   "obligatoire": false,
+   "options": [],
+   "unite": null
+  },
+  {
+   "id": "e7",
+   "section_id": "ihc",
+   "type": "liste",
+   "texte": "TTF1 : expression nucléaire diffuse.",
+   "statut": "normalise",
+   "confiance": 0.92,
+   "niveau": "haute",
+   "sources": [
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "TTF1 positif diffus",
+     "debut": 330,
+     "fin": 349,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : tableau IHC",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "explication": "« TTF1 positif diffus » est dicté ; « nucléaire » est la localisation habituelle du marquage TTF1, ajoutée par la mise en forme. Correction phonétique : « TTF1 + » → « TTF1 positif ».",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "ok",
+     "titre": "Passage de la dictée",
+     "detail": "Passage retrouvé mot pour mot dans la dictée corrigée : « TTF1 positif diffus » (dicté « TTF1 + diffus », corrigé en « positif »).",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "TTF1 positif diffus",
+      "debut": 330,
+      "fin": 349,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.9
+    },
+    {
+     "categorie": "dictee",
+     "verdict": "info",
+     "titre": "Correction phonétique dans le passage",
+     "detail": "« TTF1 + » a été corrigé en « TTF1 positif » (confiance 97 %). Correction sans effet sur la confiance : lecture non ambiguë.",
+     "calcul": null,
+     "source": {
+      "kind": "agent",
+      "ref": "correcteur",
+      "libelle": "Correcteur phonétique",
+      "extrait": "TTF1 +",
+      "debut": null,
+      "fin": null,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "ok",
+     "titre": "Chiffres conservés",
+     "detail": "Le nombre 1 (TTF1) figure dans la dictée.",
+     "calcul": "1 présent(s) dans la dictée",
+     "source": {
+      "kind": "regle",
+      "ref": "src:garde_fous",
+      "libelle": "Garde-fous déterministes MARC",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Tableau IHC de la bible",
+     "detail": "Dans le tableau d'immunomarquage de la bible, TTF1 est décrit par un « marquage nucléaire » : « nucléaire » est repris de cette formule, il n'a pas été dicté.",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:docs_bibles_pathologiste",
+      "libelle": "Bible de la pathologiste · Biopsies",
+      "extrait": "Thorax › Poumon › Biopsies : tableau IHC",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "modele",
+     "verdict": "info",
+     "titre": "Ce que le modèle a fait",
+     "detail": "Normalisé : « positif » devient « expression » et « nucléaire » est ajouté (localisation habituelle, non dictée). Relecteur indépendant : fidèle à la dictée.",
+     "calcul": "−0,04 (normalise : ajout non dicté) +0,06 (relecteur) = +0,02",
+     "source": {
+      "kind": "agent",
+      "ref": "relecteur",
+      "libelle": "Relecteur (mistral-medium-latest)",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.02
+    }
+   ],
+   "a_verifier": null,
+   "champ_id": null,
+   "obligatoire": false,
+   "options": [],
+   "unite": null
+  },
+  {
+   "id": "e8",
+   "section_id": "ihc",
+   "type": "liste",
+   "texte": "p40 : absence d'expression.",
+   "statut": "normalise",
+   "confiance": 0.96,
+   "niveau": "haute",
+   "sources": [
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "p40 négatif",
+     "debut": 351,
+     "fin": 362,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : tableau IHC",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "explication": "« p40 négatif » est dicté ; « absence d'expression » est la formule standard d'un résultat négatif. Correction phonétique : « p40 neg » → « p40 négatif ».",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "ok",
+     "titre": "Passage de la dictée",
+     "detail": "Passage retrouvé mot pour mot dans la dictée corrigée : « p40 négatif » (dicté « p40 neg », corrigé en « négatif »).",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "p40 négatif",
+      "debut": 351,
+      "fin": 362,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.9
+    },
+    {
+     "categorie": "dictee",
+     "verdict": "info",
+     "titre": "Correction phonétique dans le passage",
+     "detail": "« p40 neg » a été corrigé en « p40 négatif » (confiance 96 %). Correction sans effet sur la confiance : lecture non ambiguë.",
+     "calcul": null,
+     "source": {
+      "kind": "agent",
+      "ref": "correcteur",
+      "libelle": "Correcteur phonétique",
+      "extrait": "p40 neg",
+      "debut": null,
+      "fin": null,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "ok",
+     "titre": "Négations conservées",
+     "detail": "Le résultat négatif de la dictée est conservé : « négatif » devient « absence ».",
+     "calcul": "dictée : négatif ; élément : absence",
+     "source": {
+      "kind": "regle",
+      "ref": "src:garde_fous",
+      "libelle": "Garde-fous déterministes MARC",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Tableau IHC de la bible",
+     "detail": "Pour p40, la bible écrit « absence de marquage des cellules tumorales » : même sens.",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:docs_bibles_pathologiste",
+      "libelle": "Bible de la pathologiste · Biopsies",
+      "extrait": "Thorax › Poumon › Biopsies : tableau IHC",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "modele",
+     "verdict": "ok",
+     "titre": "Ce que le modèle a fait",
+     "detail": "Normalisé par le modèle de rédaction. Relecteur indépendant : fidèle à la dictée.",
+     "calcul": "+0,06 (relecteur) = +0,06",
+     "source": {
+      "kind": "agent",
+      "ref": "relecteur",
+      "libelle": "Relecteur (mistral-medium-latest)",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.06
+    }
+   ],
+   "a_verifier": null,
+   "champ_id": null,
+   "obligatoire": false,
+   "options": [],
+   "unite": null
+  },
+  {
+   "id": "e9",
+   "section_id": "ihc",
+   "type": "trou",
+   "texte": "Statut PD-L1 (TPS)",
+   "statut": "a_completer",
+   "confiance": 0.6,
+   "niveau": "moyenne",
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:templates_organes_py",
+     "libelle": "Référentiel interne MARC (à valider)",
+     "extrait": "Gabarit MARC Poumon, champ 10 : PD-L1 (TPS)",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "C",
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : tableau IHC",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "explication": "Le statut PD-L1 n'est pas dicté : il est exigé pour un carcinome pulmonaire sur biopsie.",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "info",
+     "titre": "Mention dans la dictée",
+     "detail": "« Statut PD-L1 (TPS) » n'est pas mentionné dans la dictée.",
+     "calcul": "0 mention trouvée pour : PD-L1, PDL1, TPS, 22C3, SP263, SP142, tumor proportion",
+     "source": null,
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "info",
+     "titre": "Pourquoi ce champ est demandé",
+     "detail": "Exigé pour : poumon · biopsie · lésion maligne (carcinome non à petites cellules).",
+     "calcul": "organe = poumon ; prélèvement = biopsie ; champ tumoral : exigé quand la lésion est maligne ; lésion détectée = lésion maligne",
+     "source": null,
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Source du champ",
+     "detail": "Exigence du gabarit interne MARC pour le poumon (champ « PD-L1 (TPS) », en %). À faire valider par la pathologiste référente.",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:templates_organes_py",
+      "libelle": "Référentiel interne MARC (à valider)",
+      "extrait": "Gabarit MARC Poumon, champ 10 : PD-L1 (TPS)",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "C",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Tableau IHC de la bible",
+     "detail": "Le tableau d'immunomarquage des biopsies pulmonaires de la bible contient une ligne PD-L1. Les données minimales INCa 2011 ne couvrent pas les biomarqueurs (PD-L1, ALK) : ils relèvent d'une exigence de pratique.",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:docs_bibles_pathologiste",
+      "libelle": "Bible de la pathologiste · Biopsies",
+      "extrait": "Thorax › Poumon › Biopsies : tableau IHC",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    }
+   ],
+   "a_verifier": "« Statut PD-L1 (TPS) » est exigé pour un carcinome pulmonaire sur biopsie et n'a pas été dicté.",
+   "champ_id": "champ:poumon.pd_l1_tps",
+   "obligatoire": true,
+   "options": [],
+   "unite": "%"
+  },
+  {
+   "id": "e10",
+   "section_id": "ihc",
+   "type": "trou",
+   "texte": "ALK",
+   "statut": "a_completer",
+   "confiance": 0.6,
+   "niveau": "moyenne",
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:templates_organes_py",
+     "libelle": "Référentiel interne MARC (à valider)",
+     "extrait": "Gabarit MARC Poumon, champ 11 : Biologie moléculaire (panel)",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "C",
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : tableau IHC",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "explication": "Le statut ALK n'est pas dicté : il est recommandé pour un adénocarcinome pulmonaire sur biopsie.",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "info",
+     "titre": "Mention dans la dictée",
+     "detail": "« ALK » n'est pas mentionné dans la dictée.",
+     "calcul": "0 mention trouvée pour : ALK, EGFR, ROS1, KRAS, BRAF, réarrangement, translocation",
+     "source": null,
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "info",
+     "titre": "Pourquoi ce champ est demandé",
+     "detail": "Recommandé pour : poumon · biopsie · lésion maligne (panel de biologie moléculaire, dont ALK).",
+     "calcul": "organe = poumon ; prélèvement = biopsie ; champ « Biologie moléculaire (panel) » : niveau recommandé, lésion maligne",
+     "source": null,
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Source du champ",
+     "detail": "ALK fait partie du champ « Biologie moléculaire (panel) » du gabarit interne MARC pour le poumon (niveau recommandé, non obligatoire). À faire valider par la pathologiste référente.",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:templates_organes_py",
+      "libelle": "Référentiel interne MARC (à valider)",
+      "extrait": "Gabarit MARC Poumon, champ 11 : Biologie moléculaire (panel)",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "C",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Tableau IHC de la bible",
+     "detail": "Le tableau d'immunomarquage des biopsies pulmonaires de la bible contient une ligne ALK (IHC).",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:docs_bibles_pathologiste",
+      "libelle": "Bible de la pathologiste · Biopsies",
+      "extrait": "Thorax › Poumon › Biopsies : tableau IHC",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    }
+   ],
+   "a_verifier": "« ALK » est recommandé pour un adénocarcinome pulmonaire sur biopsie et n'a pas été dicté.",
+   "champ_id": "champ:poumon.biologie_moleculaire_panel",
+   "obligatoire": false,
+   "options": [],
+   "unite": null
+  },
+  {
+   "id": "e11",
+   "section_id": "conclusion",
+   "type": "phrase",
+   "texte": "Adénocarcinome pulmonaire infiltrant, non mucineux.",
+   "statut": "normalise",
+   "confiance": 0.63,
+   "niveau": "moyenne",
+   "sources": [
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "TTF1 positif diffus",
+     "debut": 330,
+     "fin": 349,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "p40 négatif",
+     "debut": 351,
+     "fin": 362,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "structures glandulaires irrégulières, parfois cribriformes",
+     "debut": 117,
+     "fin": 175,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "web",
+     "ref": "https://tumourclassification.iarc.who.int/",
+     "libelle": "OMS · Classification des tumeurs thoraciques, 5e éd. (2021)",
+     "extrait": "Adénocarcinome pulmonaire : critères et sous-types",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "A",
+     "url": "https://tumourclassification.iarc.who.int/"
+    },
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : conclusion",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "explication": "Diagnostic déduit, non dicté : « adénocarcinome » découle du profil TTF1 positif / p40 négatif et de l'architecture ; « non mucineux » est une déduction à confirmer.",
+   "preuves": [
+    {
+     "categorie": "dictee",
+     "verdict": "info",
+     "titre": "Passages dictés à l'origine de la déduction",
+     "detail": "Aucun passage ne nomme le diagnostic. Sont dictés : « prolifération carcinomateuse infiltrante », « structures glandulaires irrégulières, parfois cribriformes », « TTF1 positif diffus » et « p40 négatif ».",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "TTF1 positif diffus",
+      "debut": 330,
+      "fin": 349,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": 0.75
+    },
+    {
+     "categorie": "dictee",
+     "verdict": "info",
+     "titre": "Passage de la dictée : p40",
+     "detail": "Passage retrouvé mot pour mot dans la dictée corrigée : « p40 négatif ».",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "p40 négatif",
+      "debut": 351,
+      "fin": 362,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "dictee",
+     "verdict": "info",
+     "titre": "Passage de la dictée : architecture",
+     "detail": "Passage retrouvé mot pour mot dans la dictée : « structures glandulaires irrégulières, parfois cribriformes ».",
+     "calcul": null,
+     "source": {
+      "kind": "dictee",
+      "ref": "dictee",
+      "libelle": "Dictée",
+      "extrait": "structures glandulaires irrégulières, parfois cribriformes",
+      "debut": 117,
+      "fin": 175,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "ok",
+     "titre": "Déduction du diagnostic",
+     "detail": "TTF1 positif et p40 négatif, avec architecture glandulaire et cribriforme : profil compatible avec un adénocarcinome selon la classification OMS des tumeurs thoraciques (5e éd., 2021).",
+     "calcul": "TTF1 + ; p40 − ; architecture glandulaire / cribriforme ⇒ adénocarcinome (règle de déduction, à confirmer)",
+     "source": {
+      "kind": "web",
+      "ref": "https://tumourclassification.iarc.who.int/",
+      "libelle": "OMS · Classification des tumeurs thoraciques, 5e éd. (2021)",
+      "extrait": "Adénocarcinome pulmonaire : critères et sous-types",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "A",
+      "url": "https://tumourclassification.iarc.who.int/"
+     },
+     "effet": null
+    },
+    {
+     "categorie": "regle",
+     "verdict": "attention",
+     "titre": "« Non mucineux » non dicté",
+     "detail": "Le caractère non mucineux n'est pas dicté : il est déduit de l'absence de mention de mucus dans la description.",
+     "calcul": "0 mention de mucus ou de caractère mucineux dans la dictée",
+     "source": {
+      "kind": "regle",
+      "ref": "src:garde_fous",
+      "libelle": "Garde-fous déterministes MARC",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": -0.12
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Classification OMS des tumeurs thoraciques",
+     "detail": "Référence publique de la déduction : la classification OMS (5e éd., 2021) définit l'adénocarcinome pulmonaire et ses sous-types architecturaux. Elle n'est pas dans la base de connaissances de MARC : citée comme source web, consultable en ligne.",
+     "calcul": null,
+     "source": {
+      "kind": "web",
+      "ref": "https://tumourclassification.iarc.who.int/",
+      "libelle": "OMS · Classification des tumeurs thoraciques, 5e éd. (2021)",
+      "extrait": "Adénocarcinome pulmonaire : critères et sous-types",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "A",
+      "url": "https://tumourclassification.iarc.who.int/"
+     },
+     "effet": null
+    },
+    {
+     "categorie": "referentiel",
+     "verdict": "info",
+     "titre": "Formule de conclusion de la bible",
+     "detail": "La bible conclut ses biopsies pulmonaires par « Adénocarcinome infiltrant non mucineux, d'architecture acineuse, de phénotype TTF1 + en accord avec une origine pulmonaire » : formule reprise sans le sous-type, qui n'est pas dicté.",
+     "calcul": null,
+     "source": {
+      "kind": "kb",
+      "ref": "src:docs_bibles_pathologiste",
+      "libelle": "Bible de la pathologiste · Biopsies",
+      "extrait": "Thorax › Poumon › Biopsies : conclusion",
+      "debut": null,
+      "fin": null,
+      "fiabilite": "B",
+      "url": null
+     },
+     "effet": null
+    },
+    {
+     "categorie": "modele",
+     "verdict": "attention",
+     "titre": "Ce que le modèle a fait",
+     "detail": "Conclusion proposée par le modèle de rédaction à partir des passages dictés. C'est une proposition à valider par le praticien, pas un fait dicté.",
+     "calcul": "0,75 (passages dictés) − 0,12 (« non mucineux » non dicté) = 0,63",
+     "source": {
+      "kind": "agent",
+      "ref": "redacteur",
+      "libelle": "Rédacteur (mistral-large-2512)",
+      "extrait": null,
+      "debut": null,
+      "fin": null,
+      "fiabilite": null,
+      "url": null
+     },
+     "effet": null
+    }
+   ],
+   "a_verifier": "Diagnostic déduit, non dicté : « adénocarcinome » et « non mucineux » sont à confirmer.",
+   "champ_id": null,
+   "obligatoire": false,
+   "options": [],
+   "unite": null
+  }
+ ],
+ "alertes": [
+  {
+   "id": "a1",
+   "type": "securite",
+   "gravite": "attention",
+   "message": "À vérifier : la mesure « 3 à 6 mm » n'est pas dictée.",
+   "element_ids": [
+    "e2"
+   ],
+   "suggestion": null,
+   "confiance": 0.7,
+   "sources": [
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "4 fragments",
+     "debut": 44,
+     "fin": 55,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : macroscopie",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "agent": "Relecteur",
+   "pourquoi": "La dictée ne donne aucune mesure des prélèvements : « 3 à 6 mm » vient de la formule type, pas de vous. « fragments » est aussi repris en « carottes biopsiques » (type de prélèvement non dicté).",
+   "calcul": "valeurs 3 et 6 mm : 0 présente(s) dans la dictée",
+   "action": "Confirmer la mesure ou la corriger avant validation"
+  },
+  {
+   "id": "a2",
+   "type": "securite",
+   "gravite": "attention",
+   "message": "À vérifier : « ni d'embole vasculaire » n'est pas dicté.",
+   "element_ids": [
+    "e6"
+   ],
+   "suggestion": null,
+   "confiance": 0.68,
+   "sources": [
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "Pas de nécrose visible",
+     "debut": 295,
+     "fin": 317,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:templates_organes_py",
+     "libelle": "Référentiel interne MARC (à valider)",
+     "extrait": "Gabarit MARC Poumon, champ 6 : Emboles vasculaires",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "C",
+     "url": null
+    }
+   ],
+   "agent": "Relecteur",
+   "pourquoi": "Seule l'absence de nécrose est dictée ; l'absence d'embole vasculaire a été ajoutée par le modèle de rédaction.",
+   "calcul": "négations de l'élément : 2 ; négations dictées : 1 (nécrose)",
+   "action": "Confirmer l'absence d'embole, ou retirer « ni d'embole vasculaire »"
+  },
+  {
+   "id": "a3",
+   "type": "securite",
+   "gravite": "attention",
+   "message": "À vérifier : le diagnostic « adénocarcinome pulmonaire infiltrant, non mucineux » est déduit, non dicté.",
+   "element_ids": [
+    "e11"
+   ],
+   "suggestion": null,
+   "confiance": 0.7,
+   "sources": [
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "TTF1 positif diffus",
+     "debut": 330,
+     "fin": 349,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "p40 négatif",
+     "debut": 351,
+     "fin": 362,
+     "fiabilite": null,
+     "url": null
+    },
+    {
+     "kind": "web",
+     "ref": "https://tumourclassification.iarc.who.int/",
+     "libelle": "OMS · Classification des tumeurs thoraciques, 5e éd. (2021)",
+     "extrait": "Adénocarcinome pulmonaire : critères et sous-types",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "A",
+     "url": "https://tumourclassification.iarc.who.int/"
+    }
+   ],
+   "agent": "Relecteur",
+   "pourquoi": "Aucun passage de la dictée ne nomme le diagnostic. « Adénocarcinome » est déduit du profil TTF1 positif / p40 négatif et de l'architecture glandulaire ; « non mucineux » n'est pas dicté du tout.",
+   "calcul": "TTF1 + ; p40 − ; architecture glandulaire / cribriforme ⇒ adénocarcinome (OMS, 5e éd., 2021) ; mucus : 0 mention",
+   "action": "Confirmer le diagnostic et le caractère non mucineux, ou les corriger avant validation"
+  },
+  {
+   "id": "a4",
+   "type": "manquant",
+   "gravite": "attention",
+   "message": "Champ obligatoire non dicté : Renseignements cliniques.",
+   "element_ids": [
+    "e1"
+   ],
+   "suggestion": null,
+   "confiance": 0.6,
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:conventions_cr_acp",
+     "libelle": "Conventions de rédaction des CR d'ACP",
+     "extrait": "Section 1 : renseignements cliniques",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "agent": "Vérificateur de complétude",
+   "pourquoi": "« Renseignements cliniques » est exigé pour ce compte rendu (section d'ouverture du gabarit de biopsie) et rien dans la dictée ne le renseigne.",
+   "calcul": "0 mention trouvée pour : renseignements cliniques, contexte clinique, antécédents, indication",
+   "action": "Dicter la valeur ou la saisir dans le champ à compléter"
+  },
+  {
+   "id": "a5",
+   "type": "manquant",
+   "gravite": "attention",
+   "message": "Champ non dicté : Inclusion (nombre de blocs ou cassettes, mode d'inclusion).",
+   "element_ids": [
+    "e3"
+   ],
+   "suggestion": null,
+   "confiance": 0.6,
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : macroscopie",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "agent": "Vérificateur de complétude",
+   "pourquoi": "L'inclusion est précisée dans toutes les macroscopies de biopsie pulmonaire de la bible et rien dans la dictée ne la renseigne.",
+   "calcul": "0 mention trouvée pour : inclusion, bloc, blocs, cassette, paraffine",
+   "action": "Dicter le nombre de blocs ou de cassettes et le mode d'inclusion"
+  },
+  {
+   "id": "a6",
+   "type": "manquant",
+   "gravite": "attention",
+   "message": "Champ obligatoire non dicté : Statut PD-L1 (TPS).",
+   "element_ids": [
+    "e9"
+   ],
+   "suggestion": null,
+   "confiance": 0.6,
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:templates_organes_py",
+     "libelle": "Référentiel interne MARC (à valider)",
+     "extrait": "Gabarit MARC Poumon, champ 10 : PD-L1 (TPS)",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "C",
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : tableau IHC",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "agent": "Vérificateur de complétude",
+   "pourquoi": "« PD-L1 (TPS) » est exigé pour un carcinome pulmonaire sur biopsie (gabarit poumon de MARC, à valider) et rien dans la dictée ne le renseigne.",
+   "calcul": "0 mention trouvée pour : PD-L1, PDL1, TPS, 22C3",
+   "action": "Dicter la valeur (TPS en %) ou la saisir dans le champ à compléter"
+  },
+  {
+   "id": "a7",
+   "type": "manquant",
+   "gravite": "attention",
+   "message": "Champ non dicté : ALK.",
+   "element_ids": [
+    "e10"
+   ],
+   "suggestion": null,
+   "confiance": 0.6,
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:templates_organes_py",
+     "libelle": "Référentiel interne MARC (à valider)",
+     "extrait": "Gabarit MARC Poumon, champ 11 : Biologie moléculaire (panel)",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "C",
+     "url": null
+    },
+    {
+     "kind": "kb",
+     "ref": "src:docs_bibles_pathologiste",
+     "libelle": "Bible de la pathologiste · Biopsies",
+     "extrait": "Thorax › Poumon › Biopsies : tableau IHC",
+     "debut": null,
+     "fin": null,
+     "fiabilite": "B",
+     "url": null
+    }
+   ],
+   "agent": "Vérificateur de complétude",
+   "pourquoi": "ALK est recommandé pour un adénocarcinome pulmonaire sur biopsie (panel de biologie moléculaire du gabarit poumon) et rien dans la dictée ne le renseigne.",
+   "calcul": "0 mention trouvée pour : ALK, EGFR, ROS1, réarrangement",
+   "action": "Dicter le statut ALK (IHC ou FISH) ou la saisir dans le champ à compléter"
+  }
+ ],
+ "codes": [
+  {
+   "systeme": "ADICAP",
+   "code": "BIRPA7A0",
+   "libelle": "Poumon - Adenocarcinome invasif (SAI)",
+   "statut": "partiel",
+   "confiance": 0.6,
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:adicap_2024_10",
+     "libelle": "ANS · Thésaurus ADICAP (2024-10)",
+     "extrait": null,
+     "debut": null,
+     "fin": null,
+     "fiabilite": "A",
+     "url": "https://esante.gouv.fr/produits-services/cgts/adicap"
+    },
+    {
+     "kind": "dictee",
+     "ref": "dictee",
+     "libelle": "Dictée",
+     "extrait": "prolifération carcinomateuse infiltrante",
+     "debut": 66,
+     "fin": 106,
+     "fiabilite": null,
+     "url": null
+    }
+   ],
+   "explication": "Prélèvement Biopsie chirurgicale (B), technique Immunohistochimie (I), organe Poumon (RP), lésion Adenocarcinome invasif (SAI) (A7A0). Le code lésionnel découle de la conclusion proposée, qui n'est pas dictée : à confirmer avec le diagnostic."
+  },
+  {
+   "systeme": "SNOMED_CT",
+   "code": "39607008",
+   "libelle": "Lung structure",
+   "statut": "suggestion",
+   "confiance": 0.45,
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:snomed_py_historique",
+     "libelle": "Correspondances SNOMED CT saisies à la main (à valider)",
+     "extrait": null,
+     "debut": null,
+     "fin": null,
+     "fiabilite": "C",
+     "url": null
+    }
+   ],
+   "explication": "SNOMED CT (topographie) depuis le contenu affirmé du projet. Suggestion non validée contre une édition officielle SNOMED CT."
+  },
+  {
+   "systeme": "SNOMED_CT",
+   "code": "35917007",
+   "libelle": "Adenocarcinome",
+   "statut": "suggestion",
+   "confiance": 0.45,
+   "sources": [
+    {
+     "kind": "kb",
+     "ref": "src:snomed_py_historique",
+     "libelle": "Correspondances SNOMED CT saisies à la main (à valider)",
+     "extrait": null,
+     "debut": null,
+     "fin": null,
+     "fiabilite": "C",
+     "url": null
+    }
+   ],
+   "explication": "SNOMED CT (morphologie) depuis la conclusion proposée, non dictée : à confirmer avec le diagnostic. Suggestion non validée contre une édition officielle SNOMED CT."
+  }
+ ],
+ "trace": [
+  {
+   "id": "transcription",
+   "agent": "Transcripteur",
+   "role": "transcripteur",
+   "titre": "Transcrire la dictée",
+   "statut": "saute",
+   "debut_ms": 0,
+   "duree_ms": 0,
+   "modele": null,
+   "resume": "Dictée fournie en texte : pas de transcription",
+   "details": []
+  },
+  {
+   "id": "correction",
+   "agent": "Correcteur phonétique",
+   "role": "correcteur",
+   "titre": "Corriger les erreurs de transcription",
+   "statut": "ok",
+   "debut_ms": 0,
+   "duree_ms": 81,
+   "modele": "deterministe",
+   "resume": "2 correction(s) appliquée(s), 0 à vérifier",
+   "details": [
+    "« TTF1 + » -> « TTF1 positif » (0.97, appliquée)",
+    "« p40 neg » -> « p40 négatif » (0.96, appliquée)"
+   ]
+  },
+  {
+   "id": "contexte",
+   "agent": "Orchestrateur",
+   "role": "orchestrateur",
+   "titre": "Identifier organe, prélèvement et contexte lésionnel",
+   "statut": "ok",
+   "debut_ms": 81,
+   "duree_ms": 38,
+   "modele": "deterministe",
+   "resume": "Poumon ; biopsie ; malin",
+   "details": [
+    "Organes : Poumon",
+    "Prélèvement : biopsie",
+    "Contexte lésionnel : malin",
+    "2 champ(s) attendu(s) applicable(s)",
+    "Gabarit : base v3"
+   ]
+  },
+  {
+   "id": "extraction",
+   "agent": "Extracteur",
+   "role": "extracteur",
+   "titre": "Extraire les faits dictés, avec leurs empans",
+   "statut": "ok",
+   "debut_ms": 120,
+   "duree_ms": 7899,
+   "modele": "mistral-large-2512",
+   "resume": "15 faits, 0 rejeté(s)",
+   "details": [
+    "15 fait(s) ancré(s) dans la dictée",
+    "0 mesure(s)"
+   ]
+  },
+  {
+   "id": "redaction",
+   "agent": "Redacteur",
+   "role": "redacteur",
+   "titre": "Rédiger le projet de compte rendu",
+   "statut": "ok",
+   "debut_ms": 189,
+   "duree_ms": 8597,
+   "modele": "mistral-large-2512",
+   "resume": "7 élément(s) rédigé(s), 4 trou(s)",
+   "details": [
+    "11 élément(s) dont 4 trou(s)"
+   ]
+  },
+  {
+   "id": "verif_unites",
+   "agent": "Vérificateur d'unités",
+   "role": "verificateur",
+   "titre": "Vérifier les unités de mesure (mm / cm)",
+   "statut": "ok",
+   "debut_ms": 8788,
+   "duree_ms": 1,
+   "modele": "deterministe",
+   "resume": "Rien à signaler",
+   "details": [
+    "0 mesure(s) repérée(s) dans la dictée"
+   ]
+  },
+  {
+   "id": "verif_coherence",
+   "agent": "Vérificateur de cohérence",
+   "role": "verificateur",
+   "titre": "Vérifier la cohérence du projet",
+   "statut": "ok",
+   "debut_ms": 8790,
+   "duree_ms": 13,
+   "modele": "deterministe",
+   "resume": "Rien à signaler",
+   "details": [
+    "0 incohérence(s) ; règles C1-C16 + latéralité + fractions + taille évaluées"
+   ]
+  },
+  {
+   "id": "verif_completude",
+   "agent": "Vérificateur de complétude",
+   "role": "verificateur",
+   "titre": "Vérifier les champs obligatoires",
+   "statut": "avertissement",
+   "debut_ms": 8803,
+   "duree_ms": 0,
+   "modele": "deterministe",
+   "resume": "4 champ(s) non dicté(s)",
+   "details": [
+    "4 champ(s) attendu(s), 4 non dicté(s)"
+   ]
+  },
+  {
+   "id": "verif_securite",
+   "agent": "Vérificateur de sécurité",
+   "role": "verificateur",
+   "titre": "Vérifier chiffres, négations et stades",
+   "statut": "ok",
+   "debut_ms": 8804,
+   "duree_ms": 4,
+   "modele": "deterministe",
+   "resume": "Rien à signaler",
+   "details": [
+    "0 élément(s) retiré(s) par les garde-fous, 0 passage(s) dicté(s) omis"
+   ]
+  },
+  {
+   "id": "relecture",
+   "agent": "Relecteur",
+   "role": "relecteur",
+   "titre": "Relire chaque élément contre la dictée",
+   "statut": "avertissement",
+   "debut_ms": 8808,
+   "duree_ms": 1349,
+   "modele": "mistral-medium-latest",
+   "resume": "7 élément(s) relu(s), 3 signalé(s)",
+   "details": [
+    "mesure non dictée",
+    "négation d'embole non dictée",
+    "diagnostic déduit"
+   ]
+  },
+  {
+   "id": "codage",
+   "agent": "Codeur",
+   "role": "codeur",
+   "titre": "Proposer les codes ADICAP et SNOMED CT",
+   "statut": "ok",
+   "debut_ms": 10184,
+   "duree_ms": 4,
+   "modele": "deterministe",
+   "resume": "3 code(s) proposé(s)",
+   "details": [
+    "ADICAP BIRPA7A0 (partiel)",
+    "SNOMED topographie 39607008",
+    "SNOMED morphologie 35917007"
+   ]
+  },
+  {
+   "id": "assemblage",
+   "agent": "Orchestrateur",
+   "role": "orchestrateur",
+   "titre": "Assembler le projet",
+   "statut": "ok",
+   "debut_ms": 10188,
+   "duree_ms": 30,
+   "modele": null,
+   "resume": "Projet N0 : 11 élément(s), 7 alerte(s)",
+   "details": [
+    "Niveau de service N0",
+    "0 élément(s) retiré(s), 0 trou(s) ajouté(s)",
+    "3 appel(s) LLM, 3348+1955 jetons"
+   ]
+  }
+ ],
+ "metriques": {
+  "duree_totale_ms": 10219,
+  "appels_llm": 3,
+  "tokens_entree": 3348,
+  "tokens_sortie": 1955,
+  "confiance_moyenne": 0.79
+ },
+ "tracabilite": {
+  "id": "195e41c579424e89897b6e2977ce19e0",
+  "horodatage_utc": "2026-11-17T21:54:19Z",
+  "version_pipeline": "3.0.0+c736402",
+  "kb_version": "3.0.0",
+  "kb_empreinte_sha256": "8a96ebb60bc7197ae9c53b53be0da6d385e0fb2ebb37106377ebc87c082b0cd2",
+  "kb_statut": "non_enregistree",
+  "modeles": {
+   "correcteur": "mistral-small-latest",
+   "extracteur": "mistral-large-2512",
+   "redacteur": "mistral-large-2512",
+   "relecteur": "mistral-medium-latest"
+  },
+  "empreinte_dictee_corrigee_sha256": "aea8ded2b1e4821f008bd468d913ead6f22817217f94d9a4d2fb8d4927622d97",
+  "niveau_service": "N0",
+  "statut": "brouillon"
+ }
+}

@@ -21,6 +21,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from auth import get_current_user
 from config import get_settings
 from db_models import User
+from projet import demo_cas  # DEMO_CAS : cas de demonstration temporaire (voir projet/demo_cas.py)
 from projet.export_docx import projet_vers_docx
 from projet.llm_client import ClientLLM, get_client_llm
 from projet.orchestrateur import Pipeline, PipelineErreur, Transcripteur, projet_de_secours
@@ -117,6 +118,14 @@ async def _repondre(request: Request, stream: bool, fabrique: Callable[..., Pipe
     return JSONResponse(projet.model_dump())
 
 
+def _reponse_demo(stream: bool, transcription: bool = False):  # DEMO_CAS
+    projet = demo_cas.projet_demo(transcription=transcription)
+    if not stream:
+        return JSONResponse(projet.model_dump())
+    return StreamingResponse(demo_cas.flux(projet), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
 @router.post("/projets")
 @limiter.limit("30/minute")
 async def creer_projet(
@@ -130,6 +139,8 @@ async def creer_projet(
     """Dictee texte -> projet de CR (flux SSE par defaut)."""
     if not req.dictee.strip():
         raise HTTPException(status_code=400, detail="Dictée vide.")
+    if demo_cas.correspond(req.dictee):  # DEMO_CAS
+        return _reponse_demo(stream)
 
     def fabrique(em):
         return Pipeline(client, referentiel=referentiel, emettre=em)
@@ -159,6 +170,17 @@ async def creer_projet_audio(
         raise HTTPException(status_code=400, detail="Fichier audio vide.")
     if len(octets) > get_settings().max_upload_size_mb * 1024 * 1024:
         raise HTTPException(status_code=413, detail="Fichier audio trop volumineux.")
+    if demo_cas.actif():  # DEMO_CAS : une seule transcription, reutilisee par le pipeline reel si la dictee ne correspond pas
+        try:
+            texte_demo = await transcrire(octets, nom)
+        except Exception:  # noqa: BLE001 - le pipeline reel refera la transcription et gerera l'erreur
+            texte_demo = None
+        if texte_demo is not None:
+            if demo_cas.correspond(texte_demo):
+                return _reponse_demo(stream, transcription=True)
+
+            async def transcrire(_o: bytes, _n: str, _t: str = texte_demo) -> str:  # noqa: F811
+                return _t
 
     def fabrique(em):
         return Pipeline(client, referentiel=referentiel, emettre=em, transcrire=transcrire)
@@ -215,7 +237,7 @@ async def lire_source(
 ) -> dict:
     """Fiche lisible d'une source : titre, description, editeur, version, fiabilite expliquee, licence,
     url et entrees de la base (champs, regles...) qui la citent (``references``, ``limite`` <= 500)."""
-    detail = referentiel.source_detail(source_id, limite=max(0, min(limite, 500)))
+    detail = referentiel.source_detail(source_id, limite=max(0, min(limite, 500))) or demo_cas.fiche_source(source_id)  # DEMO_CAS
     if not detail:
         raise HTTPException(status_code=404, detail="Source inconnue.")
     return detail
