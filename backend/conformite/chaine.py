@@ -17,7 +17,7 @@ GENESE = "0" * 64
 
 TYPES_EVENEMENT = (
     "generation", "validation", "revision", "derogation", "habilitation",
-    "kb_approbation", "kb_mise_en_service", "kb_retrait", "non_conformite", "non_conformite_statut",
+    "kb_approbation", "kb_mise_en_service", "kb_retrait", "non_conformite", "non_conformite_statut", "signalement_statut",
 )
 
 _verrou = asyncio.Lock()

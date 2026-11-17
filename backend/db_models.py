@@ -337,3 +337,44 @@ class ConformiteNonConformite(Base):
     statut: Mapped[str] = mapped_column(String(20), nullable=False, default="ouverte")
     kb_version: Mapped[str | None] = mapped_column(String(40), nullable=True)
     version_pipeline: Mapped[str | None] = mapped_column(String(60), nullable=True)
+
+
+class Signalement(Base):
+    """Signalement unifie (MARC v3) : dysfonctionnement, erreur de projet, amelioration, non-conformite ISO.
+
+    UN seul circuit : la note rapide « Utile / A ameliorer » reste de la telemetrie, tout le reste
+    atterrit ici. Le message est un texte libre court (1000 car. max) filtre contre les donnees
+    patient ; le projet n'est repere que par son empreinte (``projet_hash``), jamais par son texte.
+
+    Les champs ISO (gravite, etape, organe...) ne servent qu'a la categorie ``non_conformite``.
+    ``origine_nc_id`` marque une ligne recopiee depuis l'ancienne table
+    ``conformite_non_conformites`` (conservee) pour ne jamais la recopier deux fois.
+    """
+
+    __tablename__ = "signalements"
+    __table_args__ = (
+        Index("ix_signalements_user_cree", "user_id", "cree_le"),
+        Index("ix_signalements_statut", "statut"),
+        Index("ux_signalements_origine_nc", "origine_nc_id", unique=True),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid_str)
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    categorie: Mapped[str] = mapped_column(String(30), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    projet_hash: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    ecran: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    version_app: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    statut: Mapped[str] = mapped_column(String(20), nullable=False, default="ouvert")
+    note_admin: Mapped[str | None] = mapped_column(Text, nullable=True)
+    cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    maj_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    doublon_de: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    # --- champs ISO 15189 (categorie = non_conformite), tous optionnels
+    categorie_iso: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    gravite: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    etape: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    organe: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    kb_version: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    version_pipeline: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    origine_nc_id: Mapped[str | None] = mapped_column(String(36), nullable=True)

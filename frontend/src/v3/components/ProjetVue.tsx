@@ -13,6 +13,8 @@ import ConsultationSource from "./Source";
 import BandeauService from "./BandeauService";
 import BandeauAlerte from "./BandeauAlerte";
 import BarreActions, { Feedback } from "./BarreActions";
+import FeuilleSignalement from "./FeuilleSignalement";
+import type { CategorieSignalement } from "../lib/signalement";
 import Document from "./Document";
 import EtatCentre from "./EtatCentre";
 import PanneauRaisonnement, { ORDRE_ONGLETS, type NomOnglet } from "./PanneauRaisonnement";
@@ -31,6 +33,7 @@ interface Props {
 const generationActive = (g: EtatGeneration) => g.phase !== "inactif";
 
 export default function ProjetVue({ local, setLocal, generation, onReessayer, onAnnuler, onNouveau, onCompleter, onNotifier }: Props) {
+  const [signalement, setSignalement] = useState<CategorieSignalement | null>(null);
   const [onglet, setOnglet] = useState<NomOnglet>(() => (local && !generationActive(generation) && S.alertesOuvertes(local).length ? "alertes" : "progression"));
   const [selection, setSelection] = useState<string | null>(null);
   const [alerteActive, setAlerteActive] = useState<string | null>(null);
@@ -152,7 +155,7 @@ export default function ProjetVue({ local, setLocal, generation, onReessayer, on
   if (!local || (occupe && generation.mode === "nouveau")) {
     return (
       <>
-        <div className="scroll min-h-0 overflow-y-auto px-8 pb-16"><EtatCentre etat={generation} onReessayer={onReessayer} onAnnuler={onAnnuler} onNouveau={onNouveau} /></div>
+        <div className="scroll min-h-0 overflow-y-auto px-8 pb-10"><EtatCentre etat={generation} onReessayer={onReessayer} onAnnuler={onAnnuler} onNouveau={onNouveau} /></div>
         <div className="tiroir-d min-h-0" data-ouvert={tiroir}>
           <PanneauRaisonnement {...vide} onglet={onglet} onOnglet={setOnglet} local={null} generation={generation} etapes={etapes} element={null}
             alerteActive={null} correctionActive={null} onNotifier={onNotifier} onFermer={() => setTiroir(false)} />
@@ -164,25 +167,26 @@ export default function ProjetVue({ local, setLocal, generation, onReessayer, on
   return (
     <>
       <div className="flex min-h-0 min-w-0 flex-col" ref={centre}>
-        <div className="flex items-center gap-3 border-b border-[var(--line)] px-4 py-2 min-[1180px]:hidden">
+        <div className="flex items-center gap-3 border-b-[0.5px] border-[var(--line)] px-4 py-2 min-[1180px]:hidden">
           <button type="button" className="btn btn-sm" aria-expanded={tiroir} aria-controls="panneau-raisonnement" onClick={() => setTiroir(true)}>
             Raisonnement <span className="num text-[var(--faint)]">{ordreAlertes.length > 0 ? `· ${ordreAlertes.length} à vérifier` : "· pourquoi, codes, dictée"}</span>
           </button>
         </div>
-        <div className="scroll min-h-0 flex-1 overflow-y-auto px-8 py-12 pl-12" onClick={(e) => { if (e.target === e.currentTarget) choisir(null); }}>
-          <div className="mx-auto max-w-[760px]">
+        <div className="scroll min-h-0 flex-1 overflow-y-auto px-6 py-6" onClick={(e) => { if (e.target === e.currentTarget) choisir(null); }}>
+          <div className="mx-auto max-w-[800px]">
             {occupe && generation.mode === "iteration" && (
-              <p role="status" className="enter mb-6 rounded-xl border border-[var(--line)] bg-white px-4 py-2.5 text-[13px] text-[var(--mute)]">
+              <p role="status" className="enter carte mb-4 px-4 py-3 text-[15px] text-[var(--mute)]">
                 Intégration du complément en cours… Le projet reste modifiable.
                 <button type="button" className="ml-3 underline underline-offset-2 hover:text-[var(--ink)]" onClick={onAnnuler}>Annuler</button>
               </p>
             )}
             {generation.phase === "erreur" && (
-              <p role="alert" className="mb-6 rounded-xl bg-[var(--red-soft)] px-4 py-2.5 text-[13px] text-[var(--red)]">
+              <p role="alert" className="mb-4 rounded-xl bg-[var(--red-soft)] px-4 py-3 text-[15px] text-[var(--red)]">
                 {generation.erreur?.message} <button type="button" className="ml-2 underline underline-offset-2" onClick={onReessayer}>Réessayer</button>
               </p>
             )}
             <BandeauService niveau={local.projet.contexte.niveau_service} />
+            <div className="feuille px-6 py-8 sm:px-12 sm:py-10">
             <Document
               local={local} selection={selection} surlignes={surlignes} onSelect={choisir}
               onTitre={(t) => maj((l) => S.editerTitre(l, t))}
@@ -191,9 +195,10 @@ export default function ProjetVue({ local, setLocal, generation, onReessayer, on
               onIgnorer={(el) => { maj((l) => S.ignorerTrou(l, el.id)); trackTrou(el, false, local.projet.id); }}
               onRouvrir={(el: Element) => maj((l) => S.rouvrirTrou(l, el.id))}
             />
-            <div className="mt-4 flex items-center gap-2 text-[12.5px] text-[var(--mute)]">
+            </div>
+            <div className="mt-3 flex items-center gap-2 px-1 text-[13px] text-[var(--mute)]">
               <span>Ce projet vous a-t-il aidé ?</span>
-              <Feedback local={local} onFeedback={(sens, motif) => { maj((l) => S.donnerFeedback(l, sens, motif)); track("feedback", { sens, motif }, local.projet.id); }} />
+              <Feedback local={local} onDetailler={() => setSignalement("amelioration")} onFeedback={(sens, motif) => { maj((l) => S.donnerFeedback(l, sens, motif)); track("feedback", { sens, motif }, local.projet.id); }} />
             </div>
           </div>
         </div>
@@ -201,7 +206,7 @@ export default function ProjetVue({ local, setLocal, generation, onReessayer, on
         <BarreActions
           local={local} occupe={occupe} exportEnCours={exportEnCours} onNotifier={onNotifier} onCompleter={onCompleter}
           onCopier={copier} onExporter={exporter}
-          onFeedback={(sens, motif) => { maj((l) => S.donnerFeedback(l, sens, motif)); track("feedback", { sens, motif }, local.projet.id); }}
+          onSignaler={() => setSignalement("dysfonctionnement")}
         />
       </div>
       {tiroir && <button type="button" className="scrim min-[1180px]:hidden" aria-label="Fermer le panneau Raisonnement" tabIndex={-1} onClick={() => setTiroir(false)} />}
@@ -220,6 +225,7 @@ export default function ProjetVue({ local, setLocal, generation, onReessayer, on
           onNotifier={onNotifier} onDocument={() => { setTiroir(false); centre.current?.querySelector<HTMLElement>("[data-nav]")?.focus(); }}
         />
       </div>
+      {signalement && <FeuilleSignalement categorieInitiale={signalement} projetId={local.projet.id} ecran="projet" onFermer={() => setSignalement(null)} />}
       {sourceOuverte && <ConsultationSource source={sourceOuverte} onFermer={() => setSourceOuverte(null)} />}
     </>
   );

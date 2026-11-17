@@ -11,8 +11,8 @@ export default function BandeauService({ niveau }: { niveau: Contexte["niveau_se
   if (niveau === "N0") return null;
   const t = TEXTES[niveau];
   return (
-    <div role="status" className="enter mb-8 flex gap-3 rounded-xl border border-[#E8D3A8] bg-[var(--amber-soft)] px-4 py-3 text-[13px] leading-relaxed">
-      <span className="num mt-0.5 flex-none text-[11.5px] font-semibold text-[var(--amber)]">{niveau}</span>
+    <div role="status" className="enter mb-6 flex gap-3 rounded-xl border border-[var(--amber-soft)] bg-[var(--amber-soft)] px-4 py-3 text-[13px] leading-relaxed">
+      <span className="num mt-0.5 flex-none text-[12px] font-semibold text-[var(--amber)]">{niveau}</span>
       <p><b className="font-semibold">{t.titre}.</b> {t.texte}</p>
     </div>
   );

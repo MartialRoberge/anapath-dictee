@@ -18,8 +18,8 @@ export default function EtatCentre({ etat, onReessayer, onAnnuler, onNouveau }: 
     return (
       <div className="enter mx-auto max-w-[620px] pt-[12vh]" role="alert">
         <p className="label">Le traitement n'a pas abouti</p>
-        <h1 className="titre-serif mt-3 text-[34px] leading-tight">{etat.erreur?.recuperable ? "Un incident est survenu." : "Impossible de continuer."}</h1>
-        <p className="mt-4 text-[14.5px] leading-relaxed text-[var(--mute)]">{etat.erreur?.message}</p>
+        <h1 className="titre-serif mt-3 text-[28px] leading-tight">{etat.erreur?.recuperable ? "Un incident est survenu." : "Impossible de continuer."}</h1>
+        <p className="mt-4 text-[15px] leading-relaxed text-[var(--mute)]">{etat.erreur?.message}</p>
         {etat.dictee && <p className="mt-2 text-[13px] text-[var(--faint)]">Votre dictée est conservée à l'écran, rien n'a été enregistré sur le serveur.</p>}
         <div className="mt-7 flex gap-2.5">
           {etat.erreur?.recuperable && <button type="button" className="btn btn-primary" onClick={onReessayer}>Réessayer</button>}
@@ -32,7 +32,7 @@ export default function EtatCentre({ etat, onReessayer, onAnnuler, onNouveau }: 
   return (
     <div className="enter mx-auto max-w-[680px] pt-[10vh]" aria-busy="true">
       <p className="label">{etat.mode === "iteration" ? "Complément en cours d'intégration" : "Projet en préparation"}</p>
-      <h1 className="titre-serif mt-3 text-[34px] leading-tight">{apercu.length ? "Rédaction du projet" : etat.etapes.length ? "Analyse de la dictée" : etat.audio ? "Envoi de l'enregistrement" : "Envoi de la dictée"}</h1>
+      <h1 className="titre-serif mt-3 text-[28px] leading-tight">{apercu.length ? "Rédaction du projet" : etat.etapes.length ? "Analyse de la dictée" : etat.audio ? "Envoi de l'enregistrement" : "Envoi de la dictée"}</h1>
       <p className="mt-3 flex items-center gap-3 text-[13px] text-[var(--mute)]" role="status">
         <span>Temps écoulé <Chrono debut={etat.debut} /></span>
         <button type="button" className="underline underline-offset-2 hover:text-[var(--ink)]" onClick={onAnnuler}>Annuler</button>
@@ -40,7 +40,7 @@ export default function EtatCentre({ etat, onReessayer, onAnnuler, onNouveau }: 
       {etat.dictee && !etat.audio && (
         <div className="carte mt-8 p-5">
           <p className="label mb-2">Dictée</p>
-          <p className="line-clamp-6 text-[14px] leading-[1.7] text-[var(--mute)]">{etat.dictee}</p>
+          <p className="line-clamp-6 text-[15px] leading-[1.7] text-[var(--mute)]">{etat.dictee}</p>
         </div>
       )}
       {apercu.length > 0 && (

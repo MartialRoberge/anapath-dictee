@@ -45,7 +45,7 @@ export default function Document(p: Props) {
   return (
     <article className="doc" onKeyDown={clavier} aria-label="Projet de compte rendu">
       <h1
-        key={titre} ref={titreRef} className="titre-serif text-[27px] leading-[1.2] outline-none" contentEditable suppressContentEditableWarning spellCheck={false}
+        key={titre} ref={titreRef} className="titre-serif text-[28px] leading-[1.2] outline-none" contentEditable suppressContentEditableWarning spellCheck={false}
         role="textbox" aria-label="Titre du compte rendu"
         onBlur={() => {
           const t = (titreRef.current?.innerText ?? "").replace(/\s+/g, " ").trim();
@@ -54,7 +54,7 @@ export default function Document(p: Props) {
         }}
         onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); e.currentTarget.blur(); } }}
       >{titre}</h1>
-      <p className="mt-2 text-[12.5px] text-[var(--faint)]">
+      <p className="mt-2 text-[13px] text-[var(--faint)]">
         Projet à relire · {local.projet.contexte.organes_libelles.join(", ") || "organe non identifié"}
         {local.projet.contexte.prelevement ? ` · ${local.projet.contexte.prelevement}` : ""}
       </p>

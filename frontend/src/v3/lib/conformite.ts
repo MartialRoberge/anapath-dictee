@@ -1,4 +1,4 @@
-// Conformité ISO 15189:2022 côté navigateur : empreinte du texte final, validation, non-conformités.
+// Conformité ISO 15189:2022 côté navigateur : empreinte du texte final, validation.
 // Le texte du compte rendu ne quitte jamais le navigateur : seul son SHA-256 est transmis.
 import { API_BASE } from "@/lib/config";
 import type { Projet } from "../types";
@@ -14,16 +14,6 @@ export const DEROGATIONS = [
   ["autre_motif_trace_par_le_laboratoire", "Autre motif, tracé par le laboratoire"],
 ] as const;
 export type Derogation = (typeof DEROGATIONS)[number][0];
-
-export const CATEGORIES_NC = [
-  ["erreur_transcription", "Erreur de transcription"],
-  ["champ_manquant_non_detecte", "Champ manquant non détecté"],
-  ["faux_positif", "Faux positif (alerte inutile)"],
-  ["code_errone", "Code erroné"],
-  ["fabrication", "Information inventée"],
-  ["autre", "Autre"],
-] as const;
-export const GRAVITES_NC = [["mineure", "Mineure"], ["majeure", "Majeure"], ["critique", "Critique"]] as const;
 
 export interface BlocageValidation { alertes_bloquantes: number; trous_obligatoires: number }
 export interface ValidationEnregistree { id: string; ts: string; revision: number; empreinte_sha256: string; derogation: string | null }
@@ -96,13 +86,4 @@ export async function validerProjet(l: ProjetLocal, empreinte: string, derogatio
   return appel("/validations", { method: "POST", body: JSON.stringify({
     projet_id: l.projet.id, empreinte_sha256: empreinte, nb_alertes_bloquantes_ouvertes: b.alertes_bloquantes,
     nb_trous_ouverts: b.trous_obligatoires, versions: versionsDe(l.projet), ...(derogation ? { derogation } : {}) }) });
-}
-
-export async function signalerNonConformite(l: ProjetLocal, categorie: string, gravite: string): Promise<void> {
-  if (modeDemo()) return;
-  const t = l.projet.tracabilite;
-  await appel("/non-conformites", { method: "POST", body: JSON.stringify({
-    projet_id: l.projet.id, categorie, gravite,
-    ...(t?.kb_version ? { kb_version: t.kb_version } : {}), ...(t?.version_pipeline ? { version_pipeline: t.version_pipeline } : {}),
-    ...(l.projet.contexte.organes[0] && /^[a-z0-9_]{1,60}$/.test(l.projet.contexte.organes[0]) ? { organe: l.projet.contexte.organes[0] } : {}) }) });
 }

@@ -17,7 +17,7 @@ export default function AideRaccourcis({ onFermer }: { onFermer: () => void }) {
     <div className="modal" onMouseDown={(e) => { if (e.target === e.currentTarget) onFermer(); }}>
       <div role="dialog" aria-modal="true" aria-labelledby="titre-aide" onKeyDown={clavier} className="p-7">
         <div className="flex items-baseline gap-4">
-          <h2 id="titre-aide" className="titre-serif flex-1 text-[26px] leading-tight">Raccourcis clavier</h2>
+          <h2 id="titre-aide" className="titre-serif flex-1 text-[22px] leading-tight">Raccourcis clavier</h2>
           <button ref={fermer} type="button" className="btn btn-sm" onClick={onFermer}>Fermer <span className="kbd">Échap</span></button>
         </div>
         <p className="mt-2 text-[13px] text-[var(--mute)]">Le parcours complet se fait sans souris : dicter, combler les trous, traiter les points à vérifier, valider, copier.</p>

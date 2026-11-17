@@ -148,6 +148,16 @@ async def create_tables() -> None:
         await conn.run_sync(Base.metadata.create_all)
         await conn.run_sync(_reconcilier)
 
+    # Recopie additive et idempotente des non-conformites vers `signalements`.
+    # Transaction a part : un echec ici ne doit jamais empecher l'application de demarrer.
+    try:
+        from admin_v3.signalements import recopier_non_conformites
+
+        async with _engine.begin() as conn:
+            await conn.run_sync(recopier_non_conformites)
+    except Exception:  # noqa: BLE001
+        logger.exception("Recopie des non-conformites vers signalements impossible (ignoree).")
+
 
 async def close_engine() -> None:
     """Ferme le moteur async a l'arret de l'application."""

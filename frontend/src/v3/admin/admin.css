@@ -1,27 +1,105 @@
-/* Command Center : jetons et mouvements sobres (IBM Carbon : 70-240 ms). */
-.adm {
-  --adm-fond: #F5F4F1; --adm-carte: #FFFFFF; --adm-encre: #161616; --adm-accent: #1E43E5;
-  --adm-doux: #5F5D58; --adm-filet: #E4E2DC;
-  --adm-ease: cubic-bezier(0.2, 0, 0.38, 0.9);
-  background: var(--adm-fond); color: var(--adm-encre); font-family: Inter, system-ui, sans-serif;
-  min-height: 100%;
+/* Administration et feuille « Signaler » : langage Harvey (encre et papier, serif fin, bordures fines, sans verre ni pilule).
+   Autonome : jetons --a-* portés par .adm-t, clair par défaut et sombre selon le système. Règles d'ergonomie : cibles de 44 px,
+   grille de 8 pt, mouvements 110 à 240 ms, jamais de défilement de page. */
+@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 200 900; font-display: swap;
+  src: url("/fonts/SourceSerif4-Variable.woff2") format("woff2"); }
+
+.adm-t {
+  --a-paper: #F5F4F1; --a-card: #FFFFFF; --a-ink: #161616; --a-on-ink: #FFFFFF; --a-mute: #52504C; --a-faint: #6F6D68;
+  --a-line: #E4E1DA; --a-line-soft: #EFEDE8; --a-hover: #FAF9F7;
+  --a-amber: #8F5600; --a-amber-line: #B26F00; --a-amber-soft: #FBF1DE; --a-red: #B3261E; --a-red-soft: #FBE9E7;
+  --a-scrim: rgba(14, 14, 14, 0.38);
+  --a-ease: cubic-bezier(0.2, 0, 0.38, 0.9); --a-ease-out: cubic-bezier(0.4, 0.14, 0.3, 1);
+  font-family: "Inter", system-ui, -apple-system, sans-serif; font-size: 14px; line-height: 1.45; color: var(--a-ink);
+  font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased;
 }
-.v3 .adm-serif, .adm-serif { font-family: 'Source Serif 4', Georgia, serif; font-weight: 300; letter-spacing: -0.02em; }
-.adm-carte { background: var(--adm-carte); border: 1px solid var(--adm-filet); border-radius: 14px; padding: 20px 22px; }
-.adm-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--adm-doux); }
-.v3 .adm-btn, .adm-btn { font-size: 13px; min-height: 28px; padding: 4px 12px; border-radius: 6px; border: 1px solid var(--adm-filet); background: transparent; color: var(--adm-encre);
-  transition: background-color 110ms var(--adm-ease), color 110ms var(--adm-ease), border-color 110ms var(--adm-ease); cursor: pointer; }
-.v3 .adm-btn:hover, .adm-btn:hover { background: var(--adm-carte); border-color: var(--adm-encre); }
-.v3 .adm-btn[aria-pressed="true"] { background: var(--adm-encre); color: #fff; border-color: var(--adm-encre); }
-.adm-btn:focus-visible { outline: 2px solid var(--adm-accent); outline-offset: 2px; }
-.adm-barre { transform-origin: bottom; animation: adm-monte 240ms var(--adm-ease) both; transition: opacity 70ms var(--adm-ease); }
-.adm-hbar { transform-origin: left; animation: adm-etend 240ms var(--adm-ease) both; }
-.adm-entree { animation: adm-fondu 240ms var(--adm-ease) both; }
-@keyframes adm-monte { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-@keyframes adm-etend { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-color-scheme: dark) {
+  .adm-t {
+    --a-paper: #0E0E0E; --a-card: #1A1A19; --a-ink: #EDEBE6; --a-on-ink: #161616; --a-mute: #B5B2AA; --a-faint: #95928A;
+    --a-line: #2E2D2A; --a-line-soft: #232321; --a-hover: #222220;
+    --a-amber: #F0B35A; --a-amber-line: #D99A3C; --a-amber-soft: rgba(240, 179, 90, 0.14); --a-red: #F28B82; --a-red-soft: rgba(242, 139, 130, 0.14);
+    --a-scrim: rgba(0, 0, 0, 0.6);
+  }
+}
+.adm-t *:focus-visible { outline: 2px solid var(--a-ink); outline-offset: 2px; border-radius: 4px; }
+
+.v3 .adm { display: flex; flex-direction: column; height: 100%; min-height: 0; background: var(--a-paper); }
+.v3 .adm-entete { flex: none; padding: 24px 32px 0; border-bottom: 1px solid var(--a-line); }
+.v3 .adm-contenu { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px 32px 40px; scrollbar-width: thin; scrollbar-color: #CFCBC2 transparent; }
+@media (max-width: 640px) { .v3 .adm-entete { padding: 16px 16px 0; } .v3 .adm-contenu { padding: 16px 16px 32px; } }
+.v3 .adm-serif { font-family: "Source Serif 4", Georgia, serif; font-weight: 300; letter-spacing: -0.012em; }
+.v3 .adm-titre { margin: 0; font-size: 30px; line-height: 1.15; }
+.v3 .adm-label { font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--a-faint); font-weight: 500; }
+.v3 .adm-doux { color: var(--a-mute); }
+.v3 .adm-faible { color: var(--a-faint); }
+.v3 .adm-ambre { color: var(--a-amber); font-weight: 600; }
+.v3 .adm-erreur { color: var(--a-red); }
+
+/* Sections : onglets sobres soulignés d'encre */
+.v3 .adm-onglets[role="tablist"] { padding: 0; border-radius: 0; background: transparent; display: flex; gap: 24px; margin-top: 16px; overflow-x: auto; scrollbar-width: none; }
+.v3 .adm-onglet { position: relative; min-height: 44px; padding: 0 2px; font-size: 14px; color: var(--a-faint); white-space: nowrap; background: none; border: 0; cursor: pointer;
+  transition: color 110ms var(--a-ease); }
+.v3 .adm-onglet:hover { color: var(--a-ink); }
+.v3 .adm-onglet[aria-selected="true"] { color: var(--a-ink); font-weight: 500; }
+.v3 .adm-onglet[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--a-ink); animation: adm-fondu 150ms var(--a-ease) both; }
+
+/* Contrôle segmenté sobre : cadre fin, élément choisi plein encre */
+.v3 .adm-seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--a-line); border-radius: 8px; background: var(--a-card); overflow: hidden; }
+.v3 .adm-seg-item { min-height: 44px; padding: 6px 16px; font-size: 13px; color: var(--a-mute); background: none; border: 0; cursor: pointer; text-align: center; line-height: 1.2;
+  transition: background 110ms var(--a-ease), color 110ms var(--a-ease); }
+.v3 .adm-seg-item + .adm-seg-item { border-left: 1px solid var(--a-line); }
+.v3 .adm-seg-item:hover { background: var(--a-hover); color: var(--a-ink); }
+.v3 .adm-seg-item[aria-checked="true"], .adm-seg-item[aria-pressed="true"] { background: var(--a-ink); color: var(--a-on-ink); font-weight: 500; }
+.v3 .adm-seg.adm-seg-plein { display: flex; }
+.v3 .adm-seg.adm-seg-plein .adm-seg-item { flex: 1 1 0; }
+
+.v3 .adm-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+  border: 1px solid var(--a-line); background: var(--a-card); color: var(--a-ink); cursor: pointer; text-decoration: none;
+  transition: background 110ms var(--a-ease), border-color 110ms var(--a-ease), transform 110ms var(--a-ease); }
+.v3 .adm-btn:hover:not(:disabled) { background: var(--a-hover); border-color: var(--a-faint); }
+.v3 .adm-btn:active:not(:disabled) { transform: scale(0.985); }
+.v3 .adm-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.v3 .adm-btn-primaire { background: var(--a-ink); border-color: var(--a-ink); color: var(--a-on-ink); }
+.v3 .adm-btn-primaire:hover:not(:disabled) { background: var(--a-ink); border-color: var(--a-ink); opacity: 0.86; }
+.v3 .adm-btn-sm { min-height: 32px; padding: 0 12px; font-size: 12px; position: relative; }
+.v3 .adm-btn-sm::before { content: ""; position: absolute; inset: -6px -2px; }
+
+.v3 .adm-champ { width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid var(--a-line); border-radius: 8px; background: var(--a-card); color: var(--a-ink); font: inherit; font-size: 14px; }
+.v3 .adm-champ:focus, .adm-champ:focus-visible { border-color: var(--a-ink); box-shadow: 0 0 0 1px var(--a-ink); outline: none; }
+textarea.adm-champ { resize: vertical; line-height: 1.5; }
+
+.v3 .adm-carte { background: var(--a-card); border: 1px solid var(--a-line); border-radius: 14px; padding: 20px 24px; animation: adm-fondu 240ms var(--a-ease-out) both; }
+.v3 .adm-grille { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.v3 .adm-kpi-valeur { margin-top: 12px; font-size: 40px; line-height: 1; }
+.v3 .adm-kpi-note { margin-top: 12px; font-size: 12px; color: var(--a-mute); }
+
+/* Listes et tableaux : filets fins, pas de fond alterné */
+.v3 .adm-liste { margin: 0; padding: 0; list-style: none; }
+.v3 .adm-liste > li + li { border-top: 1px solid var(--a-line-soft); }
+.v3 .adm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.v3 .adm-table th { text-align: left; padding: 8px 12px; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--a-faint); font-weight: 500; border-bottom: 1px solid var(--a-line); white-space: nowrap; }
+.v3 .adm-table td { padding: 12px; border-bottom: 1px solid var(--a-line-soft); vertical-align: middle; }
+.v3 .adm-table tr:last-child td { border-bottom: 0; }
+.v3 .adm-table .num { text-align: right; }
+.v3 .adm-defile-x { overflow-x: auto; scrollbar-width: thin; }
+
+/* Bascule texte : « Habilité » / « Non » avec cible de 44 px */
+.v3 .adm-bascule { position: relative; min-height: 32px; min-width: 88px; padding: 0 12px; border: 1px solid var(--a-line); border-radius: 8px; background: var(--a-card); font-size: 12px; cursor: pointer; color: var(--a-mute);
+  transition: background 110ms var(--a-ease), color 110ms var(--a-ease); }
+.v3 .adm-bascule::before { content: ""; position: absolute; inset: -6px -2px; }
+.v3 .adm-bascule[aria-checked="true"] { background: var(--a-ink); border-color: var(--a-ink); color: var(--a-on-ink); font-weight: 500; }
+.v3 .adm-bascule:disabled { opacity: 0.45; cursor: progress; }
+
+/* Courbe */
+.v3 .adm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Feuille : voile, puis feuille qui monte (en bas de l'écran sur téléphone) */
+.v3 .adm-voile { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--a-scrim); animation: adm-fondu 150ms var(--a-ease) both; }
+.v3 .adm-feuille { width: min(520px, 100%); max-height: min(88vh, 88dvh); overflow-y: auto; padding: 24px; background: var(--a-card); border: 1px solid var(--a-line); border-radius: 14px;
+  box-shadow: 0 24px 64px -16px rgba(14, 14, 14, 0.35); animation: adm-feuille 240ms var(--a-ease-out) both; }
+@media (max-width: 640px) { .v3 .adm-voile { align-items: flex-end; padding: 0; } .v3 .adm-feuille { border-radius: 14px 14px 0 0; } }
+.v3 .adm-avert { margin: 0; padding: 4px 8px; border: 1px solid var(--a-amber-line); border-radius: 6px; background: var(--a-amber-soft); color: var(--a-amber); font-size: 13px; font-weight: 500; }
+
 @keyframes adm-fondu { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .adm *, .adm *::before { animation: none !important; transition: none !important; } }
-.adm [role="group"] .adm-btn { border-radius: 0; }
-.adm [role="group"] .adm-btn:first-child { border-radius: 6px 0 0 6px; }
-.adm [role="group"] .adm-btn:last-child { border-radius: 0 6px 6px 0; }
-.adm [role="group"] .adm-btn + .adm-btn { margin-left: -1px; }
+@keyframes adm-feuille { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .adm-t *, .adm-t *::before, .adm-t *::after { animation: none !important; transition: none !important; }  }

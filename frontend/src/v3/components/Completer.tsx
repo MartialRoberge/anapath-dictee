@@ -67,7 +67,6 @@ export default function Completer({ disabled, onEnvoyer, onNotifier }: Props) {
     requestAnimationFrame(() => bouton.current?.focus());
   };
 
-  // Pas de `relative` ici : le panneau s'ancre sur la barre d'actions (toute la largeur de la zone du document), jamais sous la sidebar.
   return (
     <div ref={racine}>
       <button ref={bouton} type="button" className="btn" disabled={disabled} aria-expanded={ouvert} aria-haspopup="dialog" onClick={() => (ouvert ? fermer() : setOuvert(true))} aria-keyshortcuts="Alt+M">Compléter à la voix</button>
@@ -85,17 +84,24 @@ function PanneauCompleter({ zone, texte, setTexte, micro, transcription, onEnvoy
 }) {
   const panneau = useRef<HTMLDivElement>(null);
   useDialogue(panneau, onFermer, { rendreFocus: false });
+  // Feuille (sheet) : voile + feuille centrée ; un clic hors de la feuille la ferme, comme Échap.
   return (
-    <div ref={panneau} className="pop !z-[45] bottom-full left-0 right-0 mx-auto mb-2 !w-[min(380px,calc(100%-2rem))] !max-w-none !p-3" role="dialog" aria-label="Compléter le projet">
-      <p className="text-[13px] text-[var(--mute)]">Dictez une précision (mesure oubliée, résultat manquant). Le reste du projet n'est pas modifié.</p>
-      <textarea ref={zone} value={texte} onChange={(e) => setTexte(e.target.value)} rows={3} aria-label="Complément de dictée"
-        onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); onEnvoyer(); } }}
-        placeholder="Ex. PD-L1 à 60 % des cellules tumorales." className="mt-2.5 w-full resize-none rounded-lg border border-[var(--line)] p-2.5 text-[14px] champ" />
-      <div className="mt-2.5 flex items-center gap-2">
-        <button type="button" className="btn btn-sm" onClick={micro.basculer} disabled={transcription} aria-pressed={micro.etat === "enregistre"}>
-          {micro.etat === "enregistre" ? <><span className="enregistrement-point" aria-hidden /> <span className="num">{chrono(micro.secondes)}</span> Arrêter</> : transcription ? "Transcription…" : "Dicter"}
-        </button>
-        <button type="button" className="btn btn-blue btn-sm ml-auto" disabled={!texte.trim() || transcription} onClick={onEnvoyer}>Intégrer <span className="kbd">{estMacLib() ? "⌘↵" : "Ctrl+↵"}</span></button>
+    <div className="modal" onMouseDown={(e) => { if (e.target === e.currentTarget) onFermer(); }}>
+      <div ref={panneau} role="dialog" aria-modal="true" aria-labelledby="titre-completer" className="!w-[min(480px,100%)] p-6">
+        <div className="flex items-baseline gap-3">
+          <h2 id="titre-completer" className="titre-serif flex-1 text-[22px] leading-[1.2]">Compléter à la voix</h2>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onFermer}>Fermer <span className="kbd">Échap</span></button>
+        </div>
+        <p className="mt-2 text-[15px] leading-snug text-[var(--mute)]">Dictez une précision (mesure oubliée, résultat manquant). Le reste du projet n'est pas modifié ; vous relisez avant d'intégrer.</p>
+        <textarea ref={zone} value={texte} onChange={(e) => setTexte(e.target.value)} rows={4} aria-label="Complément de dictée"
+          onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); onEnvoyer(); } }}
+          placeholder="Ex. PD-L1 à 60 % des cellules tumorales." className="champ mt-4 block w-full resize-none p-3 text-[16px] leading-[1.5]" />
+        <div className="mt-4 flex items-center gap-3">
+          <button type="button" className="btn" onClick={micro.basculer} disabled={transcription} aria-pressed={micro.etat === "enregistre"}>
+            {micro.etat === "enregistre" ? <><span className="enregistrement-point" aria-hidden /> <span className="num">{chrono(micro.secondes)}</span> Arrêter</> : transcription ? "Transcription…" : "Dicter"}
+          </button>
+          <button type="button" className="btn btn-primary ml-auto" disabled={!texte.trim() || transcription} onClick={onEnvoyer}>Intégrer <span className="kbd">{estMacLib() ? "⌘↵" : "Ctrl+↵"}</span></button>
+        </div>
       </div>
     </div>
   );

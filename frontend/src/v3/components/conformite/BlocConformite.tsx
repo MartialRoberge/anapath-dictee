@@ -1,14 +1,14 @@
 // Bloc conformité ISO 15189:2022 dans la barre d'actions : statut brouillon/validé, validation par un
-// pathologiste habilité, traçabilité consultable, signalement de non-conformité. Aucune donnée médicale n'est envoyée.
+// pathologiste habilité, traçabilité consultable, entrée « Signaler ». Aucune donnée médicale n'est envoyée.
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
-  blocages, CATEGORIES_NC, DEROGATIONS, enregistrerGeneration, GRAVITES_NC, moi, sha256Hex, signalerNonConformite,
+  blocages, DEROGATIONS, enregistrerGeneration, moi, sha256Hex,
   texteFinal, validerProjet, type Derogation, type ValidationEnregistree,
 } from "../../lib/conformite";
 import type { ProjetLocal } from "../../lib/session";
 import { ACTION, touche } from "../../lib/raccourcis";
 
-type Volet = "valider" | "tracabilite" | "signaler" | null;
+type Volet = "valider" | "tracabilite" | null;
 
 // Dernière validation connue par projet (mémoire de la session ; la preuve opposable est le journal serveur).
 const validees = new Map<string, ValidationEnregistree>();
@@ -36,18 +36,15 @@ const Ligne = ({ k, v }: { k: string; v?: string }) => (
   <div className="flex gap-2 py-0.5 text-[12.5px]"><dt className="w-[132px] shrink-0 text-[var(--faint)]">{k}</dt><dd className="num break-all text-[var(--ink)]">{v || "—"}</dd></div>
 );
 
-interface PropsBloc { local: ProjetLocal; occupe: boolean; resume?: ReactNode; avant?: ReactNode; apres?: ReactNode; fin?: ReactNode }
+interface PropsBloc { local: ProjetLocal; occupe: boolean; onSignaler: () => void; resume?: ReactNode; avant?: ReactNode; apres?: ReactNode; fin?: ReactNode }
 
-export default function BlocConformite({ local, occupe, resume, avant, apres, fin }: PropsBloc) {
+export default function BlocConformite({ local, occupe, onSignaler, resume, avant, apres, fin }: PropsBloc) {
   const [volet, setVolet] = useState<Volet>(null);
   const [habilite, setHabilite] = useState<boolean | null>(null);
   const [empreinte, setEmpreinte] = useState("");
   const [derog, setDerog] = useState<Derogation | "">("");
   const [erreur, setErreur] = useState("");
   const [enCours, setEnCours] = useState(false);
-  const [categorie, setCategorie] = useState("");
-  const [gravite, setGravite] = useState("majeure");
-  const [signale, setSignale] = useState(false);
   const [, rafraichir] = useState(0);
   const id = local.projet.id;
   const validation = validees.get(id);
@@ -83,26 +80,19 @@ export default function BlocConformite({ local, occupe, resume, avant, apres, fi
     } finally { setEnCours(false); }
   };
 
-  const signaler = async () => {
-    setEnCours(true); setErreur("");
-    try { await signalerNonConformite(local, categorie, gravite); setSignale(true); setCategorie(""); setVolet(null); }
-    catch (e) { setErreur((e as Error).message); } finally { setEnCours(false); }
-  };
-
   return (
     <div className="relative" aria-label="Conformité du compte rendu">
-      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <p className="mr-auto text-[12.5px] text-[var(--mute)]" role="status">
+      <div className="flex items-center gap-1">
+        <p className="mr-auto min-w-0 flex-1 truncate text-[12.5px] text-[var(--mute)]" role="status">
           {resume}
           {resume && <span aria-hidden> · </span>}
           {estValide
             ? <>Validé par le pathologiste · révision {validation.revision}</>
             : modifie ? <b className="font-semibold text-[var(--amber)]">Modifié depuis la validation · à revalider</b>
             : habilite === false ? "Validation : pathologiste habilité" : "À valider par le pathologiste"}
-          {signale && " · non-conformité signalée"}
         </p>
-        <button type="button" className="btn btn-ghost btn-sm" aria-expanded={volet === "tracabilite"} onClick={() => ouvrir("tracabilite")}>Traçabilité</button>
-        <button type="button" className="btn btn-ghost btn-sm" aria-expanded={volet === "signaler"} onClick={() => ouvrir("signaler")}>Signaler une non-conformité</button>
+        <button type="button" className="btn btn-ghost btn-sm shrink-0" aria-expanded={volet === "tracabilite"} onClick={() => ouvrir("tracabilite")}>Traçabilité</button>
+        <button type="button" className="btn btn-ghost btn-sm shrink-0" aria-haspopup="dialog" onClick={onSignaler}>Signaler</button>
         {apres}
       </div>
       <div className="mt-2.5 flex flex-wrap items-center justify-end gap-2">
@@ -157,24 +147,6 @@ export default function BlocConformite({ local, occupe, resume, avant, apres, fi
         </Popover>
       )}
 
-      {volet === "signaler" && (
-        <Popover titre="Signaler une non-conformité" onFermer={() => setVolet(null)}>
-          <p className="pb-2 text-[12.5px] text-[var(--mute)]">Aucun texte n'est envoyé : choisissez une catégorie et une gravité.</p>
-          {CATEGORIES_NC.map(([k, l]) => (
-            <label key={k} className="flex items-center gap-2 py-1 text-[13px]"><input type="radio" name="nc" checked={categorie === k} onChange={() => setCategorie(k)} />{l}</label>
-          ))}
-          <label className="mt-2 block text-[12.5px] text-[var(--mute)]">Gravité
-            <select className="mt-1 block w-full rounded border border-[var(--line)] bg-white p-1.5 text-[12.5px]" value={gravite} onChange={(e) => setGravite(e.target.value)}>
-              {GRAVITES_NC.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-            </select>
-          </label>
-          {erreur && <p className="pt-2 text-[12.5px] text-[var(--red)]" role="alert">{erreur}</p>}
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" className="btn btn-sm" onClick={() => setVolet(null)}>Annuler</button>
-            <button type="button" className="btn btn-sm btn-primary" disabled={!categorie || enCours} onClick={signaler}>Signaler</button>
-          </div>
-        </Popover>
-      )}
     </div>
   );
 }

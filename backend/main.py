@@ -63,6 +63,8 @@ from routes_etude_export import router as etude_export_router
 from projet.routes import router as v3_router
 from telemetrie.routes import router as telemetrie_router
 from conformite.routes import router as conformite_router
+from admin_v3.routes import router as admin_v3_router
+from admin_v3.signalements import router as signalements_router
 
 logger = logging.getLogger("anapath.api")
 
@@ -148,6 +150,8 @@ app.include_router(etude_export_router)
 app.include_router(v3_router)
 app.include_router(telemetrie_router)
 app.include_router(conformite_router)
+app.include_router(admin_v3_router)
+app.include_router(signalements_router)
 
 
 # ---------------------------------------------------------------------------

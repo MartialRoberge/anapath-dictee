@@ -1,5 +1,5 @@
 // MARC v3 : application racine (auth, navigation, génération, historique local, télémétrie de session).
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import "./v3.css";
 import AideRaccourcis from "./components/AideRaccourcis";
@@ -17,12 +17,7 @@ import { ACTION, cleAlt, estChampSaisie } from "./lib/raccourcis";
 import { track } from "./telemetry";
 import type { Projet } from "./types";
 
-// Administration (agent admin) : import tolérant, le module peut ne pas encore exister.
-const modulesAdmin = import.meta.glob<{ default: ComponentType }>("./admin/AdminV3.tsx");
-const AdminLazy = lazy(async () => {
-  const charger = Object.values(modulesAdmin)[0];
-  return charger ? charger() : { default: () => <p className="p-10 text-[14px] text-[var(--mute)]">Module d'administration indisponible.</p> };
-});
+const AdminLazy = lazy(() => import("./admin/AdminV3"));
 
 type Vue = "nouveau" | "projet" | "admin";
 
@@ -116,7 +111,7 @@ export default function V3App() {
   }, [microActif, micro]);
 
   // Raccourcis globaux : ? (hors saisie) ou Alt+/ = aide ; Alt+N = nouveau projet ; Échap ferme tiroir et aide.
-  const nouveauRef = useRef<() => void>(() => {});
+  const nouveauRef = useRef<(garder?: boolean) => void>(() => {});
   useEffect(() => {
     const f = (e: KeyboardEvent) => {
       const alt = cleAlt(e);
@@ -140,8 +135,10 @@ export default function V3App() {
     return () => { document.removeEventListener("visibilitychange", vis); window.removeEventListener("pagehide", envoyer); envoyer(); };
   }, []);
 
-  const nouveau = useCallback(() => {
+  // `garder` : retour à la dictée après une erreur (le texte est conservé) ; sinon un nouveau projet repart d'une zone vide.
+  const nouveau = useCallback((garder = false) => {
     gen.annuler();
+    if (garder !== true) setBrouillon("");
     setLocalBrut(null);
     setVue("nouveau");
     setNavOuverte(false);
@@ -155,16 +152,14 @@ export default function V3App() {
     if (l) { setLocalBrut(l); setVue("projet"); setNavOuverte(false); } else notifier("Projet introuvable sur cet appareil.");
   }, [gen, notifier]);
 
-  const AdminComposant = useMemo(() => AdminLazy, []);
-
-  if (!demo && auth.loading) return <div className="v3 min-h-screen" aria-busy="true" />;
-  if (!user) return <div className="v3"><LoginV3 onLogin={auth.login} onRegister={auth.register} /></div>;
+  if (!demo && auth.loading) return <div className="v3 coque" aria-busy="true" />;
+  if (!user) return <div className="v3 coque"><LoginV3 onLogin={auth.login} onRegister={auth.register} /></div>;
 
   return (
-    <div className="v3 h-screen overflow-hidden">
-      <a href="#contenu" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-2">Aller au contenu</a>
-      <div className={`grid h-full grid-cols-1 grid-rows-[auto_minmax(0,1fr)] min-[900px]:grid-rows-1 ${vue === "projet" ? "min-[900px]:grid-cols-[208px_minmax(0,1fr)] min-[1180px]:grid-cols-[236px_minmax(0,1fr)_372px] min-[1360px]:grid-cols-[252px_minmax(0,1fr)_390px]" : "min-[900px]:grid-cols-[236px_minmax(0,1fr)] min-[1360px]:grid-cols-[252px_minmax(0,1fr)]"}`}>
-        <header className="col-span-full flex items-center gap-3 border-b border-[var(--line)] bg-[var(--paper)] px-4 py-2 min-[900px]:hidden">
+    <div className="v3 coque">
+      <a href="#contenu" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-[var(--card)] focus:p-2">Aller au contenu</a>
+      <div className={`grid h-full grid-cols-1 grid-rows-[auto_minmax(0,1fr)] min-[900px]:grid-rows-1 ${vue === "projet" ? "min-[900px]:grid-cols-[208px_minmax(0,1fr)] min-[1180px]:grid-cols-[224px_minmax(0,1fr)_372px] min-[1360px]:grid-cols-[244px_minmax(0,1fr)_390px]" : "min-[900px]:grid-cols-[236px_minmax(0,1fr)] min-[1360px]:grid-cols-[252px_minmax(0,1fr)]"}`}>
+        <header className="barre col-span-full flex items-center gap-3 border-b-0 px-4 py-2 min-[900px]:hidden">
           <button type="button" className="btn btn-sm" aria-expanded={navOuverte} aria-controls="navigation-v3" onClick={() => setNavOuverte(true)}>Menu</button>
           <span className="text-[13px] font-semibold tracking-[0.18em]">MARC</span>
         </header>
@@ -172,13 +167,13 @@ export default function V3App() {
         <div id="navigation-v3" className="tiroir-g min-h-0" data-ouvert={navOuverte}>
         <Sidebar
           recents={recents} courantId={local?.projet.id ?? null} vue={vue} nom={user.name} admin={user.role === "admin"} demo={demo}
-          onNouveau={nouveau} onOuvrir={ouvrir} onAdmin={() => { gen.annuler(); setVue("admin"); setNavOuverte(false); }} onDeconnexion={auth.logout}
+          onNouveau={() => nouveau()} onOuvrir={ouvrir} onAdmin={() => { gen.annuler(); setVue("admin"); setNavOuverte(false); }} onDeconnexion={auth.logout}
           onAide={() => { setNavOuverte(false); setAide(true); }}
           onSupprimer={async (id) => { await H.supprimer(id); if (local?.projet.id === id) nouveau(); rafraichir(); }}
           onPurger={async () => { await H.purger(); rafraichir(); if (vue === "projet" && !occupe) nouveau(); notifier("Historique local supprimé"); }}
         />
         </div>
-        <main id="contenu" className={vue === "projet" ? "contents" : "min-h-0 min-w-0 overflow-hidden"}>
+        <main id="contenu" tabIndex={-1} className={`outline-none ${vue === "projet" ? "contents" : "min-h-0 min-w-0 overflow-hidden"}`}>
           {vue === "nouveau" && (
             <div key={cleNouveau} className="flex h-full min-h-0 flex-col">
               <NouveauProjet occupe={occupe} nom={user.name} etatMicro={micro.etat} secondes={micro.secondes} brouillonInitial={brouillon}
@@ -186,19 +181,17 @@ export default function V3App() {
             </div>
           )}
           {vue === "projet" && (
-            <ProjetVue key={local?.projet.id ?? "nouveau"} local={local} setLocal={setLocal} generation={gen.etat} onReessayer={gen.reessayer} onAnnuler={gen.annuler} onNouveau={nouveau}
+            <ProjetVue key={local?.projet.id ?? "nouveau"} local={local} setLocal={setLocal} generation={gen.etat} onReessayer={gen.reessayer} onAnnuler={gen.annuler} onNouveau={() => nouveau(true)}
               onCompleter={completer} onNotifier={notifier} />
           )}
           {vue === "admin" && (
-            <div className="scroll h-full overflow-y-auto">
-              <Suspense fallback={<p className="p-10 text-[14px] text-[var(--mute)]">Chargement…</p>}><AdminComposant /></Suspense>
-            </div>
+            <Suspense fallback={<p className="p-10 text-[15px] text-[var(--mute)]">Chargement…</p>}><AdminLazy /></Suspense>
           )}
         </main>
       </div>
       {aide && <AideRaccourcis onFermer={() => setAide(false)} />}
       <div aria-live="polite" role="status" className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center">
-        {message && <p className="enter rounded-full bg-[var(--ink)] px-4 py-2 text-[13px] text-white shadow-lg">{message}</p>}
+        {message && <p className="enter rounded-full bg-[var(--ink)] px-4 py-2.5 text-[15px] text-[var(--on-ink)] shadow-lg">{message}</p>}
       </div>
     </div>
   );

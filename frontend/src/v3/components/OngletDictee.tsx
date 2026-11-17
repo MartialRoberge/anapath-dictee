@@ -34,8 +34,8 @@ export default function OngletDictee({ local, element, correctionActive, onCorre
       {element ? (
         <section className="enter" aria-label="Élément sélectionné">
           <p className="label mb-2">Élément sélectionné</p>
-          <p className="font-medium leading-snug text-[14px]">{texteElement(local, element)}</p>
-          <p className="mt-2 text-[12.5px] text-[var(--mute)]">
+          <p className="font-medium leading-snug text-[15px]">{texteElement(local, element)}</p>
+          <p className="mt-2 text-[13px] text-[var(--mute)]">
             {STATUT[element.statut]}
             {element.type !== "trou" && <> · {NIVEAU[element.niveau]} <span className="num">({Math.round(element.confiance * 100)} %)</span></>}
           </p>
@@ -47,7 +47,7 @@ export default function OngletDictee({ local, element, correctionActive, onCorre
               ))}
             </ul>
           )}
-          {empansDictee.length === 0 && element.type !== "titre" && <p className="mt-3 text-[12.5px] text-[var(--faint)]">Aucun passage de la dictée n'est rattaché à cet élément.</p>}
+          {empansDictee.length === 0 && element.type !== "titre" && <p className="mt-3 text-[13px] text-[var(--faint)]">Aucun passage de la dictée n'est rattaché à cet élément.</p>}
         </section>
       ) : (
         <p className="text-[13px] leading-relaxed text-[var(--mute)]">Cliquez sur un élément du projet pour voir d'où il vient, sa confiance et le passage exact de la dictée.</p>
@@ -55,14 +55,14 @@ export default function OngletDictee({ local, element, correctionActive, onCorre
 
       <section aria-label="Dictée corrigée">
         <p className="label mb-2">Dictée corrigée</p>
-        <p className="rounded-xl border border-[var(--line)] bg-white p-4 text-[13.5px] leading-[1.7]">
+        <p className="rounded-xl border border-[var(--line)] bg-[var(--card)] p-4 text-[15px] leading-[1.7]">
           {segCorrigee.map((s, i) => s.cle ? <mark key={i} className="rounded-[3px] bg-[var(--mark)] px-px text-[var(--ink)]">{s.texte}</mark> : <span key={i}>{s.texte}</span>)}
         </p>
       </section>
 
       <section aria-label="Dictée brute">
         <p className="label mb-2">Dictée brute (reconnaissance vocale)</p>
-        <p className="rounded-xl border border-[var(--line)] bg-white p-4 text-[13.5px] leading-[1.7] text-[var(--mute)]">
+        <p className="rounded-xl border border-[var(--line)] bg-[var(--card)] p-4 text-[15px] leading-[1.7] text-[var(--mute)]">
           {segBrute.map((s, i) => s.cle ? (
             <button key={i} type="button" onClick={() => onCorrectionActive(correctionActive === s.cle ? null : s.cle!)}
               className={`inline rounded-[3px] px-px underline decoration-[var(--amber-line)] underline-offset-[3px] ${correctionActive === s.cle ? "bg-[var(--amber-soft)] text-[var(--ink)]" : "text-[var(--ink)]"}`}>{s.texte}</button>
@@ -79,8 +79,8 @@ export default function OngletDictee({ local, element, correctionActive, onCorre
               const appliquee = d ? d.appliquee : c.appliquee;
               const courant = appliquee ? (d?.choix ?? c.corrige) : c.original;
               return (
-                <li key={c.id} className={`rounded-xl border bg-white px-4 py-3.5 ${correctionActive === c.id ? "border-[var(--ink)]" : "border-[var(--line)]"}`} onClick={() => onCorrectionActive(c.id)}>
-                  <p className="text-[13.5px]"><span className="text-[var(--faint)] line-through">{c.original}</span> <span className="text-[var(--faint)]">devient</span> <span className="font-medium">{courant}</span></p>
+                <li key={c.id} className={`rounded-xl border bg-[var(--card)] px-4 py-3.5 ${correctionActive === c.id ? "border-[var(--ink)]" : "border-[var(--line)]"}`} onClick={() => onCorrectionActive(c.id)}>
+                  <p className="text-[15px]"><span className="text-[var(--faint)] line-through">{c.original}</span> <span className="text-[var(--faint)]">devient</span> <span className="font-medium">{courant}</span></p>
                   <p className="mt-1 text-[12px] leading-relaxed text-[var(--mute)]">{c.raison} · <span className="num">{Math.round(c.confiance * 100)} %</span></p>
                   <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
                     <button type="button" className="btn btn-sm" aria-pressed={appliquee && !d?.choix} onClick={(e) => { e.stopPropagation(); onDecision(c, c.corrige); }}>Accepter</button>

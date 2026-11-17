@@ -22,10 +22,11 @@ from db_models import (
     ConformiteAudit,
     ConformiteHabilitation,
     ConformiteKbVersion,
-    ConformiteNonConformite,
+    Signalement,
     ConformiteValidation,
     User,
 )
+from admin_v3.signalements import creer_signalement, iso_us, maintenant, statut_depuis_nc, statut_nc
 from telemetrie.routes import hacher_projet
 
 from . import chaine, tracabilite
@@ -355,36 +356,41 @@ class NonConformiteIn(BaseModel):
     version_pipeline: str | None = Field(default=None, pattern=PATRON_VERSION)
 
 
-def _vue_nc(n: ConformiteNonConformite) -> dict:
-    return {"id": n.id, "ts": n.ts, "user_id": n.user_id, "projet_hash": n.projet_hash, "categorie": n.categorie, "gravite": n.gravite,
-            "etape": n.etape, "organe": n.organe, "statut": n.statut, "kb_version": n.kb_version, "version_pipeline": n.version_pipeline}
+def _vue_nc(n: Signalement) -> dict:
+    """Forme historique d'une non-conformite, lue dans la table unifiee ``signalements``."""
+    return {"id": n.id, "ts": iso_us(n.cree_le), "user_id": n.user_id, "projet_hash": n.projet_hash, "categorie": n.categorie_iso,
+            "gravite": n.gravite, "etape": n.etape, "organe": n.organe, "statut": statut_nc(n.statut),
+            "kb_version": n.kb_version, "version_pipeline": n.version_pipeline}
 
 
 @router.post("/non-conformites", status_code=201)
 async def signaler(corps: NonConformiteIn, user: Annotated[User, Depends(get_current_user)], db: Db) -> dict:
+    """Ecrit dans ``signalements`` (categorie ``non_conformite``) ; meme reponse qu'avant. Doublon < 10 min : l'existant est renvoye."""
     d = _db(db)
     ph = hacher_projet(corps.projet_id) if corps.projet_id else None
-    n = ConformiteNonConformite(ts=chaine.maintenant_iso(), user_id=user.id, projet_hash=ph, categorie=corps.categorie,
-                                gravite=corps.gravite, etape=corps.etape, organe=corps.organe, kb_version=corps.kb_version,
-                                version_pipeline=corps.version_pipeline)
-    d.add(n)
-    await d.flush()
+    n, nouveau = await creer_signalement(
+        d, user_id=user.id, categorie="non_conformite", message="", projet_hash=ph, categorie_iso=corps.categorie,
+        gravite=corps.gravite, etape=corps.etape, organe=corps.organe, kb_version=corps.kb_version,
+        version_pipeline=corps.version_pipeline)
+    if not nouveau:
+        return {"id": n.id, "statut": statut_nc(n.statut)}
     await chaine.ajouter(d, "non_conformite", user.id, ph, _propre(
-        {"nc_id": n.id, "categorie": n.categorie, "gravite": n.gravite, "etape": n.etape}))
-    return {"id": n.id, "statut": n.statut}
+        {"nc_id": n.id, "categorie": n.categorie_iso, "gravite": n.gravite, "etape": n.etape}))
+    return {"id": n.id, "statut": statut_nc(n.statut)}
 
 
 @router.get("/non-conformites")
 async def lister_nc(_a: Annotated[User, Depends(get_admin_user)], db: Db,
                     statut: StatutNC | None = None) -> dict:
     d = _db(db)
-    q = select(ConformiteNonConformite).order_by(ConformiteNonConformite.ts.desc()).limit(500)
+    q = select(Signalement).where(Signalement.categorie == "non_conformite", Signalement.doublon_de.is_(None))
+    q = q.order_by(Signalement.cree_le.desc()).limit(500)
     if statut:
-        q = q.where(ConformiteNonConformite.statut == statut)
+        q = q.where(Signalement.statut == statut_depuis_nc(statut))
     lignes = list((await d.execute(q)).scalars())
     par: dict[str, int] = {}
     for n in lignes:
-        par[n.categorie] = par.get(n.categorie, 0) + 1
+        par[n.categorie_iso or ""] = par.get(n.categorie_iso or "", 0) + 1
     return {"total": len(lignes), "par_categorie": par, "non_conformites": [_vue_nc(n) for n in lignes]}
 
 
@@ -395,10 +401,10 @@ class StatutIn(BaseModel):
 @router.patch("/non-conformites/{nc_id}")
 async def changer_statut_nc(nc_id: str, corps: StatutIn, admin: Annotated[User, Depends(get_admin_user)], db: Db) -> dict:
     d = _db(db)
-    n = await d.get(ConformiteNonConformite, nc_id) if IDENT.fullmatch(nc_id) else None
-    if n is None:
+    n = await d.get(Signalement, nc_id) if IDENT.fullmatch(nc_id) else None
+    if n is None or n.categorie != "non_conformite":
         raise HTTPException(status_code=404, detail="Non-conformité inconnue.")
-    n.statut = corps.statut
+    n.statut, n.maj_le = statut_depuis_nc(corps.statut), maintenant()
     await d.flush()
-    await chaine.ajouter(d, "non_conformite_statut", admin.id, n.projet_hash, _propre({"nc_id": n.id, "statut": n.statut}))
+    await chaine.ajouter(d, "non_conformite_statut", admin.id, n.projet_hash, _propre({"nc_id": n.id, "statut": corps.statut}))
     return _vue_nc(n)

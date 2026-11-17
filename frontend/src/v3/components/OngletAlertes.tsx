@@ -24,11 +24,11 @@ interface Props {
 function Carte({ a, d, active, onActiver, onDecider, onConsulte }: { a: Alerte; d?: DecisionAlerte; active: boolean; onActiver: Props["onActiver"]; onDecider: Props["onDecider"]; onConsulte?: Props["onConsulte"] }) {
   const t = alerteTextes(a);
   return (
-    <li className={`enter rounded-xl border bg-white px-4 py-3.5 transition-colors ${active ? "border-[var(--ink)]" : "border-[var(--line)]"} ${d ? "opacity-60" : ""}`}>
+    <li className={`enter rounded-xl border bg-[var(--card)] px-4 py-3.5 transition-colors ${active ? "border-[var(--ink)]" : "border-[var(--line)]"} ${d ? "opacity-60" : ""}`}>
       <button type="button" onClick={() => onActiver(a)} aria-pressed={active} className="block w-full text-left">
-        <span className={`block text-[13.5px] font-medium leading-snug ${d ? "line-through decoration-[#B9B5AB]" : ""}`}>{t.titre}</span>
+        <span className={`block text-[15px] font-medium leading-snug ${d ? "line-through decoration-[var(--faint)]" : ""}`}>{t.titre}</span>
         {t.pourquoi && <span className="mt-1.5 block text-[13px] leading-relaxed text-[var(--mute)]">{t.pourquoi}</span>}
-        {t.calcul && <span className="num mt-1.5 block text-[12.5px] text-[var(--ink)]">{t.calcul}</span>}
+        {t.calcul && <span className="num mt-1.5 block text-[13px] text-[var(--ink)]">{t.calcul}</span>}
         {t.action && <span className="mt-2 block text-[13px] leading-snug"><span className="text-[var(--faint)]">À faire : </span>{t.action}</span>}
       </button>
       <ListeSources sources={a.sources} onConsulte={onConsulte} />
@@ -42,7 +42,7 @@ function Carte({ a, d, active, onActiver, onDecider, onConsulte }: { a: Alerte; 
           <>
             <button type="button" className="btn btn-sm" onClick={() => onDecider(a, "resolue")}>Résoudre{active && <> <span className="kbd">{touche("R")}</span></>}</button>
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => onDecider(a, "ignoree")}>Ignorer{active && <> <span className="kbd">{touche("I")}</span></>}</button>
-            {a.element_ids.length > 0 && <span className="num ml-auto text-[11.5px] text-[var(--faint)]">{a.element_ids.length} élément{a.element_ids.length > 1 ? "s" : ""}</span>}
+            {a.element_ids.length > 0 && <span className="num ml-auto text-[12px] text-[var(--faint)]">{a.element_ids.length} élément{a.element_ids.length > 1 ? "s" : ""}</span>}
           </>
         )}
       </div>
@@ -54,10 +54,10 @@ export default function OngletAlertes({ alertes, decisions, active, onActiver, o
   const [traitees, setTraitees] = useState(false);
   const ouvertes = alertes.filter((a) => !decisions[a.id]);
   const fermees = alertes.filter((a) => decisions[a.id]);
-  if (alertes.length === 0) return <p className="px-5 py-6 text-[13.5px] leading-relaxed text-[var(--mute)]">Aucun point à vérifier signalé. Relisez tout de même le projet : la validation reste la vôtre.</p>;
+  if (alertes.length === 0) return <p className="px-5 py-6 text-[15px] leading-relaxed text-[var(--mute)]">Aucun point à vérifier signalé. Relisez tout de même le projet : la validation reste la vôtre.</p>;
   return (
     <div className="space-y-6 px-5 py-5">
-      {ouvertes.length === 0 && <p className="text-[13.5px] text-[var(--mute)]">Tous les points sont traités. Vous pouvez valider : <span className="kbd">{touche("V")}</span></p>}
+      {ouvertes.length === 0 && <p className="text-[15px] text-[var(--mute)]">Tous les points sont traités. Vous pouvez valider : <span className="kbd">{touche("V")}</span></p>}
       {GRAVITES.map((g) => {
         const liste = ouvertes.filter((a) => a.gravite === g.cle);
         if (!liste.length) return null;

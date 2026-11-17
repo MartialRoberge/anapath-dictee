@@ -24,8 +24,8 @@ function Etape({ s, dernier, technique }: { s: TraceStep; dernier: boolean; tech
       <span className="absolute left-0 top-[3px]"><Marqueur statut={s.statut} /></span>
       <button type="button" onClick={() => aDetails && setOuvert(!ouvert)} aria-expanded={aDetails ? ouvert : undefined} disabled={!aDetails} className="w-full text-left !opacity-100">
         <span className="flex items-baseline gap-2">
-          <span className="etape-titre flex-1 text-[13.5px] leading-snug">{s.titre}</span>
-          {technique && <span className="num flex-none text-[11.5px] text-[var(--faint)]">{duree(s.duree_ms)}</span>}
+          <span className="etape-titre flex-1 text-[15px] leading-snug">{s.titre}</span>
+          {technique && <span className="num flex-none text-[12px] text-[var(--faint)]">{duree(s.duree_ms)}</span>}
         </span>
         <span className="mt-0.5 block text-[12px] text-[var(--faint)]">
           <span className="sr-only-v3">{LIBELLE[s.statut]}. </span>
@@ -33,7 +33,7 @@ function Etape({ s, dernier, technique }: { s: TraceStep; dernier: boolean; tech
         </span>
       </button>
       {ouvert && (
-        <div className="fade mt-2 rounded-lg bg-[var(--paper)] px-3 py-2.5 text-[12.5px] leading-relaxed text-[var(--mute)]">
+        <div className="fade mt-2 rounded-lg bg-[var(--paper)] px-3 py-2.5 text-[13px] leading-relaxed text-[var(--mute)]">
           {s.resume && <p>{s.resume}</p>}
           {s.details.length > 0 && <ul className="mt-1.5 list-disc space-y-0.5 pl-4">{s.details.map((d, i) => <li key={i}>{d}</li>)}</ul>}
         </div>
@@ -67,7 +67,7 @@ export default function OngletProgression({ etapes, projet, generation, alertesO
       {projet && !enCours && (
         <section className="enter" aria-label="Ce que MARC a fait">
           <p className="label mb-2.5">Ce qui a été fait</p>
-          <ul className="text-[13.5px] leading-snug">
+          <ul className="text-[15px] leading-snug">
             {resume.map((l) => (
               <li key={l.texte}>
                 {l.onglet ? (
@@ -79,7 +79,7 @@ export default function OngletProgression({ etapes, projet, generation, alertesO
             ))}
             {resume.length === 0 && <li className="py-1.5 text-[var(--mute)]">Projet rédigé à partir de la dictée.</li>}
           </ul>
-          <p className="mt-3 text-[12.5px] text-[var(--faint)]">
+          <p className="mt-3 text-[13px] text-[var(--faint)]">
             {alertesOuvertes ? `${alertesOuvertes} point${alertesOuvertes > 1 ? "s" : ""} à vérifier avant de valider.` : "Tous les points sont traités."}
           </p>
           <button type="button" className="btn btn-sm mt-4" onClick={onDocument}>Relire le projet</button>
@@ -90,7 +90,7 @@ export default function OngletProgression({ etapes, projet, generation, alertesO
         <details className="mt-6 border-t border-[var(--line)] pt-3">
           <summary className="cursor-pointer text-[12px] text-[var(--faint)] hover:text-[var(--ink)]">Détails techniques</summary>
           {m && (
-            <p className="mt-2.5 text-[12.5px] leading-relaxed text-[var(--mute)]">
+            <p className="mt-2.5 text-[13px] leading-relaxed text-[var(--mute)]">
               Terminé en <b className="num font-semibold text-[var(--ink)]">{duree(m.duree_totale_ms)}</b>
               {m.appels_llm > 0 && <> · {m.appels_llm} appels de modèle</>}
               {m.confiance_moyenne > 0 && <> · confiance moyenne <span className="num">{Math.round(m.confiance_moyenne * 100)} %</span></>}

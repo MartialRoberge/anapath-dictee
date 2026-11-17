@@ -85,7 +85,7 @@ export default function Trou({ el, etat, valeur, onRemplir, onIgnorer, onRouvrir
         }}
       >
         <span>{affichage}</span>
-        {el.obligatoire && etat === "ouvert" && <span className="text-[11px] font-medium text-[var(--amber)]">obligatoire</span>}
+        {el.obligatoire && etat === "ouvert" && <span className="text-[12px] font-medium text-[var(--amber)]">obligatoire</span>}
       </button>
       {ouvert && (
         <div className="pop left-0 top-full mt-1.5" onKeyDown={touche}>
@@ -94,7 +94,7 @@ export default function Trou({ el, etat, valeur, onRemplir, onIgnorer, onRouvrir
               ref={champ} value={saisie} onChange={(e) => { setSaisie(e.target.value); setActif(0); }}
               role="combobox" aria-expanded="true" aria-controls={idListe} aria-autocomplete="list" aria-label={`Valeur pour ${el.texte}`}
               placeholder={el.options.length ? "Choisir ou saisir une valeur" : "Saisir une valeur"}
-              className="w-full bg-transparent text-[14px] placeholder:text-[var(--faint)] focus:outline-none"
+              className="w-full bg-transparent text-[15px] placeholder:text-[var(--faint)] focus:outline-none"
             />
             {unite && <span className="text-[12px] text-[var(--faint)]">{unite}</span>}
           </div>
@@ -106,7 +106,7 @@ export default function Trou({ el, etat, valeur, onRemplir, onIgnorer, onRouvrir
                 </button>
               </li>
             ))}
-            {items.length === 0 && <li className="px-3 py-2 text-[12.5px] text-[var(--faint)]">Saisissez une valeur puis Entrée.</li>}
+            {items.length === 0 && <li className="px-3 py-2 text-[13px] text-[var(--faint)]">Saisissez une valeur puis Entrée.</li>}
           </ul>
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-[var(--line-soft)] px-2.5 pb-1 pt-2 text-[12px]">
             <span className="text-[var(--faint)]"><span className="kbd">Entrée</span> valider · <span className="kbd">Tab</span> suivant</span>

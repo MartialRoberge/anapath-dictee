@@ -6,7 +6,7 @@ interface Props { alerte: Alerte; reste: number; onDecider: (a: Alerte, d: "reso
 
 export default function BandeauAlerte({ alerte, reste, onDecider }: Props) {
   return (
-    <div role="status" className="enter flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-[var(--line)] bg-white px-4 py-2.5 min-[1180px]:hidden">
+    <div role="status" className="enter flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-[var(--line)] bg-[var(--card)] px-4 py-2.5 min-[1180px]:hidden">
       <p className="min-w-0 flex-1 basis-[240px] text-[13px] leading-snug">
         <span className="label mr-2">{alerte.gravite === "bloquant" ? "Bloquant" : alerte.gravite === "attention" ? "Attention" : "Information"} · {reste}</span>
         {alerte.message}

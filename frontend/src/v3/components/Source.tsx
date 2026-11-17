@@ -25,7 +25,7 @@ export function FiabiliteMots({ f, className = "" }: { f?: string | null; classN
 export function SourceLien({ source: s, onConsulte, titre }: { source: SourceRef; onConsulte?: (s: SourceRef) => void; titre?: string }) {
   const contenu = (
     <>
-      <span className="block break-words text-[13.5px] font-medium leading-snug">{titre || s.libelle}</span>
+      <span className="block break-words text-[15px] font-medium leading-snug">{titre || s.libelle}</span>
       <ExtraitSource s={s} className="mt-0.5" />
       <FiabiliteMots f={s.fiabilite} className="mt-0.5 block" />
     </>
@@ -89,9 +89,9 @@ export function FicheSource({ ref_, source: s, etat, onFermer }: { ref_?: React.
       <div ref={ref_} role="dialog" aria-modal="true" aria-labelledby={idTitre} className="!w-[min(520px,100%)] p-6">
         <p className="label">Source</p>
         <h2 id={idTitre} className="mt-1.5 break-words text-[17px] font-medium leading-snug">{titre}</h2>
-        <ExtraitSource s={s} className="mt-1.5 !text-[12.5px]" />
+        <ExtraitSource s={s} className="mt-1.5 !text-[13px]" />
 
-        {fiche?.description && <p className="mt-4 text-[13.5px] leading-relaxed">{fiche.description}</p>}
+        {fiche?.description && <p className="mt-4 text-[15px] leading-relaxed">{fiche.description}</p>}
         {etat.phase === "chargement" && <p role="status" className="mt-4 text-[13px] text-[var(--faint)]">Chargement de la fiche…</p>}
         {etat.phase === "indisponible" && aUneFiche(s) && <p role="status" className="mt-4 text-[13px] leading-relaxed text-[var(--mute)]">La fiche détaillée n'est pas disponible pour le moment. Les informations de la source citée restent affichées.</p>}
 

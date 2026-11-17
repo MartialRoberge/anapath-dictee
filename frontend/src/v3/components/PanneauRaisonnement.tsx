@@ -67,16 +67,16 @@ export default function PanneauRaisonnement(p: Props) {
   };
 
   return (
-    <aside className="flex h-full min-h-0 flex-col border-l border-[var(--line)] bg-white" aria-label="Raisonnement">
-      <div className="flex items-center px-5 pt-5">
-        <h2 className="titre-serif flex-1 text-[22px] leading-none">Raisonnement</h2>
+    <aside className="flex h-full min-h-0 flex-col border-l-[0.5px] border-[var(--line)] bg-[var(--card)]" aria-label="Raisonnement">
+      <div className="flex items-center px-4 pt-5">
+        <h2 className="titre-serif flex-1 text-[22px] leading-[1.2]">Raisonnement</h2>
         {p.onFermer && <div className="min-[1180px]:hidden"><button type="button" className="btn btn-ghost btn-sm" onClick={p.onFermer}>Fermer <span className="kbd">Échap</span></button></div>}
       </div>
-      <div ref={liste} role="tablist" aria-label="Raisonnement des agents" onKeyDown={fleches} className="mt-3 flex overflow-x-auto border-b border-[var(--line)] px-5">
+      <div ref={liste} role="tablist" aria-label="Raisonnement des agents" onKeyDown={fleches} className="mx-4 mt-3">
         {onglets.map((o) => (
           <button key={o.cle} id={`tab-${o.cle}`} role="tab" type="button" className="tab" aria-selected={p.onglet === o.cle} aria-controls="panneau-raisonnement"
             tabIndex={p.onglet === o.cle ? 0 : -1} aria-keyshortcuts={`Alt+${onglets.indexOf(o) + 1}`} title={`${o.titre} · ${touche(String(onglets.indexOf(o) + 1))}`} onClick={() => p.onOnglet(o.cle)}>
-            {o.titre}{o.n != null && o.n > 0 && <span className={`num ml-1 text-[11px] ${o.cle === "alertes" && ouvertes > 0 ? "font-semibold text-[var(--amber)]" : "text-[var(--faint)]"}`}>{o.n}</span>}
+            {o.titre}{o.n != null && o.n > 0 && <span className={`num ml-1 text-[12px] ${o.cle === "alertes" && ouvertes > 0 ? "font-semibold text-[var(--amber)]" : "text-[var(--faint)]"}`}>{o.n}</span>}
           </button>
         ))}
       </div>
@@ -91,7 +91,7 @@ export default function PanneauRaisonnement(p: Props) {
         {p.onglet === "dictee" && local && (
           <OngletDictee local={local} element={p.element} correctionActive={p.correctionActive} onCorrectionActive={p.onCorrectionActive} onDecision={p.onDecision} onConsulte={p.onConsulte} />
         )}
-        {!local && p.onglet !== "progression" && <p className="px-5 py-6 text-[13.5px] text-[var(--mute)]">Disponible dès que le projet est prêt.</p>}
+        {!local && p.onglet !== "progression" && <p className="px-5 py-6 text-[15px] text-[var(--mute)]">Disponible dès que le projet est prêt.</p>}
       </div>
     </aside>
   );
