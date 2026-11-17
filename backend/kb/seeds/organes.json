@@ -1,0 +1,1384 @@
+{
+ "_note": "Semences curees (agent sources, a valider par la pathologiste). synonymes = mots-cles SPECIFIQUES (declenchent seuls la detection) ; mots_cles_faibles = ne declenchent jamais seuls. Codes D3 verifies contre ADICAP 2024-10 au build.",
+ "organes": [
+  {
+   "id": "sein",
+   "libelle": "Sein",
+   "categorie": "senologie",
+   "synonymes": [
+    "sein",
+    "mammaire",
+    "mastectomie",
+    "mamelon",
+    "areole",
+    "galactophore",
+    "pyramidectomie",
+    "carcinome canalaire infiltrant",
+    "ccis"
+   ],
+   "mots_cles_faibles": [
+    "tumorectomie",
+    "macrobiopsie",
+    "microbiopsie",
+    "axillaire",
+    "quadrant",
+    "mammographie",
+    "ganglion sentinelle"
+   ],
+   "adicap_d3": [
+    "GS"
+   ],
+   "cim_o_topographie": [
+    "C50"
+   ],
+   "snomed_cle": "sein",
+   "template": "sein"
+  },
+  {
+   "id": "colon_rectum",
+   "libelle": "Côlon-rectum",
+   "categorie": "digestif",
+   "synonymes": [
+    "colon",
+    "rectum",
+    "rectal",
+    "rectale",
+    "colique",
+    "sigmoide",
+    "caecum",
+    "recto-sigmoidien",
+    "colectomie",
+    "hemicolectomie",
+    "sigmoidectomie",
+    "proctectomie",
+    "colo-rectal",
+    "colorectal",
+    "polypectomie colique"
+   ],
+   "mots_cles_faibles": [
+    "polype",
+    "transverse",
+    "ascendant",
+    "descendant",
+    "anastomose"
+   ],
+   "adicap_d3": [
+    "DC",
+    "DR",
+    "DV"
+   ],
+   "cim_o_topographie": [
+    "C18",
+    "C19",
+    "C20"
+   ],
+   "snomed_cle": "colon_rectum",
+   "template": "colon_rectum"
+  },
+  {
+   "id": "poumon",
+   "libelle": "Poumon",
+   "categorie": "thorax",
+   "synonymes": [
+    "poumon",
+    "pulmonaire",
+    "bronche",
+    "bronchique",
+    "pneumonectomie",
+    "parenchyme pulmonaire",
+    "broncho-pulmonaire",
+    "bronchopulmonaire",
+    "lba",
+    "lavage bronchiolo-alveolaire",
+    "ebus",
+    "aspiration bronchique"
+   ],
+   "mots_cles_faibles": [
+    "lobe",
+    "lobectomie",
+    "segmentectomie",
+    "hilaire",
+    "hile",
+    "pleural",
+    "pleure",
+    "mediastin",
+    "mediastinal",
+    "alveolaire",
+    "trachee"
+   ],
+   "adicap_d3": [
+    "RP",
+    "RB"
+   ],
+   "cim_o_topographie": [
+    "C34"
+   ],
+   "snomed_cle": "poumon",
+   "template": "poumon"
+  },
+  {
+   "id": "prostate",
+   "libelle": "Prostate",
+   "categorie": "urologie",
+   "synonymes": [
+    "prostate",
+    "prostatique",
+    "prostatectomie",
+    "rtup",
+    "vesicule seminale",
+    "vesicules seminales",
+    "adenomectomie",
+    "gleason",
+    "psa"
+   ],
+   "mots_cles_faibles": [
+    "carotte",
+    "carottes",
+    "sextant",
+    "isup",
+    "resection transuretrale"
+   ],
+   "adicap_d3": [
+    "HP",
+    "HS"
+   ],
+   "cim_o_topographie": [
+    "C61"
+   ],
+   "snomed_cle": "prostate",
+   "template": "prostate"
+  },
+  {
+   "id": "estomac",
+   "libelle": "Estomac",
+   "categorie": "digestif",
+   "synonymes": [
+    "estomac",
+    "gastrique",
+    "gastrectomie",
+    "fundus",
+    "fundique",
+    "pylore",
+    "pylorique",
+    "jonction oeso-gastrique",
+    "gastrite",
+    "gastropathie",
+    "helicobacter"
+   ],
+   "mots_cles_faibles": [
+    "antre",
+    "antral",
+    "cardia",
+    "gastro",
+    "olga",
+    "olgim",
+    "sydney"
+   ],
+   "adicap_d3": [
+    "DE"
+   ],
+   "cim_o_topographie": [
+    "C16"
+   ],
+   "snomed_cle": "estomac",
+   "template": "estomac"
+  },
+  {
+   "id": "thyroide",
+   "libelle": "Thyroïde",
+   "categorie": "endocrinologie",
+   "synonymes": [
+    "thyroide",
+    "thyroidien",
+    "thyroidienne",
+    "thyroidectomie",
+    "lobo-isthmectomie",
+    "lobo isthmectomie",
+    "nodule thyroidien",
+    "thyroidite"
+   ],
+   "mots_cles_faibles": [
+    "isthme",
+    "parathyroide",
+    "bethesda",
+    "lobe"
+   ],
+   "adicap_d3": [
+    "ET"
+   ],
+   "cim_o_topographie": [
+    "C73"
+   ],
+   "snomed_cle": "thyroide",
+   "template": "thyroide"
+  },
+  {
+   "id": "rein",
+   "libelle": "Rein",
+   "categorie": "urologie",
+   "synonymes": [
+    "rein",
+    "renal",
+    "renale",
+    "nephrectomie",
+    "pyelocaliciel",
+    "carcinome renal",
+    "tumeur renale",
+    "nephropathie",
+    "glomerule"
+   ],
+   "mots_cles_faibles": [
+    "fuhrman",
+    "isup",
+    "hile renal"
+   ],
+   "adicap_d3": [
+    "UR",
+    "UP"
+   ],
+   "cim_o_topographie": [
+    "C64"
+   ],
+   "snomed_cle": "rein",
+   "template": "rein"
+  },
+  {
+   "id": "vessie",
+   "libelle": "Vessie",
+   "categorie": "urologie",
+   "synonymes": [
+    "vessie",
+    "vesical",
+    "vesicale",
+    "cystectomie",
+    "rtuv",
+    "urothelial",
+    "urothelium",
+    "dome vesical",
+    "detrusor"
+   ],
+   "mots_cles_faibles": [
+    "trigone",
+    "resection transuretrale",
+    "urine"
+   ],
+   "adicap_d3": [
+    "UV"
+   ],
+   "cim_o_topographie": [
+    "C67"
+   ],
+   "snomed_cle": "vessie",
+   "template": "vessie"
+  },
+  {
+   "id": "col_uterin",
+   "libelle": "Col utérin",
+   "categorie": "gynecologie",
+   "synonymes": [
+    "col uterin",
+    "col de l'uterus",
+    "exocol",
+    "endocol",
+    "conisation",
+    "trachelectomie",
+    "wertheim",
+    "cin",
+    "frottis cervico-uterin",
+    "fcu",
+    "colposcopie"
+   ],
+   "mots_cles_faibles": [
+    "cervical",
+    "cervicale",
+    "parametre",
+    "parametres",
+    "hsil",
+    "lsil",
+    "bethesda",
+    "zone de jonction"
+   ],
+   "adicap_d3": [
+    "GC",
+    "GE",
+    "GX"
+   ],
+   "cim_o_topographie": [
+    "C53"
+   ],
+   "snomed_cle": "col_uterin",
+   "template": "col_uterin"
+  },
+  {
+   "id": "endometre",
+   "libelle": "Endomètre",
+   "categorie": "gynecologie",
+   "synonymes": [
+    "endometre",
+    "endometrial",
+    "endometriale",
+    "cavite uterine",
+    "uterus",
+    "myometre",
+    "corps uterin",
+    "hysterectomie",
+    "endometrioide",
+    "leiomyome uterin"
+   ],
+   "mots_cles_faibles": [
+    "curetage",
+    "leiomyome",
+    "fibrome"
+   ],
+   "adicap_d3": [
+    "GU",
+    "GM"
+   ],
+   "cim_o_topographie": [
+    "C54"
+   ],
+   "snomed_cle": "endometre",
+   "template": "endometre"
+  },
+  {
+   "id": "ovaire",
+   "libelle": "Ovaire",
+   "categorie": "gynecologie",
+   "synonymes": [
+    "ovaire",
+    "ovarien",
+    "ovarienne",
+    "annexectomie",
+    "ovariectomie",
+    "omentectomie",
+    "cystadenome"
+   ],
+   "mots_cles_faibles": [
+    "annexe",
+    "trompe",
+    "tubaire",
+    "peritoine",
+    "ascite",
+    "epiploon",
+    "kyste"
+   ],
+   "adicap_d3": [
+    "GO",
+    "GT"
+   ],
+   "cim_o_topographie": [
+    "C56"
+   ],
+   "snomed_cle": "ovaire",
+   "template": "ovaire"
+  },
+  {
+   "id": "melanome",
+   "libelle": "Mélanome",
+   "categorie": "dermatologie",
+   "synonymes": [
+    "melanome",
+    "naevus",
+    "lesion melanocytaire",
+    "breslow",
+    "lentigo maligna",
+    "melanocytaire"
+   ],
+   "mots_cles_faibles": [
+    "clark",
+    "pigmente",
+    "acral",
+    "melanocyte"
+   ],
+   "adicap_d3": [
+    "OT"
+   ],
+   "cim_o_topographie": [
+    "C43"
+   ],
+   "snomed_cle": "melanome",
+   "template": "melanome"
+  },
+  {
+   "id": "foie",
+   "libelle": "Foie",
+   "categorie": "digestif",
+   "synonymes": [
+    "foie",
+    "hepatique",
+    "hepatocellulaire",
+    "cholangiocarcinome",
+    "hepatectomie",
+    "cirrhose",
+    "metavir",
+    "fibrose hepatique",
+    "chc",
+    "hepatite",
+    "steatohepatite",
+    "steatose"
+   ],
+   "mots_cles_faibles": [
+    "lobectomie",
+    "segmentectomie",
+    "segment"
+   ],
+   "adicap_d3": [
+    "FF",
+    "FI"
+   ],
+   "cim_o_topographie": [
+    "C22"
+   ],
+   "snomed_cle": "foie",
+   "template": "foie"
+  },
+  {
+   "id": "pancreas",
+   "libelle": "Pancréas",
+   "categorie": "digestif",
+   "synonymes": [
+    "pancreas",
+    "pancreatique",
+    "duodeno-pancreatectomie",
+    "duodenopancreatectomie",
+    "whipple",
+    "wirsung",
+    "splenopancreatectomie",
+    "pancreatectomie",
+    "ampoule de vater",
+    "dpc"
+   ],
+   "mots_cles_faibles": [
+    "tumeur neuroendocrine"
+   ],
+   "adicap_d3": [
+    "FP",
+    "FO",
+    "EI"
+   ],
+   "cim_o_topographie": [
+    "C25"
+   ],
+   "snomed_cle": "pancreas",
+   "template": "pancreas"
+  },
+  {
+   "id": "oesophage",
+   "libelle": "Œsophage",
+   "categorie": "digestif",
+   "synonymes": [
+    "oesophage",
+    "oesophagien",
+    "oesophagienne",
+    "oesophagectomie",
+    "oesophagite",
+    "barrett",
+    "endobrachyoesophage",
+    "bas oesophage",
+    "jonction oeso-gastrique",
+    "ebo"
+   ],
+   "mots_cles_faibles": [
+    "cardia"
+   ],
+   "adicap_d3": [
+    "DO"
+   ],
+   "cim_o_topographie": [
+    "C15"
+   ],
+   "snomed_cle": "oesophage",
+   "template": "oesophage"
+  },
+  {
+   "id": "orl_tete_cou",
+   "libelle": "ORL / tête et cou",
+   "categorie": "orl",
+   "synonymes": [
+    "orl",
+    "larynx",
+    "laryngee",
+    "laryngectomie",
+    "pharynx",
+    "pharynge",
+    "oropharynx",
+    "hypopharynx",
+    "nasopharynx",
+    "rhinopharynx",
+    "cavum",
+    "cavite buccale",
+    "plancher buccal",
+    "amygdale",
+    "tonsille",
+    "amygdalectomie",
+    "cavite nasale",
+    "fosses nasales",
+    "glande salivaire",
+    "glandes salivaires",
+    "parotide",
+    "sous-maxillaire",
+    "parotidectomie",
+    "glossectomie",
+    "corde vocale",
+    "cordes vocales",
+    "naso-sinusien",
+    "sinus maxillaire",
+    "ethmoide",
+    "parotidien",
+    "parotidienne",
+    "salivaire",
+    "sous-mandibulaire",
+    "sous-mandibulaires",
+    "glande parotide"
+   ],
+   "mots_cles_faibles": [
+    "langue",
+    "palais",
+    "levre",
+    "sinus",
+    "cervical",
+    "cervicale",
+    "curage cervical",
+    "bouche"
+   ],
+   "adicap_d3": [
+    "AL",
+    "AP",
+    "AO",
+    "AH",
+    "AA",
+    "AC",
+    "AS",
+    "AF",
+    "BX",
+    "BL",
+    "BA",
+    "BP",
+    "BM",
+    "BS",
+    "BG",
+    "BV"
+   ],
+   "cim_o_topographie": [
+    "C00-C14",
+    "C30-C32"
+   ],
+   "snomed_cle": "larynx",
+   "template": "orl_tete_cou"
+  },
+  {
+   "id": "testicule",
+   "libelle": "Testicule",
+   "categorie": "urologie",
+   "synonymes": [
+    "testicule",
+    "testiculaire",
+    "orchidectomie",
+    "seminome",
+    "non seminomateux",
+    "cordon spermatique",
+    "albuginee",
+    "rete testis",
+    "tumeur germinale",
+    "epididyme"
+   ],
+   "mots_cles_faibles": [],
+   "adicap_d3": [
+    "HT",
+    "HE",
+    "HD",
+    "HG",
+    "HB"
+   ],
+   "cim_o_topographie": [
+    "C62"
+   ],
+   "snomed_cle": "testicule",
+   "template": "testicule"
+  },
+  {
+   "id": "lymphome",
+   "libelle": "Lymphome / ganglion",
+   "categorie": "hematologie",
+   "synonymes": [
+    "lymphome",
+    "lymphoproliferatif",
+    "hodgkin",
+    "non hodgkinien",
+    "dlbcl",
+    "reed-sternberg",
+    "burkitt",
+    "lymphoblastique",
+    "lymphadenopathie"
+   ],
+   "mots_cles_faibles": [
+    "ganglion",
+    "ganglions",
+    "ganglionnaire",
+    "adenopathie",
+    "folliculaire",
+    "manteau",
+    "marginal",
+    "splenectomie",
+    "splenomegalie"
+   ],
+   "adicap_d3": [
+    "SG",
+    "SR",
+    "SM"
+   ],
+   "cim_o_topographie": [
+    "C77"
+   ],
+   "snomed_cle": "lymphome",
+   "template": "lymphome"
+  },
+  {
+   "id": "sarcome",
+   "libelle": "Sarcome / tissus mous",
+   "categorie": "os_tissus_mous",
+   "synonymes": [
+    "sarcome",
+    "tissus mous",
+    "parties molles",
+    "lipome",
+    "tumeur adipeuse",
+    "liposarcome",
+    "leiomyosarcome",
+    "rhabdomyosarcome",
+    "synovialosarcome",
+    "fibrosarcome",
+    "histiocytofibrome",
+    "dfsp",
+    "gist",
+    "tumeur desmoide",
+    "myxofibrosarcome",
+    "sarcomateux",
+    "dermatofibrosarcome",
+    "osteosarcome",
+    "chondrosarcome",
+    "tumeur stromale"
+   ],
+   "mots_cles_faibles": [
+    "adipeux",
+    "sous-cutane",
+    "sous cutane",
+    "fusiforme",
+    "lipomateux"
+   ],
+   "adicap_d3": [
+    "TC",
+    "TA",
+    "LM"
+   ],
+   "cim_o_topographie": [
+    "C49"
+   ],
+   "snomed_cle": null,
+   "template": "sarcome"
+  },
+  {
+   "id": "systeme_nerveux_central",
+   "libelle": "Système nerveux central",
+   "categorie": "neuro",
+   "synonymes": [
+    "cerveau",
+    "cerebral",
+    "cerebrale",
+    "gliome",
+    "glioblastome",
+    "astrocytome",
+    "oligodendrogliome",
+    "meningiome",
+    "medulloblastome",
+    "craniotomie",
+    "encephale",
+    "tronc cerebral",
+    "cervelet",
+    "moelle epiniere",
+    "snc",
+    "ependymome",
+    "hemisphere cerebral"
+   ],
+   "mots_cles_faibles": [
+    "temporal",
+    "frontal",
+    "parietal",
+    "occipital",
+    "cranien",
+    "meninge"
+   ],
+   "adicap_d3": [
+    "NH",
+    "NC",
+    "NT",
+    "NM",
+    "NE",
+    "XE"
+   ],
+   "cim_o_topographie": [
+    "C71"
+   ],
+   "snomed_cle": "systeme_nerveux_central",
+   "template": "systeme_nerveux_central"
+  },
+  {
+   "id": "canal_anal",
+   "libelle": "Canal anal / marge anale",
+   "categorie": "digestif",
+   "synonymes": [
+    "canal anal",
+    "anal",
+    "anale",
+    "marge anale",
+    "peri-anal",
+    "perianal",
+    "anus",
+    "ligne pectinee",
+    "neoplasie intraepitheliale anale",
+    "ain1",
+    "ain2",
+    "ain3",
+    "hemorroide",
+    "hemorroides",
+    "hemorroidaire",
+    "paquets hemorroidaires",
+    "fissure anale"
+   ],
+   "mots_cles_faibles": [
+    "ain"
+   ],
+   "adicap_d3": [
+    "DQ"
+   ],
+   "cim_o_topographie": [
+    "C21"
+   ],
+   "snomed_cle": "canal_anal",
+   "template": "canal_anal"
+  },
+  {
+   "id": "vesicule_biliaire",
+   "libelle": "Vésicule biliaire",
+   "categorie": "digestif",
+   "synonymes": [
+    "vesicule biliaire",
+    "cholecystectomie",
+    "cholecystite",
+    "canal cystique"
+   ],
+   "mots_cles_faibles": [
+    "vesicule",
+    "biliaire",
+    "cystique",
+    "calcul",
+    "calculs"
+   ],
+   "adicap_d3": [
+    "FV"
+   ],
+   "cim_o_topographie": [
+    "C23"
+   ],
+   "snomed_cle": null,
+   "template": "vesicule_biliaire"
+  },
+  {
+   "id": "appendice",
+   "libelle": "Appendice",
+   "categorie": "digestif",
+   "synonymes": [
+    "appendice",
+    "appendicectomie",
+    "appendiculaire",
+    "appendicite",
+    "mucocele appendiculaire"
+   ],
+   "mots_cles_faibles": [
+    "caecal"
+   ],
+   "adicap_d3": [
+    "DA"
+   ],
+   "cim_o_topographie": [
+    "C18.1"
+   ],
+   "snomed_cle": null,
+   "template": "appendice"
+  },
+  {
+   "id": "peau",
+   "libelle": "Peau (hors mélanome)",
+   "categorie": "dermatologie",
+   "synonymes": [
+    "peau",
+    "cutane",
+    "cutanee",
+    "derme",
+    "epiderme",
+    "basocellulaire",
+    "spinocellulaire",
+    "keratose actinique",
+    "exerese cutanee",
+    "resection cutanee",
+    "punch cutane"
+   ],
+   "mots_cles_faibles": [
+    "dermatose",
+    "kyste epidermique"
+   ],
+   "adicap_d3": [
+    "OT",
+    "OA",
+    "OG"
+   ],
+   "cim_o_topographie": [
+    "C44"
+   ],
+   "snomed_cle": "peau",
+   "template": null
+  },
+  {
+   "id": "thymus",
+   "libelle": "Thymus",
+   "categorie": "hematologie",
+   "synonymes": [
+    "thymus",
+    "thymique",
+    "thymome",
+    "thymectomie"
+   ],
+   "mots_cles_faibles": [],
+   "adicap_d3": [
+    "ST"
+   ],
+   "cim_o_topographie": [
+    "C37"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "surrenale",
+   "libelle": "Surrénale",
+   "categorie": "endocrinologie",
+   "synonymes": [
+    "surrenale",
+    "surrenalien",
+    "surrenalienne",
+    "surrenalectomie",
+    "pheochromocytome",
+    "corticosurrenalome"
+   ],
+   "mots_cles_faibles": [],
+   "adicap_d3": [
+    "ES"
+   ],
+   "cim_o_topographie": [
+    "C74"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "parathyroide",
+   "libelle": "Parathyroïde",
+   "categorie": "endocrinologie",
+   "synonymes": [
+    "parathyroide",
+    "parathyroidien",
+    "parathyroidectomie",
+    "adenome parathyroidien"
+   ],
+   "mots_cles_faibles": [],
+   "adicap_d3": [
+    "EP"
+   ],
+   "cim_o_topographie": [
+    "C75.0"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "hypophyse",
+   "libelle": "Hypophyse",
+   "categorie": "endocrinologie",
+   "synonymes": [
+    "hypophyse",
+    "hypophysaire",
+    "adenome hypophysaire"
+   ],
+   "mots_cles_faibles": [],
+   "adicap_d3": [
+    "EH"
+   ],
+   "cim_o_topographie": [
+    "C75.1"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "os",
+   "libelle": "Os",
+   "categorie": "os_tissus_mous",
+   "synonymes": [
+    "osseux",
+    "osseuse",
+    "osteonecrose",
+    "osteomyelite",
+    "osteotomie",
+    "tete femorale",
+    "exostose",
+    "chondrome",
+    "os"
+   ],
+   "mots_cles_faibles": [
+    "fracture",
+    "cartilage"
+   ],
+   "adicap_d3": [
+    "LO"
+   ],
+   "cim_o_topographie": [
+    "C40",
+    "C41"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "articulation",
+   "libelle": "Articulation / synoviale / tendon",
+   "categorie": "os_tissus_mous",
+   "synonymes": [
+    "articulation",
+    "articulaire",
+    "synoviale",
+    "synovite",
+    "arthrose",
+    "coxarthrose",
+    "gonarthrose",
+    "menisque",
+    "tenosynovite",
+    "hygroma",
+    "canal carpien",
+    "hernie discale"
+   ],
+   "mots_cles_faibles": [
+    "tendon",
+    "bourse"
+   ],
+   "adicap_d3": [
+    "LA",
+    "LS",
+    "LT",
+    "LG",
+    "LB",
+    "LC"
+   ],
+   "cim_o_topographie": [],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "muscle",
+   "libelle": "Muscle strié",
+   "categorie": "neuro",
+   "synonymes": [
+    "biopsie musculaire",
+    "myopathie",
+    "myosite"
+   ],
+   "mots_cles_faibles": [
+    "muscle",
+    "musculaire"
+   ],
+   "adicap_d3": [
+    "LM"
+   ],
+   "cim_o_topographie": [],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "nerf_peripherique",
+   "libelle": "Nerf périphérique",
+   "categorie": "neuro",
+   "synonymes": [
+    "nerf peripherique",
+    "neuropathie",
+    "biopsie nerveuse",
+    "biopsie neuromusculaire"
+   ],
+   "mots_cles_faibles": [],
+   "adicap_d3": [
+    "NP"
+   ],
+   "cim_o_topographie": [],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "placenta",
+   "libelle": "Placenta / produits de conception",
+   "categorie": "foeto_placentaire",
+   "synonymes": [
+    "placenta",
+    "placentaire",
+    "membranes ovulaires",
+    "cordon ombilical",
+    "chorioamniotite",
+    "villite",
+    "mole hydatiforme",
+    "produit d'avortement",
+    "fausse couche",
+    "trophoblaste"
+   ],
+   "mots_cles_faibles": [
+    "avortement"
+   ],
+   "adicap_d3": [
+    "PP",
+    "PM",
+    "PC",
+    "PO",
+    "PF"
+   ],
+   "cim_o_topographie": [
+    "C58"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "rate",
+   "libelle": "Rate",
+   "categorie": "hematologie",
+   "synonymes": [
+    "rate",
+    "splenique",
+    "splenectomie"
+   ],
+   "mots_cles_faibles": [
+    "splenomegalie"
+   ],
+   "adicap_d3": [
+    "SR"
+   ],
+   "cim_o_topographie": [
+    "C42.2"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "moelle_osseuse",
+   "libelle": "Moelle osseuse",
+   "categorie": "hematologie",
+   "synonymes": [
+    "moelle osseuse",
+    "osteomedullaire",
+    "myelogramme",
+    "bom"
+   ],
+   "mots_cles_faibles": [
+    "medullaire"
+   ],
+   "adicap_d3": [
+    "SM"
+   ],
+   "cim_o_topographie": [
+    "C42.1"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "plevre",
+   "libelle": "Plèvre",
+   "categorie": "thorax",
+   "synonymes": [
+    "biopsie pleurale",
+    "biopsies pleurales",
+    "liquide pleural",
+    "epanchement pleural",
+    "mesotheliome",
+    "pleurectomie",
+    "pleuresie",
+    "ponction pleurale"
+   ],
+   "mots_cles_faibles": [
+    "plevre",
+    "pleural",
+    "pleurale",
+    "pleurales"
+   ],
+   "adicap_d3": [
+    "RS"
+   ],
+   "cim_o_topographie": [
+    "C38.4"
+   ],
+   "snomed_cle": "plevre",
+   "template": null
+  },
+  {
+   "id": "peritoine",
+   "libelle": "Péritoine",
+   "categorie": "digestif",
+   "synonymes": [
+    "carcinose peritoneale",
+    "liquide d'ascite",
+    "pseudomyxome",
+    "peritonectomie",
+    "lavage peritoneal",
+    "biopsie peritoneale",
+    "biopsies peritoneales"
+   ],
+   "mots_cles_faibles": [
+    "peritoine",
+    "peritoneal",
+    "peritoneale",
+    "ascite"
+   ],
+   "adicap_d3": [
+    "DP"
+   ],
+   "cim_o_topographie": [
+    "C48"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "intestin_grele",
+   "libelle": "Intestin grêle / duodénum",
+   "categorie": "digestif",
+   "synonymes": [
+    "intestin grele",
+    "grele",
+    "ileon",
+    "ileal",
+    "jejunum",
+    "jejunal",
+    "ileite",
+    "duodenum",
+    "duodenal",
+    "duodenite",
+    "maladie coeliaque",
+    "diverticule de meckel",
+    "enterite"
+   ],
+   "mots_cles_faibles": [
+    "ileo-caecal",
+    "valvule de bauhin"
+   ],
+   "adicap_d3": [
+    "DG",
+    "DD",
+    "DV",
+    "DM"
+   ],
+   "cim_o_topographie": [
+    "C17"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "voies_biliaires",
+   "libelle": "Voies biliaires",
+   "categorie": "digestif",
+   "synonymes": [
+    "voies biliaires",
+    "voie biliaire",
+    "klatskin",
+    "cholangite",
+    "choledoque"
+   ],
+   "mots_cles_faibles": [
+    "biliaire"
+   ],
+   "adicap_d3": [
+    "FE",
+    "FI",
+    "FO"
+   ],
+   "cim_o_topographie": [
+    "C24"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "uretere",
+   "libelle": "Uretère / voie excrétrice",
+   "categorie": "urologie",
+   "synonymes": [
+    "uretere",
+    "ureteral",
+    "ureterale",
+    "voie excretrice",
+    "voies excretrices",
+    "jonction pyelo-ureterale",
+    "bassinet"
+   ],
+   "mots_cles_faibles": [],
+   "adicap_d3": [
+    "UT",
+    "UP"
+   ],
+   "cim_o_topographie": [
+    "C65",
+    "C66"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "verge",
+   "libelle": "Verge / prépuce",
+   "categorie": "urologie",
+   "synonymes": [
+    "penis",
+    "verge",
+    "prepuce",
+    "balanite",
+    "circoncision"
+   ],
+   "mots_cles_faibles": [],
+   "adicap_d3": [
+    "HV"
+   ],
+   "cim_o_topographie": [
+    "C60"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "vulve_vagin",
+   "libelle": "Vulve / vagin",
+   "categorie": "gynecologie",
+   "synonymes": [
+    "vulve",
+    "vulvaire",
+    "vagin",
+    "vaginal",
+    "vulvectomie",
+    "bartholin"
+   ],
+   "mots_cles_faibles": [
+    "vaginale"
+   ],
+   "adicap_d3": [
+    "GV",
+    "GG",
+    "GB"
+   ],
+   "cim_o_topographie": [
+    "C51",
+    "C52"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "coeur_vaisseaux",
+   "libelle": "Cœur / vaisseaux",
+   "categorie": "cardio_vasculaire",
+   "synonymes": [
+    "myocarde",
+    "endocarde",
+    "valve aortique",
+    "valve mitrale",
+    "valvulaire",
+    "endarteriectomie",
+    "anevrisme",
+    "arterite",
+    "vascularite",
+    "pericarde",
+    "cardiomyopathie",
+    "artere temporale"
+   ],
+   "mots_cles_faibles": [
+    "aorte",
+    "aortique",
+    "coronaire",
+    "artere",
+    "veine"
+   ],
+   "adicap_d3": [
+    "CX",
+    "CM",
+    "CE",
+    "CP",
+    "CC",
+    "VO",
+    "VA"
+   ],
+   "cim_o_topographie": [],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "oeil",
+   "libelle": "Œil / annexes",
+   "categorie": "ophtalmologie",
+   "synonymes": [
+    "oeil",
+    "oculaire",
+    "orbite",
+    "paupiere",
+    "cornee",
+    "conjonctive",
+    "uvee",
+    "retinoblastome",
+    "dacryocystorhinostomie",
+    "dcr"
+   ],
+   "mots_cles_faibles": [],
+   "adicap_d3": [
+    "OE",
+    "OP",
+    "OC",
+    "OU",
+    "OL"
+   ],
+   "cim_o_topographie": [
+    "C69"
+   ],
+   "snomed_cle": null,
+   "template": null
+  },
+  {
+   "id": "oreille",
+   "libelle": "Oreille",
+   "categorie": "orl",
+   "synonymes": [
+    "oreille",
+    "cholesteatome",
+    "otite",
+    "mastoide",
+    "conduit auditif"
+   ],
+   "mots_cles_faibles": [],
+   "adicap_d3": [
+    "OR"
+   ],
+   "cim_o_topographie": [
+    "C30.1",
+    "C44.2"
+   ],
+   "snomed_cle": null,
+   "template": null
+  }
+ ],
+ "organe_generique": {
+  "id": "generique",
+  "libelle": "Générique (organe non reconnu)",
+  "categorie": "generique"
+ }
+}

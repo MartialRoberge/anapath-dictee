@@ -10,6 +10,10 @@ RUN npm run build
 FROM python:3.12-slim
 WORKDIR /app
 
+# Traçabilité ISO 15189 : version exacte du code embarquée (docker build --build-arg MARC_GIT_COMMIT=$(git rev-parse --short HEAD))
+ARG MARC_GIT_COMMIT=""
+ENV MARC_GIT_COMMIT=${MARC_GIT_COMMIT}
+
 # Install system dependencies for asyncpg
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \

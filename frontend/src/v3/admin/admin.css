@@ -1,0 +1,27 @@
+/* Command Center : jetons et mouvements sobres (IBM Carbon : 70-240 ms). */
+.adm {
+  --adm-fond: #F5F4F1; --adm-carte: #FFFFFF; --adm-encre: #161616; --adm-accent: #1E43E5;
+  --adm-doux: #5F5D58; --adm-filet: #E4E2DC;
+  --adm-ease: cubic-bezier(0.2, 0, 0.38, 0.9);
+  background: var(--adm-fond); color: var(--adm-encre); font-family: Inter, system-ui, sans-serif;
+  min-height: 100%;
+}
+.v3 .adm-serif, .adm-serif { font-family: 'Source Serif 4', Georgia, serif; font-weight: 300; letter-spacing: -0.02em; }
+.adm-carte { background: var(--adm-carte); border: 1px solid var(--adm-filet); border-radius: 14px; padding: 20px 22px; }
+.adm-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--adm-doux); }
+.v3 .adm-btn, .adm-btn { font-size: 13px; min-height: 28px; padding: 4px 12px; border-radius: 6px; border: 1px solid var(--adm-filet); background: transparent; color: var(--adm-encre);
+  transition: background-color 110ms var(--adm-ease), color 110ms var(--adm-ease), border-color 110ms var(--adm-ease); cursor: pointer; }
+.v3 .adm-btn:hover, .adm-btn:hover { background: var(--adm-carte); border-color: var(--adm-encre); }
+.v3 .adm-btn[aria-pressed="true"] { background: var(--adm-encre); color: #fff; border-color: var(--adm-encre); }
+.adm-btn:focus-visible { outline: 2px solid var(--adm-accent); outline-offset: 2px; }
+.adm-barre { transform-origin: bottom; animation: adm-monte 240ms var(--adm-ease) both; transition: opacity 70ms var(--adm-ease); }
+.adm-hbar { transform-origin: left; animation: adm-etend 240ms var(--adm-ease) both; }
+.adm-entree { animation: adm-fondu 240ms var(--adm-ease) both; }
+@keyframes adm-monte { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes adm-etend { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes adm-fondu { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .adm *, .adm *::before { animation: none !important; transition: none !important; } }
+.adm [role="group"] .adm-btn { border-radius: 0; }
+.adm [role="group"] .adm-btn:first-child { border-radius: 6px 0 0 6px; }
+.adm [role="group"] .adm-btn:last-child { border-radius: 0 6px 6px 0; }
+.adm [role="group"] .adm-btn + .adm-btn { margin-left: -1px; }

@@ -1,0 +1,79 @@
+{
+ "kb_version": "3.0.0",
+ "schema_version": "kb_marc_v3.1",
+ "version": "3.0.0",
+ "date_build": "2026-11-15",
+ "build": {
+  "git_commit": "4997b39",
+  "pii_scan": {
+   "ok": true,
+   "regles": 15,
+   "textes_scannes": 1696
+  },
+  "regles_testees": 98
+ },
+ "comptes": {
+  "sources": 19,
+  "organes": 46,
+  "prelevements": 7,
+  "champs": 300,
+  "lexique": 1101,
+  "variantes_stt": 758,
+  "adicap_concepts": 9683,
+  "adicap_mappings": 609,
+  "adicap_rejets": 5,
+  "snomed_concepts": 41,
+  "regles": 40,
+  "plages": 45,
+  "echelles": 10,
+  "stations": 17,
+  "gabarits": 120,
+  "exemples_style": 843
+ },
+ "ingestion": {
+  "exemples_total": 843,
+  "exemples_feuilles_perdues": 193,
+  "exemples_purges": 2,
+  "doublons_ignores": 5,
+  "mappings": 609,
+  "rejets": 5
+ },
+ "couverture": {
+  "organes_total": 45,
+  "organes_avec_champs": 23,
+  "organes_avec_gabarit_specifique": 24,
+  "organes_avec_exemples": 42,
+  "organes_sans_exemples": [
+   "organe:hypophyse",
+   "organe:muscle",
+   "organe:nerf_peripherique",
+   "organe:voies_biliaires"
+  ],
+  "organes_sans_champs": [
+   "organe:articulation",
+   "organe:coeur_vaisseaux",
+   "organe:hypophyse",
+   "organe:intestin_grele",
+   "organe:moelle_osseuse",
+   "organe:muscle",
+   "organe:nerf_peripherique",
+   "organe:oeil",
+   "organe:oreille",
+   "organe:os",
+   "organe:parathyroide",
+   "organe:peau",
+   "organe:peritoine",
+   "organe:placenta",
+   "organe:plevre",
+   "organe:rate",
+   "organe:surrenale",
+   "organe:thymus",
+   "organe:uretere",
+   "organe:verge",
+   "organe:voies_biliaires",
+   "organe:vulve_vagin"
+  ]
+ },
+ "avertissements": [],
+ "avertissement_juridique": "INCa, ICCR et SNOMED CT : statut juridique a valider avant production (voir `sources`)."
+}

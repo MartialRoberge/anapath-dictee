@@ -60,6 +60,9 @@ from routes_etude import router as etude_router
 from routes_etude_admin import router as etude_admin_router
 from routes_etude_ergonomie import router as etude_ergonomie_router
 from routes_etude_export import router as etude_export_router
+from projet.routes import router as v3_router
+from telemetrie.routes import router as telemetrie_router
+from conformite.routes import router as conformite_router
 
 logger = logging.getLogger("anapath.api")
 
@@ -142,6 +145,9 @@ app.include_router(etude_router)
 app.include_router(etude_admin_router)
 app.include_router(etude_ergonomie_router)
 app.include_router(etude_export_router)
+app.include_router(v3_router)
+app.include_router(telemetrie_router)
+app.include_router(conformite_router)
 
 
 # ---------------------------------------------------------------------------

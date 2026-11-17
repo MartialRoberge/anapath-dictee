@@ -20,6 +20,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        MARC_GIT_COMMIT: ${MARC_GIT_COMMIT:-}
     restart: unless-stopped
     ports:
       - "8000:8000"
@@ -29,7 +31,8 @@ services:
       MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       LLM_PROVIDER: ${LLM_PROVIDER:-mistral}
-      REPORT_ENGINE: ${REPORT_ENGINE:-local}
+      MISTRAL_MODEL: ${MISTRAL_MODEL:-mistral-large-2512}
+      REPORT_ENGINE: ${REPORT_ENGINE:-multipass}
       JWT_SECRET: ${JWT_SECRET:-}
     depends_on:
       db:

@@ -1,0 +1,1008 @@
+{
+ "_meta": {
+  "titre": "Données minimales INCa/SFP pour un CR d'anatomopathologie (tumeur primitive) - 10 organes prioritaires MARC",
+  "source_principale": "INCa, déc. 2011 (30 fiches ; collaboration SFP)",
+  "statut": "Paraphrase structurée, pas une reproduction. Ne pas utiliser comme référentiel unique : la fiche 2011 est antérieure à TNM 8/9, OMS 5e éd. et aux biomarqueurs actuels ; compléter avec ICCR (voir catalogue_sources.json) et faire valider par un pathologiste (PO/SFP).",
+  "reutilisation": "Autorisation INCa requise pour tout usage autre que personnel non commercial / courtes citations. Embarquer uniquement la structure (noms de champs) après accord écrit ; sinon régénérer des libellés propres.",
+  "date_acces": "2026-11-15",
+  "a_verifier": "Existence d'une version INCa postérieure à 2011 (non trouvée par la recherche ; page cancer.fr non explorée exhaustivement)."
+ },
+ "provenance": {
+  "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+  "date_acces": "2026-11-15",
+  "citation_courte": "INCa, Mise à jour 2011 des CR d'anatomopathologie, déc. 2011",
+  "fiabilite": "haute",
+  "note": ""
+ },
+ "organes": [
+  {
+   "organe": "Sein",
+   "cim10_topo": "C50",
+   "fiche_inca_n": "4 et 5",
+   "contextes": [
+    "biopsie",
+    "pièce opératoire"
+   ],
+   "entete_commun": [
+    "identification patient (nom, prénom, date de naissance/âge, sexe, INS/IPP, code postal)",
+    "établissement préleveur + FINESS",
+    "médecin demandeur/préleveur, date de prélèvement",
+    "identifiant pathologiste, n° de CR, structure ACP + FINESS, signataire, date de signature"
+   ],
+   "items": [
+    {
+     "id": "type_prelevement",
+     "label": "Type de prélèvement",
+     "type": "enum",
+     "valeurs": [
+      "microbiopsie",
+      "macrobiopsie",
+      "pyramidectomie",
+      "tumorectomie",
+      "tumorectomie large/mastectomie partielle",
+      "mastectomie",
+      "biopsie chirurgicale",
+      "chirurgie oncoplastique",
+      "autre"
+     ]
+    },
+    {
+     "id": "cote",
+     "label": "Côté",
+     "type": "enum",
+     "valeurs": [
+      "droit",
+      "gauche"
+     ]
+    },
+    {
+     "id": "localisation",
+     "label": "Localisation (quadrants QSE/QIE/QSI/QII, UQ, mamelon, central, prolongement axillaire, sillon sous-mammaire, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "type_histologique",
+     "label": "Type histologique (selon OMS en vigueur) : lésion bénigne, atypies canalaires (HCA/métaplasie cylindrique atypique), LIN1-3 (CLIS), CCIS, carcinome infiltrant canalaire SAI/lobulaire/autre",
+     "type": "enum"
+    },
+    {
+     "id": "ccis_taille",
+     "label": "Taille du CCIS (pièce opératoire)",
+     "type": "num",
+     "unite": "mm",
+     "condition": "CCIS sans infiltrant associé, pièce opératoire"
+    },
+    {
+     "id": "ccis_grade_nucleaire",
+     "label": "Grade nucléaire du CCIS",
+     "type": "enum",
+     "valeurs": [
+      "bas",
+      "intermédiaire",
+      "haut"
+     ]
+    },
+    {
+     "id": "ccis_microinvasion",
+     "label": "Micro-invasion",
+     "type": "bool"
+    },
+    {
+     "id": "grade_SBR",
+     "label": "Grade SBR Elston-Ellis (carcinome infiltrant)",
+     "type": "enum",
+     "valeurs": [
+      "I",
+      "II",
+      "III"
+     ]
+    },
+    {
+     "id": "foyers_multiples",
+     "label": "Foyers infiltrants multiples",
+     "type": "enum",
+     "valeurs": [
+      "oui",
+      "non",
+      "non évaluable"
+     ],
+     "condition": "pièce opératoire"
+    },
+    {
+     "id": "marges",
+     "label": "Marges d'exérèse",
+     "type": "enum+num",
+     "valeurs": [
+      "non évaluables",
+      "saines",
+      "atteintes (préciser type histologique et topographie)"
+     ],
+     "unite": "mm",
+     "condition": "pièce opératoire"
+    },
+    {
+     "id": "emboles",
+     "label": "Emboles vasculaires",
+     "type": "enum",
+     "valeurs": [
+      "non vus",
+      "présents"
+     ],
+     "condition": "pièce opératoire"
+    },
+    {
+     "id": "RH",
+     "label": "Récepteurs hormonaux (oestrogènes, progestérone)",
+     "type": "enum",
+     "condition": "sur biopsie ; sinon sur pièce opératoire"
+    },
+    {
+     "id": "HER2",
+     "label": "Statut HER2",
+     "type": "enum",
+     "condition": "sur biopsie ; sinon sur pièce opératoire"
+    },
+    {
+     "id": "reponse_neoadjuvant",
+     "label": "Réponse histologique après traitement néoadjuvant (Sataloff/autre)",
+     "type": "enum",
+     "condition": "si néoadjuvant"
+    },
+    {
+     "id": "taille_infiltrant",
+     "label": "Taille de la plus grosse tumeur infiltrante",
+     "type": "num",
+     "unite": "mm",
+     "condition": "pièce opératoire"
+    },
+    {
+     "id": "ganglions",
+     "label": "Ganglions régionaux par groupe : nombre examinés, nombre métastatiques, taille de la plus grande métastase, mention ganglion sentinelle",
+     "type": "num/groupe",
+     "unite": "mm (taille métastase)",
+     "condition": "pièce opératoire"
+    },
+    {
+     "id": "pTpN",
+     "label": "pT / pN (+ édition UICC)",
+     "type": "text"
+    }
+   ],
+   "provenance": {
+    "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+    "date_acces": "2026-11-15",
+    "citation_courte": "INCa, Mise à jour 2011 des comptes rendus d'anatomopathologie : données minimales à renseigner pour une tumeur primitive, déc. 2011 (fiche n°4 et 5). Paraphrase structurée.",
+    "fiabilite": "haute (source officielle) mais ancienne : alignée UICC 7e éd. / OMS 2004-2010",
+    "note": "Reproduction libre usage personnel non commercial ou courtes citations ; tout autre usage = demande INCa (publication@institutcancer.fr). Ne pas embarquer le texte brut : ici paraphrase."
+   },
+   "classement_pTNM": "Mentionner l'année/édition UICC utilisée à la suite du pTNM (fiche INCa).",
+   "notes": "Ki-67 non listé dans les données minimales INCa 2011 (à ajouter via ICCR/CAP si souhaité)."
+  },
+  {
+   "organe": "Côlon-rectum",
+   "cim10_topo": "C18/C19/C20",
+   "fiche_inca_n": "8",
+   "contextes": [
+    "pièce opératoire"
+   ],
+   "entete_commun": [
+    "identification patient (nom, prénom, date de naissance/âge, sexe, INS/IPP, code postal)",
+    "établissement préleveur + FINESS",
+    "médecin demandeur/préleveur, date de prélèvement",
+    "identifiant pathologiste, n° de CR, structure ACP + FINESS, signataire, date de signature"
+   ],
+   "items": [
+    {
+     "id": "type_prelevement",
+     "label": "Type de prélèvement (colectomie D/transverse/G, sigmoïdectomie, exérèse locale endorectale, exérèse rectum+mésorectum, amputation abdomino-périnéale, anoproctectomie, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "localisation",
+     "label": "Localisation (côlon asc., angle D, transverse, angle G, descendant, sigmoïde, rectum, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "type_histologique",
+     "label": "Type histologique (adénocarcinome lieberkühnien, indifférencié, bague à chaton, colloïde mucineux, médullaire, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "grade",
+     "label": "Grade (adénocarcinome lieberkühnien) : bien/moyennement/peu différencié",
+     "type": "enum"
+    },
+    {
+     "id": "tranche_distale",
+     "label": "État de la tranche de section distale",
+     "type": "enum",
+     "valeurs": [
+      "saine",
+      "envahie"
+     ]
+    },
+    {
+     "id": "marge_circonferentielle",
+     "label": "Marge circonférentielle",
+     "type": "num",
+     "unite": "mm",
+     "condition": "tumeur rectale"
+    },
+    {
+     "id": "emboles",
+     "label": "Emboles vasculaires",
+     "type": "bool"
+    },
+    {
+     "id": "perinerveux",
+     "label": "Infiltration péri-nerveuse",
+     "type": "bool"
+    },
+    {
+     "id": "regression",
+     "label": "Évaluation de la régression tumorale",
+     "type": "enum",
+     "condition": "si néoadjuvant"
+    },
+    {
+     "id": "infiltration_paroi",
+     "label": "Degré d'infiltration de la paroi, du péri-colorectal et des organes adjacents",
+     "type": "enum"
+    },
+    {
+     "id": "perforation",
+     "label": "Perforation en zone tumorale",
+     "type": "bool"
+    },
+    {
+     "id": "depots_meso",
+     "label": "Dépôts tumoraux dans le méso",
+     "type": "bool"
+    },
+    {
+     "id": "ganglions",
+     "label": "Nombre de ganglions envahis / nombre examinés",
+     "type": "num/num"
+    },
+    {
+     "id": "pTpN",
+     "label": "pT / pN (+ édition UICC)",
+     "type": "text"
+    }
+   ],
+   "provenance": {
+    "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+    "date_acces": "2026-11-15",
+    "citation_courte": "INCa, Mise à jour 2011 des comptes rendus d'anatomopathologie : données minimales à renseigner pour une tumeur primitive, déc. 2011 (fiche n°8). Paraphrase structurée.",
+    "fiabilite": "haute (source officielle) mais ancienne : alignée UICC 7e éd. / OMS 2004-2010",
+    "note": "Reproduction libre usage personnel non commercial ou courtes citations ; tout autre usage = demande INCa (publication@institutcancer.fr). Ne pas embarquer le texte brut : ici paraphrase."
+   },
+   "classement_pTNM": "Mentionner l'année/édition UICC utilisée à la suite du pTNM (fiche INCa).",
+   "notes": "Statut MMR/MSI non dans les items minimaux 2011 ; à traiter comme champ recommandé (ICCR/CAP)."
+  },
+  {
+   "organe": "Poumon",
+   "cim10_topo": "C34",
+   "fiche_inca_n": "13",
+   "contextes": [
+    "pièce opératoire"
+   ],
+   "entete_commun": [
+    "identification patient (nom, prénom, date de naissance/âge, sexe, INS/IPP, code postal)",
+    "établissement préleveur + FINESS",
+    "médecin demandeur/préleveur, date de prélèvement",
+    "identifiant pathologiste, n° de CR, structure ACP + FINESS, signataire, date de signature"
+   ],
+   "items": [
+    {
+     "id": "type_prelevement",
+     "label": "Type de prélèvement (pneumonectomie, élargie, lobectomie, bilobectomie, segmentectomie, résection atypique, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "cote",
+     "label": "Côté",
+     "type": "enum",
+     "valeurs": [
+      "droit",
+      "gauche"
+     ]
+    },
+    {
+     "id": "localisation",
+     "label": "Localisation : proximal / parenchymateux / autre",
+     "type": "enum"
+    },
+    {
+     "id": "type_histologique",
+     "label": "Type histologique (épidermoïde, adénocarcinome, petites cellules, grandes cellules, adénosquameux, sarcomatoïde, glandes bronchiques, carcinoïde, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "grade",
+     "label": "Grade : non utilisé (sauf carcinoïde)",
+     "type": "enum"
+    },
+    {
+     "id": "section_bronchique",
+     "label": "État de la tranche bronchique et des recoupes vasculaires",
+     "type": "enum"
+    },
+    {
+     "id": "limites_pleure",
+     "label": "État des limites pleurales pariétales, péricardiques, osseuses, intercostales",
+     "type": "enum"
+    },
+    {
+     "id": "taille",
+     "label": "Taille de la tumeur",
+     "type": "num",
+     "unite": "cm",
+     "condition": "NB : unité cm dans la fiche INCa poumon (mm ailleurs) -> piège pour le vérificateur d'unités"
+    },
+    {
+     "id": "distance_section_bronchique",
+     "label": "Distance à la section bronchique",
+     "type": "num"
+    },
+    {
+     "id": "extension_plevre_paroi",
+     "label": "Extension plèvre/paroi",
+     "type": "enum"
+    },
+    {
+     "id": "extension_mediastin",
+     "label": "Extension aux organes du médiastin",
+     "type": "enum"
+    },
+    {
+     "id": "nombre_tumeurs",
+     "label": "Nombre de tumeurs",
+     "type": "num"
+    },
+    {
+     "id": "ganglions",
+     "label": "État des ganglions pulmonaires et médiastinaux (latéralité par rapport à la tumeur)",
+     "type": "enum"
+    },
+    {
+     "id": "pTpN",
+     "label": "pT / pN (+ édition UICC)",
+     "type": "text"
+    }
+   ],
+   "provenance": {
+    "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+    "date_acces": "2026-11-15",
+    "citation_courte": "INCa, Mise à jour 2011 des comptes rendus d'anatomopathologie : données minimales à renseigner pour une tumeur primitive, déc. 2011 (fiche n°13). Paraphrase structurée.",
+    "fiabilite": "haute (source officielle) mais ancienne : alignée UICC 7e éd. / OMS 2004-2010",
+    "note": "Reproduction libre usage personnel non commercial ou courtes citations ; tout autre usage = demande INCa (publication@institutcancer.fr). Ne pas embarquer le texte brut : ici paraphrase."
+   },
+   "classement_pTNM": "Mentionner l'année/édition UICC utilisée à la suite du pTNM (fiche INCa).",
+   "notes": "Biomarqueurs (PD-L1, EGFR, ALK...) hors items minimaux 2011 ; à intégrer via CAP/ICCR (note : ces tests relèvent de la RIHN/biologie moléculaire)."
+  },
+  {
+   "organe": "Prostate",
+   "cim10_topo": "C61",
+   "fiche_inca_n": "14 et 15",
+   "contextes": [
+    "biopsies",
+    "pièce opératoire (prostatectomie)"
+   ],
+   "entete_commun": [
+    "identification patient (nom, prénom, date de naissance/âge, sexe, INS/IPP, code postal)",
+    "établissement préleveur + FINESS",
+    "médecin demandeur/préleveur, date de prélèvement",
+    "identifiant pathologiste, n° de CR, structure ACP + FINESS, signataire, date de signature"
+   ],
+   "items": [
+    {
+     "id": "type_prelevement",
+     "label": "Type de prélèvement (biopsies prostatiques ; prostatectomie radicale ; cysto-prostatectomie ; autre)",
+     "type": "enum"
+    },
+    {
+     "id": "localisation",
+     "label": "Localisation (lobe D/G, apex, base, antérieur, zone de transition, postéro-latéral, multifocal ; pièce : latéralité + topographie)",
+     "type": "enum"
+    },
+    {
+     "id": "type_histologique",
+     "label": "Type histologique (adénocarcinome acinaire, atrophique, ductal, neuro-endocrine, cellules spumeuses, mucineux, basaloïde, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "tumeur_residuelle",
+     "label": "Absence de tumeur résiduelle",
+     "type": "bool",
+     "condition": "pièce, si traitement antérieur"
+    },
+    {
+     "id": "gleason",
+     "label": "Score de Gleason (primaire+secondaire=total) [ISUP grade group dérivable]",
+     "type": "text"
+    },
+    {
+     "id": "biopsies_positives",
+     "label": "Nombre de biopsies positives / siège / évaluation (qualitative ou semi-quantitative) de l'envahissement",
+     "type": "num",
+     "condition": "biopsies"
+    },
+    {
+     "id": "perinerveux",
+     "label": "Engainement péri-nerveux",
+     "type": "bool",
+     "condition": "biopsies"
+    },
+    {
+     "id": "extension_peri_prostatique_biopsie",
+     "label": "Extension au tissu péri-prostatique",
+     "type": "bool",
+     "condition": "biopsies, si tissu péri-prostatique observé"
+    },
+    {
+     "id": "limites_chirurgicales",
+     "label": "Limites chirurgicales : négatives / douteuses / positives (préciser) / en tissu prostatique sain",
+     "type": "enum",
+     "condition": "pièce"
+    },
+    {
+     "id": "infiltration_prostate",
+     "label": "Degré d'infiltration (<1/2 lobe, >1/2 lobe, deux lobes)",
+     "type": "enum",
+     "condition": "pièce"
+    },
+    {
+     "id": "extension_extra",
+     "label": "Envahissement péri-prostatique et organes adjacents",
+     "type": "enum",
+     "condition": "pièce"
+    },
+    {
+     "id": "ganglions",
+     "label": "État des ganglions régionaux (si communiqués)",
+     "type": "enum",
+     "condition": "pièce"
+    },
+    {
+     "id": "pTpN",
+     "label": "pT / pN (+ édition UICC)",
+     "type": "text",
+     "condition": "pièce"
+    }
+   ],
+   "provenance": {
+    "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+    "date_acces": "2026-11-15",
+    "citation_courte": "INCa, Mise à jour 2011 des comptes rendus d'anatomopathologie : données minimales à renseigner pour une tumeur primitive, déc. 2011 (fiche n°14 et 15). Paraphrase structurée.",
+    "fiabilite": "haute (source officielle) mais ancienne : alignée UICC 7e éd. / OMS 2004-2010",
+    "note": "Reproduction libre usage personnel non commercial ou courtes citations ; tout autre usage = demande INCa (publication@institutcancer.fr). Ne pas embarquer le texte brut : ici paraphrase."
+   },
+   "classement_pTNM": "Mentionner l'année/édition UICC utilisée à la suite du pTNM (fiche INCa)."
+  },
+  {
+   "organe": "Peau - mélanome cutané",
+   "cim10_topo": "C43",
+   "fiche_inca_n": "19",
+   "contextes": [
+    "biopsie/exérèse/amputation"
+   ],
+   "entete_commun": [
+    "identification patient (nom, prénom, date de naissance/âge, sexe, INS/IPP, code postal)",
+    "établissement préleveur + FINESS",
+    "médecin demandeur/préleveur, date de prélèvement",
+    "identifiant pathologiste, n° de CR, structure ACP + FINESS, signataire, date de signature"
+   ],
+   "items": [
+    {
+     "id": "type_prelevement",
+     "label": "Type de prélèvement : biopsie, exérèse, amputation",
+     "type": "enum"
+    },
+    {
+     "id": "cote",
+     "label": "Côté : droit, gauche, médian",
+     "type": "enum"
+    },
+    {
+     "id": "siege",
+     "label": "Siège",
+     "type": "text"
+    },
+    {
+     "id": "type_histologique",
+     "label": "Type (SSM, mélanome de Dubreuilh/LMM, acral lentigineux, nodulaire, inclassable, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "grade",
+     "label": "Grade de différenciation : non reconnu",
+     "type": "enum"
+    },
+    {
+     "id": "exerese_complete",
+     "label": "Exérèse complète : oui / non (latéralement, en profondeur, les deux)",
+     "type": "enum"
+    },
+    {
+     "id": "breslow",
+     "label": "Épaisseur de Breslow (mélanome in situ : 0 ; préciser stigmates de régression)",
+     "type": "num",
+     "unite": "mm"
+    },
+    {
+     "id": "ulceration",
+     "label": "Ulcération",
+     "type": "bool"
+    },
+    {
+     "id": "index_mitotique",
+     "label": "Index mitotique",
+     "type": "num",
+     "unite": "mitoses/mm²"
+    },
+    {
+     "id": "pN",
+     "label": "Nombre de ganglions envahis (si communiqués), métastases cutanées en transit",
+     "type": "num"
+    },
+    {
+     "id": "pTpN",
+     "label": "pT / pN (+ édition UICC)",
+     "type": "text"
+    }
+   ],
+   "provenance": {
+    "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+    "date_acces": "2026-11-15",
+    "citation_courte": "INCa, Mise à jour 2011 des comptes rendus d'anatomopathologie : données minimales à renseigner pour une tumeur primitive, déc. 2011 (fiche n°19). Paraphrase structurée.",
+    "fiabilite": "haute (source officielle) mais ancienne : alignée UICC 7e éd. / OMS 2004-2010",
+    "note": "Reproduction libre usage personnel non commercial ou courtes citations ; tout autre usage = demande INCa (publication@institutcancer.fr). Ne pas embarquer le texte brut : ici paraphrase."
+   },
+   "classement_pTNM": "Mentionner l'année/édition UICC utilisée à la suite du pTNM (fiche INCa).",
+   "notes": "Niveau de Clark non exigé par la fiche INCa 2011 ; régression 'Optionnel' marquée."
+  },
+  {
+   "organe": "Thyroïde",
+   "cim10_topo": "C73",
+   "fiche_inca_n": "20",
+   "contextes": [
+    "pièce opératoire"
+   ],
+   "entete_commun": [
+    "identification patient (nom, prénom, date de naissance/âge, sexe, INS/IPP, code postal)",
+    "établissement préleveur + FINESS",
+    "médecin demandeur/préleveur, date de prélèvement",
+    "identifiant pathologiste, n° de CR, structure ACP + FINESS, signataire, date de signature"
+   ],
+   "items": [
+    {
+     "id": "type_prelevement",
+     "label": "Type (lobectomie, partielle, lobo-isthmectomie, thyroïdectomie totale/subtotale, isthmectomie, biopsie, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "localisation",
+     "label": "Localisation : droit, gauche, isthme, plurifocal, autre",
+     "type": "enum"
+    },
+    {
+     "id": "type_histologique",
+     "label": "Type (vésiculaire, papillaire, peu différencié/insulaire, médullaire, anaplasique, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "grade",
+     "label": "Grade : non utilisé",
+     "type": "enum"
+    },
+    {
+     "id": "capsule",
+     "label": "État de la capsule de la lésion si présente",
+     "type": "enum"
+    },
+    {
+     "id": "emboles",
+     "label": "Emboles vasculaires",
+     "type": "bool"
+    },
+    {
+     "id": "taille",
+     "label": "Taille de la tumeur",
+     "type": "num"
+    },
+    {
+     "id": "multifocalite",
+     "label": "Multifocalité",
+     "type": "bool"
+    },
+    {
+     "id": "extension_extrathyroidienne",
+     "label": "Extension extra-thyroïdienne",
+     "type": "enum"
+    },
+    {
+     "id": "ganglions",
+     "label": "Nombre et localisation des ganglions régionaux envahis",
+     "type": "num"
+    },
+    {
+     "id": "pTpN",
+     "label": "pT / pN (+ édition UICC)",
+     "type": "text"
+    }
+   ],
+   "provenance": {
+    "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+    "date_acces": "2026-11-15",
+    "citation_courte": "INCa, Mise à jour 2011 des comptes rendus d'anatomopathologie : données minimales à renseigner pour une tumeur primitive, déc. 2011 (fiche n°20). Paraphrase structurée.",
+    "fiabilite": "haute (source officielle) mais ancienne : alignée UICC 7e éd. / OMS 2004-2010",
+    "note": "Reproduction libre usage personnel non commercial ou courtes citations ; tout autre usage = demande INCa (publication@institutcancer.fr). Ne pas embarquer le texte brut : ici paraphrase."
+   },
+   "classement_pTNM": "Mentionner l'année/édition UICC utilisée à la suite du pTNM (fiche INCa).",
+   "notes": "La cytologie thyroïdienne (Bethesda) n'est pas couverte par cette fiche : voir nomenclatures_scores.json."
+  },
+  {
+   "organe": "Vessie",
+   "cim10_topo": "C67",
+   "fiche_inca_n": "18",
+   "contextes": [
+    "pièce opératoire (cystectomie)"
+   ],
+   "entete_commun": [
+    "identification patient (nom, prénom, date de naissance/âge, sexe, INS/IPP, code postal)",
+    "établissement préleveur + FINESS",
+    "médecin demandeur/préleveur, date de prélèvement",
+    "identifiant pathologiste, n° de CR, structure ACP + FINESS, signataire, date de signature"
+   ],
+   "items": [
+    {
+     "id": "type_prelevement",
+     "label": "Type (cysto-prostatectomie, cystectomie totale/partielle, pelvectomie antérieure, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "localisation",
+     "label": "Localisation (col, trigone, faces, dôme, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "tumeur_residuelle",
+     "label": "Pas de tumeur résiduelle",
+     "type": "bool"
+    },
+    {
+     "id": "type_histologique",
+     "label": "Type ; pour urothéliales classification OMS 2004 ; petites cellules ; autre",
+     "type": "enum"
+    },
+    {
+     "id": "grade",
+     "label": "Grade urothélial : bas grade / haut grade (OMS 2004)",
+     "type": "enum"
+    },
+    {
+     "id": "limites",
+     "label": "État des limites : urètre, uretères G/D, périvésicales, autres",
+     "type": "enum"
+    },
+    {
+     "id": "emboles",
+     "label": "Emboles vasculaires",
+     "type": "bool"
+    },
+    {
+     "id": "infiltration",
+     "label": "Degré d'infiltration de la paroi, du tissu périvésical et des organes adjacents",
+     "type": "enum"
+    },
+    {
+     "id": "extension_extravesicale",
+     "label": "Extension extra-vésicale : uretères, urètre, prostate, vésicules séminales, utérus, vagin, paroi",
+     "type": "enum"
+    },
+    {
+     "id": "ganglions",
+     "label": "Nombre envahis / examinés / taille du ou des ganglions envahis",
+     "type": "num"
+    },
+    {
+     "id": "pTpN",
+     "label": "pT / pN (+ édition UICC)",
+     "type": "text"
+    }
+   ],
+   "provenance": {
+    "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+    "date_acces": "2026-11-15",
+    "citation_courte": "INCa, Mise à jour 2011 des comptes rendus d'anatomopathologie : données minimales à renseigner pour une tumeur primitive, déc. 2011 (fiche n°18). Paraphrase structurée.",
+    "fiabilite": "haute (source officielle) mais ancienne : alignée UICC 7e éd. / OMS 2004-2010",
+    "note": "Reproduction libre usage personnel non commercial ou courtes citations ; tout autre usage = demande INCa (publication@institutcancer.fr). Ne pas embarquer le texte brut : ici paraphrase."
+   },
+   "classement_pTNM": "Mentionner l'année/édition UICC utilisée à la suite du pTNM (fiche INCa).",
+   "notes": "Les RTUV/biopsies vésicales (pTa/pT1, présence de détrusor) ne sont PAS couvertes par la fiche INCa 2011 ; utiliser ICCR bladder."
+  },
+  {
+   "organe": "Rein",
+   "cim10_topo": "C64",
+   "fiche_inca_n": "17",
+   "contextes": [
+    "pièce opératoire"
+   ],
+   "entete_commun": [
+    "identification patient (nom, prénom, date de naissance/âge, sexe, INS/IPP, code postal)",
+    "établissement préleveur + FINESS",
+    "médecin demandeur/préleveur, date de prélèvement",
+    "identifiant pathologiste, n° de CR, structure ACP + FINESS, signataire, date de signature"
+   ],
+   "items": [
+    {
+     "id": "type_prelevement",
+     "label": "Type (néphrectomie élargie, partielle, tumorectomie, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "cote",
+     "label": "Côté",
+     "type": "enum",
+     "valeurs": [
+      "droit",
+      "gauche"
+     ]
+    },
+    {
+     "id": "localisation",
+     "label": "Localisation : pôle sup., pôle inf., centro-hilaire, pan-rénal, autre",
+     "type": "enum"
+    },
+    {
+     "id": "type_histologique",
+     "label": "Type (cellules claires, tubulo-papillaire 1/2, chromophobe, Bellini, médullaire, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "grade",
+     "label": "Grade de Fuhrman (obsolète depuis OMS 2016 -> grade ISUP/OMS 1-4)",
+     "type": "enum"
+    },
+    {
+     "id": "extension_extrarenale",
+     "label": "Extension extra-rénale (graisse péri-rénale, sinusale, fascia de Gérota, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "voie_excretrice",
+     "label": "Voie excrétrice saine/envahie",
+     "type": "enum"
+    },
+    {
+     "id": "surrenale",
+     "label": "Surrénale : absente/présente saine/envahie par contiguïté/par métastase",
+     "type": "enum"
+    },
+    {
+     "id": "limites",
+     "label": "Limites chirurgicales saines/envahies",
+     "type": "enum"
+    },
+    {
+     "id": "thrombus",
+     "label": "Thrombus veineux (rénale, cave sous- ou sus-diaphragmatique)",
+     "type": "enum"
+    },
+    {
+     "id": "emboles",
+     "label": "Emboles vasculaires",
+     "type": "bool"
+    },
+    {
+     "id": "taille",
+     "label": "Taille de la plus grosse tumeur maligne",
+     "type": "num"
+    },
+    {
+     "id": "ganglions",
+     "label": "Ganglions régionaux envahis (si prélevés)",
+     "type": "num"
+    },
+    {
+     "id": "pTpN",
+     "label": "pT / pN (+ édition UICC)",
+     "type": "text"
+    }
+   ],
+   "provenance": {
+    "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+    "date_acces": "2026-11-15",
+    "citation_courte": "INCa, Mise à jour 2011 des comptes rendus d'anatomopathologie : données minimales à renseigner pour une tumeur primitive, déc. 2011 (fiche n°17). Paraphrase structurée.",
+    "fiabilite": "haute (source officielle) mais ancienne : alignée UICC 7e éd. / OMS 2004-2010",
+    "note": "Reproduction libre usage personnel non commercial ou courtes citations ; tout autre usage = demande INCa (publication@institutcancer.fr). Ne pas embarquer le texte brut : ici paraphrase."
+   },
+   "classement_pTNM": "Mentionner l'année/édition UICC utilisée à la suite du pTNM (fiche INCa)."
+  },
+  {
+   "organe": "Col utérin et endomètre (corps utérin)",
+   "cim10_topo": "C53 / C54",
+   "fiche_inca_n": "1 et 2",
+   "contextes": [
+    "pièce opératoire"
+   ],
+   "entete_commun": [
+    "identification patient (nom, prénom, date de naissance/âge, sexe, INS/IPP, code postal)",
+    "établissement préleveur + FINESS",
+    "médecin demandeur/préleveur, date de prélèvement",
+    "identifiant pathologiste, n° de CR, structure ACP + FINESS, signataire, date de signature"
+   ],
+   "items": [
+    {
+     "id": "type_prelevement",
+     "label": "Col : colpectomie/colpo-hystérectomie/hystérectomie+annexectomie ; corps : hystérectomie ± annexectomie ± lymphadénectomie",
+     "type": "enum"
+    },
+    {
+     "id": "localisation",
+     "label": "Col : exocol/jonction/endocol ; corps : corps/isthme",
+     "type": "enum"
+    },
+    {
+     "id": "type_histologique",
+     "label": "Col : épidermoïde, adénocarcinomes (endocervical, endométrioïde, cellules claires, séreux...), indifférencié, adénosquameux, petites cellules ; corps : endométrioïde, mucineux, séreux, cellules claires, épidermoïde, indifférencié, tumeur maligne mixte",
+     "type": "enum"
+    },
+    {
+     "id": "grade",
+     "label": "Col : grade histopronostique ; corps : grade FIGO (% contingent solide non malpighien/non morulaire, atypies cytonucléaires)",
+     "type": "enum"
+    },
+    {
+     "id": "limites",
+     "label": "État des limites : saines/envahies ; si saines marge minimale",
+     "type": "enum+num",
+     "unite": "mm"
+    },
+    {
+     "id": "emboles",
+     "label": "Emboles vasculaires",
+     "type": "bool"
+    },
+    {
+     "id": "col_micro_invasif",
+     "label": "Col micro-invasif : profondeur d'invasion et extension horizontale",
+     "type": "num",
+     "unite": "mm",
+     "condition": "col"
+    },
+    {
+     "id": "col_invasif",
+     "label": "Col invasif : plus grand diamètre, profondeur d'invasion",
+     "type": "num",
+     "unite": "mm",
+     "condition": "col"
+    },
+    {
+     "id": "col_extension",
+     "label": "Col : extension extra-cervicale (vagin 2/3 sup/1/3 inf, paramètres, paroi pelvienne, vessie, rectum, uretère)",
+     "type": "enum"
+    },
+    {
+     "id": "corps_myometre",
+     "label": "Corps : degré d'infiltration du myomètre",
+     "type": "num",
+     "unite": "%",
+     "condition": "corps"
+    },
+    {
+     "id": "corps_serieuse",
+     "label": "Corps : séreuse utérine saine/envahie ; extension extra-corporéale (col, vagin, paramètres, séreuse péritonéale, ovaire/trompe, vessie/intestin) ; cellules tumorales dans ascite/lavage (ne modifie plus FIGO)",
+     "type": "enum"
+    },
+    {
+     "id": "ganglions",
+     "label": "Ganglions régionaux/à distance : localisation, envahis/examinés, capsule dépassée (col), sentinelle",
+     "type": "num"
+    },
+    {
+     "id": "pTpN_FIGO",
+     "label": "pT / pN et stade FIGO (+ édition)",
+     "type": "text"
+    }
+   ],
+   "provenance": {
+    "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+    "date_acces": "2026-11-15",
+    "citation_courte": "INCa, Mise à jour 2011 des comptes rendus d'anatomopathologie : données minimales à renseigner pour une tumeur primitive, déc. 2011 (fiche n°1 et 2). Paraphrase structurée.",
+    "fiabilite": "haute (source officielle) mais ancienne : alignée UICC 7e éd. / OMS 2004-2010",
+    "note": "Reproduction libre usage personnel non commercial ou courtes citations ; tout autre usage = demande INCa (publication@institutcancer.fr). Ne pas embarquer le texte brut : ici paraphrase."
+   },
+   "classement_pTNM": "Mentionner l'année/édition UICC utilisée à la suite du pTNM (fiche INCa)."
+  },
+  {
+   "organe": "Estomac",
+   "cim10_topo": "C16",
+   "fiche_inca_n": "7",
+   "contextes": [
+    "pièce opératoire"
+   ],
+   "entete_commun": [
+    "identification patient (nom, prénom, date de naissance/âge, sexe, INS/IPP, code postal)",
+    "établissement préleveur + FINESS",
+    "médecin demandeur/préleveur, date de prélèvement",
+    "identifiant pathologiste, n° de CR, structure ACP + FINESS, signataire, date de signature"
+   ],
+   "items": [
+    {
+     "id": "type_prelevement",
+     "label": "Type (œso-gastrectomie totale, gastrectomie totale/proximale/distale, exérèse locale endoluminale, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "localisation",
+     "label": "Localisation : cardia, grosse tubérosité, corps, antre, pylore, autre",
+     "type": "enum"
+    },
+    {
+     "id": "type_histologique",
+     "label": "Type (adénocarcinome tubuleux/papillaire/mucineux/cellules indépendantes, adénosquameux, épidermoïde, indifférencié, autre)",
+     "type": "enum"
+    },
+    {
+     "id": "grade",
+     "label": "Grade pour adénocarcinomes : bien/moyennement/peu différencié",
+     "type": "enum"
+    },
+    {
+     "id": "limite_proximale",
+     "label": "Limite proximale saine/envahie ; marge minimale si saine",
+     "type": "enum+num",
+     "unite": "mm"
+    },
+    {
+     "id": "limite_distale",
+     "label": "Limite distale saine/envahie ; marge minimale si saine",
+     "type": "enum+num",
+     "unite": "mm"
+    },
+    {
+     "id": "emboles",
+     "label": "Emboles vasculaires",
+     "type": "bool"
+    },
+    {
+     "id": "perinerveux",
+     "label": "Infiltration péri-nerveuse",
+     "type": "bool"
+    },
+    {
+     "id": "regression",
+     "label": "Régression tumorale après néoadjuvant",
+     "type": "enum",
+     "condition": "si néoadjuvant"
+    },
+    {
+     "id": "infiltration_paroi",
+     "label": "Degré d'infiltration de la paroi gastrique, péri-gastrique, organes adjacents",
+     "type": "enum"
+    },
+    {
+     "id": "ganglions",
+     "label": "Nombre de ganglions envahis et examinés",
+     "type": "num/num"
+    },
+    {
+     "id": "pTpN",
+     "label": "pT / pN (+ édition UICC)",
+     "type": "text"
+    }
+   ],
+   "provenance": {
+    "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+    "date_acces": "2026-11-15",
+    "citation_courte": "INCa, Mise à jour 2011 des comptes rendus d'anatomopathologie : données minimales à renseigner pour une tumeur primitive, déc. 2011 (fiche n°7). Paraphrase structurée.",
+    "fiabilite": "haute (source officielle) mais ancienne : alignée UICC 7e éd. / OMS 2004-2010",
+    "note": "Reproduction libre usage personnel non commercial ou courtes citations ; tout autre usage = demande INCa (publication@institutcancer.fr). Ne pas embarquer le texte brut : ici paraphrase."
+   },
+   "classement_pTNM": "Mentionner l'année/édition UICC utilisée à la suite du pTNM (fiche INCa).",
+   "notes": "HER2 gastrique et MMR non dans la fiche 2011."
+  }
+ ]
+}

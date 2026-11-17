@@ -1,0 +1,101 @@
+{
+ "_meta": {
+  "date_acces": "2026-11-15",
+  "objectif": "Règles pour le vérificateur d'unités mm/cm et de plausibilité (STT : 'trois millimètres' vs 'trois centimètres')"
+ },
+ "provenance": {
+  "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+  "date_acces": "2026-11-15",
+  "citation_courte": "INCa 2011 : unités des items (mm majoritaire ; cm pour la taille tumorale du poumon) + connaissances métier",
+  "fiabilite": "moyenne",
+  "note": "Plages plausibles = heuristiques à valider par pathologiste, PAS issues des sources."
+ },
+ "conversions": {
+  "1 cm": "10 mm",
+  "1 mm": "0,1 cm",
+  "1 µm": "0,001 mm",
+  "1 g": "1000 mg"
+ },
+ "unites_par_champ": [
+  {
+   "champ": "taille tumeur sein (infiltrant)",
+   "unite_inca": "mm"
+  },
+  {
+   "champ": "taille CCIS",
+   "unite_inca": "mm"
+  },
+  {
+   "champ": "marges exérèse",
+   "unite_inca": "mm"
+  },
+  {
+   "champ": "marge circonférentielle rectum",
+   "unite_inca": "mm"
+  },
+  {
+   "champ": "marge minimale (estomac, col, corps)",
+   "unite_inca": "mm"
+  },
+  {
+   "champ": "invasion col (profondeur/horizontale)",
+   "unite_inca": "mm"
+  },
+  {
+   "champ": "infiltration myomètre",
+   "unite_inca": "%"
+  },
+  {
+   "champ": "taille tumeur poumon",
+   "unite_inca": "cm",
+   "piege": "seule fiche en cm : un STT 'deux centimètres' est normal ici, mais 20 mm = 2 cm : normaliser avant comparaison"
+  },
+  {
+   "champ": "épaisseur Breslow",
+   "unite_inca": "mm"
+  },
+  {
+   "champ": "index mitotique mélanome",
+   "unite_inca": "mitoses/mm²"
+  },
+  {
+   "champ": "taille de la plus grande métastase ganglionnaire",
+   "unite_inca": "mm"
+  },
+  {
+   "champ": "Ki-67",
+   "unite": "%"
+  }
+ ],
+ "regles_verificateur": [
+  "Normaliser toutes les tailles en mm en interne, restituer dans l'unité du gabarit/de la fiche.",
+  "Confusion STT fréquente 'mm'/'cm' et décimales ('virgule') : toujours proposer les deux lectures avec confiance si la valeur sort de la plage plausible.",
+  "Breslow > 0 pour un mélanome invasif ; =0 pour in situ.",
+  "Somme composantes Nottingham = total ; Gleason primaire+secondaire = total.",
+  "Nombre de ganglions envahis <= nombre examinés.",
+  "Taille tumorale pT compatible avec pT annoncé (calcul déterministe, pas LLM)."
+ ],
+ "plages_plausibles_heuristiques": {
+  "taille_tumeur_sein_mm": [
+   0.1,
+   150
+  ],
+  "breslow_mm": [
+   0,
+   30
+  ],
+  "marge_mm": [
+   0,
+   100
+  ],
+  "ganglions_examines": [
+   0,
+   100
+  ],
+  "ki67_pct": [
+   0,
+   100
+  ]
+ },
+ "avertissement": "Plages = suggestions de départ, non sourcées ; à faire valider."
+}

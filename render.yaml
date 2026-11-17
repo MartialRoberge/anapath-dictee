@@ -20,6 +20,10 @@ services:
       # Moteur de generation : mistral (souverain, defaut) — necessite MISTRAL_API_KEY.
       - key: LLM_PROVIDER
         value: mistral
+      # Modele epingle : l'alias mistral-large-latest pointe vers un modele a raisonnement
+      # qui refuse temperature 0 (erreur 400). Ne pas repasser sur -latest.
+      - key: MISTRAL_MODEL
+        value: mistral-large-2512
       # multipass = 3 passes explicables (comprendre -> rediger -> relire), plus souple.
       # Repli possible sans redeploiement : passer cette valeur a "local" dans le
       # dashboard Render (1 seule passe, ~3x moins d'appels LLM).

@@ -1,0 +1,273 @@
+[
+ {
+  "id": "prelevement:biopsie",
+  "libelle": "Biopsie",
+  "classe": "biopsie",
+  "variantes": [
+   "microbiopsie",
+   "macrobiopsie",
+   "carotte",
+   "ponction-biopsie"
+  ],
+  "declencheurs": [
+   "biopsie",
+   "biopsies",
+   "biopsique",
+   "carotte",
+   "carottes",
+   "curetage biopsique",
+   "fragment biopsique",
+   "fragments biopsiques",
+   "macrobiopsie",
+   "microbiopsie",
+   "prelevement biopsique",
+   "punch",
+   "punch biopsie"
+  ],
+  "adicap_d1": [
+   "P",
+   "H",
+   "B",
+   "T"
+  ],
+  "adicap_d2": [],
+  "regles_codage_ref": "src:codage_d1_d2",
+  "prov": {
+   "source_id": "src:specimen_type_py",
+   "localisation": "Règles d'applicabilité, prélèvement de classe « biopsie »",
+   "version_source": "2026-07",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "B",
+   "confiance": 0.7,
+   "statut_validation": "derive_auto",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "extraction_automatique",
+   "remplace": null
+  }
+ },
+ {
+  "id": "prelevement:piece_operatoire",
+  "libelle": "Pièce opératoire",
+  "classe": "piece_operatoire",
+  "variantes": [],
+  "declencheurs": [
+   "amputation",
+   "amputation abdomino-perineale",
+   "annexectomie",
+   "colectomie",
+   "cystectomie",
+   "duodeno-pancreatectomie",
+   "exerese",
+   "exerese large",
+   "gastrectomie",
+   "hemicolectomie",
+   "hepatectomie",
+   "hysterectomie",
+   "laryngectomie",
+   "lobectomie",
+   "lobo-isthmectomie",
+   "lumpectomie",
+   "mastectomie",
+   "nephrectomie",
+   "orchidectomie",
+   "pharyngectomie",
+   "piece de",
+   "piece operatoire",
+   "pneumonectomie",
+   "prostatectomie",
+   "resection",
+   "resection anterieure",
+   "segmentectomie",
+   "sigmoidectomie",
+   "splenopancreatectomie",
+   "thyroidectomie",
+   "tumorectomie"
+  ],
+  "adicap_d1": [
+   "I",
+   "O"
+  ],
+  "adicap_d2": [],
+  "regles_codage_ref": "src:codage_d1_d2",
+  "prov": {
+   "source_id": "src:specimen_type_py",
+   "localisation": "Règles d'applicabilité, prélèvement de classe « piece_operatoire »",
+   "version_source": "2026-07",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "B",
+   "confiance": 0.7,
+   "statut_validation": "derive_auto",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "extraction_automatique",
+   "remplace": null
+  }
+ },
+ {
+  "id": "prelevement:cytologie",
+  "libelle": "Cytologie",
+  "classe": "cytologie",
+  "variantes": [],
+  "declencheurs": [
+   "ascite",
+   "aspiration",
+   "cytologie",
+   "cytologique",
+   "cytoponction",
+   "epanchement",
+   "frottis",
+   "lavage bronchiolo-alveolaire",
+   "lavage broncho-alveolaire",
+   "lba",
+   "liquide de lavage",
+   "liquide peritoneal",
+   "liquide pleural",
+   "ponction",
+   "urine",
+   "urines"
+  ],
+  "adicap_d1": [
+   "C",
+   "G",
+   "F",
+   "L",
+   "R",
+   "A",
+   "S",
+   "E"
+  ],
+  "adicap_d2": [],
+  "regles_codage_ref": "src:codage_d1_d2",
+  "prov": {
+   "source_id": "src:specimen_type_py",
+   "localisation": "Règles d'applicabilité, prélèvement de classe « cytologie »",
+   "version_source": "2026-07",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "B",
+   "confiance": 0.7,
+   "statut_validation": "derive_auto",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "extraction_automatique",
+   "remplace": null
+  }
+ },
+ {
+  "id": "prelevement:curage",
+  "libelle": "Curage ganglionnaire",
+  "classe": "curage",
+  "variantes": [],
+  "declencheurs": [
+   "curage",
+   "curage ganglionnaire",
+   "evidement",
+   "evidement ganglionnaire",
+   "ganglion sentinelle"
+  ],
+  "adicap_d1": [
+   "I"
+  ],
+  "adicap_d2": [],
+  "regles_codage_ref": "src:codage_d1_d2",
+  "prov": {
+   "source_id": "src:specimen_type_py",
+   "localisation": "Règles d'applicabilité, prélèvement de classe « curage »",
+   "version_source": "2026-07",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "B",
+   "confiance": 0.7,
+   "statut_validation": "derive_auto",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "extraction_automatique",
+   "remplace": null
+  }
+ },
+ {
+  "id": "prelevement:extemporane",
+  "libelle": "Examen extemporané",
+  "classe": "extemporane",
+  "variantes": [],
+  "declencheurs": [
+   "examen extemporane",
+   "extempo",
+   "extemporane"
+  ],
+  "adicap_d1": [],
+  "adicap_d2": [
+   "E"
+  ],
+  "regles_codage_ref": "src:codage_d1_d2",
+  "prov": {
+   "source_id": "src:specimen_type_py",
+   "localisation": "Règles d'applicabilité, prélèvement de classe « extemporane »",
+   "version_source": "2026-07",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "B",
+   "confiance": 0.7,
+   "statut_validation": "derive_auto",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "extraction_automatique",
+   "remplace": null
+  }
+ },
+ {
+  "id": "prelevement:autre",
+  "libelle": "Autre (curetage, résection endoscopique, expulsé...)",
+  "classe": "autre",
+  "variantes": [],
+  "declencheurs": [
+   "curetage",
+   "mucosectomie",
+   "resection endoscopique",
+   "rtu"
+  ],
+  "adicap_d1": [
+   "K",
+   "M",
+   "N",
+   "X",
+   "V"
+  ],
+  "adicap_d2": [],
+  "regles_codage_ref": "src:codage_d1_d2",
+  "prov": {
+   "source_id": "src:specimen_type_py",
+   "localisation": "Règles d'applicabilité, prélèvement de classe « autre »",
+   "version_source": "2026-07",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "B",
+   "confiance": 0.7,
+   "statut_validation": "derive_auto",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "extraction_automatique",
+   "remplace": null
+  }
+ },
+ {
+  "id": "prelevement:indetermine",
+  "libelle": "Prélèvement non précisé",
+  "classe": "indetermine",
+  "variantes": [],
+  "declencheurs": [],
+  "adicap_d1": [],
+  "adicap_d2": [],
+  "regles_codage_ref": "src:codage_d1_d2",
+  "prov": {
+   "source_id": "src:specimen_type_py",
+   "localisation": "Règles d'applicabilité, prélèvement de classe « indetermine »",
+   "version_source": "2026-07",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "B",
+   "confiance": 0.7,
+   "statut_validation": "derive_auto",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "extraction_automatique",
+   "remplace": null
+  }
+ }
+]

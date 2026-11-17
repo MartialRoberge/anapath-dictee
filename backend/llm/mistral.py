@@ -57,6 +57,7 @@ class MistralProvider:
             "model": self.model,
             "messages": messages,
             "temperature": request.temperature,
+            "top_p": 1,  # exige par les modeles recents en echantillonnage glouton
             "max_tokens": request.max_tokens,
         }
         if request.json_object:
@@ -104,6 +105,12 @@ def _parse_mistral_response(data: dict[str, object], model: str) -> LLMResponse:
         content = message.get("content")
         if isinstance(content, str):
             text = content
+        elif isinstance(content, list):
+            # modeles a raisonnement : blocs [{type: thinking|text, ...}] -> on ne garde que le texte
+            text = "".join(
+                str(b.get("text", "")) for b in content
+                if isinstance(b, dict) and b.get("type") == "text"
+            )
 
     if not text.strip():
         raise LLMError("Reponse Mistral vide.")

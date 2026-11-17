@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     llm_provider: str = "mistral"
 
     # Modeles par fournisseur (surchargeable par variable d'environnement).
-    mistral_model: str = "mistral-large-latest"
+    mistral_model: str = "mistral-large-2512"  # epingle : l'alias -latest pointe vers un modele a raisonnement (400 a temperature 0)
     claude_model: str = "claude-sonnet-4-6"
 
     # Parametres de generation communs a tous les fournisseurs.

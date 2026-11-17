@@ -91,8 +91,15 @@ export default {
         display: ['"Bricolage Grotesque"', '"Inter"', "sans-serif"],
         hand: ['"Caveat"', "cursive"],
         serif: ['"Instrument Serif"', "Georgia", "serif"],
+        // v3 : serif de titrage fin auto-hébergé (OFL)
+        titre: ['"Source Serif 4"', "Georgia", "serif"],
         medical: ['"Inter"', "Arial", "sans-serif"],
         mono: ['"JetBrains Mono"', "Consolas", "Monaco", "monospace"],
+      },
+      // v3 : courbes IBM Carbon (productive / expressive)
+      transitionTimingFunction: {
+        productive: "cubic-bezier(0.2, 0, 0.38, 0.9)",
+        expressive: "cubic-bezier(0.4, 0.14, 0.3, 1)",
       },
       keyframes: {
         "pulse-glow": {

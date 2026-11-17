@@ -1,0 +1,1223 @@
+{
+ "edition": null,
+ "avertissement": "Aucune release SNOMED CT chargee : tout code est une SUGGESTION NON VERIFIEE (statut_validation = non_valide). Ne jamais presenter comme code certain.",
+ "concepts": [
+  {
+   "id": "snomed:10200004",
+   "concept_id": "10200004",
+   "fsn": "Liver structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "foie"
+   ],
+   "organe_ids": [
+    "organe:foie"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : foie",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:12738006",
+   "concept_id": "12738006",
+   "fsn": "Brain structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "snc",
+    "systeme_nerveux_central"
+   ],
+   "organe_ids": [
+    "organe:systeme_nerveux_central"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : snc",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:15497006",
+   "concept_id": "15497006",
+   "fsn": "Ovarian structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "ovaire"
+   ],
+   "organe_ids": [
+    "organe:ovaire"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : ovaire",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:15776009",
+   "concept_id": "15776009",
+   "fsn": "Pancreatic structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "pancreas"
+   ],
+   "organe_ids": [
+    "organe:pancreas"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : pancreas",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:2739003",
+   "concept_id": "2739003",
+   "fsn": "Endometrial structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "endometre"
+   ],
+   "organe_ids": [
+    "organe:endometre"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : endometre",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:3120008",
+   "concept_id": "3120008",
+   "fsn": "Pleural structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "plevre"
+   ],
+   "organe_ids": [
+    "organe:plevre"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : plevre",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:32849002",
+   "concept_id": "32849002",
+   "fsn": "Esophageal structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "oesophage"
+   ],
+   "organe_ids": [
+    "organe:oesophage"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : oesophage",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:34381000",
+   "concept_id": "34381000",
+   "fsn": "Anal canal structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "canal_anal"
+   ],
+   "organe_ids": [
+    "organe:canal_anal"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : canal_anal",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:39607008",
+   "concept_id": "39607008",
+   "fsn": "Lung structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "poumon"
+   ],
+   "organe_ids": [
+    "organe:poumon"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : poumon",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:39937001",
+   "concept_id": "39937001",
+   "fsn": "Skin structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "melanome",
+    "peau"
+   ],
+   "organe_ids": [
+    "organe:melanome",
+    "organe:peau"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : melanome",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:40689003",
+   "concept_id": "40689003",
+   "fsn": "Testis structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "testicule"
+   ],
+   "organe_ids": [
+    "organe:testicule"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : testicule",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:41216001",
+   "concept_id": "41216001",
+   "fsn": "Prostatic structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "prostate"
+   ],
+   "organe_ids": [
+    "organe:prostate"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : prostate",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:4596009",
+   "concept_id": "4596009",
+   "fsn": "Laryngeal structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "larynx"
+   ],
+   "organe_ids": [
+    "organe:orl_tete_cou"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : larynx",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:59441001",
+   "concept_id": "59441001",
+   "fsn": "Lymph node structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "ganglion",
+    "lymphome"
+   ],
+   "organe_ids": [
+    "organe:lymphome"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : ganglion",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:64033007",
+   "concept_id": "64033007",
+   "fsn": "Kidney structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "rein"
+   ],
+   "organe_ids": [
+    "organe:rein"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : rein",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:69695003",
+   "concept_id": "69695003",
+   "fsn": "Stomach structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "estomac"
+   ],
+   "organe_ids": [
+    "organe:estomac"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : estomac",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:69748006",
+   "concept_id": "69748006",
+   "fsn": "Thyroid structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "thyroide"
+   ],
+   "organe_ids": [
+    "organe:thyroide"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : thyroide",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:71252005",
+   "concept_id": "71252005",
+   "fsn": "Cervix uteri structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "col_uterin"
+   ],
+   "organe_ids": [
+    "organe:col_uterin"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : col_uterin",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:71854001",
+   "concept_id": "71854001",
+   "fsn": "Colon structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "colon_rectum"
+   ],
+   "organe_ids": [
+    "organe:colon_rectum"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : colon_rectum",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:76752008",
+   "concept_id": "76752008",
+   "fsn": "Breast structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "sein"
+   ],
+   "organe_ids": [
+    "organe:sein"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : sein",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:89837001",
+   "concept_id": "89837001",
+   "fsn": "Urinary bladder structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "vessie"
+   ],
+   "organe_ids": [
+    "organe:vessie"
+   ],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : vessie",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:955009",
+   "concept_id": "955009",
+   "fsn": "Bronchial structure",
+   "terme_fr": null,
+   "hierarchie": "body_structure",
+   "usage": "topographie",
+   "cles_snomed_py": [
+    "bronche"
+   ],
+   "organe_ids": [],
+   "type_mapping": "equivalent",
+   "verifie_contre_release": false,
+   "declencheurs": [],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Structure anatomique saisie à la main : bronche",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:65845004",
+   "concept_id": "65845004",
+   "fsn": "Neoplasie intraepitheliale de haut grade (HSIL)",
+   "terme_fr": "Neoplasie intraepitheliale de haut grade (HSIL)",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "ain3",
+    "hsil",
+    "neoplasie intraepitheliale de haut grade",
+    "neoplasie malpighienne intraepitheliale de haut grade",
+    "dysplasie de haut grade"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Neoplasie intraepitheliale de haut grade (HSIL)",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:285636001",
+   "concept_id": "285636001",
+   "fsn": "Neoplasie intraepitheliale de bas grade (LSIL)",
+   "terme_fr": "Neoplasie intraepitheliale de bas grade (LSIL)",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "ain1",
+    "lsil",
+    "neoplasie intraepitheliale de bas grade",
+    "lesion malpighienne intraepitheliale de bas grade",
+    "dysplasie de bas grade"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Neoplasie intraepitheliale de bas grade (LSIL)",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:402815007",
+   "concept_id": "402815007",
+   "fsn": "Carcinome epidermoide",
+   "terme_fr": "Carcinome epidermoide",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "carcinome epidermoide",
+    "carcinome malpighien"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Carcinome epidermoide",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:27090000",
+   "concept_id": "27090000",
+   "fsn": "Carcinome urothelial (transitionnel)",
+   "terme_fr": "Carcinome urothelial (transitionnel)",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "carcinome urothelial",
+    "carcinome transitionnel"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Carcinome urothelial (transitionnel)",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:35917007",
+   "concept_id": "35917007",
+   "fsn": "Adenocarcinome",
+   "terme_fr": "Adenocarcinome",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "adenocarcinome"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Adenocarcinome",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:82711006",
+   "concept_id": "82711006",
+   "fsn": "Carcinome canalaire infiltrant du sein",
+   "terme_fr": "Carcinome canalaire infiltrant du sein",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "carcinome canalaire infiltrant",
+    "carcinome infiltrant de type non specifique"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Carcinome canalaire infiltrant du sein",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:44782003",
+   "concept_id": "44782003",
+   "fsn": "Carcinome lobulaire infiltrant du sein",
+   "terme_fr": "Carcinome lobulaire infiltrant du sein",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "carcinome lobulaire infiltrant"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Carcinome lobulaire infiltrant du sein",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:254626006",
+   "concept_id": "254626006",
+   "fsn": "Adenocarcinome du poumon",
+   "terme_fr": "Adenocarcinome du poumon",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "adenocarcinome pulmonaire",
+    "adenocarcinome du poumon",
+    "adenocarcinome acineux",
+    "adenocarcinome lepidique"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Adenocarcinome du poumon",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:372130007",
+   "concept_id": "372130007",
+   "fsn": "Melanome malin",
+   "terme_fr": "Melanome malin",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "melanome"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Melanome malin",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:93655004",
+   "concept_id": "93655004",
+   "fsn": "Carcinome a cellules renales",
+   "terme_fr": "Carcinome a cellules renales",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "carcinome a cellules renales",
+    "carcinome renal"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Carcinome a cellules renales",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:188725004",
+   "concept_id": "188725004",
+   "fsn": "Lymphome",
+   "terme_fr": "Lymphome",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "lymphome"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Lymphome",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:404136000",
+   "concept_id": "404136000",
+   "fsn": "Sarcome",
+   "terme_fr": "Sarcome",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "sarcome"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Sarcome",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:393564001",
+   "concept_id": "393564001",
+   "fsn": "Glioblastome",
+   "terme_fr": "Glioblastome",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "glioblastome"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Glioblastome",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:76197007",
+   "concept_id": "76197007",
+   "fsn": "Hyperplasie",
+   "terme_fr": "Hyperplasie",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "hyperplasie"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Hyperplasie",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:23583003",
+   "concept_id": "23583003",
+   "fsn": "Inflammation",
+   "terme_fr": "Inflammation",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "inflammation",
+    "inflammatoire"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Inflammation",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:263680009",
+   "concept_id": "263680009",
+   "fsn": "Fibrose",
+   "terme_fr": "Fibrose",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "fibrose"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Fibrose",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:4500007",
+   "concept_id": "4500007",
+   "fsn": "Metaplasie",
+   "terme_fr": "Metaplasie",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "metaplasie"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Metaplasie",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:240542006",
+   "concept_id": "240542006",
+   "fsn": "Condylome / infection HPV",
+   "terme_fr": "Condylome / infection HPV",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "condylome",
+    "condylomateuse",
+    "koilocyte",
+    "hpv",
+    "papillomavirus"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Condylome / infection HPV",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  },
+  {
+   "id": "snomed:17621005",
+   "concept_id": "17621005",
+   "fsn": "Tissu normal",
+   "terme_fr": "Tissu normal",
+   "hierarchie": "morphologic_abnormality",
+   "usage": "morphologie",
+   "cles_snomed_py": [],
+   "organe_ids": [],
+   "type_mapping": "related",
+   "verifie_contre_release": false,
+   "declencheurs": [
+    "absence de lesion",
+    "tissu normal",
+    "absence de malignite",
+    "pas de dysplasie"
+   ],
+   "prov": {
+    "source_id": "src:snomed_py_historique",
+    "localisation": "Morphologie saisie à la main : Tissu normal",
+    "version_source": "2026-07",
+    "date_extraction": "2026-11-15",
+    "fiabilite": "C",
+    "confiance": 0.4,
+    "statut_validation": "non_valide",
+    "valide_par": null,
+    "date_validation": null,
+    "methode": "saisie_manuelle_historique",
+    "remplace": null
+   }
+  }
+ ]
+}

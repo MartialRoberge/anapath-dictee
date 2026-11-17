@@ -25,6 +25,7 @@ export default defineConfig({
       "/etude": "http://localhost:8000",
       "/adicap": "http://localhost:8000",
       "/snomed": "http://localhost:8000",
+      "/v3": "http://localhost:8000",
     },
   },
 });

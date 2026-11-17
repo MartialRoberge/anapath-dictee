@@ -1,0 +1,71 @@
+{
+ "exclusions": [
+  {
+   "id": "excl:sein_engainements",
+   "organe_id": "organe:sein",
+   "concept": "engainements",
+   "prelevements": [
+    "biopsie",
+    "cytologie",
+    "indetermine"
+   ],
+   "raison": "Les fiches INCa sein (biopsie et pièce, fiches 4 et 5) ne comportent aucun item d'engainement péri-nerveux : non exigé sur une biopsie mammaire.",
+   "prov": {
+    "source_id": "src:inca_donnees_minimales_2011",
+    "localisation": "Sein, fiches 4 et 5 : liste des items (aucun engainement péri-nerveux)",
+    "fiabilite": "C",
+    "confiance": 0.7,
+    "statut_validation": "a_valider"
+   }
+  },
+  {
+   "id": "excl:colon_biopsie_pt",
+   "organe_id": "organe:colon_rectum",
+   "concept": "invasion",
+   "libelle_motif": "niveau d.infiltration pt",
+   "prelevements": [
+    "biopsie"
+   ],
+   "raison": "La fiche INCa côlon-rectum (fiche 8) ne concerne que la pièce opératoire : le niveau d'infiltration pT n'est pas évaluable sur une biopsie. À valider par la pathologiste référente.",
+   "prov": {
+    "source_id": "src:inca_donnees_minimales_2011",
+    "localisation": "Côlon-rectum, fiche 8 : contexte pièce opératoire uniquement",
+    "fiabilite": "C",
+    "confiance": 0.6,
+    "statut_validation": "a_valider"
+   }
+  },
+  {
+   "id": "excl:colon_biopsie_perinerveux",
+   "organe_id": "organe:colon_rectum",
+   "concept": "engainements",
+   "prelevements": [
+    "biopsie"
+   ],
+   "raison": "Infiltration péri-nerveuse : item de la fiche INCa côlon-rectum limitée à la pièce opératoire, non évaluable sur biopsie. À valider par la pathologiste référente.",
+   "prov": {
+    "source_id": "src:inca_donnees_minimales_2011",
+    "localisation": "Côlon-rectum, fiche 8 : contexte pièce opératoire uniquement",
+    "fiabilite": "C",
+    "confiance": 0.6,
+    "statut_validation": "a_valider"
+   }
+  },
+  {
+   "id": "excl:colon_biopsie_budding",
+   "organe_id": "organe:colon_rectum",
+   "libelle_motif": "tumour budding",
+   "prelevements": [
+    "biopsie"
+   ],
+   "raison": "Le tumour budding se mesure sur la pièce de résection, pas sur une biopsie (connaissance du domaine, absent de la fiche INCa). À valider par la pathologiste référente.",
+   "prov": {
+    "source_id": "src:seed_marc_v3",
+    "localisation": "seeds/exigences.json#excl:colon_biopsie_budding",
+    "fiabilite": "D",
+    "confiance": 0.5,
+    "statut_validation": "a_valider"
+   }
+  }
+ ]
+}

@@ -1,0 +1,591 @@
+{
+ "plages": [
+  {
+   "champ": "taille_tumorale",
+   "organe_id": null,
+   "unite": "mm",
+   "min": 0.1,
+   "max": 300,
+   "libelle": "Taille tumorale (plus grande dimension)",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.01,
+     "max": 30.0
+    }
+   ],
+   "localisation": "unites_conversions.json"
+  },
+  {
+   "champ": "dimension_piece",
+   "organe_id": null,
+   "unite": "cm",
+   "min": 0.3,
+   "max": 60,
+   "libelle": "Dimension macroscopique de la piece",
+   "alternatives": [
+    {
+     "unite": "mm",
+     "min": 3,
+     "max": 600
+    }
+   ]
+  },
+  {
+   "champ": "marge",
+   "organe_id": null,
+   "unite": "mm",
+   "min": 0,
+   "max": 100,
+   "libelle": "Distance a la marge d'exerese",
+   "localisation": "plages_plausibles_heuristiques.marge_mm"
+  },
+  {
+   "champ": "breslow",
+   "organe_id": null,
+   "unite": "mm",
+   "min": 0,
+   "max": 30,
+   "libelle": "Indice de Breslow",
+   "localisation": "plages_plausibles_heuristiques.breslow_mm"
+  },
+  {
+   "champ": "ganglions_examines",
+   "organe_id": null,
+   "unite": "nombre",
+   "min": 0,
+   "max": 100,
+   "libelle": "Ganglions examines",
+   "localisation": "plages_plausibles_heuristiques.ganglions_examines"
+  },
+  {
+   "champ": "ganglions_envahis",
+   "organe_id": null,
+   "unite": "nombre",
+   "min": 0,
+   "max": 100,
+   "libelle": "Ganglions envahis"
+  },
+  {
+   "champ": "ki67",
+   "organe_id": null,
+   "unite": "%",
+   "min": 0,
+   "max": 100,
+   "libelle": "Ki67",
+   "localisation": "plages_plausibles_heuristiques.ki67_pct"
+  },
+  {
+   "champ": "pdl1",
+   "organe_id": null,
+   "unite": "%",
+   "min": 0,
+   "max": 100,
+   "libelle": "PD-L1 (TPS)"
+  },
+  {
+   "champ": "recepteurs_hormonaux",
+   "organe_id": null,
+   "unite": "%",
+   "min": 0,
+   "max": 100,
+   "libelle": "Recepteurs hormonaux (RE, RP) : pourcentage de cellules"
+  },
+  {
+   "champ": "index_mitotique",
+   "organe_id": null,
+   "unite": "mitoses/mm2",
+   "min": 0,
+   "max": 100,
+   "libelle": "Index mitotique (melanome)",
+   "note": "Plage heuristique."
+  },
+  {
+   "champ": "grade_sbr_total",
+   "organe_id": null,
+   "unite": "score",
+   "min": 3,
+   "max": 9,
+   "libelle": "Score SBR (Nottingham) : total",
+   "localisation": "nottingham_SBR"
+  },
+  {
+   "champ": "gleason_total",
+   "organe_id": null,
+   "unite": "score",
+   "min": 2,
+   "max": 10,
+   "libelle": "Score de Gleason : total",
+   "localisation": "gleason_isup"
+  },
+  {
+   "champ": "grade_isup",
+   "organe_id": null,
+   "unite": "grade",
+   "min": 1,
+   "max": 5,
+   "libelle": "Grade group ISUP (prostate)"
+  },
+  {
+   "champ": "nb_carottes",
+   "organe_id": null,
+   "unite": "nombre",
+   "min": 1,
+   "max": 40,
+   "libelle": "Nombre de carottes biopsiques"
+  },
+  {
+   "champ": "longueur_tumorale_carotte",
+   "organe_id": null,
+   "unite": "mm",
+   "min": 0.1,
+   "max": 30,
+   "libelle": "Longueur tumorale par carotte",
+   "note": "Une carotte depasse rarement 25 mm."
+  },
+  {
+   "champ": "invasion_myometre",
+   "organe_id": null,
+   "unite": "%",
+   "min": 0,
+   "max": 100,
+   "libelle": "Infiltration du myometre"
+  },
+  {
+   "champ": "profondeur_invasion",
+   "organe_id": null,
+   "unite": "mm",
+   "min": 0,
+   "max": 60,
+   "libelle": "Profondeur d'invasion",
+   "note": "Heuristique."
+  },
+  {
+   "champ": "nb_fragments",
+   "organe_id": null,
+   "unite": "nombre",
+   "min": 1,
+   "max": 60,
+   "libelle": "Nombre de fragments"
+  },
+  {
+   "champ": "poids_piece",
+   "organe_id": null,
+   "unite": "g",
+   "min": 1,
+   "max": 10000,
+   "libelle": "Poids de la piece"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:sein",
+   "unite": "mm",
+   "min": 0.1,
+   "max": 150,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.01,
+     "max": 15.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:poumon",
+   "unite": "mm",
+   "min": 1,
+   "max": 200,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.1,
+     "max": 20.0
+    }
+   ],
+   "note": "Seule fiche INCa exprimee en cm : un STT « deux centimetres » est normal ici ; normaliser en mm avant comparaison.",
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:prostate",
+   "unite": "mm",
+   "min": 0.5,
+   "max": 80,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.05,
+     "max": 8.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:colon_rectum",
+   "unite": "mm",
+   "min": 1,
+   "max": 200,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.1,
+     "max": 20.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:estomac",
+   "unite": "mm",
+   "min": 1,
+   "max": 250,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.1,
+     "max": 25.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:thyroide",
+   "unite": "mm",
+   "min": 0.5,
+   "max": 100,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.05,
+     "max": 10.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:rein",
+   "unite": "mm",
+   "min": 3,
+   "max": 250,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.3,
+     "max": 25.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:vessie",
+   "unite": "mm",
+   "min": 1,
+   "max": 150,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.1,
+     "max": 15.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:col_uterin",
+   "unite": "mm",
+   "min": 0.5,
+   "max": 80,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.05,
+     "max": 8.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:endometre",
+   "unite": "mm",
+   "min": 1,
+   "max": 200,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.1,
+     "max": 20.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:ovaire",
+   "unite": "mm",
+   "min": 5,
+   "max": 400,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.5,
+     "max": 40.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:melanome",
+   "unite": "mm",
+   "min": 0.5,
+   "max": 100,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.05,
+     "max": 10.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:foie",
+   "unite": "mm",
+   "min": 3,
+   "max": 300,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.3,
+     "max": 30.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:pancreas",
+   "unite": "mm",
+   "min": 3,
+   "max": 100,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.3,
+     "max": 10.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:oesophage",
+   "unite": "mm",
+   "min": 1,
+   "max": 150,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.1,
+     "max": 15.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:orl_tete_cou",
+   "unite": "mm",
+   "min": 1,
+   "max": 100,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.1,
+     "max": 10.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:testicule",
+   "unite": "mm",
+   "min": 3,
+   "max": 150,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.3,
+     "max": 15.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:sarcome",
+   "unite": "mm",
+   "min": 5,
+   "max": 500,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.5,
+     "max": 50.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:systeme_nerveux_central",
+   "unite": "mm",
+   "min": 2,
+   "max": 100,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.2,
+     "max": 10.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_tumorale",
+   "organe_id": "organe:canal_anal",
+   "unite": "mm",
+   "min": 1,
+   "max": 80,
+   "libelle": "Taille tumorale",
+   "alternatives": [
+    {
+     "unite": "cm",
+     "min": 0.1,
+     "max": 8.0
+    }
+   ],
+   "localisation": "unites_conversions.json (sein) ; autres : heuristique"
+  },
+  {
+   "champ": "taille_fragments",
+   "organe_id": "organe:poumon",
+   "prelevement": "biopsie",
+   "categorie": "fragment",
+   "unite": "mm",
+   "min": 0.2,
+   "max": 5,
+   "libelle": "Fragment de biopsie bronchique",
+   "libelle_court": "biopsie bronchique",
+   "localisation": "Bibles Thorax / Biopsies.docx : fragments bronchiques décrits « exigus », sans dimension ; carottes 18G à part",
+   "source_id": "src:docs_bibles_pathologiste",
+   "fiabilite": "C",
+   "note": "Plage heuristique à valider par la pathologiste référente."
+  },
+  {
+   "champ": "taille_fragments",
+   "organe_id": "organe:colon_rectum",
+   "prelevement": "biopsie",
+   "categorie": "fragment",
+   "unite": "mm",
+   "min": 0.2,
+   "max": 10,
+   "libelle": "Fragment de biopsie colorectale",
+   "libelle_court": "biopsie colorectale",
+   "localisation": "BIOPSIES COLIQUES.docx : fragments non mesurés ; seul polype de 8 mm cité",
+   "source_id": "src:docs_bibles_pathologiste",
+   "fiabilite": "C",
+   "note": "Plage heuristique à valider par la pathologiste référente."
+  },
+  {
+   "champ": "taille_fragments",
+   "organe_id": "organe:estomac",
+   "prelevement": "biopsie",
+   "categorie": "fragment",
+   "unite": "mm",
+   "min": 0.2,
+   "max": 10,
+   "libelle": "Fragment de biopsie gastrique",
+   "libelle_court": "biopsie gastrique",
+   "localisation": "Biopsies gastriques.docx : fragments non mesurés",
+   "source_id": "src:docs_bibles_pathologiste",
+   "fiabilite": "C",
+   "note": "Plage heuristique à valider par la pathologiste référente."
+  },
+  {
+   "champ": "taille_carotte",
+   "organe_id": "organe:poumon",
+   "prelevement": "biopsie",
+   "categorie": "carotte",
+   "unite": "mm",
+   "min": 1,
+   "max": 35,
+   "libelle": "Carotte de biopsie à l'aiguille",
+   "libelle_court": "carotte biopsique",
+   "localisation": "Bibles Thorax / Biopsies.docx : carottes 18G de 6 mm et 17 mm de longueur",
+   "source_id": "src:docs_bibles_pathologiste",
+   "fiabilite": "C",
+   "note": "Plage heuristique à valider par la pathologiste référente."
+  },
+  {
+   "champ": "taille_carotte",
+   "organe_id": "organe:prostate",
+   "prelevement": "biopsie",
+   "categorie": "carotte",
+   "unite": "mm",
+   "min": 1,
+   "max": 30,
+   "libelle": "Carotte de biopsie prostatique",
+   "libelle_court": "carotte prostatique",
+   "localisation": "BIOPSIES PROSTATIQUES.docx : longueurs tumorales par carotte en mm (cumul 10/74 mm sur plusieurs carottes)",
+   "source_id": "src:docs_bibles_pathologiste",
+   "fiabilite": "C",
+   "note": "Plage heuristique à valider par la pathologiste référente."
+  },
+  {
+   "champ": "taille_carotte",
+   "organe_id": "organe:sein",
+   "prelevement": "biopsie",
+   "categorie": "carotte",
+   "unite": "mm",
+   "min": 1,
+   "max": 30,
+   "libelle": "Carotte de microbiopsie mammaire",
+   "libelle_court": "carotte mammaire",
+   "localisation": "Heuristique (aiguille 14G, longueur usuelle jusqu'à 20 mm) ; aucune valeur dans les documents fournis",
+   "source_id": "src:seed_marc_v3",
+   "fiabilite": "D",
+   "note": "Plage heuristique à valider par la pathologiste référente."
+  }
+ ]
+}

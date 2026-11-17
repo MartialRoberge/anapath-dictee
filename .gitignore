@@ -15,3 +15,4 @@ Ressources/
 
 # Corpus d'evaluation : dictees reelles, non versionnees
 corpus/
+.claude/test-account.local

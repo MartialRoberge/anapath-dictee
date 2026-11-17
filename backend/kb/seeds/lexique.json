@@ -1,0 +1,3926 @@
+{
+ "termes": [
+  {
+   "terme": "Barety",
+   "categorie": "station_ganglionnaire",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "baretti",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "barrety",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "bareti",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "baretis",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "barétis",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "barretis",
+     "origine": "observe_terrain",
+     "occurrences": 1,
+     "confiance": 0.9
+    }
+   ],
+   "contexte_requis": [
+    "ganglion",
+    "loge",
+    "curage",
+    "station",
+    "paratracheal"
+   ]
+  },
+  {
+   "terme": "sous-carinaire",
+   "categorie": "station_ganglionnaire",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "sous carinaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sous-carinaires",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sous carénaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sous-carénaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sous carinaires",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "ganglion",
+    "loge",
+    "station",
+    "curage"
+   ]
+  },
+  {
+   "terme": "paratrachéal",
+   "categorie": "station_ganglionnaire",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "para trachéal",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "paratrachéale",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "para-trachéal",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "paratracheal",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "para trachéale",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "ganglion",
+    "loge",
+    "station"
+   ]
+  },
+  {
+   "terme": "para-œsophagien",
+   "categorie": "station_ganglionnaire",
+   "organes": [
+    "organe:poumon",
+    "organe:oesophage"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "para oesophagien",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "para-esophagien",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "paraoesophagien",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "para œsophagien",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "ganglion",
+    "loge",
+    "station"
+   ]
+  },
+  {
+   "terme": "interlobaire",
+   "categorie": "station_ganglionnaire",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "inter lobaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "interlobaires",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "inter-lobaire",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "ganglion",
+    "loge",
+    "station"
+   ]
+  },
+  {
+   "terme": "péribronchique",
+   "categorie": "anatomie",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "péri bronchique",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "peribronchique",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "péri-bronchique",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "lombo-aortique",
+   "categorie": "station_ganglionnaire",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "lombo aortique",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lombo-aortiques",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lombo aortiques",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lombaortique",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "ganglion",
+    "loge",
+    "curage"
+   ]
+  },
+  {
+   "terme": "ganglionnaire",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "ganglio-naire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ganglionaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ganglionnaires",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "TTF1",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:poumon",
+    "organe:thyroide"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "ttf 1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ttf un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "t t f 1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "té té éf un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ttf-1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "tt f1",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "ALK",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:poumon",
+    "organe:lymphome"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "alk",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "a l k",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "alque",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "al k",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "PD-L1",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "pdl1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pd l 1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pd l un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pédé el un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pd-l-1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pdl 1",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "Ki67",
+   "categorie": "sigle_marqueur",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "ki 67",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "qui 67",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ki soixante-sept",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "kay 67",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ki6 7",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "quille 67",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "kiss 67",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "kiss soixante-sept",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "kiss soixante sept",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "ki soixante sept",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "quiss 67",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "kis 67",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "HER2",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:sein",
+    "organe:estomac"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "her 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "her deux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "herre deux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "hair 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "air 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "her two",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "hère 2",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "CK7",
+   "categorie": "sigle_marqueur",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "ck 7",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cé ka 7",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ck sept",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ca ka 7",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ck7",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "CK20",
+   "categorie": "sigle_marqueur",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "ck 20",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cé ka 20",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ck vingt",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ca ka 20",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "CK5/6",
+   "categorie": "sigle_marqueur",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "ck 5 6",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ck5 6",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ck 5/6",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cé ka 5 6",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ck cinq six",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "CDX2",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:colon_rectum"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "cdx 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cdx deux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cé dé x 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "c d x 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cdx-2",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "p16",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:col_uterin",
+    "organe:orl_tete_cou"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "p 16",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pé 16",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "p seize",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pe 16",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "p-16",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "p40",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "p 40",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pé 40",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "p quarante",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pe 40",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "p63",
+   "categorie": "sigle_marqueur",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "p 63",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pé 63",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "p soixante-trois",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pe 63",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "p53",
+   "categorie": "sigle_marqueur",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "p 53",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pé 53",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "p cinquante-trois",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pe 53",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "GATA3",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:sein",
+    "organe:vessie"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "gata 3",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "gata trois",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "gatta 3",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "gata-3",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "PAX8",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:thyroide",
+    "organe:rein",
+    "organe:ovaire"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "pax 8",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "packs 8",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pax huit",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pax-8",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pas 8",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "SOX10",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:melanome"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "sox 10",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "socks 10",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sox dix",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sox-10",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sauce 10",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "HMB45",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:melanome"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "hmb 45",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ache m b 45",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "hmb quarante-cinq",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "hmb-45",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "h m b 45",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "AMACR",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:prostate"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "amacr",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "a mac r",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "amakre",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "a m a c r",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "PSA",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:prostate"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "p s a",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pé ès a",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "psa",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "ERG",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:prostate"
+   ],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "erg",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "e r g",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ergue",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "MLH1",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:colon_rectum",
+    "organe:endometre"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "mlh 1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "m l h 1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "èm èl ach un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mlh un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mlh-1",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "MSH2",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:colon_rectum",
+    "organe:endometre"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "msh 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "m s h 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "msh deux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "msh-2",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "MSH6",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:colon_rectum",
+    "organe:endometre"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "msh 6",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "m s h 6",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "msh six",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "msh-6",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "PMS2",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:colon_rectum",
+    "organe:endometre"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "pms 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "p m s 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pms deux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "pms-2",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "BRAF",
+   "categorie": "sigle_marqueur",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "b raf",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "braf",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "brafe",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "bé raf",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "b-raf",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "KRAS",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:colon_rectum",
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "k ras",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ka ras",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cras",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "k-ras",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "kras",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "NRAS",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:colon_rectum",
+    "organe:melanome"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "n ras",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "èn ras",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "n-ras",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "EGFR",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "e g f r",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "egfer",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "égéfère",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "eg f r",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "egf r",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "ROS1",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "ros 1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "rosse un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ros un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ros-1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "rhos 1",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "IDH1",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:systeme_nerveux_central"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "idh 1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "i d h 1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "idéache 1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "idh un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "idh-1",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "DOG1",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:sarcome"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "dog 1",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "dogue un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "dog un",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "dog-1",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "BCL2",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:lymphome"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "bcl 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "b c l 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "bé cé èl 2",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "bcl deux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "bcl-2",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "NGS",
+   "categorie": "sigle",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "n g s",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "èn jé ès",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ngs",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "AIN3",
+   "categorie": "sigle",
+   "organes": [
+    "organe:canal_anal"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "ain 3",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "a i n 3",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "aïn trois",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ène 3",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ain-3",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "CIN3",
+   "categorie": "sigle",
+   "organes": [
+    "organe:col_uterin"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "cin 3",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sin 3",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cine trois",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "c i n 3",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cin-3",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "SBR",
+   "categorie": "sigle",
+   "organes": [
+    "organe:sein"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "s b r",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ès bé èr",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "esbéer",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sbr",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "ISUP",
+   "categorie": "sigle",
+   "organes": [
+    "organe:prostate",
+    "organe:rein"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "isup",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "i sup",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "y sup",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "isoup",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "isupe",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "i-sup",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "RE",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:sein",
+    "organe:endometre"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "récepteurs aux oestrogènes",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "r e",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "air e",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "récepteur",
+    "recepteurs",
+    "oestrogène",
+    "oestrogènes",
+    "estrogène",
+    "ihc",
+    "immunohistochimie"
+   ],
+   "expansion": "récepteurs aux oestrogènes"
+  },
+  {
+   "terme": "RP",
+   "categorie": "sigle_marqueur",
+   "organes": [
+    "organe:sein",
+    "organe:endometre"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "récepteurs à la progestérone",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "r p",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "air pe",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "récepteur",
+    "recepteurs",
+    "progestérone",
+    "ihc",
+    "immunohistochimie"
+   ],
+   "expansion": "récepteurs à la progestérone"
+  },
+  {
+   "terme": "FISH",
+   "categorie": "technique",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "fiche",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "fisch",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "fich",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "hybridation",
+    "amplification",
+    "her2",
+    "her 2",
+    "sonde",
+    "ratio"
+   ],
+   "expansion": "hybridation in situ en fluorescence"
+  },
+  {
+   "terme": "Gleason",
+   "categorie": "score",
+   "organes": [
+    "organe:prostate"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "gleeson",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "glisson",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "gliesson",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "glèsone",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "gleason",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "score",
+    "prostate",
+    "pattern",
+    "isup",
+    "carotte"
+   ]
+  },
+  {
+   "terme": "Breslow",
+   "categorie": "score",
+   "organes": [
+    "organe:melanome"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "breslaw",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "bresslo",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "breslau",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "breslo",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "brèslow",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "indice",
+    "mélanome",
+    "épaisseur",
+    "clark"
+   ]
+  },
+  {
+   "terme": "Clark",
+   "categorie": "score",
+   "organes": [
+    "organe:melanome"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "clarque",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "clarke",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "niveau",
+    "breslow",
+    "mélanome"
+   ]
+  },
+  {
+   "terme": "Fuhrman",
+   "categorie": "score",
+   "organes": [
+    "organe:rein"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "fourman",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "furman",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "fureman",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "fürman",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "grade",
+    "nucléaire",
+    "rein"
+   ]
+  },
+  {
+   "terme": "Nottingham",
+   "categorie": "score",
+   "organes": [
+    "organe:sein"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "notingham",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "nottinghame",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "nottingam",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "grade",
+    "sbr",
+    "sein"
+   ]
+  },
+  {
+   "terme": "Scarff-Bloom-Richardson",
+   "categorie": "score",
+   "organes": [
+    "organe:sein"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "scarf bloom richardson",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "scarff bloom richardsson",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "scarf bloom richardson",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "scarff-bloom-richardsson",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "grade",
+    "sein"
+   ]
+  },
+  {
+   "terme": "FIGO",
+   "categorie": "score",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "figo",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "fig o",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "fiko",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "stade",
+    "grade",
+    "endomètre",
+    "col"
+   ]
+  },
+  {
+   "terme": "adénocarcinome",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "adéno carcinome",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "adénocarcinôme",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "adenocarcinome",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "adénocarcinômes",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "adeno-carcinome",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "adénos carcinome",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "adénocarsinome",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "carcinome",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "carcinôme",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "carcino me",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "carsinome",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "épidermoïde",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "épidermoïd",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "épidermoide",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "épider moïde",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "epidermoide",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "épidermoïdes",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "urothélial",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "urothéliale",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "uro-thélial",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "urothelial",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "euro thélial",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "uro thélial",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "mélanome",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "mélanôme",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mélanomme",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mélano me",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "mésothéliome",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "méso théliome",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mésothéliôme",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mézothéliome",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mesothéliome",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "lymphome",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "linfome",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lymphôme",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lymphomes",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lim fome",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "lépidique",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "lépidic",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lépide hic",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "le pidique",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lépidik",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "acineux",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "assineux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "acineu",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "a cineux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "a si neux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "acinaire",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "cribriforme",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "cribri forme",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cribiforme",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cribrifor",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cribriformes",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "micropapillaire",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "micro papillaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "micro-papillaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "micropapilaire",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "papillaire",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "papilaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "papillaires",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "trabéculaire",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "trabéculair",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "trabeculaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "trabéculaires",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "mucineux",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "mucineu",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mucineuse",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mussineux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mucineuses",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "desmoplasique",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "des moplasique",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "desmo plasique",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "desmoplastique",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "des-moplasique",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "koïlocytes",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "coilocytes",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "koilocytes",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "coïlocytes",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "kohi locytes",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "coïlocyte",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "dyskératose",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "dis kératose",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "diskératose",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "dyscératose",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "dys kératose",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "parakératose",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "para kératose",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "paracératose",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "para-kératose",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "acanthose",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "acantose",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "a canthose",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "myxoïde",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "mixoïde",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "myxoïd",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mixoide",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mixoïdes",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "fibro-hyalin",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "fibro hyalin",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "fibrohyalin",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "fibro-hyaline",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "stroma",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "stromat",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "stroma",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "hématoxyline",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "hémato xyline",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "hématoxiline",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "périnerveux",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "péri nerveux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "périnerveuse",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "périnerveuses",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "péri-nerveux",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "lymphovasculaire",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "lympho vasculaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "limphovasculaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lympho-vasculaire",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "parenchymateuse",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "parenchimateuse",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "parenchymateux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "parenchimateux",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "dysplasie",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "dis plasie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "dysplazie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "métaplasie",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "métaplazie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "méta plasie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "sidérophages",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "sidérophage",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sidero phages",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cidérophages",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sidéro phages",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "polynucléaires",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "polynucléaire",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "poly nucléaires",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "polynuclaires",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "polynucléère",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "éosinophiles",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "éosino philes",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "éosinophile",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "éosinophilles",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "neutrophiles",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "neutro philes",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "neutrophile",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "neutrophilles",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "chromogranine",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "chromo granine",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cromogranine",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "chromogranin",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cromogranin",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "synaptophysine",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "synapto physine",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "synaptofisine",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cinaptophysine",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "synaptophysin",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "Mélan-A",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "melan a",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mélane a",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "melan-a",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mélanation",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "calrétinine",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "calre tinine",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "calrétinin",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cal rétinine",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "calretinine",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "desmine",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "dès mine",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "des mines",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "desmin",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "vimentine",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "vi mentine",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "vimentin",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "cytokératine",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "cyto kératine",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cytokératines",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cytocératine",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "immunohistochimie",
+   "categorie": "histologie",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "immuno histochimie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "immunohistochimique",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "immuno-histochimie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "lobectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "lobectomi",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lobe ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lobectomies",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "mastectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "mas ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mastectomi",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mastectomies",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "prostatectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "prostat ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "prostatectomi",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "néphrectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "néfrectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "néphro ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "nephrectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "colectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "colectomi",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "colo ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "gastrectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "gastrectomi",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "gastro ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "thyroïdectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "tyroïdectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "thyroidectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "thyroïde ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "hystérectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "istérectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "hystérectomi",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "hystère ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "cystectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "cistectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sistectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cyst ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "tumorectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "tumor ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "tumorectomi",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "tumeur ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "conisation",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "conizasion",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "conisation",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "coni sation",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "curetage",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "curétage",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cure tage",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "macrobiopsie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "macro biopsie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "macro-biopsie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "microbiopsie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "micro biopsie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "micro-biopsie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "cytoponction",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "cyto ponction",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cytoponction",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cytoponctions",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "polypectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "polype ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "polypectomi",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "amygdalectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "amygdal ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "amigdalectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "splénectomie",
+   "categorie": "geste",
+   "organes": [],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "splénectomi",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "spleno ectomie",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "bronchique",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "bronchic",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "bronchiques",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "bronchik",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "hilaire",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "hilère",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "hilaires",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "œsophage",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "oesophage",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "esophage",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ésophage",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "endomètre",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "endométre",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "endo mètre",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "myomètre",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "miomètre",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "myo mètre",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "péritoine",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "péritoin",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "péritoine",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "épiploon",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "épiploon",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "épiplon",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "épi ploon",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "cæcum",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "caecum",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cécum",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sécum",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "sigmoïde",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "sigmoïd",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "sigmoide",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "duodénum",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "duodénun",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "duo dénum",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "séreuse",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "sereuse",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "séreuses",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "muqueuse",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "muqueux",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "muqueuses",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "jéjunum",
+   "categorie": "anatomie",
+   "organes": [],
+   "priorite_biais_stt": 3,
+   "variantes": [
+    {
+     "forme": "jéjunun",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "jéjunum",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "LBA",
+   "categorie": "sigle",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "l b a",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "èl bé a",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "lba",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "lavage",
+    "bronchiolo",
+    "alvéolaire",
+    "aspiration"
+   ],
+   "expansion": "lavage broncho-alvéolaire"
+  },
+  {
+   "terme": "EBUS",
+   "categorie": "sigle",
+   "organes": [
+    "organe:poumon"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "e b u s",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ébus",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ebus",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ébusse",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "ponction",
+    "ganglion",
+    "écho",
+    "transbronchique"
+   ],
+   "expansion": "échoendoscopie bronchique"
+  },
+  {
+   "terme": "CCIS",
+   "categorie": "sigle",
+   "organes": [
+    "organe:sein"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "c c i s",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cé cé i ès",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "ccis",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "canalaire",
+    "sein",
+    "in situ"
+   ],
+   "expansion": "carcinome canalaire in situ"
+  },
+  {
+   "terme": "CHC",
+   "categorie": "sigle",
+   "organes": [
+    "organe:foie"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "c h c",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cé ache cé",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "chc",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "hépatocellulaire",
+    "foie",
+    "carcinome"
+   ],
+   "expansion": "carcinome hépatocellulaire"
+  },
+  {
+   "terme": "GIST",
+   "categorie": "sigle",
+   "organes": [
+    "organe:sarcome"
+   ],
+   "priorite_biais_stt": 2,
+   "variantes": [
+    {
+     "forme": "jiste",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "guiste",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "gist",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "j i s t",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": [
+    "stromale",
+    "estomac",
+    "grêle",
+    "c-kit",
+    "dog1"
+   ],
+   "expansion": "tumeur stromale gastro-intestinale"
+  },
+  {
+   "terme": "mm",
+   "categorie": "unite",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "millimètre",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "millimètres",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "mm",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "milimètres",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "cm",
+   "categorie": "unite",
+   "organes": [],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "centimètre",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "centimètres",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "cm",
+     "origine": "genere",
+     "confiance": 0.5
+    },
+    {
+     "forme": "centimetres",
+     "origine": "genere",
+     "confiance": 0.5
+    }
+   ],
+   "contexte_requis": []
+  },
+  {
+   "terme": "Lieberkühn",
+   "categorie": "histologie",
+   "organes": [
+    "organe:colon_rectum"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "lieu berquin",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "lieu berkin",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "lieberquin",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "lieber kun",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "libre kune",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    }
+   ],
+   "contexte_requis": [
+    "glande",
+    "glandes",
+    "colon",
+    "rectum",
+    "adenocarcinome",
+    "cryptes",
+    "lieberkuhnien"
+   ]
+  },
+  {
+   "terme": "lieberkühnien",
+   "categorie": "histologie",
+   "organes": [
+    "organe:colon_rectum"
+   ],
+   "priorite_biais_stt": 1,
+   "variantes": [
+    {
+     "forme": "lieu berquinien",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "lieberquinien",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    },
+    {
+     "forme": "lieberkunien",
+     "origine": "observe_terrain",
+     "confiance": 0.85
+    }
+   ],
+   "contexte_requis": [
+    "adenocarcinome",
+    "colon",
+    "rectum",
+    "glande"
+   ]
+  }
+ ]
+}

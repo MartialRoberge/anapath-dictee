@@ -1,0 +1,138 @@
+{
+ "_meta": {
+  "date_acces": "2026-11-15",
+  "statut": "Règles issues de la connaissance du domaine (non toutes re-vérifiées en ligne dans cette veille). A valider par un pathologiste avant production. Aucune valeur de risque de malignité n'est fournie : à relire dans les sources originales."
+ },
+ "provenance": {
+  "url": "voir 'reference' par entrée",
+  "date_acces": "2026-11-15",
+  "citation_courte": "Connaissances de référence + vérifications partielles (Bethesda 2023, Milan 2023 confirmés par PubMed)",
+  "fiabilite": "moyenne à haute",
+  "note": ""
+ },
+ "systemes": [
+  {
+   "id": "bethesda_thyroide",
+   "organe": "thyroïde",
+   "type": "cytologie",
+   "edition": "3e éd., 2023",
+   "categories": [
+    "I non diagnostique/insuffisant",
+    "II bénin",
+    "III atypies de signification indéterminée (AUS)",
+    "IV néoplasme folliculaire/suspect de néoplasme folliculaire",
+    "V suspect de malignité",
+    "VI malin"
+   ],
+   "verif": "catégorie obligatoire en cytologie thyroïdienne ; libellés alignés OMS 2022",
+   "reference": "https://pubmed.ncbi.nlm.nih.gov/37427847/"
+  },
+  {
+   "id": "milan_salivaire",
+   "organe": "glandes salivaires",
+   "type": "cytologie",
+   "edition": "2e éd., 2023",
+   "categories": [
+    "I non diagnostique",
+    "II non néoplasique",
+    "III atypies de signification indéterminée",
+    "IVA néoplasme bénin",
+    "IVB néoplasme de potentiel de malignité incertain (SUMP)",
+    "V suspect de malignité",
+    "VI malin"
+   ],
+   "reference": "https://pubmed.ncbi.nlm.nih.gov/37971186/",
+   "note": "Structure 6 catégories + subdivision IV en A/B (connaissance interne)."
+  },
+  {
+   "id": "paris_urine",
+   "organe": "urine",
+   "type": "cytologie",
+   "edition": "2e éd., 2022",
+   "categories": [
+    "non diagnostique/insuffisant",
+    "négatif pour carcinome urothélial de haut grade (NHGUC)",
+    "atypies cellulaires urothéliales (AUC)",
+    "suspect de carcinome urothélial de haut grade (SHGUC)",
+    "carcinome urothélial de haut grade (HGUC)",
+    "néoplasie urothéliale de bas grade (LGUN)",
+    "autres"
+   ],
+   "reference": "(non vérifiée en ligne)",
+   "note": "A vérifier."
+  },
+  {
+   "id": "gleason_isup",
+   "organe": "prostate",
+   "type": "grade",
+   "regles": {
+    "score_total": "primaire + secondaire (2-10 ; grades 1-2 non rapportés sur biopsie en pratique actuelle)",
+    "grade_group": {
+     "1": "Gleason <=6 (3+3)",
+     "2": "3+4=7",
+     "3": "4+3=7",
+     "4": "8 (4+4, 3+5, 5+3)",
+     "5": "9-10"
+    }
+   },
+   "verif": "cohérence primaire+secondaire=total ; 3+4 != 4+3 ; grade group dérivé du score",
+   "reference": "ISUP 2014/2019 (consensus) - connaissance interne"
+  },
+  {
+   "id": "nottingham_SBR",
+   "organe": "sein",
+   "type": "grade",
+   "regles": {
+    "composantes": "tubules (1-3) + noyaux (1-3) + mitoses (1-3) ; total 3-9",
+    "grade": {
+     "I": "3-5",
+     "II": "6-7",
+     "III": "8-9"
+    }
+   },
+   "verif": "total = somme des 3 ; grade déduit du total ; seuil des mitoses dépend de la surface de champ du microscope",
+   "reference": "Elston & Ellis 1991 ; INCa fiche sein (grade SBR) - connaissance interne"
+  },
+  {
+   "id": "breslow_clark",
+   "organe": "peau (mélanome)",
+   "type": "profondeur",
+   "regles": {
+    "breslow": "épaisseur en mm (1 décimale ou 2 selon AJCC : arrondi à 0,1 mm)",
+    "pT_seuils_mm": "<=1,0 ; >1,0-2,0 ; >2,0-4,0 ; >4,0 (T1-T4 ; a/b selon ulcération)",
+    "clark": "niveaux I-V (optionnel, non minimal INCa)"
+   },
+   "verif": "Breslow en mm, 0 si in situ ; cohérence avec pT ; ulcération et index mitotique (mitoses/mm²)",
+   "reference": "INCa fiche 19 ; UICC/AJCC - connaissance interne"
+  },
+  {
+   "id": "ki67",
+   "organe": "sein, NET, lymphome",
+   "type": "index de prolifération",
+   "regles": {
+    "unite": "% de noyaux marqués",
+    "plage": "0-100",
+    "note": "méthode de comptage (hot spot/moyenne) et nombre de cellules à noter"
+   },
+   "verif": "valeur en [0,100] ; refuser mm/cm",
+   "reference": "Recommandations IMWG (connaissance interne)"
+  },
+  {
+   "id": "sydney_vienne",
+   "organe": "estomac / digestif",
+   "type": "classification",
+   "regles": {
+    "vienne": "1 négatif ; 2 indéfini ; 3 néoplasie non invasive bas grade ; 4 néoplasie non invasive haut grade ; 5 invasion (sous-muqueuse et plus)"
+   },
+   "reference": "(non vérifiée en ligne)"
+  },
+  {
+   "id": "oms_edition",
+   "type": "méta",
+   "regles": {
+    "citation": "Indiquer l'édition OMS utilisée (5e en vigueur pour la plupart des organes, 6e en cours de publication)"
+   },
+   "reference": "https://www.iarc.who.int/ (annonces de publication)"
+  }
+ ]
+}

@@ -1,0 +1,3326 @@
+[
+ {
+  "id": "organe:sein",
+  "libelle": "Sein",
+  "synonymes": [
+   "areole",
+   "carcinome canalaire infiltrant",
+   "ccis",
+   "galactophore",
+   "mamelon",
+   "mammaire",
+   "mastectomie",
+   "pyramidectomie",
+   "sein"
+  ],
+  "mots_cles_faibles": [
+   "axillaire",
+   "ganglion sentinelle",
+   "macrobiopsie",
+   "mammographie",
+   "microbiopsie",
+   "quadrant",
+   "tumorectomie"
+  ],
+  "categorie": "senologie",
+  "parent": null,
+  "adicap_d3": [
+   "GS"
+  ],
+  "adicap_d3_libelles": [
+   "SEIN (ÉGALEMENT UTILISÉ CHEZ L'HOMME)"
+  ],
+  "snomed_body_structure": [
+   "snomed:76752008"
+  ],
+  "cim_o_topographie": [
+   "C50"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Sein (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "RE",
+   "RP",
+   "HER2",
+   "Ki67",
+   "E-cadhérine",
+   "CK5/6",
+   "p63",
+   "CK14"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "microbiopsie",
+   "macrobiopsie",
+   "pièce opératoire",
+   "tumorectomie",
+   "mastectomie",
+   "ganglion sentinelle",
+   "curage axillaire"
+  ],
+  "template_source": "TEMPLATE_SEIN",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#sein",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 22,
+   "nb_exemples": 19,
+   "nb_mappings_adicap": 16
+  }
+ },
+ {
+  "id": "organe:colon_rectum",
+  "libelle": "Côlon-rectum",
+  "synonymes": [
+   "caecum",
+   "colectomie",
+   "colique",
+   "colo-rectal",
+   "colon",
+   "colorectal",
+   "hemicolectomie",
+   "polypectomie colique",
+   "proctectomie",
+   "rectal",
+   "rectale",
+   "recto-sigmoidien",
+   "rectum",
+   "sigmoide",
+   "sigmoidectomie"
+  ],
+  "mots_cles_faibles": [
+   "anastomose",
+   "ascendant",
+   "descendant",
+   "polype",
+   "transverse"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "DC",
+   "DR",
+   "DV"
+  ],
+  "adicap_d3_libelles": [
+   "COLON",
+   "RECTUM",
+   "VALVULE DE BAUHIN ET REGION ILEO-COECALE"
+  ],
+  "snomed_body_structure": [
+   "snomed:71854001"
+  ],
+  "cim_o_topographie": [
+   "C18",
+   "C19",
+   "C20"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Côlon/Rectum (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "MLH1",
+   "MSH2",
+   "MSH6",
+   "PMS2",
+   "CDX2",
+   "CK20",
+   "CK7"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "polypectomie",
+   "mucosectomie",
+   "colectomie",
+   "proctectomie",
+   "résection antérieure",
+   "amputation abdomino-périnéale"
+  ],
+  "template_source": "TEMPLATE_COLON_RECTUM",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#colon_rectum",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 22,
+   "nb_exemples": 50,
+   "nb_mappings_adicap": 39
+  }
+ },
+ {
+  "id": "organe:poumon",
+  "libelle": "Poumon",
+  "synonymes": [
+   "aspiration bronchique",
+   "bronche",
+   "bronchique",
+   "broncho-pulmonaire",
+   "bronchopulmonaire",
+   "ebus",
+   "lavage bronchiolo-alveolaire",
+   "lba",
+   "parenchyme pulmonaire",
+   "pneumonectomie",
+   "poumon",
+   "pulmonaire"
+  ],
+  "mots_cles_faibles": [
+   "alveolaire",
+   "hilaire",
+   "hile",
+   "lobe",
+   "lobectomie",
+   "mediastin",
+   "mediastinal",
+   "pleural",
+   "pleure",
+   "segmentectomie",
+   "trachee"
+  ],
+  "categorie": "thorax",
+  "parent": null,
+  "adicap_d3": [
+   "RP",
+   "RB"
+  ],
+  "adicap_d3_libelles": [
+   "POUMON",
+   "BRONCHE"
+  ],
+  "snomed_body_structure": [
+   "snomed:39607008"
+  ],
+  "cim_o_topographie": [
+   "C34"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Poumon (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "TTF1",
+   "Napsin A",
+   "p40",
+   "p63",
+   "CK7",
+   "CK5/6",
+   "chromogranine",
+   "synaptophysine",
+   "PD-L1"
+  ],
+  "sous_types_prelevement": [
+   "biopsie bronchique",
+   "biopsie transthoracique",
+   "résection atypique",
+   "segmentectomie",
+   "lobectomie",
+   "pneumonectomie",
+   "biopsie pleurale",
+   "cytologie"
+  ],
+  "template_source": "TEMPLATE_POUMON",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#poumon",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 19,
+   "nb_exemples": 65,
+   "nb_mappings_adicap": 7
+  }
+ },
+ {
+  "id": "organe:prostate",
+  "libelle": "Prostate",
+  "synonymes": [
+   "adenomectomie",
+   "gleason",
+   "prostate",
+   "prostatectomie",
+   "prostatique",
+   "psa",
+   "rtup",
+   "vesicule seminale",
+   "vesicules seminales"
+  ],
+  "mots_cles_faibles": [
+   "carotte",
+   "carottes",
+   "isup",
+   "resection transuretrale",
+   "sextant"
+  ],
+  "categorie": "urologie",
+  "parent": null,
+  "adicap_d3": [
+   "HP",
+   "HS"
+  ],
+  "adicap_d3_libelles": [
+   "PROSTATE",
+   "VESICULE SEMINALE"
+  ],
+  "snomed_body_structure": [
+   "snomed:41216001"
+  ],
+  "cim_o_topographie": [
+   "C61"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Prostate (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "AMACR/P504S",
+   "p63",
+   "CK5/6",
+   "CK903",
+   "ERG",
+   "NKX3.1",
+   "PSA",
+   "PSMA",
+   "racémase"
+  ],
+  "sous_types_prelevement": [
+   "biopsies prostatiques",
+   "résection transurétrale (RTUP)",
+   "prostatectomie radicale",
+   "adénomectomie"
+  ],
+  "template_source": "TEMPLATE_PROSTATE",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#prostate",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 18,
+   "nb_exemples": 4,
+   "nb_mappings_adicap": 1
+  }
+ },
+ {
+  "id": "organe:estomac",
+  "libelle": "Estomac",
+  "synonymes": [
+   "estomac",
+   "fundique",
+   "fundus",
+   "gastrectomie",
+   "gastrique",
+   "gastrite",
+   "gastropathie",
+   "helicobacter",
+   "jonction oeso-gastrique",
+   "pylore",
+   "pylorique"
+  ],
+  "mots_cles_faibles": [
+   "antral",
+   "antre",
+   "cardia",
+   "gastro",
+   "olga",
+   "olgim",
+   "sydney"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "DE"
+  ],
+  "adicap_d3_libelles": [
+   "ESTOMAC"
+  ],
+  "snomed_body_structure": [
+   "snomed:69695003"
+  ],
+  "cim_o_topographie": [
+   "C16"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Estomac (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "HER2",
+   "MLH1",
+   "MSH2",
+   "MSH6",
+   "PMS2",
+   "PD-L1",
+   "Claudin 18.2",
+   "CDX2",
+   "CK7",
+   "CK20"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "mucosectomie",
+   "dissection sous-muqueuse",
+   "gastrectomie partielle",
+   "gastrectomie totale"
+  ],
+  "template_source": "TEMPLATE_ESTOMAC",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#estomac",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 26,
+   "nb_exemples": 24,
+   "nb_mappings_adicap": 19
+  }
+ },
+ {
+  "id": "organe:thyroide",
+  "libelle": "Thyroïde",
+  "synonymes": [
+   "lobo isthmectomie",
+   "lobo-isthmectomie",
+   "nodule thyroidien",
+   "thyroide",
+   "thyroidectomie",
+   "thyroidien",
+   "thyroidienne",
+   "thyroidite"
+  ],
+  "mots_cles_faibles": [
+   "bethesda",
+   "isthme",
+   "lobe",
+   "parathyroide"
+  ],
+  "categorie": "endocrinologie",
+  "parent": null,
+  "adicap_d3": [
+   "ET"
+  ],
+  "adicap_d3_libelles": [
+   "THYROIDE"
+  ],
+  "snomed_body_structure": [
+   "snomed:69748006"
+  ],
+  "cim_o_topographie": [
+   "C73"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Thyroïde (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "TTF1",
+   "thyroglobuline",
+   "PAX8",
+   "calcitonine",
+   "chromogranine",
+   "ACE",
+   "HBME-1",
+   "CK19",
+   "galectine-3"
+  ],
+  "sous_types_prelevement": [
+   "cytoponction",
+   "lobo-isthmectomie",
+   "thyroïdectomie totale",
+   "curage ganglionnaire"
+  ],
+  "template_source": "TEMPLATE_THYROIDE",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#thyroide",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 15,
+   "nb_exemples": 34,
+   "nb_mappings_adicap": 21
+  }
+ },
+ {
+  "id": "organe:rein",
+  "libelle": "Rein",
+  "synonymes": [
+   "carcinome renal",
+   "glomerule",
+   "nephrectomie",
+   "nephropathie",
+   "pyelocaliciel",
+   "rein",
+   "renal",
+   "renale",
+   "tumeur renale"
+  ],
+  "mots_cles_faibles": [
+   "fuhrman",
+   "hile renal",
+   "isup"
+  ],
+  "categorie": "urologie",
+  "parent": null,
+  "adicap_d3": [
+   "UR",
+   "UP"
+  ],
+  "adicap_d3_libelles": [
+   "REIN",
+   "PYELOCALICE - BASSINET - CALICE"
+  ],
+  "snomed_body_structure": [
+   "snomed:64033007"
+  ],
+  "cim_o_topographie": [
+   "C64"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Rein (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "PAX8",
+   "CD10",
+   "vimentine",
+   "CK7",
+   "CA IX",
+   "racémase/AMACR",
+   "TFE3",
+   "cathepsine K",
+   "CD117"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "néphrectomie partielle",
+   "tumorectomie rénale",
+   "néphrectomie élargie"
+  ],
+  "template_source": "TEMPLATE_REIN",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#rein",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 19,
+   "nb_exemples": 12,
+   "nb_mappings_adicap": 6
+  }
+ },
+ {
+  "id": "organe:vessie",
+  "libelle": "Vessie",
+  "synonymes": [
+   "cystectomie",
+   "detrusor",
+   "dome vesical",
+   "rtuv",
+   "urothelial",
+   "urothelium",
+   "vesical",
+   "vesicale",
+   "vessie"
+  ],
+  "mots_cles_faibles": [
+   "resection transuretrale",
+   "trigone",
+   "urine"
+  ],
+  "categorie": "urologie",
+  "parent": null,
+  "adicap_d3": [
+   "UV"
+  ],
+  "adicap_d3_libelles": [
+   "VESSIE - OURAQUE"
+  ],
+  "snomed_body_structure": [
+   "snomed:89837001"
+  ],
+  "cim_o_topographie": [
+   "C67"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Vessie (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "CK7",
+   "CK20",
+   "GATA3",
+   "p63",
+   "CK5/6",
+   "p53",
+   "Ki67",
+   "uroplakine"
+  ],
+  "sous_types_prelevement": [
+   "résection transurétrale de vessie (RTUV)",
+   "biopsie vésicale",
+   "cystectomie partielle",
+   "cystectomie radicale"
+  ],
+  "template_source": "TEMPLATE_VESSIE",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#vessie",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 14,
+   "nb_exemples": 28,
+   "nb_mappings_adicap": 21
+  }
+ },
+ {
+  "id": "organe:col_uterin",
+  "libelle": "Col utérin",
+  "synonymes": [
+   "cin",
+   "col de l'uterus",
+   "col uterin",
+   "colposcopie",
+   "conisation",
+   "endocol",
+   "exocol",
+   "fcu",
+   "frottis cervico-uterin",
+   "trachelectomie",
+   "wertheim"
+  ],
+  "mots_cles_faibles": [
+   "bethesda",
+   "cervical",
+   "cervicale",
+   "hsil",
+   "lsil",
+   "parametre",
+   "parametres",
+   "zone de jonction"
+  ],
+  "categorie": "gynecologie",
+  "parent": null,
+  "adicap_d3": [
+   "GC",
+   "GE",
+   "GX"
+  ],
+  "adicap_d3_libelles": [
+   "COL UTERIN - EXOCOL",
+   "ENDOCOL",
+   "REGION CERVICO-VAGINALE"
+  ],
+  "snomed_body_structure": [
+   "snomed:71252005"
+  ],
+  "cim_o_topographie": [
+   "C53"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition / FIGO 2018 - Col utérin",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "p16",
+   "Ki67",
+   "p63",
+   "CK5/6",
+   "CK7",
+   "CEA",
+   "vimentine"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "conisation",
+   "hystérectomie simple",
+   "hystérectomie élargie (Wertheim)",
+   "trachélectomie"
+  ],
+  "template_source": "TEMPLATE_COL_UTERIN",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#col_uterin",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 14,
+   "nb_exemples": 37,
+   "nb_mappings_adicap": 22
+  }
+ },
+ {
+  "id": "organe:endometre",
+  "libelle": "Endomètre",
+  "synonymes": [
+   "cavite uterine",
+   "corps uterin",
+   "endometre",
+   "endometrial",
+   "endometriale",
+   "endometrioide",
+   "hysterectomie",
+   "leiomyome uterin",
+   "myometre",
+   "uterus"
+  ],
+  "mots_cles_faibles": [
+   "curetage",
+   "fibrome",
+   "leiomyome"
+  ],
+  "categorie": "gynecologie",
+  "parent": null,
+  "adicap_d3": [
+   "GU",
+   "GM"
+  ],
+  "adicap_d3_libelles": [
+   "MUQUEUSE UTERINE - ENDOMETRE",
+   "MYOMETRE - UTERUS"
+  ],
+  "snomed_body_structure": [
+   "snomed:2739003"
+  ],
+  "cim_o_topographie": [
+   "C54"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition / FIGO 2023 - Endomètre",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "RE",
+   "RP",
+   "p53",
+   "MLH1",
+   "MSH2",
+   "MSH6",
+   "PMS2",
+   "PTEN",
+   "L1CAM",
+   "ARID1A",
+   "napsin A",
+   "WT1"
+  ],
+  "sous_types_prelevement": [
+   "biopsie endométriale",
+   "curetage",
+   "hystérectomie totale",
+   "hystérectomie avec annexectomie bilatérale"
+  ],
+  "template_source": "TEMPLATE_ENDOMETRE",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#endometre",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 12,
+   "nb_exemples": 35,
+   "nb_mappings_adicap": 34
+  }
+ },
+ {
+  "id": "organe:ovaire",
+  "libelle": "Ovaire",
+  "synonymes": [
+   "annexectomie",
+   "cystadenome",
+   "omentectomie",
+   "ovaire",
+   "ovariectomie",
+   "ovarien",
+   "ovarienne"
+  ],
+  "mots_cles_faibles": [
+   "annexe",
+   "ascite",
+   "epiploon",
+   "kyste",
+   "peritoine",
+   "trompe",
+   "tubaire"
+  ],
+  "categorie": "gynecologie",
+  "parent": null,
+  "adicap_d3": [
+   "GO",
+   "GT"
+  ],
+  "adicap_d3_libelles": [
+   "OVAIRE",
+   "TROMPE"
+  ],
+  "snomed_body_structure": [
+   "snomed:15497006"
+  ],
+  "cim_o_topographie": [
+   "C56"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition / FIGO 2014 - Ovaire",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "WT1",
+   "PAX8",
+   "p53",
+   "RE",
+   "RP",
+   "CK7",
+   "napsin A",
+   "HNF1-beta",
+   "calrétinine",
+   "inhibine",
+   "CD10",
+   "Ki67"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "annexectomie",
+   "ovariectomie",
+   "hystérectomie avec annexectomie bilatérale",
+   "chirurgie de réduction tumorale"
+  ],
+  "template_source": "TEMPLATE_OVAIRE",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#ovaire",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 10,
+   "nb_exemples": 31,
+   "nb_mappings_adicap": 26
+  }
+ },
+ {
+  "id": "organe:melanome",
+  "libelle": "Mélanome",
+  "synonymes": [
+   "breslow",
+   "lentigo maligna",
+   "lesion melanocytaire",
+   "melanocytaire",
+   "melanome",
+   "naevus"
+  ],
+  "mots_cles_faibles": [
+   "acral",
+   "clark",
+   "melanocyte",
+   "pigmente"
+  ],
+  "categorie": "dermatologie",
+  "parent": null,
+  "adicap_d3": [
+   "OT"
+  ],
+  "adicap_d3_libelles": [
+   "TEGUMENTS"
+  ],
+  "snomed_body_structure": [
+   "snomed:39937001"
+  ],
+  "cim_o_topographie": [
+   "C43"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Mélanome cutané (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "SOX10",
+   "Melan-A",
+   "HMB45",
+   "S100",
+   "Ki67",
+   "PRAME",
+   "p16"
+  ],
+  "sous_types_prelevement": [
+   "biopsie-exérèse",
+   "reprise de marges",
+   "ganglion sentinelle",
+   "curage ganglionnaire"
+  ],
+  "template_source": "TEMPLATE_MELANOME",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#melanome",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 17,
+   "nb_exemples": 6,
+   "nb_mappings_adicap": 4
+  }
+ },
+ {
+  "id": "organe:foie",
+  "libelle": "Foie",
+  "synonymes": [
+   "chc",
+   "cholangiocarcinome",
+   "cirrhose",
+   "fibrose hepatique",
+   "foie",
+   "hepatectomie",
+   "hepatique",
+   "hepatite",
+   "hepatocellulaire",
+   "metavir",
+   "steatohepatite",
+   "steatose"
+  ],
+  "mots_cles_faibles": [
+   "lobectomie",
+   "segment",
+   "segmentectomie"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "FF",
+   "FI"
+  ],
+  "adicap_d3_libelles": [
+   "FOIE",
+   "VOIES BILIAIRES INTRA-HEPATIQUES"
+  ],
+  "snomed_body_structure": [
+   "snomed:10200004"
+  ],
+  "cim_o_topographie": [
+   "C22"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Foie (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "Glypican-3",
+   "HSP70",
+   "glutamine synthétase",
+   "arginase-1",
+   "HepPar-1",
+   "CK7",
+   "CK19",
+   "CD34",
+   "AFP",
+   "beta-caténine"
+  ],
+  "sous_types_prelevement": [
+   "biopsie hépatique",
+   "hépatectomie partielle",
+   "segmentectomie",
+   "lobectomie hépatique",
+   "transplantation hépatique"
+  ],
+  "template_source": "TEMPLATE_FOIE",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#foie",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 12,
+   "nb_exemples": 12,
+   "nb_mappings_adicap": 4
+  }
+ },
+ {
+  "id": "organe:pancreas",
+  "libelle": "Pancréas",
+  "synonymes": [
+   "ampoule de vater",
+   "dpc",
+   "duodeno-pancreatectomie",
+   "duodenopancreatectomie",
+   "pancreas",
+   "pancreatectomie",
+   "pancreatique",
+   "splenopancreatectomie",
+   "whipple",
+   "wirsung"
+  ],
+  "mots_cles_faibles": [
+   "tumeur neuroendocrine"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "FP",
+   "FO",
+   "EI"
+  ],
+  "adicap_d3_libelles": [
+   "PANCREAS EXOCRINE",
+   "ODDI - AMPOULE DE VATER",
+   "ILOTS DE LANGHERANS - PANCREAS ENDOCRINE"
+  ],
+  "snomed_body_structure": [
+   "snomed:15776009"
+  ],
+  "cim_o_topographie": [
+   "C25"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Pancréas exocrine (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "CK7",
+   "CK19",
+   "CK20",
+   "MUC1",
+   "MUC2",
+   "MUC5AC",
+   "CDX2",
+   "chromogranine",
+   "synaptophysine",
+   "Ki67",
+   "beta-caténine"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "échoendoscopie avec ponction",
+   "duodéno-pancréatectomie céphalique (DPC)",
+   "splénopancréatectomie gauche",
+   "pancréatectomie totale",
+   "énucléation"
+  ],
+  "template_source": "TEMPLATE_PANCREAS",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#pancreas",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 9,
+   "nb_exemples": 3,
+   "nb_mappings_adicap": 1
+  }
+ },
+ {
+  "id": "organe:oesophage",
+  "libelle": "Œsophage",
+  "synonymes": [
+   "barrett",
+   "bas oesophage",
+   "ebo",
+   "endobrachyoesophage",
+   "jonction oeso-gastrique",
+   "oesophage",
+   "oesophagectomie",
+   "oesophagien",
+   "oesophagienne",
+   "oesophagite"
+  ],
+  "mots_cles_faibles": [
+   "cardia"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "DO"
+  ],
+  "adicap_d3_libelles": [
+   "OESOPHAGE"
+  ],
+  "snomed_body_structure": [
+   "snomed:32849002"
+  ],
+  "cim_o_topographie": [
+   "C15"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Œsophage (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "CK7",
+   "CK20",
+   "CDX2",
+   "p63",
+   "CK5/6",
+   "p40",
+   "PD-L1",
+   "HER2",
+   "MLH1",
+   "MSH2",
+   "MSH6",
+   "PMS2"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "mucosectomie",
+   "dissection sous-muqueuse",
+   "œsophagectomie",
+   "résection selon Lewis-Santy",
+   "résection selon Ivor-Lewis"
+  ],
+  "template_source": "TEMPLATE_OESOPHAGE",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#oesophage",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 14,
+   "nb_exemples": 10,
+   "nb_mappings_adicap": 11
+  }
+ },
+ {
+  "id": "organe:orl_tete_cou",
+  "libelle": "ORL / tête et cou",
+  "synonymes": [
+   "amygdale",
+   "amygdalectomie",
+   "cavite buccale",
+   "cavite nasale",
+   "cavum",
+   "corde vocale",
+   "cordes vocales",
+   "ethmoide",
+   "fosses nasales",
+   "glande parotide",
+   "glande salivaire",
+   "glandes salivaires",
+   "glossectomie",
+   "hypopharynx",
+   "laryngectomie",
+   "laryngee",
+   "larynx",
+   "naso-sinusien",
+   "nasopharynx",
+   "orl",
+   "oropharynx",
+   "parotide",
+   "parotidectomie",
+   "parotidien",
+   "parotidienne",
+   "pharynge",
+   "pharynx",
+   "plancher buccal",
+   "rhinopharynx",
+   "salivaire",
+   "sinus maxillaire",
+   "sous-mandibulaire",
+   "sous-mandibulaires",
+   "sous-maxillaire",
+   "tonsille"
+  ],
+  "mots_cles_faibles": [
+   "bouche",
+   "cervical",
+   "cervicale",
+   "curage cervical",
+   "langue",
+   "levre",
+   "palais",
+   "sinus"
+  ],
+  "categorie": "orl",
+  "parent": null,
+  "adicap_d3": [
+   "AL",
+   "AP",
+   "AO",
+   "AH",
+   "AA",
+   "AC",
+   "AS",
+   "AF",
+   "BX",
+   "BL",
+   "BA",
+   "BP",
+   "BM",
+   "BS",
+   "BG",
+   "BV"
+  ],
+  "adicap_d3_libelles": [
+   "LARYNX",
+   "PHARYNX",
+   "OROPHARYNX",
+   "HYPOPHARYNX",
+   "AMYGDALE PALATINE",
+   "CAVUM - RHINOPHARYNX",
+   "SINUS DE LA FACE",
+   "FOSSES NASALES",
+   "CAVITE BUCCALE",
+   "LANGUE",
+   "AUTRE GLANDE SALIVAIRE ACCESSOIRE - GLANDE SALIVAIRE",
+   "PAROTIDE",
+   "GLANDE SOUS-MAXILLAIRE",
+   "GLANDE SUB-LINGUALE",
+   "GENCIVE",
+   "VERMILLON - LEVRE"
+  ],
+  "snomed_body_structure": [
+   "snomed:4596009"
+  ],
+  "cim_o_topographie": [
+   "C00-C14",
+   "C30-C32"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Tête et Cou (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "p16",
+   "p63",
+   "p40",
+   "CK5/6",
+   "CK7",
+   "EMA",
+   "S100",
+   "SMA",
+   "Ki67",
+   "SOX10"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "laryngectomie",
+   "pharyngectomie",
+   "glossectomie",
+   "maxillectomie",
+   "mandibulectomie",
+   "parotidectomie",
+   "curage ganglionnaire cervical"
+  ],
+  "template_source": "TEMPLATE_ORL_TETE_COU",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#orl_tete_cou",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 12,
+   "nb_exemples": 120,
+   "nb_mappings_adicap": 106
+  }
+ },
+ {
+  "id": "organe:testicule",
+  "libelle": "Testicule",
+  "synonymes": [
+   "albuginee",
+   "cordon spermatique",
+   "epididyme",
+   "non seminomateux",
+   "orchidectomie",
+   "rete testis",
+   "seminome",
+   "testiculaire",
+   "testicule",
+   "tumeur germinale"
+  ],
+  "mots_cles_faibles": [],
+  "categorie": "urologie",
+  "parent": null,
+  "adicap_d3": [
+   "HT",
+   "HE",
+   "HD",
+   "HG",
+   "HB"
+  ],
+  "adicap_d3_libelles": [
+   "TESTICULE",
+   "EPIDIDYME",
+   "DEFERENT - CORDON SPERMATIQUE",
+   "VAGINALE DU TESTICULE",
+   "BOURSES - SCROTUM"
+  ],
+  "snomed_body_structure": [
+   "snomed:40689003"
+  ],
+  "cim_o_topographie": [
+   "C62"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Testicule (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "OCT4",
+   "SALL4",
+   "PLAP",
+   "CD117",
+   "D2-40",
+   "AFP",
+   "hCG",
+   "beta-hCG",
+   "CD30",
+   "glypican-3",
+   "SOX2",
+   "SOX17"
+  ],
+  "sous_types_prelevement": [
+   "orchidectomie",
+   "biopsie testiculaire"
+  ],
+  "template_source": "TEMPLATE_TESTICULE",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#testicule",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 8,
+   "nb_exemples": 12,
+   "nb_mappings_adicap": 8
+  }
+ },
+ {
+  "id": "organe:lymphome",
+  "libelle": "Lymphome / ganglion",
+  "synonymes": [
+   "burkitt",
+   "dlbcl",
+   "hodgkin",
+   "lymphadenopathie",
+   "lymphoblastique",
+   "lymphome",
+   "lymphoproliferatif",
+   "non hodgkinien",
+   "reed-sternberg"
+  ],
+  "mots_cles_faibles": [
+   "adenopathie",
+   "folliculaire",
+   "ganglion",
+   "ganglionnaire",
+   "ganglions",
+   "manteau",
+   "marginal",
+   "splenectomie",
+   "splenomegalie"
+  ],
+  "categorie": "hematologie",
+  "parent": null,
+  "adicap_d3": [
+   "SG",
+   "SR",
+   "SM"
+  ],
+  "adicap_d3_libelles": [
+   "GANGLION LYMPHATIQUE",
+   "RATE",
+   "MOELLE OSSEUSE"
+  ],
+  "snomed_body_structure": [
+   "snomed:59441001"
+  ],
+  "cim_o_topographie": [
+   "C77"
+  ],
+  "staging": [
+   {
+    "nom": "Ann Arbor / Lugano",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "CD20",
+   "CD3",
+   "CD5",
+   "CD10",
+   "CD15",
+   "CD23",
+   "CD30",
+   "CD79a",
+   "BCL2",
+   "BCL6",
+   "MUM1",
+   "Ki67",
+   "cycline D1",
+   "SOX11",
+   "TdT",
+   "ALK",
+   "CD138",
+   "kappa",
+   "lambda",
+   "EBV-LMP1",
+   "EBER"
+  ],
+  "sous_types_prelevement": [
+   "biopsie ganglionnaire",
+   "biopsie médullaire",
+   "biopsie tissulaire",
+   "splénectomie"
+  ],
+  "template_source": "TEMPLATE_LYMPHOME",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#lymphome",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 8,
+   "nb_exemples": 16,
+   "nb_mappings_adicap": 17
+  }
+ },
+ {
+  "id": "organe:sarcome",
+  "libelle": "Sarcome / tissus mous",
+  "synonymes": [
+   "chondrosarcome",
+   "dermatofibrosarcome",
+   "dfsp",
+   "fibrosarcome",
+   "gist",
+   "histiocytofibrome",
+   "leiomyosarcome",
+   "lipome",
+   "liposarcome",
+   "myxofibrosarcome",
+   "osteosarcome",
+   "parties molles",
+   "rhabdomyosarcome",
+   "sarcomateux",
+   "sarcome",
+   "synovialosarcome",
+   "tissus mous",
+   "tumeur adipeuse",
+   "tumeur desmoide",
+   "tumeur stromale"
+  ],
+  "mots_cles_faibles": [
+   "adipeux",
+   "fusiforme",
+   "lipomateux",
+   "sous cutane",
+   "sous-cutane"
+  ],
+  "categorie": "os_tissus_mous",
+  "parent": null,
+  "adicap_d3": [
+   "TC",
+   "TA",
+   "LM"
+  ],
+  "adicap_d3_libelles": [
+   "TISSU CONJONCTIF",
+   "TISSU ADIPEUX",
+   "MUSCLE STRIE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C49"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Tissus mous (AJCC/UICC) et Grade FNCLCC",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "MDM2",
+   "CDK4",
+   "desmine",
+   "actine muscle lisse",
+   "SMA",
+   "S100",
+   "SOX10",
+   "CD34",
+   "CD117",
+   "DOG1",
+   "TLE1",
+   "EMA",
+   "INI1",
+   "beta-caténine",
+   "STAT6",
+   "ERG",
+   "Ki67"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "exérèse chirurgicale",
+   "résection large",
+   "résection compartimentale"
+  ],
+  "template_source": "TEMPLATE_SARCOME",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#sarcome",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "partiel",
+   "gabarit": "specifique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 7,
+   "nb_exemples": 9,
+   "nb_mappings_adicap": 9
+  }
+ },
+ {
+  "id": "organe:systeme_nerveux_central",
+  "libelle": "Système nerveux central",
+  "synonymes": [
+   "astrocytome",
+   "cerebral",
+   "cerebrale",
+   "cerveau",
+   "cervelet",
+   "craniotomie",
+   "encephale",
+   "ependymome",
+   "glioblastome",
+   "gliome",
+   "hemisphere cerebral",
+   "medulloblastome",
+   "meningiome",
+   "moelle epiniere",
+   "oligodendrogliome",
+   "snc",
+   "tronc cerebral"
+  ],
+  "mots_cles_faibles": [
+   "cranien",
+   "frontal",
+   "meninge",
+   "occipital",
+   "parietal",
+   "temporal"
+  ],
+  "categorie": "neuro",
+  "parent": null,
+  "adicap_d3": [
+   "NH",
+   "NC",
+   "NT",
+   "NM",
+   "NE",
+   "XE"
+  ],
+  "adicap_d3_libelles": [
+   "HEMISPHERE CEREBRAL",
+   "CERVELET",
+   "TRONC CEREBRAL - NERF CRANIEN",
+   "MENINGE",
+   "MOELLE EPINIERE",
+   "REGION ENCEPHALIQUE"
+  ],
+  "snomed_body_structure": [
+   "snomed:12738006"
+  ],
+  "cim_o_topographie": [
+   "C71"
+  ],
+  "staging": [
+   {
+    "nom": "Classification OMS 2021 des tumeurs du SNC (grade 1 à 4)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "IDH1 R132H",
+   "ATRX",
+   "p53",
+   "GFAP",
+   "Olig2",
+   "Ki67",
+   "H3K27M",
+   "H3K27me3",
+   "EMA",
+   "SSTR2A",
+   "synaptophysine",
+   "NeuN",
+   "INI1",
+   "BRG1",
+   "neurofilament",
+   "beta-caténine"
+  ],
+  "sous_types_prelevement": [
+   "biopsie stéréotaxique",
+   "exérèse chirurgicale",
+   "résection partielle",
+   "résection complète"
+  ],
+  "template_source": "TEMPLATE_SYSTEME_NERVEUX_CENTRAL",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#systeme_nerveux_central",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "complet",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 9,
+   "nb_exemples": 18,
+   "nb_mappings_adicap": 7
+  }
+ },
+ {
+  "id": "organe:canal_anal",
+  "libelle": "Canal anal / marge anale",
+  "synonymes": [
+   "ain1",
+   "ain2",
+   "ain3",
+   "anal",
+   "anale",
+   "anus",
+   "canal anal",
+   "fissure anale",
+   "hemorroidaire",
+   "hemorroide",
+   "hemorroides",
+   "ligne pectinee",
+   "marge anale",
+   "neoplasie intraepitheliale anale",
+   "paquets hemorroidaires",
+   "peri-anal",
+   "perianal"
+  ],
+  "mots_cles_faibles": [
+   "ain"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "DQ"
+  ],
+  "adicap_d3_libelles": [
+   "ANUS"
+  ],
+  "snomed_body_structure": [
+   "snomed:34381000"
+  ],
+  "cim_o_topographie": [
+   "C21"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e édition - Canal anal (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "p16",
+   "p63",
+   "CK5/6",
+   "CK7",
+   "CK20",
+   "Ki67",
+   "CDX2"
+  ],
+  "sous_types_prelevement": [
+   "biopsie",
+   "exérèse locale",
+   "résection abdomino-périnéale"
+  ],
+  "template_source": "TEMPLATE_CANAL_ANAL",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#canal_anal",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "partiel",
+   "gabarit": "specifique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 7,
+   "nb_exemples": 9,
+   "nb_mappings_adicap": 7
+  }
+ },
+ {
+  "id": "organe:vesicule_biliaire",
+  "libelle": "Vésicule biliaire",
+  "synonymes": [
+   "canal cystique",
+   "cholecystectomie",
+   "cholecystite",
+   "vesicule biliaire"
+  ],
+  "mots_cles_faibles": [
+   "biliaire",
+   "calcul",
+   "calculs",
+   "cystique",
+   "vesicule"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "FV"
+  ],
+  "adicap_d3_libelles": [
+   "VESICULE BILIAIRE ET CANAL CYSTIQUE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C23"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e edition - Vesicule biliaire (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [
+   "cholecystectomie",
+   "piece operatoire"
+  ],
+  "template_source": "TEMPLATE_VESICULE_BILIAIRE",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#vesicule_biliaire",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "minimal",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 2,
+   "nb_exemples": 15,
+   "nb_mappings_adicap": 11
+  }
+ },
+ {
+  "id": "organe:appendice",
+  "libelle": "Appendice",
+  "synonymes": [
+   "appendice",
+   "appendicectomie",
+   "appendicite",
+   "appendiculaire",
+   "mucocele appendiculaire"
+  ],
+  "mots_cles_faibles": [
+   "caecal"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "DA"
+  ],
+  "adicap_d3_libelles": [
+   "APPENDICE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C18.1"
+  ],
+  "staging": [
+   {
+    "nom": "TNM 8e edition - Appendice (AJCC/UICC)",
+    "statut": "a_verifier"
+   }
+  ],
+  "marqueurs_ihc": [
+   "Chromogranine A",
+   "Synaptophysine",
+   "Ki-67"
+  ],
+  "sous_types_prelevement": [
+   "appendicectomie",
+   "piece operatoire"
+  ],
+  "template_source": "TEMPLATE_APPENDICE",
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#appendice",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "minimal",
+   "gabarit": "specifique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 2,
+   "nb_exemples": 20,
+   "nb_mappings_adicap": 11
+  }
+ },
+ {
+  "id": "organe:peau",
+  "libelle": "Peau (hors mélanome)",
+  "synonymes": [
+   "basocellulaire",
+   "cutane",
+   "cutanee",
+   "derme",
+   "epiderme",
+   "exerese cutanee",
+   "keratose actinique",
+   "peau",
+   "punch cutane",
+   "resection cutanee",
+   "spinocellulaire"
+  ],
+  "mots_cles_faibles": [
+   "dermatose",
+   "kyste epidermique"
+  ],
+  "categorie": "dermatologie",
+  "parent": null,
+  "adicap_d3": [
+   "OT",
+   "OA",
+   "OG"
+  ],
+  "adicap_d3_libelles": [
+   "TEGUMENTS",
+   "ANNEXES SUDORIPARE, SEBACEE ET PILAIRE",
+   "ONGLE"
+  ],
+  "snomed_body_structure": [
+   "snomed:39937001"
+  ],
+  "cim_o_topographie": [
+   "C44"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#peau",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 111,
+   "nb_mappings_adicap": 108
+  }
+ },
+ {
+  "id": "organe:thymus",
+  "libelle": "Thymus",
+  "synonymes": [
+   "thymectomie",
+   "thymique",
+   "thymome",
+   "thymus"
+  ],
+  "mots_cles_faibles": [],
+  "categorie": "hematologie",
+  "parent": null,
+  "adicap_d3": [
+   "ST"
+  ],
+  "adicap_d3_libelles": [
+   "THYMUS"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C37"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#thymus",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "partiel",
+   "codage": "absent",
+   "nb_champs": 0,
+   "nb_exemples": 3,
+   "nb_mappings_adicap": 0
+  }
+ },
+ {
+  "id": "organe:surrenale",
+  "libelle": "Surrénale",
+  "synonymes": [
+   "corticosurrenalome",
+   "pheochromocytome",
+   "surrenale",
+   "surrenalectomie",
+   "surrenalien",
+   "surrenalienne"
+  ],
+  "mots_cles_faibles": [],
+  "categorie": "endocrinologie",
+  "parent": null,
+  "adicap_d3": [
+   "ES"
+  ],
+  "adicap_d3_libelles": [
+   "SURRENALE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C74"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#surrenale",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "minimal",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 2,
+   "nb_mappings_adicap": 2
+  }
+ },
+ {
+  "id": "organe:parathyroide",
+  "libelle": "Parathyroïde",
+  "synonymes": [
+   "adenome parathyroidien",
+   "parathyroide",
+   "parathyroidectomie",
+   "parathyroidien"
+  ],
+  "mots_cles_faibles": [],
+  "categorie": "endocrinologie",
+  "parent": null,
+  "adicap_d3": [
+   "EP"
+  ],
+  "adicap_d3_libelles": [
+   "PARATHYROIDE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C75.0"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#parathyroide",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 6,
+   "nb_mappings_adicap": 1
+  }
+ },
+ {
+  "id": "organe:hypophyse",
+  "libelle": "Hypophyse",
+  "synonymes": [
+   "adenome hypophysaire",
+   "hypophysaire",
+   "hypophyse"
+  ],
+  "mots_cles_faibles": [],
+  "categorie": "endocrinologie",
+  "parent": null,
+  "adicap_d3": [
+   "EH"
+  ],
+  "adicap_d3_libelles": [
+   "HYPOPHYSE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C75.1"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#hypophyse",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "absent",
+   "codage": "absent",
+   "nb_champs": 0,
+   "nb_exemples": 0,
+   "nb_mappings_adicap": 0
+  }
+ },
+ {
+  "id": "organe:os",
+  "libelle": "Os",
+  "synonymes": [
+   "chondrome",
+   "exostose",
+   "os",
+   "osseuse",
+   "osseux",
+   "osteomyelite",
+   "osteonecrose",
+   "osteotomie",
+   "tete femorale"
+  ],
+  "mots_cles_faibles": [
+   "cartilage",
+   "fracture"
+  ],
+  "categorie": "os_tissus_mous",
+  "parent": null,
+  "adicap_d3": [
+   "LO"
+  ],
+  "adicap_d3_libelles": [
+   "OS"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C40",
+   "C41"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#os",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 21,
+   "nb_mappings_adicap": 25
+  }
+ },
+ {
+  "id": "organe:articulation",
+  "libelle": "Articulation / synoviale / tendon",
+  "synonymes": [
+   "arthrose",
+   "articulaire",
+   "articulation",
+   "canal carpien",
+   "coxarthrose",
+   "gonarthrose",
+   "hernie discale",
+   "hygroma",
+   "menisque",
+   "synoviale",
+   "synovite",
+   "tenosynovite"
+  ],
+  "mots_cles_faibles": [
+   "bourse",
+   "tendon"
+  ],
+  "categorie": "os_tissus_mous",
+  "parent": null,
+  "adicap_d3": [
+   "LA",
+   "LS",
+   "LT",
+   "LG",
+   "LB",
+   "LC"
+  ],
+  "adicap_d3_libelles": [
+   "ARTICULATION",
+   "SYNOVIALE - CAPSULE",
+   "TENDON",
+   "GAINE TENDINEUSE",
+   "BOURSE SEREUSE",
+   "CARTILAGE ARTICULAIRE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#articulation",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 26,
+   "nb_mappings_adicap": 9
+  }
+ },
+ {
+  "id": "organe:muscle",
+  "libelle": "Muscle strié",
+  "synonymes": [
+   "biopsie musculaire",
+   "myopathie",
+   "myosite"
+  ],
+  "mots_cles_faibles": [
+   "muscle",
+   "musculaire"
+  ],
+  "categorie": "neuro",
+  "parent": null,
+  "adicap_d3": [
+   "LM"
+  ],
+  "adicap_d3_libelles": [
+   "MUSCLE STRIE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#muscle",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "absent",
+   "codage": "absent",
+   "nb_champs": 0,
+   "nb_exemples": 0,
+   "nb_mappings_adicap": 0
+  }
+ },
+ {
+  "id": "organe:nerf_peripherique",
+  "libelle": "Nerf périphérique",
+  "synonymes": [
+   "biopsie nerveuse",
+   "biopsie neuromusculaire",
+   "nerf peripherique",
+   "neuropathie"
+  ],
+  "mots_cles_faibles": [],
+  "categorie": "neuro",
+  "parent": null,
+  "adicap_d3": [
+   "NP"
+  ],
+  "adicap_d3_libelles": [
+   "SYSTEME NERVEUX PERIPHERIQUE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#nerf_peripherique",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "absent",
+   "codage": "absent",
+   "nb_champs": 0,
+   "nb_exemples": 0,
+   "nb_mappings_adicap": 0
+  }
+ },
+ {
+  "id": "organe:placenta",
+  "libelle": "Placenta / produits de conception",
+  "synonymes": [
+   "chorioamniotite",
+   "cordon ombilical",
+   "fausse couche",
+   "membranes ovulaires",
+   "mole hydatiforme",
+   "placenta",
+   "placentaire",
+   "produit d'avortement",
+   "trophoblaste",
+   "villite"
+  ],
+  "mots_cles_faibles": [
+   "avortement"
+  ],
+  "categorie": "foeto_placentaire",
+  "parent": null,
+  "adicap_d3": [
+   "PP",
+   "PM",
+   "PC",
+   "PO",
+   "PF"
+  ],
+  "adicap_d3_libelles": [
+   "PLACENTA",
+   "MEMBRANES",
+   "CORDON OMBILICAL",
+   "OEUF - PRODUITS OVULAIRES",
+   "FOETUS - EMBRYON"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C58"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#placenta",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "minimal",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 2,
+   "nb_mappings_adicap": 2
+  }
+ },
+ {
+  "id": "organe:rate",
+  "libelle": "Rate",
+  "synonymes": [
+   "rate",
+   "splenectomie",
+   "splenique"
+  ],
+  "mots_cles_faibles": [
+   "splenomegalie"
+  ],
+  "categorie": "hematologie",
+  "parent": null,
+  "adicap_d3": [
+   "SR"
+  ],
+  "adicap_d3_libelles": [
+   "RATE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C42.2"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#rate",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "minimal",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 2,
+   "nb_mappings_adicap": 1
+  }
+ },
+ {
+  "id": "organe:moelle_osseuse",
+  "libelle": "Moelle osseuse",
+  "synonymes": [
+   "bom",
+   "moelle osseuse",
+   "myelogramme",
+   "osteomedullaire"
+  ],
+  "mots_cles_faibles": [
+   "medullaire"
+  ],
+  "categorie": "hematologie",
+  "parent": null,
+  "adicap_d3": [
+   "SM"
+  ],
+  "adicap_d3_libelles": [
+   "MOELLE OSSEUSE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C42.1"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#moelle_osseuse",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "minimal",
+   "codage": "absent",
+   "nb_champs": 0,
+   "nb_exemples": 2,
+   "nb_mappings_adicap": 0
+  }
+ },
+ {
+  "id": "organe:plevre",
+  "libelle": "Plèvre",
+  "synonymes": [
+   "biopsie pleurale",
+   "biopsies pleurales",
+   "epanchement pleural",
+   "liquide pleural",
+   "mesotheliome",
+   "pleurectomie",
+   "pleuresie",
+   "ponction pleurale"
+  ],
+  "mots_cles_faibles": [
+   "pleural",
+   "pleurale",
+   "pleurales",
+   "plevre"
+  ],
+  "categorie": "thorax",
+  "parent": null,
+  "adicap_d3": [
+   "RS"
+  ],
+  "adicap_d3_libelles": [
+   "SEREUSE PLEURALE"
+  ],
+  "snomed_body_structure": [
+   "snomed:3120008"
+  ],
+  "cim_o_topographie": [
+   "C38.4"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#plevre",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 6,
+   "nb_mappings_adicap": 1
+  }
+ },
+ {
+  "id": "organe:peritoine",
+  "libelle": "Péritoine",
+  "synonymes": [
+   "biopsie peritoneale",
+   "biopsies peritoneales",
+   "carcinose peritoneale",
+   "lavage peritoneal",
+   "liquide d'ascite",
+   "peritonectomie",
+   "pseudomyxome"
+  ],
+  "mots_cles_faibles": [
+   "ascite",
+   "peritoine",
+   "peritoneal",
+   "peritoneale"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "DP"
+  ],
+  "adicap_d3_libelles": [
+   "PERITOINE - CANAL DE NUCK"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C48"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#peritoine",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 3,
+   "nb_mappings_adicap": 3
+  }
+ },
+ {
+  "id": "organe:intestin_grele",
+  "libelle": "Intestin grêle / duodénum",
+  "synonymes": [
+   "diverticule de meckel",
+   "duodenal",
+   "duodenite",
+   "duodenum",
+   "enterite",
+   "grele",
+   "ileal",
+   "ileite",
+   "ileon",
+   "intestin grele",
+   "jejunal",
+   "jejunum",
+   "maladie coeliaque"
+  ],
+  "mots_cles_faibles": [
+   "ileo-caecal",
+   "valvule de bauhin"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "DG",
+   "DD",
+   "DV",
+   "DM"
+  ],
+  "adicap_d3_libelles": [
+   "INTESTIN GRELE",
+   "DUODENUM",
+   "VALVULE DE BAUHIN ET REGION ILEO-COECALE",
+   "DIVERTICULE DE MECKEL"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C17"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#intestin_grele",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 14,
+   "nb_mappings_adicap": 11
+  }
+ },
+ {
+  "id": "organe:voies_biliaires",
+  "libelle": "Voies biliaires",
+  "synonymes": [
+   "cholangite",
+   "choledoque",
+   "klatskin",
+   "voie biliaire",
+   "voies biliaires"
+  ],
+  "mots_cles_faibles": [
+   "biliaire"
+  ],
+  "categorie": "digestif",
+  "parent": null,
+  "adicap_d3": [
+   "FE",
+   "FI",
+   "FO"
+  ],
+  "adicap_d3_libelles": [
+   "VOIES BILIAIRES EXTRA-HEPATIQUES",
+   "VOIES BILIAIRES INTRA-HEPATIQUES",
+   "ODDI - AMPOULE DE VATER"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C24"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#voies_biliaires",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "absent",
+   "codage": "absent",
+   "nb_champs": 0,
+   "nb_exemples": 0,
+   "nb_mappings_adicap": 0
+  }
+ },
+ {
+  "id": "organe:uretere",
+  "libelle": "Uretère / voie excrétrice",
+  "synonymes": [
+   "bassinet",
+   "jonction pyelo-ureterale",
+   "ureteral",
+   "ureterale",
+   "uretere",
+   "voie excretrice",
+   "voies excretrices"
+  ],
+  "mots_cles_faibles": [],
+  "categorie": "urologie",
+  "parent": null,
+  "adicap_d3": [
+   "UT",
+   "UP"
+  ],
+  "adicap_d3_libelles": [
+   "URETERE",
+   "PYELOCALICE - BASSINET - CALICE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C65",
+   "C66"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#uretere",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "minimal",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 1,
+   "nb_mappings_adicap": 1
+  }
+ },
+ {
+  "id": "organe:verge",
+  "libelle": "Verge / prépuce",
+  "synonymes": [
+   "balanite",
+   "circoncision",
+   "penis",
+   "prepuce",
+   "verge"
+  ],
+  "mots_cles_faibles": [],
+  "categorie": "urologie",
+  "parent": null,
+  "adicap_d3": [
+   "HV"
+  ],
+  "adicap_d3_libelles": [
+   "VERGE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C60"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#verge",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 6,
+   "nb_mappings_adicap": 6
+  }
+ },
+ {
+  "id": "organe:vulve_vagin",
+  "libelle": "Vulve / vagin",
+  "synonymes": [
+   "bartholin",
+   "vagin",
+   "vaginal",
+   "vulvaire",
+   "vulve",
+   "vulvectomie"
+  ],
+  "mots_cles_faibles": [
+   "vaginale"
+  ],
+  "categorie": "gynecologie",
+  "parent": null,
+  "adicap_d3": [
+   "GV",
+   "GG",
+   "GB"
+  ],
+  "adicap_d3_libelles": [
+   "VULVE",
+   "VAGIN",
+   "GLANDES DE BARTHOLIN"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C51",
+   "C52"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#vulve_vagin",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 15,
+   "nb_mappings_adicap": 10
+  }
+ },
+ {
+  "id": "organe:coeur_vaisseaux",
+  "libelle": "Cœur / vaisseaux",
+  "synonymes": [
+   "anevrisme",
+   "artere temporale",
+   "arterite",
+   "cardiomyopathie",
+   "endarteriectomie",
+   "endocarde",
+   "myocarde",
+   "pericarde",
+   "valve aortique",
+   "valve mitrale",
+   "valvulaire",
+   "vascularite"
+  ],
+  "mots_cles_faibles": [
+   "aorte",
+   "aortique",
+   "artere",
+   "coronaire",
+   "veine"
+  ],
+  "categorie": "cardio_vasculaire",
+  "parent": null,
+  "adicap_d3": [
+   "CX",
+   "CM",
+   "CE",
+   "CP",
+   "CC",
+   "VO",
+   "VA"
+  ],
+  "adicap_d3_libelles": [
+   "COEUR ET GROS VAISSEAUX",
+   "MYOCARDE",
+   "ENDOCARDE - VALVULE - PILIER",
+   "PERICARDE",
+   "CORONAIRES - VAISSEAUX DU COEUR",
+   "AORTE",
+   "ARTERE"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#coeur_vaisseaux",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "riche",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 16,
+   "nb_mappings_adicap": 6
+  }
+ },
+ {
+  "id": "organe:oeil",
+  "libelle": "Œil / annexes",
+  "synonymes": [
+   "conjonctive",
+   "cornee",
+   "dacryocystorhinostomie",
+   "dcr",
+   "oculaire",
+   "oeil",
+   "orbite",
+   "paupiere",
+   "retinoblastome",
+   "uvee"
+  ],
+  "mots_cles_faibles": [],
+  "categorie": "ophtalmologie",
+  "parent": null,
+  "adicap_d3": [
+   "OE",
+   "OP",
+   "OC",
+   "OU",
+   "OL"
+  ],
+  "adicap_d3_libelles": [
+   "OEIL ET ORBITE",
+   "PAUPIERE",
+   "CORNEE",
+   "UVEE",
+   "SYSTEME LACRYMAL"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C69"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#oeil",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 6,
+   "nb_mappings_adicap": 4
+  }
+ },
+ {
+  "id": "organe:oreille",
+  "libelle": "Oreille",
+  "synonymes": [
+   "cholesteatome",
+   "conduit auditif",
+   "mastoide",
+   "oreille",
+   "otite"
+  ],
+  "mots_cles_faibles": [],
+  "categorie": "orl",
+  "parent": null,
+  "adicap_d3": [
+   "OR"
+  ],
+  "adicap_d3_libelles": [
+   "OREILLE (EXTERNE, MOYENNE, INTERNE, MASTOIDE)"
+  ],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [
+   "C30.1",
+   "C44.2"
+  ],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#oreille",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "generique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 0,
+   "nb_exemples": 8,
+   "nb_mappings_adicap": 7
+  }
+ },
+ {
+  "id": "organe:generique",
+  "libelle": "Générique (organe non reconnu)",
+  "synonymes": [],
+  "mots_cles_faibles": [],
+  "categorie": "generique",
+  "parent": null,
+  "adicap_d3": [],
+  "adicap_d3_libelles": [],
+  "snomed_body_structure": [],
+  "cim_o_topographie": [],
+  "staging": [],
+  "marqueurs_ihc": [],
+  "sous_types_prelevement": [],
+  "template_source": null,
+  "prov": {
+   "source_id": "src:seed_marc_v3",
+   "localisation": "seeds/organes.json#generique",
+   "version_source": "3.0.0",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "semence_curee",
+   "remplace": null
+  },
+  "couverture": {
+   "champs": "absent",
+   "gabarit": "specifique",
+   "exemples_style": "partiel",
+   "codage": "partiel",
+   "nb_champs": 2,
+   "nb_exemples": 4,
+   "nb_mappings_adicap": 4
+  }
+ }
+]

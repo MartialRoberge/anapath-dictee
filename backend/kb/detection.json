@@ -1,0 +1,7 @@
+{
+ "_note": "Expressions neutralisees avant la detection d'organes (regex sur texte normalise sans accents).",
+ "expressions_neutralisees": [
+  "\\bau sein (?:de |d'|du |des |meme|duquel|desquel)",
+  "\\ba l'interieur du sein de\\b"
+ ]
+}

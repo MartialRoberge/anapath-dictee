@@ -19,6 +19,8 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    Integer,
+    JSON,
 )
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -220,3 +222,118 @@ class BusinessRule(Base):
     organization: Mapped[Organization] = relationship(
         back_populates="business_rules"
     )
+
+
+class TelemetrieEvenement(Base):
+    """Evenement d'usage MARC v3 (telemetrie).
+
+    AUCUNE donnee medicale : le payload ne contient que des nombres bornes, des
+    booleens, des enums connus et des ids techniques ([a-z0-9_]). Valide par
+    ``telemetrie.whitelist`` avant insertion. Le projet n'est repere que par un
+    hash sale irreversible.
+    """
+
+    __tablename__ = "telemetrie_evenements"
+    __table_args__ = (
+        Index("ix_telemetrie_ts", "ts"),
+        Index("ix_telemetrie_type_ts", "type", "ts"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=_uuid_str
+    )
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    type: Mapped[str] = mapped_column(String(40), nullable=False)
+    projet_hash: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    ts: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    payload: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+
+
+# ---------------------------------------------------------------------------
+# Conformite ISO 15189:2022 (backend/conformite). AUCUN texte medical, aucun
+# texte libre : uniquement des identifiants techniques, enums, nombres et
+# empreintes SHA-256 (validation par ``conformite.metadonnees``).
+# ---------------------------------------------------------------------------
+
+
+class ConformiteAudit(Base):
+    """Journal d'audit append-only, chaine par hash (8.4 maitrise des enregistrements)."""
+
+    __tablename__ = "conformite_audit"
+    __table_args__ = (Index("ix_conformite_audit_projet", "projet_hash"),)
+
+    seq: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    ts: Mapped[str] = mapped_column(String(32), nullable=False)
+    type: Mapped[str] = mapped_column(String(40), nullable=False)
+    acteur_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    projet_hash: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    payload: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    hash_precedent: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+
+
+class ConformiteHabilitation(Base):
+    """Habilitation 'valideur' (6.2) : un pathologiste habilite peut liberer un compte rendu."""
+
+    __tablename__ = "conformite_habilitations"
+
+    user_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    habilite: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    modifie_par: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    modifie_le: Mapped[str] = mapped_column(String(32), nullable=False, default="")
+
+
+class ConformiteValidation(Base):
+    """Validation d'un projet par un pathologiste habilite : qui, quand, versions, empreinte. Jamais le texte."""
+
+    __tablename__ = "conformite_validations"
+    __table_args__ = (Index("ix_conformite_validations_projet", "projet_hash", "revision"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid_str)
+    projet_hash: Mapped[str] = mapped_column(String(32), nullable=False)
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    ts: Mapped[str] = mapped_column(String(32), nullable=False)
+    empreinte_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    precedente_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    nb_alertes_bloquantes_ouvertes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    nb_trous_ouverts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    derogation: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    versions: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    audit_seq: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+
+class ConformiteKbVersion(Base):
+    """Registre des versions de la base de connaissances (8.3 maitrise documentaire)."""
+
+    __tablename__ = "conformite_kb_versions"
+
+    version: Mapped[str] = mapped_column(String(40), primary_key=True)
+    empreinte_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    statut: Mapped[str] = mapped_column(String(20), nullable=False, default="brouillon")
+    enregistree_le: Mapped[str] = mapped_column(String(32), nullable=False)
+    approuvee_par: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    approuvee_le: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    en_service_le: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    retiree_le: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
+
+class ConformiteNonConformite(Base):
+    """Non-conformite signalee (7.5, 8.7) : categories enum, aucun texte medical ni libre."""
+
+    __tablename__ = "conformite_non_conformites"
+    __table_args__ = (Index("ix_conformite_nc_ts", "ts"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid_str)
+    ts: Mapped[str] = mapped_column(String(32), nullable=False)
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    projet_hash: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    categorie: Mapped[str] = mapped_column(String(40), nullable=False)
+    gravite: Mapped[str] = mapped_column(String(20), nullable=False)
+    etape: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    organe: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    statut: Mapped[str] = mapped_column(String(20), nullable=False, default="ouverte")
+    kb_version: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    version_pipeline: Mapped[str | None] = mapped_column(String(60), nullable=True)

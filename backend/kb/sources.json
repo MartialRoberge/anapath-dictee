@@ -1,0 +1,446 @@
+[
+ {
+  "id": "src:adicap_2024_10",
+  "type": "officiel",
+  "titre": "Thesaurus de la codification ADICAP, index raisonne des lesions",
+  "editeur": "ANS (Agence du Numerique en Sante)",
+  "version": "2024-10",
+  "date_publication": "2024-10-02",
+  "url": "https://esante.gouv.fr/produits-services/cgts/adicap",
+  "licence": "Licence Ouverte 2.0 (Etalab)",
+  "fichiers": [
+   {
+    "chemin": "backend/data/adicap_ref.json",
+    "sha256": "891c7dda39502d3c90feb96056c9cfa2b8b1fa741e160924141fc9ecd564d3d5"
+   }
+  ],
+  "fiabilite": "A",
+  "perimetre": "D1-D8 (9 683 concepts)",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "libre_reutilisation",
+  "titre_court": "ANS · Thésaurus ADICAP (2024-10)",
+  "description": "Thésaurus officiel de la codification ADICAP publié par l'Agence du numérique en santé : référence nationale des codes lésionnels et topographiques."
+ },
+ {
+  "id": "src:adicap_bible_json",
+  "type": "praticien",
+  "titre": "Catalogue ADICAP de la bible du praticien (57 codes organe, 306 lesions)",
+  "editeur": "Praticien referent (derive de Bibles Greg.xlsx)",
+  "version": "2026-07",
+  "date_publication": null,
+  "url": null,
+  "licence": "Interne (donnees du praticien)",
+  "fichiers": [
+   {
+    "chemin": "backend/data/adicap_bible.json",
+    "sha256": "17941c279711739f3f8283b51ea5220dbd3dbccaf21bec2c3c90ff3337dfd528"
+   }
+  ],
+  "fiabilite": "B",
+  "perimetre": "codes lesion partiels (4 car.) et organe D3",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "titre_court": "Catalogue ADICAP de la bible de la pathologiste",
+  "description": "Codes ADICAP d'organes et de lésions relevés dans la bible de la pathologiste référente : usage du laboratoire, partiel, non publié."
+ },
+ {
+  "id": "src:bible_greg_xlsx",
+  "type": "praticien",
+  "titre": "Bibles Greg.xlsx (formulations de reference d'un praticien)",
+  "editeur": "Praticien referent",
+  "version": "non versionne",
+  "date_publication": null,
+  "url": null,
+  "licence": "Interne (donnees du praticien)",
+  "fichiers": [
+   {
+    "chemin": "Ressources/1. Codes Bible/Bibles Greg.xlsx",
+    "sha256": "fc43fe42e58d0575aa314749e2f7cd7022fb210c99320690c1606914e688f153"
+   }
+  ],
+  "fiabilite": "B",
+  "perimetre": "20 feuilles ; 5 feuilles (SEIN, DERMATO, OS-ARTI, T mous, NEURO) lues par detection d'en-tetes",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "note": "Tout texte est purge puis scanne (PII) a l'ingestion.",
+  "titre_court": "Bible de la pathologiste · Formulations de référence",
+  "description": "Classeur de formulations de comptes rendus tenu par la pathologiste référente (sein, dermato, os-articulations, tissus mous, neuro) : document interne du laboratoire, non versionné."
+ },
+ {
+  "id": "src:textes_canoniques_json",
+  "type": "derive_auto",
+  "titre": "Textes canoniques (653 formulations) purges de toute donnee patient",
+  "editeur": "Derive de Bibles Greg.xlsx",
+  "version": "2026-07",
+  "date_publication": null,
+  "url": null,
+  "licence": "Interne",
+  "fichiers": [
+   {
+    "chemin": "backend/data/textes_canoniques.json",
+    "sha256": "1e080a7cd025a3d908b736079e0bae1779bdf8ac48c2456381f1afb77f9b4f9e"
+   }
+  ],
+  "fiabilite": "B",
+  "perimetre": "formulations macro/micro/conclusion",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "note": "3 entrees comportaient des en-tetes patient (audit PO-1) : purgees le 2026-11-15.",
+  "titre_court": "Bible de la pathologiste · Textes canoniques",
+  "description": "Formulations de la bible de la pathologiste, purgées de toute donnée patient puis normalisées par MARC : dérivé automatique d'un document interne."
+ },
+ {
+  "id": "src:templates_organes_py",
+  "type": "derive_auto",
+  "titre": "Templates organes (23 organes, 237 champs, donnees minimales INCa)",
+  "editeur": "Projet MARC (équipe de développement)",
+  "version": "2026-07",
+  "date_publication": null,
+  "url": null,
+  "licence": "Interne",
+  "fichiers": [
+   {
+    "chemin": "backend/templates_organes.py",
+    "sha256": "4922fb47200ff4f2a8718be96da8da7de67f3597665df0e2b1f59ba5c80fe467"
+   }
+  ],
+  "fiabilite": "C",
+  "perimetre": "champs obligatoires par organe",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "note": "Contenu non relu par un pathologiste tiers (audit PO-1 : B/C).",
+  "titre_court": "Référentiel interne MARC (à valider)",
+  "description": "Gabarits d'organes écrits par l'équipe MARC en s'inspirant des données minimales INCa ; ils n'ont pas été relus par un pathologiste tiers, d'où une fiabilité C."
+ },
+ {
+  "id": "src:specimen_type_py",
+  "type": "derive_auto",
+  "titre": "Logique d'applicabilite des champs et declencheurs de prelevement",
+  "editeur": "Projet MARC (équipe de développement)",
+  "version": "2026-07",
+  "date_publication": null,
+  "url": null,
+  "licence": "Interne",
+  "fichiers": [
+   {
+    "chemin": "backend/specimen_type.py",
+    "sha256": "9b753c47758cf632e87a46c046b2fb5b91282a0ed9ebb45b9056c176e2f8bbd6"
+   }
+  ],
+  "fiabilite": "B",
+  "perimetre": "matrice champ x prelevement x contexte",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "titre_court": "Règles internes MARC · Applicabilité par prélèvement",
+  "description": "Logique écrite par l'équipe MARC qui décide quels champs s'appliquent à une biopsie, une pièce opératoire ou une cytologie, selon le contexte lésionnel."
+ },
+ {
+  "id": "src:vocabulaire_acp_py",
+  "type": "derive_auto",
+  "titre": "Termes d'amorce STT (context_bias Voxtral)",
+  "editeur": "Projet MARC (équipe de développement)",
+  "version": "2026-07",
+  "date_publication": null,
+  "url": null,
+  "licence": "Interne",
+  "fichiers": [
+   {
+    "chemin": "backend/vocabulaire_acp.py",
+    "sha256": "230dc2e3409c5a6eb92bc97c366697e4b7e6ce6298dc595fb3af20d5c967599a"
+   }
+  ],
+  "fiabilite": "B",
+  "perimetre": "101 termes",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "titre_court": "Vocabulaire ACP interne MARC (amorce de transcription)",
+  "description": "Liste de termes d'anatomopathologie utilisée pour guider la transcription vocale : vocabulaire interne de MARC."
+ },
+ {
+  "id": "src:snomed_py_historique",
+  "type": "derive_auto",
+  "titre": "Correspondances SNOMED CT saisies a la main (25 structures, 19 morphologies)",
+  "editeur": "Projet MARC (équipe de développement)",
+  "version": "2026-07",
+  "date_publication": null,
+  "url": null,
+  "licence": "SNOMED CT : licence affilie (SNOMED International / ANS) a clarifier",
+  "fichiers": [
+   {
+    "chemin": "backend/snomed.py",
+    "sha256": "79e47c17612d38851190733a47e8677fac168988b96c78fcfe838a7062b807d8"
+   }
+  ],
+  "fiabilite": "C",
+  "perimetre": "suggestions non verifiees contre une release",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "a_valider_juridiquement",
+  "titre_court": "Correspondances SNOMED CT saisies à la main (à valider)",
+  "description": "Table historique de correspondances SNOMED CT saisies à la main par l'équipe MARC, non vérifiée contre une édition officielle de SNOMED CT."
+ },
+ {
+  "id": "src:inca_donnees_minimales_2011",
+  "type": "synthese_web",
+  "titre": "Donnees minimales INCa/SFP des CR d'anatomopathologie (paraphrase structuree, 10 organes)",
+  "editeur": "INCa avec SFP",
+  "version": "2011-12",
+  "date_publication": "2011-12",
+  "url": "https://www.cancer.fr/Media/files/comptes-rendus-d-anatomopathologie-donnees-minimales-a-renseigner-pour-une-tumeur-primitive",
+  "licence": "Copyright INCa : usage personnel non commercial et courtes citations ; autre usage sur demande a l'INCa (service publications)",
+  "fichiers": [
+   {
+    "chemin": "docs/v3/sources_web/inca_donnees_minimales.json",
+    "sha256": "1449241234dcd65000e9c57bd7adbc45d544741e6d1eb6d7791555e5fdbb07e5"
+   }
+  ],
+  "fiabilite": "C",
+  "perimetre": "champs, enumerations, unites (paraphrase)",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "a_valider_juridiquement",
+  "note": "Antérieur à TNM 8/9 et OMS 5e ed. Accord INCa requis avant production.",
+  "titre_court": "INCa/SFP · Données minimales des CR d'ACP (2011)",
+  "description": "Fiches de l'Institut national du cancer et de la Société française de pathologie listant les données minimales d'un compte rendu par organe ; MARC en utilise une paraphrase structurée, antérieure à TNM 8 et OMS 5."
+ },
+ {
+  "id": "src:nomenclatures_scores_veille",
+  "type": "synthese_web",
+  "titre": "Echelles et scores (Gleason/ISUP, SBR, Breslow, Bethesda, Milan, Paris...)",
+  "editeur": "Veille PO-3 (connaissances de reference)",
+  "version": "2026-11-15",
+  "date_publication": "2026-11-15",
+  "url": null,
+  "licence": "Nomenclatures citables ; aucun taux de risque embarque",
+  "fichiers": [
+   {
+    "chemin": "docs/v3/sources_web/nomenclatures_scores.json",
+    "sha256": "77c7a8c0576f925c46b9d9faecb181fd499f9ce3e067d5eba1621c48fd0034cd"
+   }
+  ],
+  "fiabilite": "C",
+  "perimetre": "regles de calcul et categories",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "a_valider_juridiquement",
+  "titre_court": "Échelles et scores (Gleason, SBR, Breslow, Bethesda)",
+  "description": "Nomenclatures et règles de calcul de scores usuels, issues d'une veille documentaire de MARC ; à faire confirmer par la pathologiste référente."
+ },
+ {
+  "id": "src:regles_unites_veille",
+  "type": "synthese_web",
+  "titre": "Unites, conversions et plages plausibles (heuristiques)",
+  "editeur": "Veille PO-3",
+  "version": "2026-11-15",
+  "date_publication": "2026-11-15",
+  "url": null,
+  "licence": "Interne",
+  "fichiers": [
+   {
+    "chemin": "docs/v3/sources_web/unites_conversions.json",
+    "sha256": "b12b97815af6ba0c813834c6adc6a41467c1d489d7176abccb280a61444397fe"
+   }
+  ],
+  "fiabilite": "C",
+  "perimetre": "verificateur mm/cm",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "note": "Plages heuristiques non sourcees : a faire valider.",
+  "titre_court": "Unités et plages plausibles · heuristiques MARC",
+  "description": "Conversions d'unités et plages de mesures plausibles issues d'une veille de MARC : des heuristiques, pas une norme publiée."
+ },
+ {
+  "id": "src:regles_architecture_cible",
+  "type": "officiel_interne",
+  "titre": "Catalogue de regles de coherence C1-C17 (architecture cible)",
+  "editeur": "Projet MARC (document d'architecture cible)",
+  "version": "2026",
+  "date_publication": null,
+  "url": null,
+  "licence": "Interne",
+  "fichiers": [
+   {
+    "chemin": "docs/specs/spec/Outil_ideal_architecture_cible.md",
+    "sha256": "6ee0a95f83baa871d0f65bdb768c5b60e09f0ae5be105ed6f19117336f57a221"
+   }
+  ],
+  "fiabilite": "B",
+  "perimetre": "couche 2 deterministe",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "titre_court": "Règles de cohérence C1-C17 · MARC",
+  "description": "Catalogue de règles de cohérence entre éléments d'un compte rendu, défini par l'équipe MARC dans son document d'architecture cible."
+ },
+ {
+  "id": "src:conventions_cr_acp",
+  "type": "synthese_web",
+  "titre": "Conventions de redaction des CR d'ACP (CI-SIS, INCa, CRFS)",
+  "editeur": "Projet MARC (document de conventions)",
+  "version": "2026",
+  "date_publication": null,
+  "url": null,
+  "licence": "Interne",
+  "fichiers": [
+   {
+    "chemin": "docs/CONVENTIONS_CR_ACP.md",
+    "sha256": "59fbdfa2ada9ad9041a208b517a7f74424deadffdcdfa02714bec5c83c179df1"
+   }
+  ],
+  "fiabilite": "B",
+  "perimetre": "structure du CR, seuils qualite",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "note": "Seuils (12 ganglions colon, 10 sein) cites sans passage de source primaire : fiabilite C pour ces regles.",
+  "titre_court": "Conventions de rédaction des CR d'ACP",
+  "description": "Synthèse par MARC des conventions de structure et de rédaction des comptes rendus (CI-SIS, INCa, CRFS) ; certains seuils sont cités sans passage de source primaire."
+ },
+ {
+  "id": "src:codage_d1_d2",
+  "type": "praticien",
+  "titre": "Table de codage ADICAP D1/D2 v2.0 (derivee du lexique de la pathologiste)",
+  "editeur": "Praticienne referente",
+  "version": "2.0",
+  "date_publication": null,
+  "url": null,
+  "licence": "Interne",
+  "fichiers": [
+   {
+    "chemin": "backend/data/codage_d1_d2.json",
+    "sha256": "ca459a6910dfcf5c1eb006d2a31b679b598354a83dd94182028f8c2e72adcb70"
+   }
+  ],
+  "fiabilite": "B",
+  "perimetre": "modes de prelevement et techniques",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "note": "Entrees `a_valider` explicites.",
+  "titre_court": "Codage ADICAP D1/D2 · table de la pathologiste",
+  "description": "Table des modes de prélèvement et techniques (codes ADICAP D1 et D2) dérivée du lexique de la pathologiste référente."
+ },
+ {
+  "id": "src:seed_marc_v3",
+  "type": "derive_auto",
+  "titre": "Semences curees de la base v3 (synonymes d'organes, variantes STT, stations, plages)",
+  "editeur": "Agent sources MARC v3",
+  "version": "3.0.0",
+  "date_publication": "2026-11-15",
+  "url": null,
+  "licence": "Interne",
+  "fichiers": [
+   {
+    "chemin": "backend/kb/seeds",
+    "sha256": "4ad04e0a15c322c97b61afc8f75b08742966396a62026dc88e642d1f124345a8"
+   }
+  ],
+  "fiabilite": "C",
+  "perimetre": "semences backend/kb/seeds/",
+  "contient_pii": false,
+  "embarque": true,
+  "statut_juridique": "interne",
+  "note": "Connaissance du domaine non re-verifiee : tout est `a_valider` par la pathologiste.",
+  "titre_court": "Semences MARC v3 (à valider)",
+  "description": "Synonymes, variantes de transcription, stations ganglionnaires et plages saisis par l'équipe MARC à partir de la connaissance du domaine, non encore validés par la pathologiste."
+ },
+ {
+  "id": "src:docs_bibles_pathologiste",
+  "type": "praticien",
+  "titre": "Bibles de la pathologiste : biopsies",
+  "editeur": "Praticienne referente / service HML",
+  "version": "non versionne",
+  "date_publication": null,
+  "url": null,
+  "licence": "Interne (documents de l'utilisateur)",
+  "fichiers": [
+   {
+    "chemin": "Ressources/1. Codes Bible/1. Thorax/1. Poumon/Biopsies.docx",
+    "sha256": "0706a89085f94724f3390c303f20a7c7354f303340fcdd610a8f84485d2c1df9"
+   },
+   {
+    "chemin": "Ressources/1. Codes Bible/6. Urologie/1. Prostate/BIOPSIES PROSTATIQUES.docx",
+    "sha256": "2d75619ea420e501283dd29ce0909145e156d36344ddafcfce929efca5c6c484"
+   },
+   {
+    "chemin": "Ressources/1. Codes Bible/Bibles HML/BIOPSIES COLIQUES.docx",
+    "sha256": "3c33c72adcbb9abf070ba243adcbc7915b63f05895c34a595836baea36a12920"
+   },
+   {
+    "chemin": "Ressources/1. Codes Bible/Bibles HML/Biopsies gastriques.docx",
+    "sha256": "35b637c7a340e41739456cba0ad910498f324536bf35a3b84c55ec7708458d91"
+   }
+  ],
+  "fiabilite": "B",
+  "perimetre": "formulations de biopsies ; peu de dimensions chiffrees (carottes 18G de 6 et 17 mm, polype de 8 mm)",
+  "contient_pii": false,
+  "embarque": false,
+  "statut_juridique": "interne",
+  "note": "Fichiers non embarques (empreintes seules). Les plages derivees restent des heuristiques a valider par la pathologiste referente.",
+  "titre_court": "Bible de la pathologiste · Biopsies",
+  "description": "Documents Word de la pathologiste référente décrivant ses formulations de biopsies (poumon, prostate, côlon, estomac) : documents internes du laboratoire."
+ },
+ {
+  "id": "src:uicc_tnm8_rcpath",
+  "type": "officiel",
+  "titre": "UICC TNM 8e ed., sein : seuils pT et pN (RCPath, appendice D)",
+  "editeur": "UICC / Royal College of Pathologists",
+  "version": "TNM 8",
+  "date_publication": "2018",
+  "url": "https://www.rcpath.org/asset/FEF52EB5-DEC0-4B48-9438289B086FF3F9/",
+  "licence": "Seuils numeriques cites ; texte non embarque",
+  "fichiers": [],
+  "fiabilite": "A",
+  "perimetre": "pT1a >1-5 mm, pT1b >5-10, pT1c >10-20, pT2 >20-50, pT3 >50 ; pN1 1-3, pN2 4-9, pN3 >=10 ganglions axillaires",
+  "contient_pii": false,
+  "embarque": false,
+  "statut_juridique": "citation_courte",
+  "note": "Seuils sein verifies sur la page ; seuils poumon/colon/estomac issus de la connaissance du domaine (TNM 8, UICC) : a valider.",
+  "titre_court": "UICC TNM 8e éd. · seuils pT et pN du sein",
+  "description": "Classification TNM 8e édition de l'UICC, seuils de taille tumorale et de ganglions, relevés dans l'appendice D du Royal College of Pathologists."
+ },
+ {
+  "id": "src:iccr_datasets",
+  "type": "officiel",
+  "titre": "ICCR cancer datasets (core / non-core)",
+  "editeur": "ICCR",
+  "version": "continu (aligne UICC TNM 9)",
+  "date_publication": null,
+  "url": "https://www.iccr-cancer.org/datasets/",
+  "licence": "Copyright ICCR : CR chirurgicaux, enseignement, recherche non lucrative ; commerce exclu",
+  "fichiers": [],
+  "fiabilite": "A",
+  "perimetre": "NON embarque",
+  "contient_pii": false,
+  "embarque": false,
+  "statut_juridique": "bloquant_a_lever",
+  "titre_court": "ICCR · Datasets de cancers",
+  "description": "Jeux de données internationaux de comptes rendus de cancers (ICCR) : source de référence non embarquée, licence restrictive."
+ },
+ {
+  "id": "src:snomed_ct_release",
+  "type": "officiel",
+  "titre": "SNOMED CT (edition nationale francaise via SMT/ANS)",
+  "editeur": "SNOMED International / ANS",
+  "version": "non charge",
+  "date_publication": null,
+  "url": "https://smt.esante.gouv.fr/",
+  "licence": "Licence affilie gratuite (ANS) ; pas de redistribution libre",
+  "fichiers": [],
+  "fiabilite": "A",
+  "perimetre": "NON embarque : aucun code verifie contre une release",
+  "contient_pii": false,
+  "embarque": false,
+  "statut_juridique": "a_valider_juridiquement",
+  "titre_court": "SNOMED CT · édition nationale française",
+  "description": "Terminologie SNOMED CT distribuée en France par l'ANS : source officielle, non chargée dans MARC à ce jour."
+ }
+]

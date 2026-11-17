@@ -1,0 +1,300 @@
+[
+ {
+  "id": "echelle:bethesda_thyroide",
+  "organe": "thyroïde",
+  "type": "cytologie",
+  "edition": "3e éd., 2023",
+  "categories": [
+   "I non diagnostique/insuffisant",
+   "II bénin",
+   "III atypies de signification indéterminée (AUS)",
+   "IV néoplasme folliculaire/suspect de néoplasme folliculaire",
+   "V suspect de malignité",
+   "VI malin"
+  ],
+  "verif": "catégorie obligatoire en cytologie thyroïdienne ; libellés alignés OMS 2022",
+  "reference": "https://pubmed.ncbi.nlm.nih.gov/37427847/",
+  "prov": {
+   "source_id": "src:nomenclatures_scores_veille",
+   "localisation": "nomenclatures_scores.json#bethesda_thyroide",
+   "version_source": "2026-11-15",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "import_veille",
+   "remplace": null
+  }
+ },
+ {
+  "id": "echelle:milan_salivaire",
+  "organe": "glandes salivaires",
+  "type": "cytologie",
+  "edition": "2e éd., 2023",
+  "categories": [
+   "I non diagnostique",
+   "II non néoplasique",
+   "III atypies de signification indéterminée",
+   "IVA néoplasme bénin",
+   "IVB néoplasme de potentiel de malignité incertain (SUMP)",
+   "V suspect de malignité",
+   "VI malin"
+  ],
+  "note": "Structure 6 catégories + subdivision IV en A/B (connaissance interne).",
+  "reference": "https://pubmed.ncbi.nlm.nih.gov/37971186/",
+  "prov": {
+   "source_id": "src:nomenclatures_scores_veille",
+   "localisation": "nomenclatures_scores.json#milan_salivaire",
+   "version_source": "2026-11-15",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "import_veille",
+   "remplace": null
+  }
+ },
+ {
+  "id": "echelle:paris_urine",
+  "organe": "urine",
+  "type": "cytologie",
+  "edition": "2e éd., 2022",
+  "categories": [
+   "non diagnostique/insuffisant",
+   "négatif pour carcinome urothélial de haut grade (NHGUC)",
+   "atypies cellulaires urothéliales (AUC)",
+   "suspect de carcinome urothélial de haut grade (SHGUC)",
+   "carcinome urothélial de haut grade (HGUC)",
+   "néoplasie urothéliale de bas grade (LGUN)",
+   "autres"
+  ],
+  "note": "A vérifier.",
+  "reference": "(non vérifiée en ligne)",
+  "prov": {
+   "source_id": "src:nomenclatures_scores_veille",
+   "localisation": "nomenclatures_scores.json#paris_urine",
+   "version_source": "2026-11-15",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "import_veille",
+   "remplace": null
+  }
+ },
+ {
+  "id": "echelle:gleason_isup",
+  "organe": "prostate",
+  "type": "grade",
+  "regles": {
+   "score_total": "primaire + secondaire (2-10 ; grades 1-2 non rapportés sur biopsie en pratique actuelle)",
+   "grade_group": {
+    "1": "Gleason <=6 (3+3)",
+    "2": "3+4=7",
+    "3": "4+3=7",
+    "4": "8 (4+4, 3+5, 5+3)",
+    "5": "9-10"
+   }
+  },
+  "verif": "cohérence primaire+secondaire=total ; 3+4 != 4+3 ; grade group dérivé du score",
+  "reference": "ISUP 2014/2019 (consensus) - connaissance interne",
+  "prov": {
+   "source_id": "src:nomenclatures_scores_veille",
+   "localisation": "nomenclatures_scores.json#gleason_isup",
+   "version_source": "2026-11-15",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "import_veille",
+   "remplace": null
+  }
+ },
+ {
+  "id": "echelle:nottingham_SBR",
+  "organe": "sein",
+  "type": "grade",
+  "regles": {
+   "composantes": "tubules (1-3) + noyaux (1-3) + mitoses (1-3) ; total 3-9",
+   "grade": {
+    "I": "3-5",
+    "II": "6-7",
+    "III": "8-9"
+   }
+  },
+  "verif": "total = somme des 3 ; grade déduit du total ; seuil des mitoses dépend de la surface de champ du microscope",
+  "reference": "Elston & Ellis 1991 ; INCa fiche sein (grade SBR) - connaissance interne",
+  "prov": {
+   "source_id": "src:nomenclatures_scores_veille",
+   "localisation": "nomenclatures_scores.json#nottingham_SBR",
+   "version_source": "2026-11-15",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "import_veille",
+   "remplace": null
+  }
+ },
+ {
+  "id": "echelle:breslow_clark",
+  "organe": "peau (mélanome)",
+  "type": "profondeur",
+  "regles": {
+   "breslow": "épaisseur en mm (1 décimale ou 2 selon AJCC : arrondi à 0,1 mm)",
+   "pT_seuils_mm": "<=1,0 ; >1,0-2,0 ; >2,0-4,0 ; >4,0 (T1-T4 ; a/b selon ulcération)",
+   "clark": "niveaux I-V (optionnel, non minimal INCa)"
+  },
+  "verif": "Breslow en mm, 0 si in situ ; cohérence avec pT ; ulcération et index mitotique (mitoses/mm²)",
+  "reference": "INCa fiche 19 ; UICC/AJCC - connaissance interne",
+  "prov": {
+   "source_id": "src:nomenclatures_scores_veille",
+   "localisation": "nomenclatures_scores.json#breslow_clark",
+   "version_source": "2026-11-15",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "import_veille",
+   "remplace": null
+  }
+ },
+ {
+  "id": "echelle:ki67",
+  "organe": "sein, NET, lymphome",
+  "type": "index de prolifération",
+  "regles": {
+   "unite": "% de noyaux marqués",
+   "plage": "0-100",
+   "note": "méthode de comptage (hot spot/moyenne) et nombre de cellules à noter"
+  },
+  "verif": "valeur en [0,100] ; refuser mm/cm",
+  "reference": "Recommandations IMWG (connaissance interne)",
+  "prov": {
+   "source_id": "src:nomenclatures_scores_veille",
+   "localisation": "nomenclatures_scores.json#ki67",
+   "version_source": "2026-11-15",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "import_veille",
+   "remplace": null
+  }
+ },
+ {
+  "id": "echelle:sydney_vienne",
+  "organe": "estomac / digestif",
+  "type": "classification",
+  "regles": {
+   "vienne": "1 négatif ; 2 indéfini ; 3 néoplasie non invasive bas grade ; 4 néoplasie non invasive haut grade ; 5 invasion (sous-muqueuse et plus)"
+  },
+  "reference": "(non vérifiée en ligne)",
+  "prov": {
+   "source_id": "src:nomenclatures_scores_veille",
+   "localisation": "nomenclatures_scores.json#sydney_vienne",
+   "version_source": "2026-11-15",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "import_veille",
+   "remplace": null
+  }
+ },
+ {
+  "id": "echelle:oms_edition",
+  "type": "méta",
+  "regles": {
+   "citation": "Indiquer l'édition OMS utilisée (5e en vigueur pour la plupart des organes, 6e en cours de publication)"
+  },
+  "reference": "https://www.iarc.who.int/ (annonces de publication)",
+  "prov": {
+   "source_id": "src:nomenclatures_scores_veille",
+   "localisation": "nomenclatures_scores.json#oms_edition",
+   "version_source": "2026-11-15",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "import_veille",
+   "remplace": null
+  }
+ },
+ {
+  "id": "echelle:gleason_isup_table",
+  "type": "table_correspondance",
+  "organe": "prostate",
+  "entrees": [
+   {
+    "gleason": "3+3",
+    "somme": 6,
+    "isup": 1
+   },
+   {
+    "gleason": "3+4",
+    "somme": 7,
+    "isup": 2
+   },
+   {
+    "gleason": "4+3",
+    "somme": 7,
+    "isup": 3
+   },
+   {
+    "gleason": "4+4",
+    "somme": 8,
+    "isup": 4
+   },
+   {
+    "gleason": "3+5",
+    "somme": 8,
+    "isup": 4
+   },
+   {
+    "gleason": "5+3",
+    "somme": 8,
+    "isup": 4
+   },
+   {
+    "somme": 9,
+    "isup": 5
+   },
+   {
+    "somme": 10,
+    "isup": 5
+   }
+  ],
+  "prov": {
+   "source_id": "src:nomenclatures_scores_veille",
+   "localisation": "nomenclatures_scores.json#gleason_isup",
+   "version_source": "2026-11-15",
+   "date_extraction": "2026-11-15",
+   "fiabilite": "C",
+   "confiance": 0.6,
+   "statut_validation": "a_valider",
+   "valide_par": null,
+   "date_validation": null,
+   "methode": "derive_auto",
+   "remplace": null
+  }
+ }
+]
