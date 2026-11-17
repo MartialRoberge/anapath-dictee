@@ -52,12 +52,12 @@ export default function NouveauProjet(p: Props) {
 
   // Tient dans 1280 x 800 sans défiler : titre, une carte de saisie (texte + dictée), trois exemples compacts.
   return (
-    <div className="scroll flex min-h-0 flex-1 flex-col overflow-y-auto px-8 py-6">
+    <div className="scroll nv-page flex min-h-0 flex-1 flex-col overflow-y-auto px-8 py-6">
       <div className="enter mx-auto my-auto w-full max-w-[720px]">
         <p className="label">Nouveau projet</p>
-        <h1 className="titre-serif mt-2 text-[clamp(28px,4.6vh,40px)] leading-[1.15]">{salutation()}{prenom ? ` ${prenom}` : ""}.<br />Que souhaitez-vous dicter ?</h1>
+        <h1 className="titre-serif nv-titre mt-2 text-[clamp(28px,4.6vh,40px)] leading-[1.15]">{salutation()}{prenom ? ` ${prenom}` : ""}.<br />Que souhaitez-vous dicter ?</h1>
 
-        <div className="carte carte-saisie mt-6 p-2">
+        <div className="carte carte-saisie nv-carte mt-6 p-2">
           <label htmlFor="dictee-texte" className="sr-only-v3">Texte de la dictée</label>
           <textarea
             id="dictee-texte" ref={zone} value={texte} onChange={(e) => setTexte(e.target.value)} rows={5}
@@ -68,18 +68,18 @@ export default function NouveauProjet(p: Props) {
             placeholder="Collez ou tapez la dictée."
             className="block w-full resize-none rounded-lg bg-transparent px-3 py-2.5 text-[16px] leading-[1.5] placeholder:text-[var(--faint)] focus:outline-none"
           />
-          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--line-soft)] px-1 pb-0.5 pt-2.5">
+          <div className="nv-actions flex flex-wrap items-center gap-3 border-t border-[var(--line-soft)] px-1 pb-0.5 pt-2.5">
             <BarreDictee etat={p.etatMicro} secondes={p.secondes} occupe={p.occupe} onBasculer={p.onBasculerMicro} onAnnuler={p.onAnnulerMicro} />
             <button type="button" className="btn btn-primary" disabled={!texte.trim() || p.occupe} onClick={envoyer}>
               Préparer le projet <span className="kbd">{estMac() ? "⌘↵" : "Ctrl+↵"}</span>
             </button>
           </div>
         </div>
-        <p className="num mt-2 px-1 text-[12px] text-[var(--faint)]">{mots > 0 ? `${mots} mots · ` : ""}Rien n'est conservé sur nos serveurs. Échap quitte le champ.</p>
+        <p className="num mt-2 px-1 text-[12px] text-[var(--faint)]">{mots > 0 ? `${mots} mots · ` : ""}Rien n'est conservé sur nos serveurs.<span className="pour-clavier"> Échap quitte le champ.</span></p>
 
         <div className="mt-6">
-          <p className="label">Exemples de dictée</p>
-          <ul className="mt-2 grid gap-3 sm:grid-cols-3">
+          <p className="label">Exemples de dictée <span className="nv-glisser normal-case tracking-normal">· faites glisser</span></p>
+          <ul className="nv-exemples mt-2 grid gap-3 sm:grid-cols-3" aria-label="Exemples de dictée">
             {dicteesExemples.map((ex) => (
               <li key={ex.titre}>
                 <button type="button" onClick={() => { setTexte(ex.texte); zone.current?.focus(); }}

@@ -17,6 +17,8 @@ interface Props {
   onAdmin: () => void;
   onAide: () => void;
   onDeconnexion: () => void;
+  /** Fermeture du tiroir (affichée sous 900 px seulement). */
+  onFermer?: () => void;
 }
 
 const jour = (t: number) => {
@@ -40,9 +42,12 @@ export default function Sidebar(p: Props) {
 
   return (
     <aside className="side flex h-full min-h-0 flex-col" aria-label="Navigation">
-      <div className="px-5 pb-4 pt-6">
-        <p className="text-[17px] font-semibold tracking-[0.12em]">MARC</p>
-        <p className="side-mute mt-0.5 text-[12px]">Une solution Gilbert</p>
+      <div className="flex items-start gap-2 pb-4 pl-5 pr-3 pt-6 max-[899px]:pt-4">
+        <div className="flex-1">
+          <p className="text-[17px] font-semibold tracking-[0.12em]">MARC</p>
+          <p className="side-mute mt-0.5 text-[12px]">Une solution Gilbert</p>
+        </div>
+        {p.onFermer && <button type="button" onClick={p.onFermer} className="side-item !w-auto px-3 min-[900px]:hidden">Fermer</button>}
       </div>
       <div className="px-3">
         <button type="button" onClick={p.onNouveau} aria-current={p.vue === "nouveau"} className="side-item font-medium shadow-[inset_0_0_0_1px_var(--side-line)]">
@@ -50,7 +55,7 @@ export default function Sidebar(p: Props) {
         </button>
       </div>
 
-      <nav className="scroll mt-6 min-h-0 flex-1 overflow-y-auto px-3" aria-label="Projets récents">
+      <nav className="scroll mt-6 max-[899px]:mt-3 min-h-0 flex-1 overflow-y-auto px-3" aria-label="Projets récents">
         <p className="side-mute px-2.5 pb-1.5 text-[12px] font-medium uppercase tracking-[0.1em]">Récents</p>
         {p.recents.length === 0 && <p className="side-mute px-2.5 text-[13px] leading-relaxed">Aucun projet. L'historique reste sur cet appareil.</p>}
         {groupes.map(([j, liste]) => (
@@ -59,14 +64,14 @@ export default function Sidebar(p: Props) {
             <ul>
               {liste.map((r) => (
                 <li key={r.id} className="group relative">
-                  <button type="button" onClick={() => p.onOuvrir(r.id)} aria-current={p.vue === "projet" && p.courantId === r.id} className="side-item flex-col !items-start !gap-0.5">
+                  <button type="button" onClick={() => p.onOuvrir(r.id)} aria-current={p.vue === "projet" && p.courantId === r.id} className="side-item flex-col !items-start !gap-0.5 [@media(hover:none)]:!pr-[76px]">
                     <span className="w-full truncate pr-1 text-[13px]">{r.organes || "Projet"} <span className="side-mute">· {new Date(r.maj).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span></span>
                     <span className="side-mute w-full truncate text-[12px]">
                       {r.trous > 0 ? `${r.trous} à compléter` : "Complet"}{r.alertes > 0 ? ` · ${r.alertes} à vérifier` : ""}
                     </span>
                   </button>
                   <button type="button" onClick={() => p.onSupprimer(r.id)} aria-label={`Supprimer le projet ${r.organes || ""} de l'historique local`}
-                    className="side-mute absolute right-2 top-2.5 hidden h-8 items-center rounded-md bg-[var(--side-hover)] px-2 text-[12px] [@media(hover:none)]:flex hover:bg-[var(--side-line)] hover:text-[var(--side-text)] focus-visible:flex group-hover:flex">Retirer</button>
+                    className="side-mute absolute right-1 top-1/2 -translate-y-1/2 hidden h-11 items-center rounded-md !px-3 text-[13px] [@media(hover:none)]:flex hover:bg-[var(--side-line)] hover:text-[var(--side-text)] focus-visible:flex group-hover:flex">Retirer</button>
                 </li>
               ))}
             </ul>
@@ -75,7 +80,7 @@ export default function Sidebar(p: Props) {
       </nav>
 
       <div className="side-pied border-t border-[var(--side-line)] px-3 py-2">
-        <button type="button" onClick={p.onAide} className="side-item side-mute"><span className="flex-1">Raccourcis clavier</span><span className="kbd !bg-transparent !text-[var(--side-mute)]">?</span></button>
+        <button type="button" onClick={p.onAide} className="side-item side-mute pour-clavier"><span className="flex-1">Raccourcis clavier</span><span className="kbd !bg-transparent !text-[var(--side-mute)]">?</span></button>
         {p.admin && (
           <button type="button" onClick={p.onAdmin} aria-current={p.vue === "admin"} className="side-item">Administration</button>
         )}
@@ -83,8 +88,8 @@ export default function Sidebar(p: Props) {
           <div className="px-2.5 py-1.5 text-[12px]" role="alertdialog" aria-label="Confirmer la purge">
             <p className="side-mute">Supprimer tout l'historique de cet appareil ?</p>
             <div className="mt-1.5 flex gap-3">
-              <button type="button" className="font-medium underline underline-offset-2" onClick={() => { p.onPurger(); setConfirmer(false); }}>Supprimer</button>
-              <button type="button" className="side-mute hover:text-[var(--side-text)]" onClick={() => setConfirmer(false)}>Annuler</button>
+              <button type="button" className="min-h-[44px] !pr-2 font-medium underline underline-offset-2" onClick={() => { p.onPurger(); setConfirmer(false); }}>Supprimer</button>
+              <button type="button" className="side-mute min-h-[44px] !px-2 hover:text-[var(--side-text)]" onClick={() => setConfirmer(false)}>Annuler</button>
             </div>
           </div>
         ) : (
@@ -92,7 +97,7 @@ export default function Sidebar(p: Props) {
         ))}
         <div className="mt-1 flex items-center gap-2 px-2.5 py-2">
           <span className="min-w-0 flex-1 truncate text-[13px]">{p.nom}{p.demo && <span className="side-mute"> · démo</span>}</span>
-          {!p.demo && <button type="button" onClick={p.onDeconnexion} className="side-mute rounded-md px-2 py-1.5 text-[13px] hover:bg-[var(--side-hover)] hover:text-[var(--side-text)]">Déconnexion</button>}
+          {!p.demo && <button type="button" onClick={p.onDeconnexion} className="side-mute min-h-[44px] rounded-md !px-3 text-[13px] hover:bg-[var(--side-hover)] hover:text-[var(--side-text)]">Déconnexion</button>}
         </div>
       </div>
     </aside>

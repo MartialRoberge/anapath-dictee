@@ -9,6 +9,7 @@ import OngletDictee from "./OngletDictee";
 import OngletProgression from "./OngletProgression";
 import OngletPourquoi from "./OngletPourquoi";
 import { touche } from "../lib/raccourcis";
+import { useTelephone } from "../hooks/useTelephone";
 import type { DecisionAlerte } from "../lib/session";
 
 export type NomOnglet = "pourquoi" | "alertes" | "codes" | "dictee" | "progression";
@@ -39,6 +40,7 @@ interface Props {
 
 export default function PanneauRaisonnement(p: Props) {
   const { local } = p;
+  const tel = useTelephone();
   const ouvertes = local ? alertesOuvertes(local).length : 0;
   const onglets: Array<{ cle: NomOnglet; titre: string; n?: number }> = [
     { cle: "pourquoi", titre: "Pourquoi" },
@@ -68,9 +70,9 @@ export default function PanneauRaisonnement(p: Props) {
 
   return (
     <aside className="flex h-full min-h-0 flex-col border-l-[0.5px] border-[var(--line)] bg-[var(--card)]" aria-label="Raisonnement">
-      <div className="flex items-center px-4 pt-5">
+      <div className="flex items-center px-4 pt-5 max-sm:pt-2">
         <h2 className="titre-serif flex-1 text-[22px] leading-[1.2]">Raisonnement</h2>
-        {p.onFermer && <div className="min-[1180px]:hidden"><button type="button" className="btn btn-ghost btn-sm" onClick={p.onFermer}>Fermer <span className="kbd">Échap</span></button></div>}
+        {p.onFermer && <div className="-mr-2 min-[1180px]:hidden"><button type="button" className="btn btn-ghost btn-sm" onClick={p.onFermer}>{tel ? "Retour au document" : <>Fermer <span className="kbd">Échap</span></>}</button></div>}
       </div>
       <div ref={liste} role="tablist" aria-label="Raisonnement des agents" onKeyDown={fleches} className="mx-4 mt-3">
         {onglets.map((o) => (

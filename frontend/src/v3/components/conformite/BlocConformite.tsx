@@ -7,6 +7,7 @@ import {
 } from "../../lib/conformite";
 import type { ProjetLocal } from "../../lib/session";
 import { ACTION, touche } from "../../lib/raccourcis";
+import { useDialogue } from "../../hooks/useDialogue";
 
 type Volet = "valider" | "tracabilite" | null;
 
@@ -25,9 +26,41 @@ function Popover({ titre, onFermer, children }: { titre: string; onFermer: () =>
     return () => document.removeEventListener("mousedown", f);
   }, [onFermer]);
   return (
-    <div ref={racine} className="pop bottom-full right-0 mb-2 !w-[380px] !max-w-[92vw] p-3" role="dialog" aria-label={titre} onKeyDown={(e) => e.key === "Escape" && onFermer()}>
-      <p className="label pb-1.5">{titre}</p>
-      {children}
+    <>
+      <div className="pop-scrim" aria-hidden />
+      <div ref={racine} className="pop pop-tel bottom-full right-0 mb-2 !w-[380px] !max-w-[92vw] p-3" role="dialog" aria-label={titre} onKeyDown={(e) => e.key === "Escape" && onFermer()}>
+        <div className="flex items-center pb-1.5"><p className="label flex-1">{titre}</p><button type="button" className="btn btn-ghost btn-sm pop-fermer -mr-3" onClick={onFermer}>Fermer</button></div>
+        {children}
+      </div>
+    </>
+  );
+}
+
+export interface ActionFeuille { titre: string; detail?: string; onClick: () => void; disabled?: boolean }
+
+/** Feuille « Actions » du téléphone : statut en tête, puis les actions secondaires en liste (pas d'icônes). */
+function FeuilleActions({ statut, actions, onFermer }: { statut: ReactNode; actions: ActionFeuille[]; onFermer: () => void }) {
+  const racine = useRef<HTMLDivElement>(null);
+  useDialogue(racine, onFermer);
+  return (
+    <div className="modal" onMouseDown={(e) => { if (e.target === e.currentTarget) onFermer(); }}>
+      <div ref={racine} role="dialog" aria-modal="true" aria-labelledby="titre-actions" className="px-5 !pt-5">
+        <div className="flex items-center gap-3">
+          <h2 id="titre-actions" className="titre-serif flex-1 text-[22px] leading-[1.2]">Actions</h2>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onFermer}>Fermer</button>
+        </div>
+        <p className="mt-1 text-[13px] leading-snug text-[var(--mute)]" role="status">{statut}</p>
+        <ul className="mt-3">
+          {actions.map((a) => (
+            <li key={a.titre} className="border-t border-[var(--line-soft)] first:border-t-0">
+              <button type="button" className="ligne-action" disabled={a.disabled} onClick={a.onClick}>
+                <span className="text-[16px] font-medium">{a.titre}</span>
+                {a.detail && <span className="text-[13px] text-[var(--mute)]">{a.detail}</span>}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
@@ -36,10 +69,17 @@ const Ligne = ({ k, v }: { k: string; v?: string }) => (
   <div className="flex gap-2 py-0.5 text-[12.5px]"><dt className="w-[132px] shrink-0 text-[var(--faint)]">{k}</dt><dd className="num break-all text-[var(--ink)]">{v || "—"}</dd></div>
 );
 
-interface PropsBloc { local: ProjetLocal; occupe: boolean; onSignaler: () => void; resume?: ReactNode; avant?: ReactNode; apres?: ReactNode; fin?: ReactNode }
+interface PropsBloc {
+  local: ProjetLocal; occupe: boolean; onSignaler: () => void; resume?: ReactNode; avant?: ReactNode; apres?: ReactNode; fin?: ReactNode;
+  /** Téléphone : une seule ligne (Actions + Valider) ; `actions` alimente la feuille. */
+  compact?: boolean; actions?: ActionFeuille[];
+  /** Compact seulement : éléments insérés entre « Actions » et « Valider » (paysage : statut et Raisonnement). */
+  enLigne?: ReactNode;
+}
 
-export default function BlocConformite({ local, occupe, onSignaler, resume, avant, apres, fin }: PropsBloc) {
+export default function BlocConformite({ local, occupe, onSignaler, resume, avant, apres, fin, compact, actions, enLigne }: PropsBloc) {
   const [volet, setVolet] = useState<Volet>(null);
+  const [feuille, setFeuille] = useState(false);
   const [habilite, setHabilite] = useState<boolean | null>(null);
   const [empreinte, setEmpreinte] = useState("");
   const [derog, setDerog] = useState<Derogation | "">("");
@@ -80,8 +120,22 @@ export default function BlocConformite({ local, occupe, onSignaler, resume, avan
     } finally { setEnCours(false); }
   };
 
+  const libelleValider = modifie ? "Revalider le compte rendu" : estValide ? "Compte rendu validé" : "Valider le compte rendu";
+  const statut = estValide
+    ? <>Validé par le pathologiste · révision {validation.revision}</>
+    : modifie ? <b className="font-semibold text-[var(--amber)]">Modifié depuis la validation · à revalider</b>
+    : habilite === false ? "Validation : pathologiste habilité" : "À valider par le pathologiste";
+
   return (
     <div className="relative" aria-label="Conformité du compte rendu">
+      {compact ? (
+        <div className="flex items-center gap-2">
+          <button type="button" className="btn shrink-0" aria-haspopup="dialog" aria-expanded={feuille} onClick={() => setFeuille(true)}>Actions</button>
+          {enLigne}
+          <button type="button" className="btn btn-blue min-w-0 flex-1" disabled={occupe || estValide || habilite === false} aria-expanded={volet === "valider"}
+            title={habilite === false ? "Réservé aux pathologistes habilités" : undefined} onClick={() => ouvrir("valider")}>{libelleValider}</button>
+        </div>
+      ) : (<>
       <div className="flex items-center gap-1">
         <p className="mr-auto min-w-0 flex-1 truncate text-[12.5px] text-[var(--mute)]" role="status">
           {resume}
@@ -103,6 +157,19 @@ export default function BlocConformite({ local, occupe, onSignaler, resume, avan
         </button>
         {fin}
       </div>
+      </>)}
+
+      {feuille && (
+        <FeuilleActions
+          statut={<>{resume}{resume && <span aria-hidden> · </span>}{statut}</>}
+          onFermer={() => setFeuille(false)}
+          actions={[
+            ...(actions ?? []).map((a) => ({ ...a, onClick: () => { setFeuille(false); a.onClick(); } })),
+            { titre: "Traçabilité", detail: "Versions, empreintes, statut du compte rendu", onClick: () => { setFeuille(false); setErreur(""); setVolet("tracabilite"); } },
+            { titre: "Signaler", detail: "Un problème, une erreur ou une idée", onClick: () => { setFeuille(false); onSignaler(); } },
+          ]}
+        />
+      )}
 
       {volet === "valider" && (
         <Popover titre="Valider le compte rendu" onFermer={() => setVolet(null)}>

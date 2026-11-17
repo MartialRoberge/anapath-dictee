@@ -7,10 +7,13 @@ import { useRecorder } from "../hooks/useRecorder";
 import { chrono } from "../lib/format";
 import { ACTION, estMac as estMacLib } from "../lib/raccourcis";
 
-interface Props { disabled: boolean; onEnvoyer: (texte: string) => void; onNotifier: (m: string) => void }
+/** `ouvertExt` + `onFermerExt` : ouverture pilotée de l'extérieur (feuille « Actions » du téléphone), sans bouton propre. */
+interface Props { disabled: boolean; onEnvoyer: (texte: string) => void; onNotifier: (m: string) => void; ouvertExt?: boolean; onFermerExt?: () => void; sansBouton?: boolean }
 
-export default function Completer({ disabled, onEnvoyer, onNotifier }: Props) {
-  const [ouvert, setOuvert] = useState(false);
+export default function Completer({ disabled, onEnvoyer, onNotifier, ouvertExt, onFermerExt, sansBouton }: Props) {
+  const [ouvertInt, setOuvertInt] = useState(false);
+  const ouvert = ouvertInt || !!ouvertExt;
+  const setOuvert = useCallback((v: boolean) => { setOuvertInt(v); if (!v) onFermerExt?.(); }, [onFermerExt]);
   const [texte, setTexte] = useState("");
   const [transcription, setTranscription] = useState(false);
   const racine = useRef<HTMLDivElement>(null);
@@ -44,20 +47,20 @@ export default function Completer({ disabled, onEnvoyer, onNotifier }: Props) {
     };
     window.addEventListener(ACTION, f);
     return () => window.removeEventListener(ACTION, f);
-  }, [disabled]);
+  }, [disabled, setOuvert]);
 
   useEffect(() => {
     if (!ouvert) return;
     const f = (e: MouseEvent) => { if (!racine.current?.contains(e.target as Node)) setOuvert(false); };
     document.addEventListener("mousedown", f);
     return () => document.removeEventListener("mousedown", f);
-  }, [ouvert]);
+  }, [ouvert, setOuvert]);
 
   const fermer = useCallback(() => {
     micro.arreter(true);
     setOuvert(false);
     requestAnimationFrame(() => bouton.current?.focus());
-  }, [micro]);
+  }, [micro, setOuvert]);
 
   const envoyer = () => {
     if (!texte.trim()) return;
@@ -69,7 +72,7 @@ export default function Completer({ disabled, onEnvoyer, onNotifier }: Props) {
 
   return (
     <div ref={racine}>
-      <button ref={bouton} type="button" className="btn" disabled={disabled} aria-expanded={ouvert} aria-haspopup="dialog" onClick={() => (ouvert ? fermer() : setOuvert(true))} aria-keyshortcuts="Alt+M">Compléter à la voix</button>
+      {!sansBouton && <button ref={bouton} type="button" className="btn" disabled={disabled} aria-expanded={ouvert} aria-haspopup="dialog" onClick={() => (ouvert ? fermer() : setOuvert(true))} aria-keyshortcuts="Alt+M">Compléter à la voix</button>}
       {ouvert && (
         <PanneauCompleter zone={zone} texte={texte} setTexte={setTexte} micro={micro} transcription={transcription} onEnvoyer={envoyer} onFermer={fermer} />
       )}
@@ -97,7 +100,7 @@ function PanneauCompleter({ zone, texte, setTexte, micro, transcription, onEnvoy
           onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); onEnvoyer(); } }}
           placeholder="Ex. PD-L1 à 60 % des cellules tumorales." className="champ mt-4 block w-full resize-none p-3 text-[16px] leading-[1.5]" />
         <div className="mt-4 flex items-center gap-3">
-          <button type="button" className="btn" onClick={micro.basculer} disabled={transcription} aria-pressed={micro.etat === "enregistre"}>
+          <button type="button" className="btn min-w-[120px]" onClick={micro.basculer} disabled={transcription} aria-pressed={micro.etat === "enregistre"}>
             {micro.etat === "enregistre" ? <><span className="enregistrement-point" aria-hidden /> <span className="num">{chrono(micro.secondes)}</span> Arrêter</> : transcription ? "Transcription…" : "Dicter"}
           </button>
           <button type="button" className="btn btn-primary ml-auto" disabled={!texte.trim() || transcription} onClick={onEnvoyer}>Intégrer <span className="kbd">{estMacLib() ? "⌘↵" : "Ctrl+↵"}</span></button>

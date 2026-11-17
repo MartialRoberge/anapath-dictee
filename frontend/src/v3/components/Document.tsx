@@ -45,7 +45,7 @@ export default function Document(p: Props) {
   return (
     <article className="doc" onKeyDown={clavier} aria-label="Projet de compte rendu">
       <h1
-        key={titre} ref={titreRef} className="titre-serif text-[28px] leading-[1.2] outline-none" contentEditable suppressContentEditableWarning spellCheck={false}
+        key={titre} ref={titreRef} className="titre-serif text-[28px] leading-[1.2] outline-none max-sm:text-[22px] [overflow-wrap:anywhere]" contentEditable suppressContentEditableWarning spellCheck={false}
         role="textbox" aria-label="Titre du compte rendu"
         onBlur={() => {
           const t = (titreRef.current?.innerText ?? "").replace(/\s+/g, " ").trim();

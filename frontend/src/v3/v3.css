@@ -48,7 +48,10 @@
 /* ===== Coque : la page ne défile jamais (comme une app native) ===== */
 :root:has(.v3), :root:has(.v3) body, :root:has(.v3) #root { height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; }
 :root:has(.v3) body { background: var(--paper); }
-.v3.coque { height: 100vh; height: 100dvh; overflow: hidden; }
+.v3.coque { height: 100vh; overflow: hidden; box-sizing: border-box;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+/* Hauteur dynamique ; --vvh (clavier virtuel ouvert) et --vvtf sont posés par useClavierVirtuel. */
+@supports (height: 100dvh) { .v3.coque { height: var(--vvh, 100dvh); transform: var(--vvtf, none); } }
 
 /* ===== Typographie : Inter pour le texte, Source Serif 4 (fin) pour les titres d'écran ===== */
 .v3 {
@@ -103,7 +106,7 @@
 /* Petits contrôles : 32 px visibles, zone tactile étendue à 44 px */
 .v3 .btn-sm { min-height: 32px; padding: 0 12px; font-size: 13px; border-radius: 6px; }
 .v3 .btn-sm::before { content: ""; position: absolute; inset: -6px -2px; }
-@media (pointer: coarse) { .v3 .btn-sm { min-height: 44px; } .v3 .btn-sm::before { inset: 0; } }
+@media (pointer: coarse), (max-width: 639px), (max-height: 500px) and (max-width: 940px) { .v3 .btn-sm { min-height: 44px; } .v3 .btn-sm::before { inset: 0; } }
 .v3 .btn[aria-pressed="true"] { border-color: var(--ink); }
 .v3 .btn[disabled], .v3 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
@@ -199,10 +202,10 @@
 .v3 .puce-bas { text-decoration: underline solid var(--amber-line); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
 
 /* Feuilles (sheets) : voile uni, puis feuille blanche à bordure fine qui monte avec un léger ressort ; en bas de l'écran sur téléphone. */
-.v3 .modal { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--scrim); animation: v3-fade var(--t-base) var(--productive) both; }
-.v3 .modal > div { width: min(720px, 100%); max-height: min(88vh, 88dvh); overflow-y: auto; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow-modal);
+.v3 .modal { position: fixed; inset: 0; height: var(--vvh, auto); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--scrim); animation: v3-fade var(--t-base) var(--productive) both; }
+.v3 .modal > div { width: min(720px, 100%); max-height: min(88vh, 88dvh, calc(var(--vvh, 100dvh) - 32px)); overflow-y: auto; overscroll-behavior: contain; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow-modal);
   scrollbar-width: thin; animation: v3-sheet var(--t-slow) var(--expressive) both; }
-@media (max-width: 640px) { .v3 .modal { align-items: flex-end; padding: 0; } .v3 .modal > div { border-radius: var(--r-card) var(--r-card) 0 0; border-bottom: 0; } }
+
 
 /* Zone de dictée : un seul cadre, encre, au focus (pas de double contour). */
 .v3 .carte-saisie { transition: border-color var(--t-fast) var(--productive), box-shadow var(--t-fast) var(--productive); }
@@ -221,3 +224,73 @@
   .v3 .etape-cours { animation: none; border-top-color: var(--ink); border-right-color: var(--ink); }
   .v3 .enregistrement-point, .v3 .skeleton { animation: none; }
 }
+
+/* ===== Téléphone (portrait et paysage) =====
+   Requête commune : écran étroit, ou paysage bas d'un téléphone (voir REQ_TELEPHONE dans hooks/useTelephone.ts).
+   Sur appareil tactile : ni raccourcis clavier ni astuce Espace ; feuilles ancrées en bas ; tiroirs plein écran ; cibles de 44 px. */
+.v3 .pour-tactile, .v3 .pop-scrim, .v3 .nv-glisser, .v3 .pop-fermer { display: none; }
+.v3 .pop-tel { z-index: 70; }
+@media (hover: none) and (pointer: coarse), (max-width: 639px), (max-height: 500px) and (max-width: 940px) {
+  .v3 .kbd, .v3 .pour-clavier { display: none !important; }
+  .v3 .aide .kbd { display: inline-block !important; }
+  .v3 .pour-tactile { display: revert; }
+}
+@media (max-width: 639px), (max-height: 500px) and (max-width: 940px) {
+  .v3 .modal { align-items: flex-end; padding: 0; }
+  .v3 .modal > div { width: 100%; border-radius: var(--r-card) var(--r-card) 0 0; border-bottom: 0; padding-bottom: calc(24px + env(safe-area-inset-bottom)); animation-name: v3-sheet-bas; }
+  .v3 .tiroir-d { width: 100%; box-shadow: none; }
+  .v3 [role="tablist"] { gap: 12px; scroll-snap-type: x proximity; }
+  .v3 .tab { padding: 0; scroll-snap-align: start; }
+
+  /* Fenêtres flottantes de la barre d'actions : feuilles du bas avec voile */
+  .v3 .pop-scrim { display: block; position: fixed; inset: 0; z-index: 65; background: var(--scrim); animation: v3-fade var(--t-base) var(--productive) both; }
+  .v3 .pop.pop-tel { position: fixed; inset: auto 0 0 0; width: auto !important; max-width: none !important; margin: 0 !important; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)) !important;
+    max-height: calc(var(--vvh, 100dvh) * 0.88); overflow-y: auto; border: 1px solid var(--line); border-bottom: 0; border-radius: var(--r-card) var(--r-card) 0 0; box-shadow: var(--shadow-modal); animation-name: v3-sheet-bas; animation-duration: var(--t-slow); }
+
+  /* 16 px minimum dans les champs : iOS ne zoome pas à la prise de focus */
+  .v3 select, .v3 input:not([type=checkbox]):not([type=radio]), .v3 textarea { font-size: 16px; }
+
+  /* Nouveau projet */
+  .v3 .nv-page { padding: 16px 16px 24px; }
+  .v3 .nv-titre { font-size: 26px; line-height: 1.18; margin-top: 4px; }
+  .v3 .nv-page > div { margin-block: 0; }
+  .v3 .nv-carte { margin-top: 16px; }
+  .v3 .nv-carte textarea { height: 96px; }
+  .v3 .nv-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 8px 0 0; }
+  .v3 .nv-actions .btn { width: 100%; }
+  .v3 .nv-exemples { display: flex; gap: 12px; overflow-x: auto; margin: 8px -16px 0; padding: 0 16px 4px; scroll-snap-type: x mandatory; scroll-padding: 0 16px; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .v3 .nv-exemples::-webkit-scrollbar { display: none; }
+  .v3 .nv-exemples > li { flex: 0 0 76%; scroll-snap-align: start; }
+  .v3 .nv-glisser { display: inline; }
+  .v3 .pop-fermer { display: inline-flex; }
+
+  /* Dictée : un grand bouton, l'état dessous */
+  .v3 .bd { flex-direction: column; align-items: stretch; gap: 8px; }
+  .v3 .bd-bouton { width: 100%; min-height: 52px; font-size: 16px; }
+
+  /* Trous : 32 px visibles, zone tactile de 44 px */
+  .v3 .trou { position: relative; min-height: 32px; }
+  .v3 .trou::before { content: ""; position: absolute; inset: -6px -4px; }
+
+  /* Document et barre d'actions */
+  .v3 .doc-defile { padding: 12px 12px 16px; }
+  .v3 .doc-feuille { padding: 20px 16px; }
+  .v3 .barre-tel { padding: 8px 16px; }
+  .v3 .ligne-action { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%; min-height: 56px; padding: 10px 0; text-align: left; }
+}
+@keyframes v3-sheet-bas { from { opacity: 0.4; transform: translateY(32px); } to { opacity: 1; transform: none; } }
+
+/* Tiroirs sous 900 px (menu) et 1180 px (raisonnement) : fond propre et marges de l'encoche / de la barre d'accueil */
+@media (max-width: 899px) { .v3 .tiroir-g { background: var(--side); padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) env(safe-area-inset-left); } }
+@media (max-width: 1179px) { .v3 .tiroir-d { background: var(--card); padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) 0; } }
+@media (max-height: 500px) and (max-width: 940px) { .v3 .nv-titre { font-size: 20px; } .v3 .side-pied { padding-bottom: 4px; } }
+@media (pointer: coarse), (max-width: 899px) { .v3 .side-pied .side-item { min-height: 44px; } }
+/* Paysage (téléphone couché) : actions côte à côte, champ plus bas */
+@media (max-height: 500px) and (min-width: 640px) and (max-width: 940px) {
+  .v3 .nv-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .v3 .nv-carte textarea { height: 64px; }
+  .v3 .bd-bouton { min-height: 44px; }
+  .v3 .nv-exemples > li { flex-basis: 40%; }
+  .v3 .doc-defile { padding: 8px 16px 12px; }
+}
+@media (max-height: 500px) and (min-width: 640px) and (max-width: 940px) { .v3 .modal > div { max-width: 600px; } }

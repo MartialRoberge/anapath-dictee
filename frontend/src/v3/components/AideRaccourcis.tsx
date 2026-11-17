@@ -15,7 +15,7 @@ export default function AideRaccourcis({ onFermer }: { onFermer: () => void }) {
   };
   return (
     <div className="modal" onMouseDown={(e) => { if (e.target === e.currentTarget) onFermer(); }}>
-      <div role="dialog" aria-modal="true" aria-labelledby="titre-aide" onKeyDown={clavier} className="p-7">
+      <div role="dialog" aria-modal="true" aria-labelledby="titre-aide" onKeyDown={clavier} className="aide p-7 max-sm:p-5">
         <div className="flex items-baseline gap-4">
           <h2 id="titre-aide" className="titre-serif flex-1 text-[22px] leading-tight">Raccourcis clavier</h2>
           <button ref={fermer} type="button" className="btn btn-sm" onClick={onFermer}>Fermer <span className="kbd">Échap</span></button>

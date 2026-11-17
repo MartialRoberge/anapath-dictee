@@ -12,10 +12,10 @@ interface Props {
 export default function BarreDictee({ etat, secondes, occupe, onBasculer, onAnnuler }: Props) {
   const enr = etat === "enregistre";
   return (
-    <div className="flex min-w-0 flex-1 items-center gap-3" role="group" aria-label="Dictée vocale">
+    <div className="bd flex min-w-0 flex-1 items-center gap-3" role="group" aria-label="Dictée vocale">
       <button
         type="button" onClick={onBasculer} disabled={occupe || etat === "demande"} aria-pressed={enr}
-        className={`btn min-w-[104px] ${enr ? "btn-blue" : "btn-primary"}`}
+        className={`btn bd-bouton min-w-[104px] ${enr ? "btn-blue" : "btn-primary"}`}
       >
         {enr ? "Envoyer" : "Dicter"}
       </button>
@@ -24,12 +24,12 @@ export default function BarreDictee({ etat, secondes, occupe, onBasculer, onAnnu
           <p className="flex flex-wrap items-center gap-x-2 text-[15px]">
             <span className="enregistrement-point" aria-hidden />
             <span className="num font-medium">{chrono(secondes)}</span>
-            <span className="text-[var(--mute)]">Relâchez <span className="kbd">Espace</span> pour envoyer</span>
+            <span className="text-[var(--mute)]"><span className="pour-clavier">Relâchez <span className="kbd">Espace</span> pour envoyer</span><span className="pour-tactile">Appuyez sur Envoyer pour terminer</span></span>
           </p>
         ) : etat === "demande" ? (
           <p className="text-[13px] text-[var(--mute)]">Autorisez le micro dans votre navigateur…</p>
         ) : (
-          <p className="text-[13px] leading-snug text-[var(--mute)]">ou maintenez <span className="kbd">Espace</span> et parlez</p>
+          <p className="text-[13px] leading-snug text-[var(--mute)]"><span className="pour-clavier">ou maintenez <span className="kbd">Espace</span> et parlez</span><span className="pour-tactile">Appuyez pour dicter, rappuyez pour envoyer.</span></p>
         )}
       </div>
       {enr && <button type="button" onClick={onAnnuler} className="btn btn-ghost btn-sm">Annuler <span className="kbd">Échap</span></button>}

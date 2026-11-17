@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { trousOuverts, alertesOuvertes, type ProjetLocal } from "../lib/session";
 import { touche } from "../lib/raccourcis";
+import { useTelephone } from "../hooks/useTelephone";
 import Completer from "./Completer";
 import BlocConformite from "./conformite/BlocConformite";
 
@@ -19,6 +20,8 @@ interface Props {
   onCompleter: (texte: string) => void;
   onSignaler: () => void;
   onNotifier: (m: string) => void;
+  /** Paysage : le statut et l'accès à « Raisonnement » rejoignent la barre (pas de seconde barre en haut). */
+  paysage?: { onRaisonnement: () => void; ouvert: boolean };
 }
 
 export function Feedback({ local, onFeedback, onDetailler }: { local: ProjetLocal; onFeedback: (sens: "plus" | "moins", motif: string) => void; onDetailler: () => void }) {
@@ -59,12 +62,35 @@ export function Feedback({ local, onFeedback, onDetailler }: { local: ProjetLoca
 export default function BarreActions(p: Props) {
   const trous = trousOuverts(p.local);
   const alertes = alertesOuvertes(p.local).length;
+  const tel = useTelephone();
+  const [voix, setVoix] = useState(false);
+  const resume = <span className="num">{trous > 0 ? <b className="font-semibold text-[var(--amber)]">{trous} à compléter</b> : "Aucun trou"} · {alertes > 0 ? <b className="font-semibold text-[var(--ink)]">{alertes} à vérifier</b> : "rien à vérifier"}</span>;
+  // Téléphone : une seule ligne (Actions, Valider) ; Compléter, Exporter et Copier passent dans la feuille « Actions ».
+  if (tel) {
+    return (
+      <div className="barre barre-tel" role="toolbar" aria-label="Actions sur le projet">
+        <BlocConformite
+          local={p.local} occupe={p.occupe} onSignaler={p.onSignaler} compact resume={resume}
+          enLigne={p.paysage && (<>
+            <button type="button" className="btn shrink-0" aria-expanded={p.paysage.ouvert} aria-controls="panneau-raisonnement" onClick={p.paysage.onRaisonnement}>Raisonnement</button>
+            <p className="num min-w-0 flex-1 text-[13px] text-[var(--mute)]" role="status">{resume}</p>
+          </>)}
+          actions={[
+            { titre: "Compléter à la voix", detail: "Dicter une précision, relue avant d'être intégrée", disabled: p.occupe, onClick: () => setVoix(true) },
+            { titre: p.exportEnCours ? "Export…" : "Exporter en DOCX", detail: "Fichier Word du compte rendu", disabled: p.exportEnCours || p.occupe, onClick: p.onExporter },
+            { titre: "Copier tout", detail: "Mise en forme Word incluse", onClick: p.onCopier },
+          ]}
+        />
+        <Completer disabled={p.occupe} onEnvoyer={p.onCompleter} onNotifier={p.onNotifier} ouvertExt={voix} onFermerExt={() => setVoix(false)} sansBouton />
+      </div>
+    );
+  }
   return (
     <div className="barre px-4 py-3" role="toolbar" aria-label="Actions sur le projet">
       <div className="mx-auto max-w-[800px]">
         <BlocConformite
           local={p.local} occupe={p.occupe} onSignaler={p.onSignaler}
-          resume={<span className="num">{trous > 0 ? <b className="font-semibold text-[var(--amber)]">{trous} à compléter</b> : "Aucun trou"} · {alertes > 0 ? <b className="font-semibold text-[var(--ink)]">{alertes} à vérifier</b> : "rien à vérifier"}</span>}
+          resume={resume}
           avant={<>
             <Completer disabled={p.occupe} onEnvoyer={p.onCompleter} onNotifier={p.onNotifier} />
             <button type="button" className="btn" disabled={p.exportEnCours || p.occupe} onClick={p.onExporter} aria-keyshortcuts="Alt+X" title={`Exporter en DOCX · ${touche("X")}`}>{p.exportEnCours ? "Export…" : "Exporter DOCX"}</button>

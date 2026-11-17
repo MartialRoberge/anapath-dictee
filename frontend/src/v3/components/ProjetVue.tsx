@@ -17,6 +17,7 @@ import FeuilleSignalement from "./FeuilleSignalement";
 import type { CategorieSignalement } from "../lib/signalement";
 import Document from "./Document";
 import EtatCentre from "./EtatCentre";
+import { useMedia, useTelephone } from "../hooks/useTelephone";
 import PanneauRaisonnement, { ORDRE_ONGLETS, type NomOnglet } from "./PanneauRaisonnement";
 
 interface Props {
@@ -45,6 +46,8 @@ export default function ProjetVue({ local, setLocal, generation, onReessayer, on
   const occupe = generation.phase !== "inactif";
   const precedente = useRef(generation.phase);
   const centre = useRef<HTMLDivElement>(null);
+  const tel = useTelephone();
+  const paysage = useMedia("(max-height: 500px) and (max-width: 940px)");
 
   // Pendant le traitement : Progression ; à la fin : « À vérifier » s'il reste des points.
   useEffect(() => {
@@ -75,6 +78,7 @@ export default function ProjetVue({ local, setLocal, generation, onReessayer, on
 
   const RANG = { bloquant: 0, attention: 1, info: 2 } as const;
   const ordreAlertes = useMemo(() => (local ? S.alertesOuvertes(local).slice().sort((a, b) => RANG[a.gravite] - RANG[b.gravite]) : []), [local]);
+  const nTrous = local ? S.trousOuverts(local) : 0;
   const alerte = local?.projet.alertes.find((a) => a.id === alerteActive) ?? null;
   const alerteOuverte = alerte && local && !local.alertes[alerte.id] ? alerte : null;
 
@@ -167,12 +171,23 @@ export default function ProjetVue({ local, setLocal, generation, onReessayer, on
   return (
     <>
       <div className="flex min-h-0 min-w-0 flex-col" ref={centre}>
+        {tel && paysage ? null : tel ? (
+          <div className="flex items-center gap-3 border-b-[0.5px] border-[var(--line)] py-1 pl-4 pr-2">
+            <p className="num min-w-0 flex-1 text-[13px] text-[var(--mute)]" role="status">
+              {nTrous > 0 ? <b className="font-semibold text-[var(--amber)]">{nTrous} à compléter</b> : "Aucun trou"}
+              <span aria-hidden> · </span>
+              {ordreAlertes.length > 0 ? <b className="font-semibold text-[var(--ink)]">{ordreAlertes.length} à vérifier</b> : "rien à vérifier"}
+            </p>
+            <button type="button" className="btn btn-ghost shrink-0" aria-expanded={tiroir} aria-controls="panneau-raisonnement" onClick={() => setTiroir(true)}>Raisonnement</button>
+          </div>
+        ) : (
         <div className="flex items-center gap-3 border-b-[0.5px] border-[var(--line)] px-4 py-2 min-[1180px]:hidden">
           <button type="button" className="btn btn-sm" aria-expanded={tiroir} aria-controls="panneau-raisonnement" onClick={() => setTiroir(true)}>
             Raisonnement <span className="num text-[var(--faint)]">{ordreAlertes.length > 0 ? `· ${ordreAlertes.length} à vérifier` : "· pourquoi, codes, dictée"}</span>
           </button>
         </div>
-        <div className="scroll min-h-0 flex-1 overflow-y-auto px-6 py-6" onClick={(e) => { if (e.target === e.currentTarget) choisir(null); }}>
+        )}
+        <div className="scroll doc-defile min-h-0 flex-1 overflow-y-auto px-6 py-6" onClick={(e) => { if (e.target === e.currentTarget) choisir(null); }}>
           <div className="mx-auto max-w-[800px]">
             {occupe && generation.mode === "iteration" && (
               <p role="status" className="enter carte mb-4 px-4 py-3 text-[15px] text-[var(--mute)]">
@@ -186,7 +201,7 @@ export default function ProjetVue({ local, setLocal, generation, onReessayer, on
               </p>
             )}
             <BandeauService niveau={local.projet.contexte.niveau_service} />
-            <div className="feuille px-6 py-8 sm:px-12 sm:py-10">
+            <div className="feuille doc-feuille px-6 py-8 sm:px-12 sm:py-10">
             <Document
               local={local} selection={selection} surlignes={surlignes} onSelect={choisir}
               onTitre={(t) => maj((l) => S.editerTitre(l, t))}
@@ -207,6 +222,7 @@ export default function ProjetVue({ local, setLocal, generation, onReessayer, on
           local={local} occupe={occupe} exportEnCours={exportEnCours} onNotifier={onNotifier} onCompleter={onCompleter}
           onCopier={copier} onExporter={exporter}
           onSignaler={() => setSignalement("dysfonctionnement")}
+          paysage={tel && paysage ? { onRaisonnement: () => setTiroir(true), ouvert: tiroir } : undefined}
         />
       </div>
       {tiroir && <button type="button" className="scrim min-[1180px]:hidden" aria-label="Fermer le panneau Raisonnement" tabIndex={-1} onClick={() => setTiroir(false)} />}

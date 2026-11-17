@@ -10,6 +10,7 @@ import Sidebar from "./components/Sidebar";
 import { useGeneration } from "./hooks/useGeneration";
 import { useNotice } from "./hooks/useNotice";
 import { useRecorder } from "./hooks/useRecorder";
+import { useClavierVirtuel } from "./hooks/useTelephone";
 import { genererAudio, genererTexte, iterer, modeDemo } from "./lib/api";
 import * as H from "./lib/history";
 import { creerLocal, fusionnerIteration, trousOuverts, type ProjetLocal } from "./lib/session";
@@ -33,6 +34,7 @@ export default function V3App() {
   const [navOuverte, setNavOuverte] = useState(false);
   const [aide, setAide] = useState(false);
   const { message, notifier } = useNotice();
+  useClavierVirtuel();
   const source = useRef<"audio" | "texte">("texte");
   const localRef = useRef<ProjetLocal | null>(null);
   useEffect(() => { localRef.current = local; }, [local]);
@@ -159,8 +161,8 @@ export default function V3App() {
     <div className="v3 coque">
       <a href="#contenu" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-[var(--card)] focus:p-2">Aller au contenu</a>
       <div className={`grid h-full grid-cols-1 grid-rows-[auto_minmax(0,1fr)] min-[900px]:grid-rows-1 ${vue === "projet" ? "min-[900px]:grid-cols-[208px_minmax(0,1fr)] min-[1180px]:grid-cols-[224px_minmax(0,1fr)_372px] min-[1360px]:grid-cols-[244px_minmax(0,1fr)_390px]" : "min-[900px]:grid-cols-[236px_minmax(0,1fr)] min-[1360px]:grid-cols-[252px_minmax(0,1fr)]"}`}>
-        <header className="barre col-span-full flex items-center gap-3 border-b-0 px-4 py-2 min-[900px]:hidden">
-          <button type="button" className="btn btn-sm" aria-expanded={navOuverte} aria-controls="navigation-v3" onClick={() => setNavOuverte(true)}>Menu</button>
+        <header className="barre col-span-full flex items-center gap-3 border-b-0 px-4 py-1 min-[900px]:hidden">
+          <button type="button" className="btn" aria-expanded={navOuverte} aria-controls="navigation-v3" onClick={() => setNavOuverte(true)}>Menu</button>
           <span className="text-[13px] font-semibold tracking-[0.18em]">MARC</span>
         </header>
         {navOuverte && <button type="button" className="scrim min-[900px]:hidden" aria-label="Fermer le menu" tabIndex={-1} onClick={() => setNavOuverte(false)} />}
@@ -168,7 +170,7 @@ export default function V3App() {
         <Sidebar
           recents={recents} courantId={local?.projet.id ?? null} vue={vue} nom={user.name} admin={user.role === "admin"} demo={demo}
           onNouveau={() => nouveau()} onOuvrir={ouvrir} onAdmin={() => { gen.annuler(); setVue("admin"); setNavOuverte(false); }} onDeconnexion={auth.logout}
-          onAide={() => { setNavOuverte(false); setAide(true); }}
+          onAide={() => { setNavOuverte(false); setAide(true); }} onFermer={() => setNavOuverte(false)}
           onSupprimer={async (id) => { await H.supprimer(id); if (local?.projet.id === id) nouveau(); rafraichir(); }}
           onPurger={async () => { await H.purger(); rafraichir(); if (vue === "projet" && !occupe) nouveau(); notifier("Historique local supprimé"); }}
         />
@@ -190,8 +192,8 @@ export default function V3App() {
         </main>
       </div>
       {aide && <AideRaccourcis onFermer={() => setAide(false)} />}
-      <div aria-live="polite" role="status" className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center">
-        {message && <p className="enter rounded-full bg-[var(--ink)] px-4 py-2.5 text-[15px] text-[var(--on-ink)] shadow-lg">{message}</p>}
+      <div aria-live="polite" role="status" className="pointer-events-none fixed inset-x-0 bottom-[max(24px,env(safe-area-inset-bottom))] z-[80] flex justify-center px-4">
+        {message && <p className="enter max-w-full rounded-full bg-[var(--ink)] px-4 py-2.5 text-center text-[15px] text-[var(--on-ink)] shadow-lg">{message}</p>}
       </div>
     </div>
   );
